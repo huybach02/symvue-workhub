@@ -12,6 +12,7 @@
                 label="Email"
                 prepend-inner-icon="mdi-account"
                 variant="outlined"
+                persistent-placeholder
             />
         </VeeField>
 
@@ -23,6 +24,7 @@
                 label="Mật khẩu"
                 prepend-inner-icon="mdi-lock"
                 variant="outlined"
+                persistent-placeholder
             />
         </VeeField>
 
@@ -67,6 +69,7 @@
 import { Form, Field } from "vee-validate";
 import { loginSchema } from "@/utils/schemas/auth";
 import { authService } from "@/services/authService";
+import { NAME_ROUTES_CONFIG } from "@/configs/nameRouteConfig";
 
 export default {
     name: "LoginPage",
@@ -81,8 +84,8 @@ export default {
             schema: loginSchema,
             loading: false,
             initialValues: {
-                email: "",
-                password: "",
+                email: import.meta.env.VITE_EMAIL_ACCOUNT_DEFAULT || "",
+                password: import.meta.env.VITE_PASSWORD_ACCOUNT_DEFAULT || "",
                 rememberMe: false,
             },
         };
@@ -90,7 +93,10 @@ export default {
     methods: {
         async onSubmit(values) {
             this.$store.commit("setIsLoading");
-            await authService.login(values);
+            const response = await authService.login(values);
+            if (response.success) {
+                this.$router.push({ name: NAME_ROUTES_CONFIG.dashboard });
+            }
             this.$store.commit("unsetIsLoading");
         },
     },

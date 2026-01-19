@@ -19,4 +19,18 @@ export const routes = [
             },
         ],
     },
+    {
+        path: "/system",
+        component: () => import("../components/layouts/MainLayout.vue"),
+        children: [
+            {
+                path: "dashboard",
+                name: NAME_ROUTES_CONFIG.dashboard,
+                component: () => import("../pages/DashboardPage.vue"),
+                meta: {
+                    title: "Dashboard",
+                },
+            },
+        ],
+    },
 ];

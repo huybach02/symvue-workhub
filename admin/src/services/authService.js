@@ -31,4 +31,12 @@ export const authService = {
             return handleAxiosError(error);
         }
     },
+    getMe: async () => {
+        try {
+            const response = await axiosInstance.get(API_ROUTES_CONFIG.getMe);
+            return response;
+        } catch (error) {
+            return handleAxiosError(error);
+        }
+    },
 };

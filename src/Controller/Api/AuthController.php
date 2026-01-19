@@ -33,7 +33,7 @@ final class AuthController extends AbstractController
     public function logout(
         Request $request,
         RefreshTokenManagerInterface $refreshTokenManager,
-        CacheInterface $cache // Inject Cache
+        CacheInterface $cache
     ) {
         // 1. Xử lý Refresh Token
         $payload = $request->toArray();
@@ -52,12 +52,11 @@ final class AuthController extends AbstractController
         if ($authorizationHeader) {
             $accessToken = str_replace('Bearer ', '', $authorizationHeader);
 
-            // Tạo một key unique cho token này (ví dụ md5)
+            // Tạo một key unique cho token này
             $tokenKey = 'blacklist_' . md5($accessToken);
 
             // Lưu vào cache. 
             // Thời gian sống nên set bằng TTL của token (ví dụ 3600s).
-            // Ở đây mình hardcode ví dụ 3600s, tốt nhất là decode token ra để lấy exp - now.
             $cache->get($tokenKey, function (ItemInterface $item) {
                 $item->expiresAfter(3600 * 24); // Token sẽ bị chặn trong 1 ngày
                 return true;
