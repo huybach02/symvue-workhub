@@ -18,7 +18,7 @@ final class AuthController extends AbstractController
     public function me(#[CurrentUser] ?User $user)
     {
         if (null === $user) {
-            return CustomResponse::error('User not found', 401);
+            return CustomResponse::error('Không tìm thấy người dùng', 401);
         }
 
         $userData = [
@@ -63,6 +63,6 @@ final class AuthController extends AbstractController
             });
         }
 
-        return CustomResponse::success('Logout successfully');
+        return CustomResponse::success([], 'Đăng xuất thành công');
     }
 }

@@ -1,9 +1,7 @@
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import axiosInstance from "@/configs/axios";
 import { handleAxiosError } from "@/helpers/axiosHelper";
-import { useToast } from "vue-toastification";
-
-const toast = useToast();
+import { toast } from "@/main";
 
 export const authService = {
     login: async (data) => {
@@ -13,7 +11,7 @@ export const authService = {
                 data,
             );
             if (response.data.token) {
-                toast.success("Đăng nhập thành công");
+                toast.success(response.message);
                 localStorage.setItem("token", response.data.token);
                 if (response.data.refresh_token) {
                     localStorage.setItem(
@@ -34,6 +32,27 @@ export const authService = {
     getMe: async () => {
         try {
             const response = await axiosInstance.get(API_ROUTES_CONFIG.getMe);
+            return response;
+        } catch (error) {
+            return handleAxiosError(error);
+        }
+    },
+    logout: async () => {
+        try {
+            const refreshToken = localStorage.getItem("refresh_token");
+            const response = await axiosInstance.post(
+                API_ROUTES_CONFIG.logout,
+                {
+                    refresh_token: refreshToken,
+                },
+            );
+            if (response.success) {
+                toast.success(response.message);
+                localStorage.removeItem("token");
+                localStorage.removeItem("refresh_token");
+                localStorage.removeItem("device_id");
+                return response;
+            }
             return response;
         } catch (error) {
             return handleAxiosError(error);

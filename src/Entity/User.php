@@ -23,7 +23,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var list<string> The user roles
      */
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private array $roles = [];
 
     /**
@@ -31,6 +31,57 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $phone = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $gender = null;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $provinceId = null;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $districtId = null;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $wardId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $address = null;
+
+    #[ORM\Column(type: 'date', nullable: true)]
+    private ?\DateTimeInterface $birthday = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $description = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $emailVerifiedAt = null;
+
+    #[ORM\Column(type: 'integer', options: ['default' => 1, 'comment' => '1: active, 0: inactive'])]
+    private int $status = 1;
+
+    #[ORM\Column(type: 'integer', options: ['default' => 0, 'comment' => '0: cho phép ngoại giờ, 1: không cho phép ngoại giờ'])]
+    private int $isNgoaiGio = 0;
+
+    #[ORM\Column(length: 255)]
+    private ?string $maVaiTro = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $rememberToken = null;
+
+    #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private ?\DateTimeInterface $createdAt = null;
+
+    #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private ?\DateTimeInterface $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -105,6 +156,210 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
 
         return $data;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): static
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getGender(): ?string
+    {
+        return $this->gender;
+    }
+
+    public function setGender(?string $gender): static
+    {
+        $this->gender = $gender;
+
+        return $this;
+    }
+
+    public function getProvinceId(): ?string
+    {
+        return $this->provinceId;
+    }
+
+    public function setProvinceId(?string $provinceId): static
+    {
+        $this->provinceId = $provinceId;
+
+        return $this;
+    }
+
+    public function getDistrictId(): ?string
+    {
+        return $this->districtId;
+    }
+
+    public function setDistrictId(?string $districtId): static
+    {
+        $this->districtId = $districtId;
+
+        return $this;
+    }
+
+    public function getWardId(): ?string
+    {
+        return $this->wardId;
+    }
+
+    public function setWardId(?string $wardId): static
+    {
+        $this->wardId = $wardId;
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): static
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function getBirthday(): ?\DateTimeInterface
+    {
+        return $this->birthday;
+    }
+
+    public function setBirthday(?\DateTimeInterface $birthday): static
+    {
+        $this->birthday = $birthday;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): static
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getEmailVerifiedAt(): ?\DateTimeInterface
+    {
+        return $this->emailVerifiedAt;
+    }
+
+    public function setEmailVerifiedAt(?\DateTimeInterface $emailVerifiedAt): static
+    {
+        $this->emailVerifiedAt = $emailVerifiedAt;
+
+        return $this;
+    }
+
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(int $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getIsNgoaiGio(): int
+    {
+        return $this->isNgoaiGio;
+    }
+
+    public function setIsNgoaiGio(int $isNgoaiGio): static
+    {
+        $this->isNgoaiGio = $isNgoaiGio;
+
+        return $this;
+    }
+
+    public function getMaVaiTro(): ?string
+    {
+        return $this->maVaiTro;
+    }
+
+    public function setMaVaiTro(string $maVaiTro): static
+    {
+        $this->maVaiTro = $maVaiTro;
+
+        return $this;
+    }
+
+    public function getRememberToken(): ?string
+    {
+        return $this->rememberToken;
+    }
+
+    public function setRememberToken(?string $rememberToken): static
+    {
+        $this->rememberToken = $rememberToken;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeInterface $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
     }
 
     #[\Deprecated]

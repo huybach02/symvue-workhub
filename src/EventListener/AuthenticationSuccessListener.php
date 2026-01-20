@@ -63,7 +63,7 @@ class AuthenticationSuccessListener
         );
         $formattedResponse = [
             'success' => true,
-            'message' => 'Login successfully',
+            'message' => 'Đăng nhập thành công',
             'data'    => $finalDataPayload
         ];
 

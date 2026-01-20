@@ -2,13 +2,14 @@ import { NAME_ROUTES_CONFIG } from "./nameRouteConfig";
 
 export const menuSidebar = [
     {
-        title: "Thống kê",
+        key: "home",
+        title: "TRANG CHỦ",
         icon: "mdi-home-city",
         value: NAME_ROUTES_CONFIG.dashboard,
         to: NAME_ROUTES_CONFIG.dashboard,
     },
     {
-        title: "My Account",
+        title: "QUẢN LÝ NHÂN SỰ",
         icon: "mdi-account",
         value: "account",
         to: "/account",

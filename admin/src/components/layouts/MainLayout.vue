@@ -5,7 +5,9 @@
                 <SidebarMobile v-if="isMobile" />
                 <SidebarPC v-else />
                 <v-main style="height: 100vh">
-                    <router-view />
+                    <v-card class="ma-2 pa-4" elevation="2">
+                        <router-view />
+                    </v-card>
                 </v-main>
             </v-layout>
         </v-card>
@@ -13,6 +15,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import NotAuthenticatedMiddleware from "@/middlewares/NotAuthenticatedMiddleware.vue";
 import SidebarPC from "./SidebarPC.vue";
 import SidebarMobile from "./SidebarMobile.vue";
@@ -25,6 +28,7 @@ export default {
         NotAuthenticatedMiddleware,
     },
     computed: {
+        ...mapGetters("auth", ["currentUser"]),
         isMobile() {
             return this.$vuetify.display.mobile;
         },

@@ -1,4 +1,5 @@
 import { NAME_ROUTES_CONFIG } from "@/configs/nameRouteConfig";
+import { functionHelper } from "@/helpers/functionHelper";
 
 export const routes = [
     {
@@ -28,7 +29,8 @@ export const routes = [
                 name: NAME_ROUTES_CONFIG.dashboard,
                 component: () => import("../pages/DashboardPage.vue"),
                 meta: {
-                    title: "Dashboard",
+                    title: functionHelper.findMenuItemByKey("home").title,
+                    icon: functionHelper.findMenuItemByKey("home").icon,
                 },
             },
         ],
