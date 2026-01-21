@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="isLoading">
-            <Loading :model-value="isLoading" text="Đang tải..." />
+            <Loading :model-value="isLoading" />
         </div>
         <slot v-else></slot>
     </div>

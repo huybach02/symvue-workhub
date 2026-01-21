@@ -21,7 +21,7 @@
                 v-bind="field"
                 :error-messages="errorMessage"
                 type="password"
-                label="Mật khẩu"
+                :label="$t('auth.password')"
                 prepend-inner-icon="mdi-lock"
                 variant="outlined"
                 persistent-placeholder
@@ -38,7 +38,7 @@
             <v-checkbox
                 v-bind="field"
                 color="primary"
-                label="Ghi nhớ tôi"
+                :label="$t('auth.remember_me')"
                 hide-details
                 class="mb-3"
             />
@@ -47,7 +47,7 @@
         <v-btn
             :loading="this.$store.state.isLoading"
             color="primary"
-            text="Đăng nhập"
+            :text="$t('auth.sign_in')"
             type="submit"
             block
             size="large"
@@ -56,7 +56,7 @@
         <v-btn
             color="primary"
             variant="text"
-            text="Quên mật khẩu"
+            :text="$t('auth.forgot_password')"
             type="button"
             block
             class="mt-5"

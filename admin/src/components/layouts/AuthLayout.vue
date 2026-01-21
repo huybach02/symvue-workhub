@@ -12,8 +12,10 @@
                         </v-avatar>
                     </div>
                     <h2 class="mb-3">{{ appName }}</h2>
-                    <v-chip class="mb-5">{{ subName }}</v-chip>
-                    <h3 class="mb-3">{{ title }}</h3>
+                    <v-chip class="mb-5 text-uppercase font-weight-bold">
+                        {{ subName }}
+                    </v-chip>
+                    <h3 class="mb-3 text-uppercase">{{ title }}</h3>
                 </v-card-title>
             </v-card-item>
 
@@ -32,12 +34,14 @@ export default {
     data() {
         return {
             appName: import.meta.env.VITE_APP_NAME,
-            subName: import.meta.env.VITE_APP_SUBNAME,
         };
     },
     computed: {
         title() {
-            return this.$route.meta.title || "Title";
+            return this.$route.meta.title || this.$t("auth.login");
+        },
+        subName() {
+            return this.$t("system_management");
         },
     },
 };

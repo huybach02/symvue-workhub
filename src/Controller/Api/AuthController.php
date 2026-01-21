@@ -18,15 +18,8 @@ final class AuthController extends AbstractController
     public function me(#[CurrentUser] ?User $user, CacheInterface $appCache)
     {
         if (null === $user) {
-            return CustomResponse::error('Không tìm thấy người dùng', 401);
+            return CustomResponse::error(t('auth.me.not_found'), 401);
         }
-
-        $value = $appCache->get('demo_key', function (ItemInterface $item) {
-            $item->expiresAfter(3600); // Cache tồn tại 1 giờ
-
-            // Giả lập xử lý nặng
-            return 'Dữ liệu này được lấy từ Redis Cloud lúc ' . date('H:i:s');
-        });
 
         return CustomResponse::success($user->jsonSerialize());
     }
@@ -65,6 +58,6 @@ final class AuthController extends AbstractController
             });
         }
 
-        return CustomResponse::success([], 'Đăng xuất thành công');
+        return CustomResponse::success([], t('auth.logout.success'));
     }
 }

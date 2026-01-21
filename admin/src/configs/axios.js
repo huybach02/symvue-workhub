@@ -1,3 +1,4 @@
+import i18n from "@/plugins/i18n";
 import axios from "axios";
 
 const URL_LOGIN = "/auth/login";
@@ -30,6 +31,9 @@ const processQueue = (error, token = null) => {
 axiosInstance.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem("token");
+        const currentLang = i18n.global.locale;
+
+        config.headers["Accept-Language"] = currentLang;
 
         // Không gắn token nếu đang gọi API refresh
         if (token && !config.url.includes(URL_REFRESH)) {

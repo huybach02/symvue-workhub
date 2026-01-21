@@ -18,3 +18,13 @@ Implement method getGroups() trả về ['group_name']
 php bin/console doctrine:fixtures:load --group=group_name
 
 php bin/console make:fixture CategoryFixtures
+
+
+
+
+        $value = $appCache->get('demo_key', function (ItemInterface $item) {
+            $item->expiresAfter(3600); // Cache tồn tại 1 giờ
+
+            // Giả lập xử lý nặng
+            return 'Dữ liệu này được lấy từ Redis Cloud lúc ' . date('H:i:s');
+        });

@@ -13,45 +13,7 @@
                 {{ title }}
             </v-toolbar-title>
 
-            <v-menu offset-y>
-                <template #activator="{ props }">
-                    <v-btn icon v-bind="props" class="mr-2">
-                        <v-avatar size="40">
-                            <v-img
-                                v-if="currentUser?.avatarUrl"
-                                alt="Avatar"
-                                :src="currentUser?.avatarUrl"
-                            />
-                            <v-icon v-else size="40">mdi-account</v-icon>
-                        </v-avatar>
-                    </v-btn>
-                </template>
-                <v-list min-width="200">
-                    <v-list-item>
-                        <v-list-item-title class="font-weight-bold mb-2">
-                            {{ currentUser?.fullName || "User" }}
-                        </v-list-item-title>
-                        <v-list-item-subtitle>
-                            {{ currentUser?.email || "" }}
-                        </v-list-item-subtitle>
-                    </v-list-item>
-                    <v-divider />
-                    <v-list-item @click="goToProfile">
-                        <template #prepend>
-                            <v-icon>mdi-account</v-icon>
-                        </template>
-                        <v-list-item-title>Hồ sơ</v-list-item-title>
-                    </v-list-item>
-                    <v-list-item @click="handleLogout">
-                        <template #prepend>
-                            <v-icon color="error">mdi-logout</v-icon>
-                        </template>
-                        <v-list-item-title class="text-error">
-                            Đăng xuất
-                        </v-list-item-title>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
+            <UserDropdown @logout="handleLogout" />
         </v-app-bar>
 
         <v-navigation-drawer
@@ -65,10 +27,15 @@
 </template>
 
 <script>
+import { NAME_ROUTES_CONFIG } from "@/configs/nameRouteConfig";
 import MenuSidebar from "./MenuSidebar.vue";
+import { authService } from "@/services/authService";
+import UserDropdown from "@/components/UserDropdown.vue";
+
 export default {
     components: {
         MenuSidebar,
+        UserDropdown,
     },
     data() {
         return {
@@ -81,6 +48,22 @@ export default {
         },
         logo() {
             return import.meta.env.VITE_LOGO_DEFAULT;
+        },
+        currentUser() {
+            return this.$store.state.user;
+        },
+    },
+    methods: {
+        goToProfile() {
+            // TODO: Navigate to profile page
+            console.log("Go to profile");
+        },
+        async handleLogout() {
+            const response = await authService.logout();
+            if (response.success) {
+                this.$store.commit("auth/CLEAR_AUTH_DATA");
+                this.$router.push({ name: NAME_ROUTES_CONFIG.login });
+            }
         },
     },
 };

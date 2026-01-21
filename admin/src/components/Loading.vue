@@ -11,8 +11,8 @@
                 width="6"
                 color="primary"
             />
-            <div v-if="text" class="mt-4 text-h6 text-white">
-                {{ text }}
+            <div v-if="displayText" class="mt-4 text-h6 text-white">
+                {{ displayText }}
             </div>
         </div>
     </v-overlay>
@@ -29,6 +29,11 @@ export default {
         text: {
             type: String,
             default: "",
+        },
+    },
+    computed: {
+        displayText() {
+            return this.text || this.$t("loading");
         },
     },
 };

@@ -1,5 +1,6 @@
 import { NAME_ROUTES_CONFIG } from "@/configs/nameRouteConfig";
 import { functionHelper } from "@/helpers/functionHelper";
+import i18n from "@/plugins/i18n";
 
 export const routes = [
     {
@@ -15,7 +16,7 @@ export const routes = [
                 name: NAME_ROUTES_CONFIG.login,
                 component: () => import("../pages/LoginPage.vue"),
                 meta: {
-                    title: "ĐĂNG NHẬP",
+                    title: i18n.global.t("auth.login"),
                 },
             },
         ],

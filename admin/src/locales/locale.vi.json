@@ -1,0 +1,34 @@
+{
+    "validation": {
+        "mixed": {
+            "required": "Trường này là bắt buộc",
+            "default": "Giá trị không hợp lệ"
+        },
+        "string": {
+            "email": "Email không đúng định dạng",
+            "min": "Phải có ít nhất {min} ký tự",
+            "max": "Tối đa {max} ký tự"
+        }
+    },
+    "loading": "Đang tải...",
+    "system_management": "Hệ thống quản lý",
+    "auth": {
+        "login": "Đăng nhập",
+        "password": "Mật khẩu",
+        "remember_me": "Ghi nhớ tôi",
+        "sign_in": "Đăng nhập",
+        "forgot_password": "Quên mật khẩu",
+        "profile": "Hồ sơ",
+        "logout": "Đăng xuất"
+    },
+    "sidebar": {
+        "home": "Trang chủ",
+        "user_management": "Quản lý người dùng",
+        "role_management": "Quản lý vai trò",
+        "permission_management": "Quản lý quyền"
+    },
+    "language": {
+        "en": "English",
+        "vi": "Tiếng Việt"
+    }
+}

@@ -4,10 +4,13 @@ namespace App\Entity;
 
 use App\Repository\CauHinhChungRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Traits\TimestampableTrait;
 
 #[ORM\Entity(repositoryClass: CauHinhChungRepository::class)]
 class CauHinhChung
 {
+    use TimestampableTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -21,12 +24,6 @@ class CauHinhChung
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $moTa = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -65,30 +62,6 @@ class CauHinhChung
     public function setMoTa(?string $moTa): static
     {
         $this->moTa = $moTa;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
 
         return $this;
     }

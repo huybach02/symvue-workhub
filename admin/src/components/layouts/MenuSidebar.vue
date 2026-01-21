@@ -76,6 +76,7 @@ export default {
 :deep(.v-list-item-title) {
     font-weight: 500;
     font-size: 0.9rem;
+    text-transform: uppercase;
 }
 
 :deep(.v-list-item--active .v-list-item-title) {

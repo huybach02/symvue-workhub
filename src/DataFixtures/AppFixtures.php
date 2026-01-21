@@ -23,8 +23,6 @@ class AppFixtures extends Fixture
         $user->setPassword($this->passwordHasher->hashPassword($user, 'password'));
         $user->setName('Admin');
         $user->setMaVaiTro('ADMIN');
-        $user->setCreatedAt(new \DateTime());
-        $user->setUpdatedAt(new \DateTime());
         $manager->persist($user);
 
         $manager->flush();

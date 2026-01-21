@@ -14,7 +14,7 @@
                         {{ appName }}
                     </div>
                     <div
-                        class="text-subtitle-2 font-weight-light text-medium-emphasis text-center"
+                        class="text-subtitle-2 text-uppercase font-weight-light text-medium-emphasis text-center"
                     >
                         {{ subName }}
                     </div>
@@ -45,16 +45,17 @@ import { authService } from "@/services/authService";
 import MenuSidebar from "./MenuSidebar.vue";
 import { NAME_ROUTES_CONFIG } from "@/configs/nameRouteConfig";
 import UserDropdown from "@/components/UserDropdown.vue";
+import LanguageDropdown from "@/components/LanguageDropdown.vue";
 
 export default {
     components: {
         MenuSidebar,
         UserDropdown,
+        LanguageDropdown,
     },
     data() {
         return {
             appName: import.meta.env.VITE_APP_NAME,
-            subName: import.meta.env.VITE_APP_SUBNAME,
         };
     },
     computed: {
@@ -66,6 +67,9 @@ export default {
         },
         logo() {
             return import.meta.env.VITE_LOGO_DEFAULT;
+        },
+        subName() {
+            return this.$t("system_management");
         },
     },
     methods: {

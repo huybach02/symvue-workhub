@@ -1,0 +1,15 @@
+auth:
+    login:
+        success: "Đăng nhập thành công"
+        invalid: "Thông tin đăng nhập không hợp lệ"
+    me:
+        success: "Lấy thông tin người dùng thành công"
+        not_found: "Không tìm thấy người dùng"
+    logout:
+        success: "Đăng xuất thành công"
+error:
+    not_found: "Không tìm thấy dữ liệu"
+success:
+    created: "Tạo mới thành công"
+    updated: "Cập nhật thành công"
+    deleted: "Xóa thành công"

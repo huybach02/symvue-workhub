@@ -1,0 +1,15 @@
+auth:
+    login:
+        success: "Login successfully"
+        invalid: "Invalid credentials"
+    me:
+        success: "Get user successfully"
+        not_found: "User not found"
+    logout:
+        success: "Logout successfully"
+error:
+    not_found: "Not found"
+success:
+    created: "Created successfully"
+    updated: "Updated successfully"
+    deleted: "Deleted successfully"

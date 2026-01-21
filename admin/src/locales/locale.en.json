@@ -1,0 +1,34 @@
+{
+    "validation": {
+        "mixed": {
+            "required": "This field is required",
+            "default": "Invalid value"
+        },
+        "string": {
+            "email": "Invalid email format",
+            "min": "Must be at least {min} characters",
+            "max": "Maximum {max} characters"
+        }
+    },
+    "loading": "Loading...",
+    "system_management": "System Management",
+    "auth": {
+        "login": "Login",
+        "password": "Password",
+        "remember_me": "Remember me",
+        "sign_in": "Sign in",
+        "forgot_password": "Forgot password",
+        "profile": "Profile",
+        "logout": "Logout"
+    },
+    "sidebar": {
+        "home": "Home",
+        "user_management": "User Management",
+        "role_management": "Role Management",
+        "permission_management": "Permission Management"
+    },
+    "language": {
+        "en": "English",
+        "vi": "Vietnamese"
+    }
+}

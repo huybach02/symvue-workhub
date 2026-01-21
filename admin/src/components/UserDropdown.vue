@@ -22,18 +22,23 @@
                 </v-list-item-subtitle>
             </v-list-item>
             <v-divider />
+
+            <LanguageDropdown inline />
+
+            <v-divider />
+
             <v-list-item @click="goToProfile">
                 <template #prepend>
                     <v-icon>mdi-account</v-icon>
                 </template>
-                <v-list-item-title>Hồ sơ</v-list-item-title>
+                <v-list-item-title>{{ $t("auth.profile") }}</v-list-item-title>
             </v-list-item>
             <v-list-item @click="this.$emit('logout')">
                 <template #prepend>
                     <v-icon color="error">mdi-logout</v-icon>
                 </template>
                 <v-list-item-title class="text-error">
-                    Đăng xuất
+                    {{ $t("auth.logout") }}
                 </v-list-item-title>
             </v-list-item>
         </v-list>
@@ -43,9 +48,13 @@
 <script>
 import { NAME_ROUTES_CONFIG } from "@/configs/nameRouteConfig";
 import { mapGetters } from "vuex";
+import LanguageDropdown from "./LanguageDropdown.vue";
 
 export default {
     name: "UserDropdown",
+    components: {
+        LanguageDropdown,
+    },
     computed: {
         ...mapGetters("auth", ["currentUser"]),
     },

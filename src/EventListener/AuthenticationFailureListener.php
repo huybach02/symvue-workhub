@@ -14,7 +14,7 @@ class AuthenticationFailureListener
     {
         $response = new JsonResponse([
             'success' => false,
-            'message' => 'Thông tin đăng nhập không chính xác',
+            'message' => t('auth.login.invalid'),
         ], JsonResponse::HTTP_UNAUTHORIZED);
 
         $event->setResponse($response);

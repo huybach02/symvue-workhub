@@ -48,8 +48,6 @@ class CauHinhChungFixture extends Fixture
             $cauhinh->setTenCauHinh($item['ten_cau_hinh']);
             $cauhinh->setGiaTri($item['gia_tri']);
             $cauhinh->setMoTa($item['mo_ta']);
-            $cauhinh->setCreatedAt(new \DateTimeImmutable());
-            $cauhinh->setUpdatedAt(new \DateTimeImmutable());
             $manager->persist($cauhinh);
         }
 
