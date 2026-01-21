@@ -5,7 +5,7 @@
                 <SidebarMobile v-if="isMobile" />
                 <SidebarPC v-else />
                 <v-main style="height: 100vh">
-                    <v-card class="ma-2 pa-4" elevation="2">
+                    <v-card class="ma-2 pa-4 main-content-card" elevation="3">
                         <router-view />
                     </v-card>
                 </v-main>
@@ -36,4 +36,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.main-content-card {
+    min-height: calc(100vh - 100px);
+}
+</style>

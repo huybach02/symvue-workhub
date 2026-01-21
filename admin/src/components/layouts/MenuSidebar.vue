@@ -1,14 +1,45 @@
 <template>
     <v-list density="compact" nav>
-        <v-list-item
-            v-for="(item, index) in menuSidebar"
-            :key="index"
-            :prepend-icon="item.icon"
-            :title="item.title"
-            :value="item.value"
-            :to="item.to"
-            :active="activeItem === item.value"
-        />
+        <template v-for="(item, index) in menuSidebar">
+            <!-- Menu có children (nested menu) -->
+            <v-list-group
+                v-if="item.children && item.children.length > 0"
+                :key="`group-${index}`"
+                :value="item.value"
+            >
+                <!-- Menu cha -->
+                <template #activator="{ props }">
+                    <v-list-item
+                        v-bind="props"
+                        :prepend-icon="item.icon"
+                        :title="item.title"
+                        :active="isParentActive(item)"
+                    />
+                </template>
+
+                <!-- Menu con -->
+                <v-list-item
+                    v-for="(child, childIndex) in item.children"
+                    :key="`child-${index}-${childIndex}`"
+                    :prepend-icon="child.icon"
+                    :title="child.title"
+                    :value="child.value"
+                    :to="child.to"
+                    :active="activeItem === child.value"
+                />
+            </v-list-group>
+
+            <!-- Menu không có children (menu thường) -->
+            <v-list-item
+                v-else
+                :key="`item-${index}`"
+                :prepend-icon="item.icon"
+                :title="item.title"
+                :value="item.value"
+                :to="item.to"
+                :active="activeItem === item.value"
+            />
+        </template>
     </v-list>
 </template>
 
@@ -23,6 +54,19 @@ export default {
     computed: {
         activeItem() {
             return this.$route.name;
+        },
+    },
+    methods: {
+        // Kiểm tra xem menu cha có đang active không
+        // Menu cha sẽ active nếu một trong các menu con đang active
+        isParentActive(item) {
+            if (!item.children || item.children.length === 0) {
+                return false;
+            }
+            // Kiểm tra xem route hiện tại có match với bất kỳ child nào không
+            return item.children.some(
+                (child) => this.activeItem === child.value,
+            );
         },
     },
 };

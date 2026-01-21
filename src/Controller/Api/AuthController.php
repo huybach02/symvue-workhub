@@ -15,18 +15,20 @@ use Symfony\Contracts\Cache\ItemInterface;
 final class AuthController extends AbstractController
 {
     #[Route('/auth/me', name: 'api_auth_me', methods: ['GET'])]
-    public function me(#[CurrentUser] ?User $user)
+    public function me(#[CurrentUser] ?User $user, CacheInterface $appCache)
     {
         if (null === $user) {
             return CustomResponse::error('Không tìm thấy người dùng', 401);
         }
 
-        $userData = [
-            'id' => $user->getId(),
-            'email' => $user->getEmail(),
-        ];
+        $value = $appCache->get('demo_key', function (ItemInterface $item) {
+            $item->expiresAfter(3600); // Cache tồn tại 1 giờ
 
-        return CustomResponse::success($userData);
+            // Giả lập xử lý nặng
+            return 'Dữ liệu này được lấy từ Redis Cloud lúc ' . date('H:i:s');
+        });
+
+        return CustomResponse::success($user->jsonSerialize());
     }
 
     #[Route('/auth/logout', name: 'api_auth_logout', methods: ['POST'])]

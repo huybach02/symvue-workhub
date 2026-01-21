@@ -367,4 +367,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // @deprecated, to be removed when upgrading to Symfony 8
     }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'gender' => $this->gender,
+            'provinceId' => $this->provinceId,
+            'districtId' => $this->districtId,
+            'wardId' => $this->wardId,
+            'address' => $this->address,
+            'birthday' => $this->birthday,
+            'image' => $this->image,
+            'description' => $this->description,
+            'status' => $this->status,
+            'maVaiTro' => $this->maVaiTro,
+            'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
+            'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
+        ];
+    }
 }

@@ -6,7 +6,12 @@
                 @click.stop="drawer = !drawer"
             ></v-app-bar-nav-icon>
 
-            <v-toolbar-title>My files</v-toolbar-title>
+            <v-toolbar-title class="toolbar-title-mobile">
+                <v-avatar size="35" class="elevation-2 bg-white mr-2">
+                    <v-img alt="Logo" :src="logo" />
+                </v-avatar>
+                {{ title }}
+            </v-toolbar-title>
 
             <v-menu offset-y>
                 <template #activator="{ props }">
@@ -70,7 +75,19 @@ export default {
             drawer: false,
         };
     },
+    computed: {
+        title() {
+            return this.$route.meta.title;
+        },
+        logo() {
+            return import.meta.env.VITE_LOGO_DEFAULT;
+        },
+    },
 };
 </script>
 
-<style></style>
+<style>
+.toolbar-title-mobile {
+    font-size: 1rem !important;
+}
+</style>

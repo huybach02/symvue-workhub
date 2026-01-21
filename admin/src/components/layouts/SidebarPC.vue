@@ -6,10 +6,7 @@
                     class="d-flex flex-column align-center justify-center pa-4"
                 >
                     <v-avatar size="50" class="mb-3 elevation-2 bg-white">
-                        <v-img
-                            alt="Logo"
-                            src="https://brandeps.com/logo-download/H/HTML5-Boilerplate-logo-01.png"
-                        />
+                        <v-img alt="Logo" :src="logo" />
                     </v-avatar>
                     <div
                         class="text-h6 font-weight-bold text-uppercase text-center text-primary mb-1"
@@ -66,6 +63,9 @@ export default {
         },
         icon() {
             return this.$route.meta.icon;
+        },
+        logo() {
+            return import.meta.env.VITE_LOGO_DEFAULT;
         },
     },
     methods: {

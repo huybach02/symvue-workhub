@@ -15,7 +15,7 @@
         <v-list min-width="200">
             <v-list-item>
                 <v-list-item-title class="font-weight-bold mb-2">
-                    {{ currentUser?.fullName || "User" }}
+                    {{ currentUser?.name || "User" }}
                 </v-list-item-title>
                 <v-list-item-subtitle class="mb-2">
                     {{ currentUser?.email || "" }}
