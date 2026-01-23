@@ -92,7 +92,7 @@ export default {
 }
 
 :deep(.v-list-item-title) {
-    font-size: 0.95rem !important;
+    font-size: 0.91rem !important;
     padding: 1.5px;
 }
 </style>

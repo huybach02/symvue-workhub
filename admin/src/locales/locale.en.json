@@ -25,10 +25,27 @@
         "home": "Home",
         "user_management": "User Management",
         "role_management": "Role Management",
-        "permission_management": "Permission Management"
+        "permission_management": "Permission Management",
+        "system_config": "System Config",
+        "system_config_general": "General Config",
+        "system_config_working_time": "Working Time"
     },
     "language": {
         "en": "English",
         "vi": "Vietnamese"
+    },
+    "system_config": {
+        "login_fail_setting": "Login fail setting",
+        "max_login_fail": "Max login fail",
+        "lock_account_time": "Lock account time (minutes)",
+        "two_factor_setting": "Two factor setting",
+        "enable_two_factor": "Enable/Disable two factor",
+        "otp_expire_time": "OTP expire time (minutes)",
+        "device_verify_time": "Device verify time (days)",
+        "working_time_setting": "Working time setting",
+        "enable_working_time_check": "Enable/Disable working time check",
+        "edit_button": "Edit",
+        "save_button": "Save configuration",
+        "cancel_button": "Cancel"
     }
 }

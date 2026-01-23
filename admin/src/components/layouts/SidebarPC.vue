@@ -45,13 +45,11 @@ import { authService } from "@/services/authService";
 import MenuSidebar from "./MenuSidebar.vue";
 import { NAME_ROUTES_CONFIG } from "@/configs/nameRouteConfig";
 import UserDropdown from "@/components/UserDropdown.vue";
-import LanguageDropdown from "@/components/LanguageDropdown.vue";
 
 export default {
     components: {
         MenuSidebar,
         UserDropdown,
-        LanguageDropdown,
     },
     data() {
         return {

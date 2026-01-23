@@ -65,4 +65,14 @@ class CauHinhChung
 
         return $this;
     }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'tenCauHinh' => $this->tenCauHinh,
+            'giaTri' => $this->giaTri,
+            'moTa' => $this->moTa,
+        ];
+    }
 }

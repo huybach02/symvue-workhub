@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Api;
+namespace App\Controller;
 
 use App\Class\CustomResponse;
 use App\Entity\User;
@@ -14,25 +14,25 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 final class AuthController extends AbstractController
 {
-    #[Route('/auth/me', name: 'api_auth_me', methods: ['GET'])]
+    #[Route("/auth/me", name: "api_auth_me", methods: ["GET"])]
     public function me(#[CurrentUser] ?User $user, CacheInterface $appCache)
     {
         if (null === $user) {
-            return CustomResponse::error(t('auth.me.not_found'), 401);
+            return CustomResponse::error(t("auth.me.not_found"), 401);
         }
 
         return CustomResponse::success($user->jsonSerialize());
     }
 
-    #[Route('/auth/logout', name: 'api_auth_logout', methods: ['POST'])]
+    #[Route("/auth/logout", name: "api_auth_logout", methods: ["POST"])]
     public function logout(
         Request $request,
         RefreshTokenManagerInterface $refreshTokenManager,
-        CacheInterface $cache
+        CacheInterface $cache,
     ) {
         // 1. Xử lý Refresh Token
         $payload = $request->toArray();
-        $refreshTokenString = $payload['refresh_token'] ?? null;
+        $refreshTokenString = $payload["refresh_token"] ?? null;
         if ($refreshTokenString) {
             $refreshToken = $refreshTokenManager->get($refreshTokenString);
             if ($refreshToken) {
@@ -42,15 +42,15 @@ final class AuthController extends AbstractController
 
         // 2. Xử lý Blacklist Access Token
         // Lấy token từ header Authorization: Bearer <token>
-        $authorizationHeader = $request->headers->get('Authorization');
+        $authorizationHeader = $request->headers->get("Authorization");
 
         if ($authorizationHeader) {
-            $accessToken = str_replace('Bearer ', '', $authorizationHeader);
+            $accessToken = str_replace("Bearer ", "", $authorizationHeader);
 
             // Tạo một key unique cho token này
-            $tokenKey = 'blacklist_' . md5($accessToken);
+            $tokenKey = "blacklist_" . md5($accessToken);
 
-            // Lưu vào cache. 
+            // Lưu vào cache.
             // Thời gian sống nên set bằng TTL của token (ví dụ 3600s).
             $cache->get($tokenKey, function (ItemInterface $item) {
                 $item->expiresAfter(3600 * 24); // Token sẽ bị chặn trong 1 ngày
@@ -58,6 +58,6 @@ final class AuthController extends AbstractController
             });
         }
 
-        return CustomResponse::success([], t('auth.logout.success'));
+        return CustomResponse::success([], t("auth.logout.success"));
     }
 }

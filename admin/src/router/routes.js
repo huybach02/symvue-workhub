@@ -30,8 +30,46 @@ export const routes = [
                 name: NAME_ROUTES_CONFIG.dashboard,
                 component: () => import("../pages/DashboardPage.vue"),
                 meta: {
-                    title: functionHelper.findMenuItemByKey("home").title,
-                    icon: functionHelper.findMenuItemByKey("home").icon,
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.dashboard,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.dashboard,
+                        ).icon || "",
+                },
+            },
+            {
+                path: "config/general",
+                name: NAME_ROUTES_CONFIG.system_config_general,
+                component: () =>
+                    import("../pages/CauHinhChung/CauHinhChung.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.system_config_general,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.system_config_general,
+                        ).icon || "",
+                },
+            },
+            {
+                path: "config/working-time",
+                name: NAME_ROUTES_CONFIG.system_config_working_time,
+                component: () =>
+                    import("../pages/CauHinhChung/CauHinhChung.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.system_config_working_time,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.system_config_working_time,
+                        ).icon || "",
                 },
             },
         ],

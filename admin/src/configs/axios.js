@@ -36,7 +36,7 @@ axiosInstance.interceptors.request.use(
         config.headers["Accept-Language"] = currentLang;
 
         // Không gắn token nếu đang gọi API refresh
-        if (token && !config.url.includes(URL_REFRESH)) {
+        if (token && !config.url?.includes(URL_REFRESH)) {
             config.headers["Authorization"] = `Bearer ${token}`;
         }
 
@@ -62,8 +62,8 @@ axiosInstance.interceptors.response.use(
 
         // Bỏ qua nếu lỗi 401 xảy ra ngay tại API login hoặc API refresh (tránh lặp)
         if (
-            originalRequest.url.includes(URL_LOGIN) ||
-            originalRequest.url.includes(URL_REFRESH)
+            originalRequest.url?.includes(URL_LOGIN) ||
+            originalRequest.url?.includes(URL_REFRESH)
         ) {
             // Xóa token rác nếu có
             handleLogout();

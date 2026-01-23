@@ -21,6 +21,9 @@ php bin/console make:fixture CategoryFixtures
 
 
 
+Tạo controller
+php bin/console make:controller Api\CauHinhChungController
+
 
         $value = $appCache->get('demo_key', function (ItemInterface $item) {
             $item->expiresAfter(3600); // Cache tồn tại 1 giờ

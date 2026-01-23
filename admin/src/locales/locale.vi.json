@@ -25,10 +25,27 @@
         "home": "Trang chủ",
         "user_management": "Quản lý người dùng",
         "role_management": "Quản lý vai trò",
-        "permission_management": "Quản lý quyền"
+        "permission_management": "Quản lý quyền",
+        "system_config": "Thiết lập hệ thống",
+        "system_config_general": "Cấu hình chung",
+        "system_config_working_time": "Thời gian làm việc"
     },
     "language": {
         "en": "English",
         "vi": "Tiếng Việt"
+    },
+    "system_config": {
+        "login_fail_setting": "Thiết lập khi đăng nhập sai thông tin",
+        "max_login_fail": "Số lần đăng nhập sai tối đa",
+        "lock_account_time": "Thời gian tạm khóa tài khoản (phút)",
+        "two_factor_setting": "Thiết lập xác thực 2 yếu tố",
+        "enable_two_factor": "Bật/Tắt xác thực 2 yếu tố",
+        "otp_expire_time": "Thời gian hết hạn mã OTP (phút)",
+        "device_verify_time": "Thời hạn xác thực lại thiết bị (ngày)",
+        "working_time_setting": "Thiết lập kiểm tra thời gian làm việc",
+        "enable_working_time_check": "Bật/Tắt kiểm tra thời gian làm việc",
+        "edit_button": "Chỉnh sửa",
+        "save_button": "Lưu cấu hình",
+        "cancel_button": "Hủy bỏ"
     }
 }

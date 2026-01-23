@@ -2,4 +2,5 @@ export const API_ROUTES_CONFIG = {
     login: "/auth/login",
     getMe: "/auth/me",
     logout: "/auth/logout",
+    cauHinhChung: "/cau-hinh-chung",
 };

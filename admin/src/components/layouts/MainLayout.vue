@@ -5,6 +5,12 @@
                 <SidebarMobile v-if="isMobile" />
                 <SidebarPC v-else />
                 <v-main style="height: 100vh">
+                    <v-progress-linear
+                        v-if="$store.state.isLoading"
+                        color="primary"
+                        indeterminate
+                        height="5"
+                    />
                     <v-card class="ma-2 pa-4 main-content-card" elevation="3">
                         <router-view />
                     </v-card>
