@@ -9,7 +9,7 @@
         >
             <v-row v-if="!isEditing">
                 <v-col cols="12">
-                    <div class="d-flex ga-2">
+                    <div class="d-flex ga-2 justify-end">
                         <v-btn
                             color="primary"
                             class="d-flex align-center"
@@ -23,7 +23,7 @@
             </v-row>
             <v-row v-else>
                 <v-col cols="12">
-                    <div class="d-flex ga-2">
+                    <div class="d-flex ga-2 justify-end">
                         <v-btn
                             variant="tonal"
                             class="d-flex align-center"

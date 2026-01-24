@@ -16,6 +16,21 @@ class CauHinhChungRepository extends ServiceEntityRepository
         parent::__construct($registry, CauHinhChung::class);
     }
 
+    public function getAllConfig()
+    {
+        $data = [];
+
+        $configs = $this->createQueryBuilder('c')
+            ->select('c.tenCauHinh', 'c.giaTri')
+            ->getQuery()
+            ->getResult();
+
+        foreach ($configs as $config) {
+            $data[$config['tenCauHinh']] = $config['giaTri'];
+        }
+        return $data;
+    }
+
     //    /**
     //     * @return CauHinhChung[] Returns an array of CauHinhChung objects
     //     */

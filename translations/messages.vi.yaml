@@ -2,11 +2,14 @@ auth:
     login:
         success: "Đăng nhập thành công"
         invalid: "Thông tin đăng nhập không hợp lệ"
+        error: "Có lỗi xảy ra khi đăng nhập"
     me:
         success: "Lấy thông tin người dùng thành công"
         not_found: "Không tìm thấy người dùng"
     logout:
         success: "Đăng xuất thành công"
+    locked: "Tài khoản đang bị tạm khóa do đăng nhập sai quá số lần cho phép. Vui lòng thử lại sau %lockout%"
+    banned: "Tài khoản bị khóa do vi phạm. Vui lòng liên hệ với quản trị viên."
 error:
     not_found: "Không tìm thấy dữ liệu"
 success:

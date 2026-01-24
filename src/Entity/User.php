@@ -345,6 +345,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // @deprecated, to be removed when upgrading to Symfony 8
     }
 
+    public function isLocked(): bool
+    {
+        return $this->status === 0;
+    }
+
     public function jsonSerialize(): array
     {
         return [
