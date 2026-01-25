@@ -47,5 +47,29 @@
         "edit_button": "Edit",
         "save_button": "Save configuration",
         "cancel_button": "Cancel"
+    },
+    "thoi_gian_lam_viec": {
+        "fulltime": "Fixed time",
+        "parttime": "Shift time",
+        "action": "Action",
+        "thu": "Day",
+        "gio_bat_dau": "Start time",
+        "gio_ket_thuc": "End time",
+        "ghi_chu": "Note",
+        "thoi_gian_cap_nhat": "Updated time",
+        "edit_button": "Edit",
+        "save_button": "Save configuration",
+        "cancel_button": "Cancel",
+        "edit": "Edit working time"
+    },
+    "ca_lam_viec": {
+        "ten_ca": "Shift name",
+        "gio_bat_dau": "Start time",
+        "gio_ket_thuc": "End time",
+        "ghi_chu": "Note",
+        "edit": "Edit shift",
+        "create": "Create shift",
+        "cancel_button": "Cancel",
+        "save_button": "Save shift"
     }
 }

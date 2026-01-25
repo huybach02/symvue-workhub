@@ -14,7 +14,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 final class AuthController extends AbstractController
 {
-    #[Route("/auth/me", name: "api_auth_me", methods: ["GET"])]
+    #[Route("/auth/me", methods: ["GET"])]
     public function me(#[CurrentUser] ?User $user, CacheInterface $appCache)
     {
         if (null === $user) {
@@ -24,7 +24,7 @@ final class AuthController extends AbstractController
         return CustomResponse::success($user->jsonSerialize());
     }
 
-    #[Route("/auth/logout", name: "api_auth_logout", methods: ["POST"])]
+    #[Route("/auth/logout", methods: ["POST"])]
     public function logout(
         Request $request,
         RefreshTokenManagerInterface $refreshTokenManager,

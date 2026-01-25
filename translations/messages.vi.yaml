@@ -12,6 +12,7 @@ auth:
     banned: "Tài khoản bị khóa do vi phạm. Vui lòng liên hệ với quản trị viên."
 error:
     not_found: "Không tìm thấy dữ liệu"
+    exists: "Dữ liệu đã tồn tại"
 success:
     created: "Tạo mới thành công"
     updated: "Cập nhật thành công"

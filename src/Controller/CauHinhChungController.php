@@ -17,7 +17,7 @@ final class CauHinhChungController extends AbstractController
         private readonly CauHinhChungService $cauHinhChungService,
     ) {}
 
-    #[Route("/cau-hinh-chung", name: "api_cau_hinh_chung", methods: ["GET"])]
+    #[Route("/cau-hinh-chung", methods: ["GET"])]
     public function index(): Response
     {
         try {
@@ -28,7 +28,7 @@ final class CauHinhChungController extends AbstractController
         }
     }
 
-    #[Route("/cau-hinh-chung", name: "api_cau_hinh_chung_update", methods: ["POST"])]
+    #[Route("/cau-hinh-chung", methods: ["POST"])]
     public function update(
         #[MapRequestPayload] CauHinhChungDTO $cauHinhChungDTO
     ) {

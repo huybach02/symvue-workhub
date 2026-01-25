@@ -78,6 +78,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'integer', options: ['default' => 0, 'comment' => '0: cho phép ngoại giờ, 1: không cho phép ngoại giờ'])]
     private int $isNgoaiGio = 0;
 
+    #[ORM\Column(type: 'integer', options: ['default' => 1, 'comment' => '1: full time, 2: part time'])]
+    private int $hinhThucLamViec = 1;
+
     #[ORM\Column(length: 255)]
     private ?string $maVaiTro = null;
 
@@ -311,6 +314,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsNgoaiGio(int $isNgoaiGio): static
     {
         $this->isNgoaiGio = $isNgoaiGio;
+
+        return $this;
+    }
+
+    public function getHinhThucLamViec(): int
+    {
+        return $this->hinhThucLamViec;
+    }
+
+    public function setHinhThucLamViec(int $hinhThucLamViec): static
+    {
+        $this->hinhThucLamViec = $hinhThucLamViec;
 
         return $this;
     }

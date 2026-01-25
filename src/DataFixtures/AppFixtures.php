@@ -25,6 +25,14 @@ class AppFixtures extends Fixture
         $user->setMaVaiTro('ADMIN');
         $manager->persist($user);
 
+        $user2 = new User();
+        $user2->setEmail('bach@gmail.com');
+        $user2->setPassword($this->passwordHasher->hashPassword($user2, 'password'));
+        $user2->setName('Bach');
+        $user2->setMaVaiTro('NHANVIEN');
+        $user2->setHinhThucLamViec(2);
+        $manager->persist($user2);
+
         $manager->flush();
     }
 }

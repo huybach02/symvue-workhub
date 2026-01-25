@@ -4,7 +4,7 @@
             <v-layout>
                 <SidebarMobile v-if="isMobile" />
                 <SidebarPC v-else />
-                <v-main style="height: 100vh">
+                <v-main style="min-height: 100vh; overflow-y: auto">
                     <v-progress-linear
                         v-if="$store.state.isLoading"
                         color="primary"

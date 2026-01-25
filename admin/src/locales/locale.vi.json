@@ -47,5 +47,29 @@
         "edit_button": "Chỉnh sửa",
         "save_button": "Lưu cấu hình",
         "cancel_button": "Hủy bỏ"
+    },
+    "thoi_gian_lam_viec": {
+        "fulltime": "Thời gian cố định",
+        "parttime": "Thời gian theo ca làm việc",
+        "action": "Hành động",
+        "thu": "Thứ",
+        "gio_bat_dau": "Giờ bắt đầu",
+        "gio_ket_thuc": "Giờ kết thúc",
+        "ghi_chu": "Ghi chú",
+        "thoi_gian_cap_nhat": "Thời gian cập nhật",
+        "edit_button": "Chỉnh sửa",
+        "save_button": "Lưu cấu hình",
+        "cancel_button": "Hủy bỏ",
+        "edit": "Chỉnh sửa thời gian làm việc"
+    },
+    "ca_lam_viec": {
+        "ten_ca": "Tên ca",
+        "gio_bat_dau": "Giờ bắt đầu",
+        "gio_ket_thuc": "Giờ kết thúc",
+        "ghi_chu": "Ghi chú",
+        "create": "Thêm ca làm việc",
+        "edit": "Chỉnh sửa ca làm việc",
+        "cancel_button": "Hủy bỏ",
+        "save_button": "Lưu ca làm việc"
     }
 }

@@ -60,7 +60,7 @@ export const routes = [
                 path: "config/working-time",
                 name: NAME_ROUTES_CONFIG.system_config_working_time,
                 component: () =>
-                    import("../pages/CauHinhChung/CauHinhChung.vue"),
+                    import("../pages/ThoiGianLamViec/ThoiGianLamViec.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(

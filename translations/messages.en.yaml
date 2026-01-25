@@ -12,6 +12,7 @@ auth:
     banned: "Account is banned. Please contact the administrator."
 error:
     not_found: "Not found"
+    exists: "Data already exists"
 success:
     created: "Created successfully"
     updated: "Updated successfully"

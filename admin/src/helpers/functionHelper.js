@@ -19,4 +19,16 @@ export const functionHelper = {
 
         return findRecursive(menuSidebar);
     },
+    updateTime(field, value) {
+        let timeString = "";
+        if (typeof value === "object" && value !== null) {
+            const hours = String(value.hours || 0).padStart(2, "0");
+            const minutes = String(value.minutes || 0).padStart(2, "0");
+            timeString = `${hours}:${minutes}`;
+        } else if (typeof value === "string") {
+            timeString = value;
+        }
+
+        field.onChange(timeString);
+    },
 };
