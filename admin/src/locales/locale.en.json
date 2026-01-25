@@ -19,7 +19,12 @@
         "sign_in": "Sign in",
         "forgot_password": "Forgot password",
         "profile": "Profile",
-        "logout": "Logout"
+        "logout": "Logout",
+        "verify_otp": "Verify OTP",
+        "verify_otp_description": "Enter the 6-digit OTP code sent to your email",
+        "otp_code": "OTP Code",
+        "resend_otp": "Resend OTP",
+        "back_to_login": "Back to login"
     },
     "sidebar": {
         "home": "Home",
@@ -44,6 +49,7 @@
         "device_verify_time": "Device verify time (days)",
         "working_time_setting": "Working time setting",
         "enable_working_time_check": "Enable/Disable working time check",
+        "max_device_login": "Max device login",
         "edit_button": "Edit",
         "save_button": "Save configuration",
         "cancel_button": "Cancel"

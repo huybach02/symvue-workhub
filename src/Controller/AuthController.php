@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Class\CustomResponse;
 use App\Entity\User;
+use App\Service\AuthService;
+use App\Service\DeviceInfoService;
 use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +16,11 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 final class AuthController extends AbstractController
 {
+    public function __construct(
+        private readonly AuthService $authService,
+        private readonly DeviceInfoService $deviceInfoService,
+    ) {}
+
     #[Route("/auth/me", methods: ["GET"])]
     public function me(#[CurrentUser] ?User $user, CacheInterface $appCache)
     {
@@ -59,5 +66,19 @@ final class AuthController extends AbstractController
         }
 
         return CustomResponse::success([], t("auth.logout.success"));
+    }
+
+    #[Route("/auth/verify-otp", methods: ["POST"])]
+    public function verifyOtp(
+        Request $request,
+    ) {
+        try {
+            $payload = $request->toArray();
+            $metadata = $this->deviceInfoService->getMetadata($request);
+            $deviceId = $this->authService->verifyOtp($payload['email'], $payload['otp'], $metadata);
+            return CustomResponse::success($deviceId, t("auth.otp_success"));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
     }
 }

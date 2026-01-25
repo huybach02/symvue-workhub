@@ -9,7 +9,12 @@ auth:
     logout:
         success: "Đăng xuất thành công"
     locked: "Tài khoản đang bị tạm khóa do đăng nhập sai quá số lần cho phép. Vui lòng thử lại sau %lockout%"
-    banned: "Tài khoản bị khóa do vi phạm. Vui lòng liên hệ với quản trị viên."
+    banned: "Tài khoản bị khóa do vi phạm. Vui lòng liên hệ với quản trị viên"
+    time_work: "Không được phép truy cập ngoài giờ làm việc"
+    otp_invalid: "OTP không hợp lệ hoặc đã hết hạn"
+    not_found: "Không tìm thấy người dùng"
+    otp_success: "Xác thực OTP thành công"
+    otp_resend: "Xác thực OTP đã được gửi lại. Vui lòng kiểm tra email"
 error:
     not_found: "Không tìm thấy dữ liệu"
     exists: "Dữ liệu đã tồn tại"

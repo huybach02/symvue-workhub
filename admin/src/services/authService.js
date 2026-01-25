@@ -10,7 +10,7 @@ export const authService = {
                 API_ROUTES_CONFIG.login,
                 data,
             );
-            if (response.data.token) {
+            if (response?.data?.token) {
                 toast.success(response.message);
                 localStorage.setItem("token", response.data.token);
                 if (response.data.refresh_token) {
@@ -23,6 +23,21 @@ export const authService = {
                     localStorage.setItem("device_id", response.data.device_id);
                 }
                 return response;
+            }
+            return response;
+        } catch (error) {
+            return handleAxiosError(error);
+        }
+    },
+    verifyOtp: async (data) => {
+        try {
+            const response = await axiosInstance.post(
+                API_ROUTES_CONFIG.verifyOtp,
+                data,
+            );
+            if (response?.data) {
+                toast.success(response.message);
+                localStorage.setItem("device_id", response.data);
             }
             return response;
         } catch (error) {
@@ -50,7 +65,7 @@ export const authService = {
                 toast.success(response.message);
                 localStorage.removeItem("token");
                 localStorage.removeItem("refresh_token");
-                localStorage.removeItem("device_id");
+                // localStorage.removeItem("device_id");
                 return response;
             }
             return response;

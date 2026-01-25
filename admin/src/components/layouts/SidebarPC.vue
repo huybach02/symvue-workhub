@@ -5,7 +5,7 @@
                 <div
                     class="d-flex flex-column align-center justify-center pa-4"
                 >
-                    <v-avatar size="50" class="mb-3 elevation-2 bg-white">
+                    <v-avatar size="60" class="mb-3 elevation-2 bg-white">
                         <v-img alt="Logo" :src="logo" />
                     </v-avatar>
                     <div

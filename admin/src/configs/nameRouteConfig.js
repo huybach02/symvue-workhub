@@ -1,5 +1,6 @@
 export const NAME_ROUTES_CONFIG = {
     login: "auth.login",
+    verifyOtp: "auth.verifyOtp",
     dashboard: "system.dashboard",
     system_config: "system.config",
     system_config_general: "system.config.general",

@@ -20,6 +20,10 @@ php bin/console doctrine:fixtures:load --group=group_name
 php bin/console make:fixture CategoryFixtures
 
 
+Chạy worker để xử lý message (ví dụ: gửi email)
+php bin/console messenger:consume async
+
+
 
 Tạo controller
 php bin/console make:controller Api\CauHinhChungController

@@ -139,6 +139,26 @@
                 <v-col cols="12" md="3">
                     <VeeField
                         v-slot="{ field, errorMessage }"
+                        name="soThietBiDangNhapToiDa"
+                    >
+                        <v-text-field
+                            v-bind="field"
+                            :error-messages="errorMessage"
+                            type="number"
+                            variant="outlined"
+                            :readonly="!isEditing"
+                            persistent-placeholder
+                        >
+                            <template #label>
+                                {{ $t("system_config.max_device_login") }}
+                                <span class="text-red">*</span>
+                            </template>
+                        </v-text-field>
+                    </VeeField>
+                </v-col>
+                <v-col cols="12" md="3">
+                    <VeeField
+                        v-slot="{ field, errorMessage }"
                         name="thoiHanXacThucLaiThietBi"
                     >
                         <v-text-field
@@ -209,6 +229,7 @@ export default {
                 thoiGianHetHanMaOtp: 0,
                 thoiHanXacThucLaiThietBi: 0,
                 kiemTraThoiGianLamViec: false,
+                soThietBiDangNhapToiDa: 0,
             },
         };
     },
@@ -227,6 +248,7 @@ export default {
                 THOI_GIAN_HET_HAN_OTP: "thoiGianHetHanMaOtp",
                 THOI_HAN_XAC_THUC_LAI_THIET_BI: "thoiHanXacThucLaiThietBi",
                 CHECK_THOI_GIAN_LAM_VIEC: "kiemTraThoiGianLamViec",
+                SO_THIET_BI_DANG_NHAP_TOI_DA: "soThietBiDangNhapToiDa",
             };
 
             const mappedData = {};

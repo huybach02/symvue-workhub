@@ -10,6 +10,11 @@ auth:
         success: "Logout successfully"
     locked: "Account is locked after login failed too many times. Please try again after %lockout%"
     banned: "Account is banned. Please contact the administrator."
+    time_work: "Not allowed to access outside working hours"
+    otp_invalid: "Invalid or expired OTP"
+    not_found: "User not found"
+    otp_success: "Verify OTP successfully"
+    otp_resend: "Verify OTP has been resent. Please check your email"
 error:
     not_found: "Not found"
     exists: "Data already exists"

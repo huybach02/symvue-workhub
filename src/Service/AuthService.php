@@ -2,14 +2,26 @@
 
 namespace App\Service;
 
+use App\Class\Constanst;
+use App\Entity\ThietBiDangNhap;
 use App\Repository\CauHinhChungRepository;
+use App\Repository\ThietBiDangNhapRepository;
+use App\Repository\ThoiGianLamViecRepository;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Ramsey\Uuid\Uuid;
 
 class AuthService
 {
     public function __construct(
         private CacheItemPoolInterface $cache,
-        private CauHinhChungRepository $cauHinhChungRepository
+        private CauHinhChungRepository $cauHinhChungRepository,
+        private ThoiGianLamViecRepository $thoiGianLamViecRepository,
+        private UserRepository $userRepository,
+        private MailService $mailService,
+        private EntityManagerInterface $entityManager,
+        private ThietBiDangNhapRepository $thietBiDangNhapRepository,
     ) {}
 
     public function handleLoginAttempts($attemptsKey, $lockoutKey)
@@ -46,5 +58,98 @@ class AuthService
             return formatSeconds($lockoutExpires - time());
         }
         return "";
+    }
+
+    public function checkIsTimeWork($currentTime, $currentDay)
+    {
+        $cauHinhChung = $this->cauHinhChungRepository->getAllConfig();
+        if ($cauHinhChung['CHECK_THOI_GIAN_LAM_VIEC'] == Constanst::CHECK_THOI_GIAN_LAM_VIEC['KICH_HOAT']) {
+            $thoiGianLamViec = $this->thoiGianLamViecRepository->findOneBy(['thu' => $currentDay]);
+            if ($thoiGianLamViec) {
+                $gioBatDau = $thoiGianLamViec->getGioBatDau();
+                $gioKetThuc = $thoiGianLamViec->getGioKetThuc();
+
+                if ($currentTime < $gioBatDau || $currentTime > $gioKetThuc) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return true;
+    }
+
+    public function generateOtp(): string
+    {
+        return str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    }
+
+    public function sendOtpEmail($email, $otp)
+    {
+        $this->mailService->sendOtpEmail($email, $otp);
+    }
+
+    public function verifyOtp($email, $otp, $metadata)
+    {
+        $user = $this->userRepository->findOneBy(['email' => $email]);
+
+        if (!$user) {
+            throw new \Exception(t("auth.not_found"));
+        }
+
+        $keyOtp = "otp_" . $user->getId();
+
+        // Lấy opt từ cache ra và verify
+        $otpItem = $this->cache->getItem($keyOtp);
+        if ($otpItem->isHit()) {
+            $otpCache = $otpItem->get();
+            if ($otpCache == $otp) {
+
+                $this->handleLimitDeviceLogin($user);
+
+                // Dùng uuid để generate device id
+                $deviceId = Uuid::uuid4()->toString();
+
+                // Tạo record vào database
+                $device = new ThietBiDangNhap();
+                $device->setDeviceKey($deviceId);
+                $device->setUserId($user->getId());
+                $device->setMetadata($metadata);
+
+                $this->entityManager->persist($device);
+                $this->entityManager->flush();
+
+                // Dùng bcrypt để hash deviceId
+                $deviceIdHash = password_hash($deviceId, PASSWORD_BCRYPT);
+                return $deviceIdHash;
+            } else {
+                throw new \Exception(t("auth.otp_invalid"));
+            }
+        }
+
+        // Gửi lại OTP
+        $newOtp = $this->generateOtp();
+        $otpItem->set($newOtp);
+        $thoiGianHieuLucOtp = (int) $this->cauHinhChungRepository->getAllConfig()['THOI_GIAN_HET_HAN_OTP'];
+        $otpItem->expiresAfter($thoiGianHieuLucOtp * 60);
+        $this->cache->save($otpItem);
+
+        $this->sendOtpEmail($email, $newOtp);
+
+        throw new \Exception(t("auth.otp_resend"));
+    }
+
+    public function handleLimitDeviceLogin($user)
+    {
+        $cauHinhChung = $this->cauHinhChungRepository->getAllConfig()['SO_THIET_BI_DANG_NHAP_TOI_DA'];
+        $thietBiDangNhaps = $this->thietBiDangNhapRepository->findBy([
+            'user_id' => $user->getId(),
+        ], [
+            'id' => 'ASC',
+        ]);
+        if (count($thietBiDangNhaps) > $cauHinhChung) {
+            // Remove record thiết bị đăng nhập cũ nhất
+            $this->entityManager->remove($thietBiDangNhaps[0]);
+            $this->entityManager->flush();
+        }
     }
 }

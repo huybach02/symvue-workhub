@@ -16,3 +16,6 @@ api_login_check:
 
 api_refresh_token:
     path: /api/auth/refresh
+
+api_verify_otp:
+    path: /api/auth/verify-otp

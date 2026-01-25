@@ -8,6 +8,8 @@ use App\Entity\User as AppUser;
 use App\Service\AuthService;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;
 
+use function Symfony\Component\Clock\now;
+
 class UserChecker implements UserCheckerInterface
 {
     public function __construct(private AuthService $authService) {}
@@ -34,12 +36,13 @@ class UserChecker implements UserCheckerInterface
         }
 
 
-        // // 2. Kiểm tra giờ làm việc (Ví dụ: 8h - 18h)
-        // // Bạn có thể lấy cấu hình này từ DB hoặc Config
-        // $now = new \DateTime();
-        // $hour = (int)$now->format('H');
-        // $allowedStart = 8;
-        // $allowedEnd = 18;
+        // // 2. Kiểm tra giờ làm việc
+        $currentDay = Constanst::CONVERT_DATE_TIME[now()->format('l')];
+        $currentTime = now()->format('H:i');
+        if (!$this->authService->checkIsTimeWork($currentTime, $currentDay)) {
+            throw new CustomUserMessageAccountStatusException(t('auth.time_work'));
+        }
+
 
         // // Bỏ qua check nếu là ADMIN (tuỳ chọn)
         // if (!in_array('ROLE_ADMIN', $user->getRoles()) && ($hour < $allowedStart || $hour >= $allowedEnd)) {

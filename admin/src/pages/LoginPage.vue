@@ -94,9 +94,20 @@ export default {
         async onSubmit(values) {
             this.$store.commit("setIsLoading");
             const response = await authService.login(values);
+
             if (response.success) {
                 this.$router.push({ name: NAME_ROUTES_CONFIG.dashboard });
             }
+
+            if (response.code === "VERIFY_OTP") {
+                const dataLogin = {
+                    email: values.email,
+                    password: values.password,
+                };
+                this.$store.commit("auth/SET_DATA_LOGIN", dataLogin);
+                this.$router.push({ name: NAME_ROUTES_CONFIG.verifyOtp });
+            }
+
             this.$store.commit("unsetIsLoading");
         },
     },

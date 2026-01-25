@@ -3,6 +3,7 @@ import axios from "axios";
 
 const URL_LOGIN = "/auth/login";
 const URL_REFRESH = "/auth/refresh";
+const URL_VERIFY_OTP = "/auth/verify-otp";
 
 // Tạo axios instance
 const axiosInstance = axios.create({
@@ -31,9 +32,11 @@ const processQueue = (error, token = null) => {
 axiosInstance.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem("token");
+        const deviceId = localStorage.getItem("device_id");
         const currentLang = i18n.global.locale;
 
         config.headers["Accept-Language"] = currentLang;
+        config.headers["Device-Id"] = deviceId;
 
         // Không gắn token nếu đang gọi API refresh
         if (token && !config.url?.includes(URL_REFRESH)) {
@@ -63,7 +66,8 @@ axiosInstance.interceptors.response.use(
         // Bỏ qua nếu lỗi 401 xảy ra ngay tại API login hoặc API refresh (tránh lặp)
         if (
             originalRequest.url?.includes(URL_LOGIN) ||
-            originalRequest.url?.includes(URL_REFRESH)
+            originalRequest.url?.includes(URL_REFRESH) ||
+            originalRequest.url?.includes(URL_VERIFY_OTP)
         ) {
             // Xóa token rác nếu có
             handleLogout();
@@ -146,7 +150,7 @@ axiosInstance.interceptors.response.use(
 function handleLogout() {
     localStorage.removeItem("token");
     localStorage.removeItem("refresh_token");
-    localStorage.removeItem("device_id");
+    // localStorage.removeItem("device_id");
 
     // Chuyển hướng về trang login (nếu không phải đang ở trang login)
     if (window.location.pathname !== URL_LOGIN) {

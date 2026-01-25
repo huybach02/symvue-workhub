@@ -34,6 +34,7 @@ final class CauHinhChungService
                 'thoiGianHetHanMaOtp' => 'THOI_GIAN_HET_HAN_OTP',
                 'thoiHanXacThucLaiThietBi' => 'THOI_HAN_XAC_THUC_LAI_THIET_BI',
                 'kiemTraThoiGianLamViec' => 'CHECK_THOI_GIAN_LAM_VIEC',
+                'soThietBiDangNhapToiDa' => 'SO_THIET_BI_DANG_NHAP_TOI_DA',
             ];
 
             $cauHinhChungList = $this->cauHinhChungRepository->findAll();

@@ -19,7 +19,12 @@
         "sign_in": "Đăng nhập",
         "forgot_password": "Quên mật khẩu",
         "profile": "Hồ sơ",
-        "logout": "Đăng xuất"
+        "logout": "Đăng xuất",
+        "verify_otp": "Xác thực OTP",
+        "verify_otp_description": "Nhập mã OTP gồm 6 chữ số đã được gửi đến email của bạn",
+        "otp_code": "Mã OTP",
+        "resend_otp": "Gửi lại mã OTP",
+        "back_to_login": "Quay lại đăng nhập"
     },
     "sidebar": {
         "home": "Trang chủ",
@@ -44,6 +49,7 @@
         "device_verify_time": "Thời hạn xác thực lại thiết bị (ngày)",
         "working_time_setting": "Thiết lập kiểm tra thời gian làm việc",
         "enable_working_time_check": "Bật/Tắt kiểm tra thời gian làm việc",
+        "max_device_login": "Số thiết bị đăng nhập tối đa",
         "edit_button": "Chỉnh sửa",
         "save_button": "Lưu cấu hình",
         "cancel_button": "Hủy bỏ"

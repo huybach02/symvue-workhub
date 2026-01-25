@@ -1,5 +1,6 @@
 export const API_ROUTES_CONFIG = {
     login: "/auth/login",
+    verifyOtp: "/auth/verify-otp",
     getMe: "/auth/me",
     logout: "/auth/logout",
     cauHinhChung: "/cau-hinh-chung",

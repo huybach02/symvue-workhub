@@ -28,6 +28,11 @@ class CauHinhChungDTO
         #[Assert\NotBlank()]
         #[Assert\Type(type: "integer")]
         #[Assert\GreaterThan(value: 0)]
+        public readonly int $soThietBiDangNhapToiDa,
+
+        #[Assert\NotBlank()]
+        #[Assert\Type(type: "integer")]
+        #[Assert\GreaterThan(value: 0)]
         public readonly int $thoiHanXacThucLaiThietBi,
 
         #[Assert\Type(type: "bool")]

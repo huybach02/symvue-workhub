@@ -32,6 +32,11 @@ class CauHinhChungFixture extends Fixture
                 "mo_ta" => "Thời gian hết hạn OTP (phút)",
             ],
             [
+                "ten_cau_hinh" => "SO_THIET_BI_DANG_NHAP_TOI_DA",
+                "gia_tri" => "5",
+                "mo_ta" => "Số thiết bị đăng nhập tối đa",
+            ],
+            [
                 "ten_cau_hinh" => "THOI_HAN_XAC_THUC_LAI_THIET_BI",
                 "gia_tri" => "90",
                 "mo_ta" => "Thời hạn xác thực lại thiết bị (ngày)",

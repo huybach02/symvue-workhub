@@ -19,6 +19,14 @@ export const routes = [
                     title: i18n.global.t("auth.login"),
                 },
             },
+            {
+                path: "verify-otp",
+                name: NAME_ROUTES_CONFIG.verifyOtp,
+                component: () => import("../pages/VerifyOtpPage.vue"),
+                meta: {
+                    title: i18n.global.t("auth.verify_otp"),
+                },
+            },
         ],
     },
     {
