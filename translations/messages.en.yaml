@@ -15,6 +15,9 @@ auth:
     not_found: "User not found"
     otp_success: "Verify OTP successfully"
     otp_resend: "Verify OTP has been resent. Please check your email"
+    forgot_password: "Send email to reset password successfully. Please check your email"
+    password_not_match: "Password not match"
+    change_password: "Change password successfully. Please login again"
 error:
     not_found: "Not found"
     exists: "Data already exists"

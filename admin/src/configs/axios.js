@@ -1,9 +1,6 @@
 import i18n from "@/plugins/i18n";
 import axios from "axios";
-
-const URL_LOGIN = "/auth/login";
-const URL_REFRESH = "/auth/refresh";
-const URL_VERIFY_OTP = "/auth/verify-otp";
+import { PUBLIC_URL } from "@/utils/constants/publicRoute";
 
 // Tạo axios instance
 const axiosInstance = axios.create({
@@ -39,7 +36,7 @@ axiosInstance.interceptors.request.use(
         config.headers["Device-Id"] = deviceId;
 
         // Không gắn token nếu đang gọi API refresh
-        if (token && !config.url?.includes(URL_REFRESH)) {
+        if (token && !config.url?.includes(PUBLIC_URL.refresh)) {
             config.headers["Authorization"] = `Bearer ${token}`;
         }
 
@@ -63,12 +60,11 @@ axiosInstance.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        // Bỏ qua nếu lỗi 401 xảy ra ngay tại API login hoặc API refresh (tránh lặp)
-        if (
-            originalRequest.url?.includes(URL_LOGIN) ||
-            originalRequest.url?.includes(URL_REFRESH) ||
-            originalRequest.url?.includes(URL_VERIFY_OTP)
-        ) {
+        // Bỏ qua nếu lỗi 401 xảy ra ngay tại các API công khai (tránh lặp)
+        const isPublicUrl = Object.values(PUBLIC_URL).some((url) =>
+            originalRequest.url?.includes(url),
+        );
+        if (isPublicUrl) {
             // Xóa token rác nếu có
             handleLogout();
             return Promise.reject(error);
@@ -102,7 +98,7 @@ axiosInstance.interceptors.response.use(
             // Gọi API refresh (Dùng axios thường để tránh dính interceptor của instance)
             // LƯU Ý: Backend yêu cầu POST và body JSON
             const response = await axios.post(
-                import.meta.env.VITE_API_BASE_URL + URL_REFRESH,
+                import.meta.env.VITE_API_BASE_URL + PUBLIC_URL.refresh,
                 {
                     refresh_token: refreshToken,
                 },
@@ -153,8 +149,8 @@ function handleLogout() {
     // localStorage.removeItem("device_id");
 
     // Chuyển hướng về trang login (nếu không phải đang ở trang login)
-    if (window.location.pathname !== URL_LOGIN) {
-        window.location.href = URL_LOGIN;
+    if (window.location.pathname !== PUBLIC_URL.login) {
+        window.location.href = PUBLIC_URL.login;
     }
 }
 

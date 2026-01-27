@@ -15,6 +15,9 @@ auth:
     not_found: "Không tìm thấy người dùng"
     otp_success: "Xác thực OTP thành công"
     otp_resend: "Xác thực OTP đã được gửi lại. Vui lòng kiểm tra email"
+    forgot_password: "Gửi email khôi phục mật khẩu thành công. Vui lòng kiểm tra email"
+    password_not_match: "Mật khẩu không khớp"
+    change_password: "Đổi mật khẩu thành công. Vui lòng đăng nhập lại"
 error:
     not_found: "Không tìm thấy dữ liệu"
     exists: "Dữ liệu đã tồn tại"

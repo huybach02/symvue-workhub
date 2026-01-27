@@ -60,7 +60,7 @@
             type="button"
             block
             class="mt-5"
-            @click="$router.push('/forgot-password')"
+            @click="$router.push({ name: NAME_ROUTES_CONFIG })"
         />
     </VeeForm>
 </template>
@@ -83,6 +83,7 @@ export default {
             subName: import.meta.env.VITE_APP_SUBNAME,
             schema: loginSchema,
             loading: false,
+            NAME_ROUTES_CONFIG: NAME_ROUTES_CONFIG.forgotPassword,
             initialValues: {
                 email: import.meta.env.VITE_EMAIL_ACCOUNT_DEFAULT || "",
                 password: import.meta.env.VITE_PASSWORD_ACCOUNT_DEFAULT || "",
@@ -94,6 +95,7 @@ export default {
         async onSubmit(values) {
             this.$store.commit("setIsLoading");
             const response = await authService.login(values);
+            console.log(response);
 
             if (response.success) {
                 this.$router.push({ name: NAME_ROUTES_CONFIG.dashboard });
@@ -106,6 +108,14 @@ export default {
                 };
                 this.$store.commit("auth/SET_DATA_LOGIN", dataLogin);
                 this.$router.push({ name: NAME_ROUTES_CONFIG.verifyOtp });
+            }
+
+            if (response.code === "FIRST_LOGIN") {
+                const dataLogin = {
+                    email: values.email,
+                };
+                this.$store.commit("auth/SET_DATA_LOGIN", dataLogin);
+                this.$router.push({ name: NAME_ROUTES_CONFIG.changePassword });
             }
 
             this.$store.commit("unsetIsLoading");

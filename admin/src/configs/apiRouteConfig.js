@@ -3,6 +3,8 @@ export const API_ROUTES_CONFIG = {
     verifyOtp: "/auth/verify-otp",
     getMe: "/auth/me",
     logout: "/auth/logout",
+    forgotPassword: "/auth/forgot-password",
+    changePassword: "/auth/change-password",
     cauHinhChung: "/cau-hinh-chung",
     thoiGianLamViec: {
         findAll: "/thoi-gian-lam-viec/fulltime",

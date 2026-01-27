@@ -39,3 +39,8 @@ export const maxNumberRuleRequired = yup
 export const booleanRule = yup
     .boolean()
     .required(renderMessage(messageValidate.required));
+
+export const confirmPasswordRule = yup
+    .string()
+    .required("Xác nhận mật khẩu là bắt buộc")
+    .oneOf([yup.ref("password")], "Mật khẩu không khớp");

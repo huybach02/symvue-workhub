@@ -19,3 +19,9 @@ api_refresh_token:
 
 api_verify_otp:
     path: /api/auth/verify-otp
+
+api_forgot_password:
+    path: /api/auth/forgot-password
+
+api_change_password:
+    path: /api/auth/change-password

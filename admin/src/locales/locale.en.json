@@ -12,6 +12,12 @@
     },
     "loading": "Loading...",
     "system_management": "System Management",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "back": "Back",
+    "edit": "Edit",
+    "delete": "Delete",
     "auth": {
         "login": "Login",
         "password": "Password",
@@ -24,7 +30,10 @@
         "verify_otp_description": "Enter the 6-digit OTP code sent to your email",
         "otp_code": "OTP Code",
         "resend_otp": "Resend OTP",
-        "back_to_login": "Back to login"
+        "back_to_login": "Back to login",
+        "change_password": "Change new password",
+        "new_password": "New password",
+        "confirm_password": "Confirm password"
     },
     "sidebar": {
         "home": "Home",

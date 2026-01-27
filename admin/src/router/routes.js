@@ -27,6 +27,22 @@ export const routes = [
                     title: i18n.global.t("auth.verify_otp"),
                 },
             },
+            {
+                path: "forgot-password",
+                name: NAME_ROUTES_CONFIG.forgotPassword,
+                component: () => import("../pages/ForgotPasswordPage.vue"),
+                meta: {
+                    title: i18n.global.t("auth.forgot_password"),
+                },
+            },
+            {
+                path: "change-password",
+                name: NAME_ROUTES_CONFIG.changePassword,
+                component: () => import("../pages/ChangePasswordPage.vue"),
+                meta: {
+                    title: i18n.global.t("auth.change_password"),
+                },
+            },
         ],
     },
     {

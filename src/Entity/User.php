@@ -87,6 +87,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $rememberToken = null;
 
+    #[ORM\Column(type: 'integer', options: ['default' => 1, 'comment' => '0: tài khoản đã đổi mật khẩu, 1: tài khoản đăng nhập lần đầu tiên'])]
+    private int $isFirstLogin = 1;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -350,6 +353,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRememberToken(?string $rememberToken): static
     {
         $this->rememberToken = $rememberToken;
+
+        return $this;
+    }
+
+    public function getIsFirstLogin(): int
+    {
+        return $this->isFirstLogin;
+    }
+
+    public function setIsFirstLogin(int $isFirstLogin): static
+    {
+        $this->isFirstLogin = $isFirstLogin;
 
         return $this;
     }

@@ -59,6 +59,10 @@ class AuthenticationSuccessListener
 
         // LOGIC Xử lý xác thực OTP
         $formattedResponse = $this->handleOtpVerification($user, $userEntity, $formattedResponse);
+
+        // LOGIC Xử lý đổi mật khẩu khi đăng nhập lần đầu tiên
+        $formattedResponse = $this->handleFirstLogin($userEntity, $formattedResponse);
+
         $event->setData($formattedResponse);
     }
 
@@ -123,6 +127,20 @@ class AuthenticationSuccessListener
                     'data' => []
                 ];
             }
+        }
+
+        return $formattedResponse;
+    }
+
+    private function handleFirstLogin(User $user, array $formattedResponse): array
+    {
+        if ($user->getIsFirstLogin() == 1) {
+            $formattedResponse = [
+                'success' => false,
+                "code" => "FIRST_LOGIN",
+                'message' => "Đăng nhập lần đầu tiên",
+                'data' => []
+            ];
         }
 
         return $formattedResponse;

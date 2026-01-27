@@ -73,4 +73,32 @@ export const authService = {
             return handleAxiosError(error);
         }
     },
+    forgotPassword: async (data) => {
+        try {
+            const response = await axiosInstance.post(
+                API_ROUTES_CONFIG.forgotPassword,
+                data,
+            );
+            if (response.success) {
+                toast.success(response.message);
+            }
+            return response;
+        } catch (error) {
+            return handleAxiosError(error);
+        }
+    },
+    changePassword: async (data) => {
+        try {
+            const response = await axiosInstance.post(
+                API_ROUTES_CONFIG.changePassword,
+                data,
+            );
+            if (response.success) {
+                toast.success(response.message);
+            }
+            return response;
+        } catch (error) {
+            return handleAxiosError(error);
+        }
+    },
 };

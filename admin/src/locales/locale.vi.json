@@ -12,6 +12,12 @@
     },
     "loading": "Đang tải...",
     "system_management": "Hệ thống quản lý",
+    "confirm": "Xác nhận",
+    "cancel": "Hủy bỏ",
+    "save": "Lưu",
+    "back": "Quay lại",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
     "auth": {
         "login": "Đăng nhập",
         "password": "Mật khẩu",
@@ -24,7 +30,10 @@
         "verify_otp_description": "Nhập mã OTP gồm 6 chữ số đã được gửi đến email của bạn",
         "otp_code": "Mã OTP",
         "resend_otp": "Gửi lại mã OTP",
-        "back_to_login": "Quay lại đăng nhập"
+        "back_to_login": "Quay lại đăng nhập",
+        "change_password": "Cập nhật mật khẩu mới",
+        "new_password": "Mật khẩu mới",
+        "confirm_password": "Xác nhận mật khẩu"
     },
     "sidebar": {
         "home": "Trang chủ",

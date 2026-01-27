@@ -81,4 +81,28 @@ final class AuthController extends AbstractController
             return CustomResponse::error($th->getMessage());
         }
     }
+
+    #[Route("/auth/forgot-password", methods: ["POST"])]
+    public function forgotPassword(Request $request)
+    {
+        try {
+            $payload = $request->toArray();
+            $this->authService->forgotPassword($payload['email']);
+            return CustomResponse::success([], t("auth.forgot_password"));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route("/auth/change-password", methods: ["POST"])]
+    public function changePassword(Request $request)
+    {
+        try {
+            $payload = $request->toArray();
+            $this->authService->changePassword($payload['email'], $payload['password'], $payload['confirm_password']);
+            return CustomResponse::success([], t("auth.change_password"));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
 }

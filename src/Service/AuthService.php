@@ -11,6 +11,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AuthService
 {
@@ -22,6 +23,7 @@ class AuthService
         private MailService $mailService,
         private EntityManagerInterface $entityManager,
         private ThietBiDangNhapRepository $thietBiDangNhapRepository,
+        private UserPasswordHasherInterface $passwordHasher
     ) {}
 
     public function handleLoginAttempts($attemptsKey, $lockoutKey)
@@ -151,5 +153,45 @@ class AuthService
             $this->entityManager->remove($thietBiDangNhaps[0]);
             $this->entityManager->flush();
         }
+    }
+
+
+    public function sendForgotPasswordEmail($email, $password)
+    {
+        $this->mailService->sendForgotPasswordEmail($email, $password);
+    }
+
+    public function forgotPassword($email)
+    {
+        $user = $this->userRepository->findOneBy(['email' => $email]);
+        if (!$user) {
+            throw new \Exception(t("auth.not_found"));
+        }
+
+        $password = generateRandomString(10);
+
+        $user->setPassword($this->passwordHasher->hashPassword($user, $password));
+        $user->setIsFirstLogin(true);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        $this->sendForgotPasswordEmail($email, $password);
+    }
+
+    public function changePassword($email, $password, $confirmPassword)
+    {
+        $user = $this->userRepository->findOneBy(['email' => $email]);
+        if (!$user) {
+            throw new \Exception(t("auth.not_found"));
+        }
+
+        if ($password != $confirmPassword) {
+            throw new \Exception(t("auth.password_not_match"));
+        }
+
+        $user->setPassword($this->passwordHasher->hashPassword($user, $password));
+        $user->setIsFirstLogin(false);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
     }
 }
