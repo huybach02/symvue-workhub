@@ -86,5 +86,34 @@
         "edit": "Chỉnh sửa ca làm việc",
         "cancel_button": "Hủy bỏ",
         "save_button": "Lưu ca làm việc"
+    },
+    "media_library": {
+        "title": "Thư viện ảnh",
+        "select_from_library": "Chọn ảnh từ thư viện",
+        "selected_images": "Ảnh đã chọn",
+        "upload_images": "Upload ảnh",
+        "no_images": "Chưa có ảnh nào. Vui lòng upload ảnh mới.",
+        "no_images_in_trash": "Chưa có ảnh nào trong thùng rác.",
+        "delete_button": "Xóa ({count} ảnh)",
+        "confirm_select_button": "Xác nhận chọn ({count} ảnh)",
+        "delete_confirm_message": "Bạn có chắc chắn muốn xóa {count} ảnh này?",
+        "select_all": "Chọn tất cả",
+        "deselect_all": "Bỏ chọn tất cả",
+        "restore_button": "Khôi phục ({count} ảnh)",
+        "delete_permanently_button": "Xóa vĩnh viễn ({count} ảnh)",
+        "restore_confirm_title": "Xác nhận khôi phục",
+        "restore_confirm_message": "Bạn có chắc chắn muốn khôi phục {count} ảnh này?",
+        "delete_permanently_confirm_title": "Xác nhận xóa vĩnh viễn",
+        "delete_permanently_confirm_message": "Bạn có chắc chắn muốn xóa vĩnh viễn {count} ảnh này? Hành động này không thể hoàn tác!",
+        "restore_action": "Khôi phục",
+        "delete_permanently_action": "Xóa vĩnh viễn",
+        "tab_library": "Thư viện ảnh",
+        "tab_trash": "Thùng rác"
+    },
+    "confirm_dialog": {
+        "default_title": "Xác nhận",
+        "default_message": "Bạn có chắc chắn muốn thực hiện hành động này?",
+        "confirm_button": "Xác nhận",
+        "cancel_button": "Hủy"
     }
 }

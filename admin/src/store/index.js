@@ -1,5 +1,6 @@
 import { createStore } from "vuex";
 import auth from "./modules/auth";
+import media from "./modules/media";
 
 const store = createStore({
     state() {
@@ -18,6 +19,7 @@ const store = createStore({
     actions: {},
     modules: {
         auth,
+        media,
     },
 });
 

@@ -86,5 +86,34 @@
         "create": "Create shift",
         "cancel_button": "Cancel",
         "save_button": "Save shift"
+    },
+    "media_library": {
+        "title": "Media Library",
+        "select_from_library": "Select from library",
+        "selected_images": "Selected images",
+        "upload_images": "Upload images",
+        "no_images": "No images yet. Please upload new images.",
+        "no_images_in_trash": "No images in trash.",
+        "delete_button": "Delete ({count} images)",
+        "confirm_select_button": "Confirm selection ({count} images)",
+        "delete_confirm_message": "Are you sure you want to delete {count} images?",
+        "select_all": "Select all",
+        "deselect_all": "Deselect all",
+        "restore_button": "Restore ({count} images)",
+        "delete_permanently_button": "Delete permanently ({count} images)",
+        "restore_confirm_title": "Confirm restore",
+        "restore_confirm_message": "Are you sure you want to restore {count} images?",
+        "delete_permanently_confirm_title": "Confirm permanent deletion",
+        "delete_permanently_confirm_message": "Are you sure you want to permanently delete {count} images? This action cannot be undone!",
+        "restore_action": "Restore",
+        "delete_permanently_action": "Delete permanently",
+        "tab_library": "Media Library",
+        "tab_trash": "Trash"
+    },
+    "confirm_dialog": {
+        "default_title": "Confirm",
+        "default_message": "Are you sure you want to perform this action?",
+        "confirm_button": "Confirm",
+        "cancel_button": "Cancel"
     }
 }

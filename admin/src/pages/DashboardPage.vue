@@ -1,9 +1,28 @@
 <template>
-    <div>Dashboard Content</div>
+    <div>
+        Dashboard Content
+
+        <ImageSelector
+            v-model="form.avatar"
+            label="Ảnh đại diện"
+            :is-multiple="false"
+        />
+    </div>
 </template>
 
 <script>
-export default {};
+import ImageSelector from "../components/ImageSelector.vue";
+
+export default {
+    components: { ImageSelector },
+    data() {
+        return {
+            form: {
+                avatar: null,
+            },
+        };
+    },
+};
 </script>
 
 <style></style>

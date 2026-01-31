@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Traits\TimestampableTrait;
 use App\Repository\UserRepository;
 use App\Traits\SoftDeleteableTrait;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -89,6 +91,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'integer', options: ['default' => 1, 'comment' => '0: tài khoản đã đổi mật khẩu, 1: tài khoản đăng nhập lần đầu tiên'])]
     private int $isFirstLogin = 1;
+
+    /**
+     * @var Collection<int, Folder>
+     */
+    #[ORM\OneToMany(targetEntity: Folder::class, mappedBy: 'owner')]
+    private Collection $folders;
+
+    /**
+     * @var Collection<int, Media>
+     */
+    #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'owner')]
+    private Collection $media;
+
+    public function __construct()
+    {
+        $this->folders = new ArrayCollection();
+        $this->media = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -400,5 +420,65 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];
+    }
+
+    /**
+     * @return Collection<int, Folder>
+     */
+    public function getFolders(): Collection
+    {
+        return $this->folders;
+    }
+
+    public function addFolder(Folder $folder): static
+    {
+        if (!$this->folders->contains($folder)) {
+            $this->folders->add($folder);
+            $folder->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFolder(Folder $folder): static
+    {
+        if ($this->folders->removeElement($folder)) {
+            // set the owning side to null (unless already changed)
+            if ($folder->getOwner() === $this) {
+                $folder->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Media>
+     */
+    public function getMedia(): Collection
+    {
+        return $this->media;
+    }
+
+    public function addMedium(Media $medium): static
+    {
+        if (!$this->media->contains($medium)) {
+            $this->media->add($medium);
+            $medium->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMedium(Media $medium): static
+    {
+        if ($this->media->removeElement($medium)) {
+            // set the owning side to null (unless already changed)
+            if ($medium->getOwner() === $this) {
+                $medium->setOwner(null);
+            }
+        }
+
+        return $this;
     }
 }

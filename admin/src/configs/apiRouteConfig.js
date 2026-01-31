@@ -13,4 +13,12 @@ export const API_ROUTES_CONFIG = {
         createParttime: "/thoi-gian-lam-viec/parttime",
         findAllParttimeByThoiGianLamViecId: "/thoi-gian-lam-viec/parttime/:id",
     },
+    media: {
+        upload: "/media/upload",
+        getAll: "/media",
+        delete: "/media/delete",
+        getMediaTrash: "/media/trash",
+        restore: "/media/restore",
+        deletePermanently: "/media/delete-permanently",
+    },
 };
