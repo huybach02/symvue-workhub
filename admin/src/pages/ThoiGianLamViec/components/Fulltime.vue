@@ -52,8 +52,9 @@
 </template>
 
 <script>
-import { thoiGianLamViecService } from "@/services/thoiGianLamViecService";
 import FulltimeDialog from "./FulltimeDialog.vue";
+import { getAllData } from "@/services/bases/getData";
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 
 export default {
     components: {
@@ -73,7 +74,9 @@ export default {
         async fetchData() {
             try {
                 this.$store.commit("setIsLoading");
-                const response = await thoiGianLamViecService.findAll();
+                const response = await getAllData(
+                    API_ROUTES_CONFIG.thoiGianLamViec.fulltime,
+                );
                 this.$store.commit("unsetIsLoading");
                 this.data = response;
             } catch (error) {

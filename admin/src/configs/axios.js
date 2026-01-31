@@ -97,10 +97,25 @@ axiosInstance.interceptors.response.use(
 
             // Gọi API refresh (Dùng axios thường để tránh dính interceptor của instance)
             // LƯU Ý: Backend yêu cầu POST và body JSON
+            const deviceId = localStorage.getItem("device_id");
+            const currentLang = i18n.global.locale;
+
+            const headers = {
+                "Accept-Language": currentLang,
+            };
+
+            // Thêm Device-Id header nếu có
+            if (deviceId) {
+                headers["Device-Id"] = deviceId;
+            }
+
             const response = await axios.post(
                 import.meta.env.VITE_API_BASE_URL + PUBLIC_URL.refresh,
                 {
                     refresh_token: refreshToken,
+                },
+                {
+                    headers: headers,
                 },
             );
 

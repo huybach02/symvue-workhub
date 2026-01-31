@@ -208,7 +208,9 @@
 </template>
 
 <script>
-import { cauHinhChungService } from "@/services/cauHinhChungService";
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
+import { getAllData } from "@/services/bases/getData";
+import { postData } from "@/services/bases/postData";
 import { cauHinhChungSchema } from "@/utils/schemas/cauHinhChung";
 import { Field, Form } from "vee-validate";
 
@@ -239,7 +241,7 @@ export default {
     methods: {
         async getAll() {
             this.$store.commit("setIsLoading");
-            const response = await cauHinhChungService.getAll();
+            const response = await getAllData(API_ROUTES_CONFIG.cauHinhChung);
 
             const mapping = {
                 SO_LAN_DANG_NHAP_SAI_TOI_DA: "soLanDangNhapSai",
@@ -252,7 +254,7 @@ export default {
             };
 
             const mappedData = {};
-            response.data.forEach((item) => {
+            response.forEach((item) => {
                 const key = mapping[item.tenCauHinh];
                 if (key) {
                     if (
@@ -272,8 +274,11 @@ export default {
         },
         async onSubmit(values) {
             this.$store.commit("setIsLoading");
-            const response = await cauHinhChungService.update(values);
-            if (response.success) {
+            const response = await postData(
+                API_ROUTES_CONFIG.cauHinhChung,
+                values,
+            );
+            if (response) {
                 this.isEditing = false;
             }
             this.$store.commit("unsetIsLoading");

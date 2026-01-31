@@ -18,7 +18,6 @@ export const uploadService = {
             return response;
         } catch (error) {
             handleAxiosError(error);
-            throw error;
         }
     },
 
@@ -30,7 +29,6 @@ export const uploadService = {
             return response;
         } catch (error) {
             handleAxiosError(error);
-            throw error;
         }
     },
 
@@ -44,7 +42,6 @@ export const uploadService = {
             return response;
         } catch (error) {
             handleAxiosError(error);
-            throw error;
         }
     },
 
@@ -56,7 +53,6 @@ export const uploadService = {
             return response;
         } catch (error) {
             handleAxiosError(error);
-            throw error;
         }
     },
 
@@ -70,7 +66,6 @@ export const uploadService = {
             return response;
         } catch (error) {
             handleAxiosError(error);
-            throw error;
         }
     },
 
@@ -84,7 +79,6 @@ export const uploadService = {
             return response;
         } catch (error) {
             handleAxiosError(error);
-            throw error;
         }
     },
 };

@@ -142,8 +142,10 @@
 </template>
 
 <script>
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import { functionHelper } from "@/helpers/functionHelper";
-import { thoiGianLamViecService } from "@/services/thoiGianLamViecService";
+import { getDataById } from "@/services/bases/getData";
+import { putData } from "@/services/bases/updateData";
 import { Form as VeeForm, Field as VeeField } from "vee-validate";
 
 export default {
@@ -200,28 +202,33 @@ export default {
         },
     },
     methods: {
-        fetchItemById() {
+        async fetchItemById() {
             if (this.itemEdit) {
                 this.dataLoaded = false;
                 this.$store.commit("setIsLoading");
-                thoiGianLamViecService
-                    .findById(this.itemEdit.id)
-                    .then((response) => {
-                        this.initialValues = response;
-                        this.dataLoaded = true;
-                        this.$store.commit("unsetIsLoading");
-                    });
+                const response = await getDataById(
+                    API_ROUTES_CONFIG.thoiGianLamViec.fulltime,
+                    this.itemEdit.id,
+                );
+                if (response) {
+                    this.initialValues = response;
+                    this.dataLoaded = true;
+                    this.$store.commit("unsetIsLoading");
+                }
             }
         },
-        onSubmit(values) {
+        async onSubmit(values) {
             this.$store.commit("setIsLoading");
-            thoiGianLamViecService
-                .updateFulltime(this.itemEdit.id, values)
-                .then((response) => {
-                    this.$store.commit("unsetIsLoading");
-                    this.dialog = false;
-                    this.$emit("update");
-                });
+            const response = await putData(
+                API_ROUTES_CONFIG.thoiGianLamViec.fulltime,
+                this.itemEdit.id,
+                values,
+            );
+            if (response) {
+                this.$store.commit("unsetIsLoading");
+                this.dialog = false;
+                this.$emit("update");
+            }
         },
         updateTime(field, value) {
             functionHelper.updateTime(field, value);

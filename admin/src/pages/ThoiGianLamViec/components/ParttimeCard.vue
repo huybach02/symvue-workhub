@@ -47,7 +47,8 @@
 </template>
 
 <script>
-import { thoiGianLamViecService } from "@/services/thoiGianLamViecService";
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
+import { getDataById } from "@/services/bases/getData";
 
 export default {
     props: {
@@ -78,10 +79,10 @@ export default {
         async fetchCaLamViecList() {
             try {
                 this.$store.commit("setIsLoading");
-                const response =
-                    await thoiGianLamViecService.findAllParttimeByThoiGianLamViecId(
-                        this.thoiGianLamViec.id,
-                    );
+                const response = await getDataById(
+                    API_ROUTES_CONFIG.thoiGianLamViec.parttime,
+                    this.thoiGianLamViec.id,
+                );
                 this.caLamViecList = response;
                 this.$store.commit("unsetIsLoading");
             } catch (error) {

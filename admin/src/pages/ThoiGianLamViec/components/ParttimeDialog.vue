@@ -129,8 +129,9 @@
 </template>
 
 <script>
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import { functionHelper } from "@/helpers/functionHelper";
-import { thoiGianLamViecService } from "@/services/thoiGianLamViecService";
+import { postData } from "@/services/bases/postData";
 import { Form as VeeForm, Field as VeeField } from "vee-validate";
 
 export default {
@@ -175,15 +176,17 @@ export default {
         },
     },
     methods: {
-        onSubmit(values) {
+        async onSubmit(values) {
             this.$store.commit("setIsLoading");
             values.thoiGianLamViecId = this.thoiGianLamViec.id;
-            thoiGianLamViecService.createParttime(values).then((response) => {
-                if (response) {
-                    this.dialog = false;
-                    this.$emit("update");
-                }
-            });
+            const response = await postData(
+                API_ROUTES_CONFIG.thoiGianLamViec.parttime,
+                values,
+            );
+            if (response) {
+                this.dialog = false;
+                this.$emit("update");
+            }
             this.$store.commit("unsetIsLoading");
         },
         updateTime(field, value) {

@@ -7,11 +7,8 @@ export const API_ROUTES_CONFIG = {
     changePassword: "/auth/change-password",
     cauHinhChung: "/cau-hinh-chung",
     thoiGianLamViec: {
-        findAll: "/thoi-gian-lam-viec/fulltime",
-        findById: "/thoi-gian-lam-viec/fulltime/:id",
-        updateFulltime: "/thoi-gian-lam-viec/fulltime/:id",
-        createParttime: "/thoi-gian-lam-viec/parttime",
-        findAllParttimeByThoiGianLamViecId: "/thoi-gian-lam-viec/parttime/:id",
+        fulltime: "/thoi-gian-lam-viec/fulltime",
+        parttime: "/thoi-gian-lam-viec/parttime",
     },
     media: {
         upload: "/media/upload",
