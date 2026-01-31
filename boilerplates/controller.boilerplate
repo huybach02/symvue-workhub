@@ -1,0 +1,76 @@
+<?php
+
+namespace App\Controller;
+
+use App\Class\CustomResponse;
+use App\DTO\{{MODULE_NAME}}DTO;
+use App\Service\{{MODULE_NAME}}Service;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\Routing\Attribute\Route;
+
+final class {{MODULE_NAME}}Controller extends AbstractController
+{
+    public function __construct(
+        private readonly {{MODULE_NAME}}Service ${{ENTITY_VAR}}Service,
+    ) {}
+
+    #[Route('/{{MODULE_NAME_LOWER}}', methods: ['GET'])]
+    public function getAll(): JsonResponse
+    {
+        try {
+            $data = $this->{{ENTITY_VAR}}Service->findAll();
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/{{MODULE_NAME_LOWER}}/{id}', methods: ['GET'])]
+    public function getOne(int $id): JsonResponse
+    {
+        try {
+            $data = $this->{{ENTITY_VAR}}Service->findById($id);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/{{MODULE_NAME_LOWER}}', methods: ['POST'])]
+    public function create(
+        #[MapRequestPayload(validationGroups: ['create'])] {{MODULE_NAME}}DTO ${{ENTITY_VAR}}DTO
+    ): JsonResponse {
+        try {
+            $data = $this->{{ENTITY_VAR}}Service->create(${{ENTITY_VAR}}DTO);
+            return CustomResponse::success($data, t('success.created'));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/{{MODULE_NAME_LOWER}}/{id}', methods: ['PUT'])]
+    public function update(
+        int $id,
+        #[MapRequestPayload(validationGroups: ['update'])] {{MODULE_NAME}}DTO ${{ENTITY_VAR}}DTO
+    ): JsonResponse {
+        try {
+            $data = $this->{{ENTITY_VAR}}Service->update($id, ${{ENTITY_VAR}}DTO);
+            return CustomResponse::success($data, t('success.updated'));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/{{MODULE_NAME_LOWER}}/{id}', methods: ['DELETE'])]
+    public function delete(int $id): JsonResponse
+    {
+        try {
+            $this->{{ENTITY_VAR}}Service->delete($id);
+            return CustomResponse::success([], t('success.deleted'));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+}

@@ -1,0 +1,78 @@
+<?php
+
+namespace App\Service;
+
+use App\DTO\{{MODULE_NAME}}DTO;
+use App\Entity\{{ENTITY_NAME}};
+use App\Repository\{{ENTITY_NAME}}Repository;
+use Doctrine\ORM\EntityManagerInterface;
+
+class {{MODULE_NAME}}Service
+{
+    public function __construct(
+        private readonly {{ENTITY_NAME}}Repository ${{ENTITY_VAR}}Repository,
+        private readonly EntityManagerInterface $entityManager,
+    ) {}
+
+    public function findAll(): array
+    {
+        $items = $this->{{ENTITY_VAR}}Repository->findAll();
+
+        return array_map(
+            fn({{ENTITY_NAME}} $item) => $item->jsonSerialize(),
+            $items
+        );
+    }
+
+    public function findById(int $id): array
+    {
+        $item = $this->{{ENTITY_VAR}}Repository->find($id);
+        
+        if (!$item) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        return $item->jsonSerialize();
+    }
+
+    public function create({{MODULE_NAME}}DTO $dto): array
+    {
+        $item = new {{ENTITY_NAME}}();
+        
+        // TODO: Map DTO properties to entity
+        // Example: $item->setName($dto->name);
+        
+        $this->entityManager->persist($item);
+        $this->entityManager->flush();
+
+        return $item->jsonSerialize();
+    }
+
+    public function update(int $id, {{MODULE_NAME}}DTO $dto): array
+    {
+        $item = $this->{{ENTITY_VAR}}Repository->find($id);
+        
+        if (!$item) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        // TODO: Map DTO properties to entity
+        // Example: $item->setName($dto->name);
+
+        $this->entityManager->flush();
+
+        return $item->jsonSerialize();
+    }
+
+    public function delete(int $id): void
+    {
+        $item = $this->{{ENTITY_VAR}}Repository->find($id);
+        
+        if (!$item) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $this->entityManager->remove($item);
+        $this->entityManager->flush();
+    }
+}
