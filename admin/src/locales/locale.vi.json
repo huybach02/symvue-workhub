@@ -97,7 +97,7 @@
         "no_images_in_trash": "Chưa có ảnh nào trong thùng rác.",
         "delete_button": "Xóa ({count} ảnh)",
         "confirm_select_button": "Xác nhận chọn ({count} ảnh)",
-        "delete_confirm_message": "Bạn có chắc chắn muốn xóa {count} ảnh này?",
+        "delete_confirm_message": "Bạn có chắc chắn muốn xóa {count} dữ liệu này?",
         "select_all": "Chọn tất cả",
         "deselect_all": "Bỏ chọn tất cả",
         "restore_button": "Khôi phục ({count} ảnh)",
@@ -135,6 +135,9 @@
             "display": {
                 "from": "Từ",
                 "to": "Đến"
+            },
+            "error": {
+                "invalid_range": "Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc"
             }
         },
         "pagination": {

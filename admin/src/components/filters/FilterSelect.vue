@@ -6,7 +6,9 @@
         multiple
         :label="title"
         hide-details
+        clearable
         @update:model-value="onChange"
+        @click:clear="handleClear"
     />
 </template>
 
@@ -29,6 +31,12 @@ export default {
             this.$emit("update", {
                 type: "includes",
                 value: val,
+            });
+        },
+        handleClear() {
+            this.$emit("update", {
+                type: "includes",
+                value: [],
             });
         },
     },

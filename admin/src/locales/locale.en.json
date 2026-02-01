@@ -96,7 +96,7 @@
         "no_images_in_trash": "No images in trash.",
         "delete_button": "Delete ({count} images)",
         "confirm_select_button": "Confirm selection ({count} images)",
-        "delete_confirm_message": "Are you sure you want to delete {count} images?",
+        "delete_confirm_message": "Are you sure you want to delete {count} records?",
         "select_all": "Select all",
         "deselect_all": "Deselect all",
         "restore_button": "Restore ({count} images)",
@@ -134,6 +134,9 @@
             "display": {
                 "from": "From",
                 "to": "To"
+            },
+            "error": {
+                "invalid_range": "Start date must be less than or equal to end date"
             }
         },
         "pagination": {

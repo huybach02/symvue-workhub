@@ -125,29 +125,59 @@ class FilterWithPagination
             return;
         }
 
-        // Nếu chỉ có end date (lấy tất cả từ quá khứ đến end date)
+        // Kiểm tra xem có phải là date string không (format: YYYY-MM-DD)
+        $isDateFilter = self::isDateString($start) || self::isDateString($end);
+
+        // Nếu chỉ có end value
         if (!$start && $end) {
-            $endDateTime = new DateTime($end . " 23:59:59");
-            $qb->andWhere("$field <= :bEnd$index")
-                ->setParameter("bEnd$index", $endDateTime);
+            if ($isDateFilter) {
+                $endDateTime = new DateTime($end . " 23:59:59");
+                $qb->andWhere("$field <= :bEnd$index")
+                    ->setParameter("bEnd$index", $endDateTime);
+            } else {
+                $qb->andWhere("$field <= :bEnd$index")
+                    ->setParameter("bEnd$index", $end);
+            }
             return;
         }
 
-        // Nếu chỉ có start date (lấy từ start date đến hiện tại)
+        // Nếu chỉ có start value
         if ($start && !$end) {
-            $startDateTime = new DateTime($start . " 00:00:00");
-            $qb->andWhere("$field >= :bStart$index")
-                ->setParameter("bStart$index", $startDateTime);
+            if ($isDateFilter) {
+                $startDateTime = new DateTime($start . " 00:00:00");
+                $qb->andWhere("$field >= :bStart$index")
+                    ->setParameter("bStart$index", $startDateTime);
+            } else {
+                $qb->andWhere("$field >= :bStart$index")
+                    ->setParameter("bStart$index", $start);
+            }
             return;
         }
 
-        // Nếu có cả start và end date
-        $startDateTime = new DateTime($start . " 00:00:00");
-        $endDateTime   = new DateTime($end . " 23:59:59");
+        // Nếu có cả start và end value
+        if ($isDateFilter) {
+            $startDateTime = new DateTime($start . " 00:00:00");
+            $endDateTime   = new DateTime($end . " 23:59:59");
 
-        $qb->andWhere("$field BETWEEN :bStart$index AND :bEnd$index")
-            ->setParameter("bStart$index", $startDateTime)
-            ->setParameter("bEnd$index", $endDateTime);
+            $qb->andWhere("$field BETWEEN :bStart$index AND :bEnd$index")
+                ->setParameter("bStart$index", $startDateTime)
+                ->setParameter("bEnd$index", $endDateTime);
+        } else {
+            $qb->andWhere("$field BETWEEN :bStart$index AND :bEnd$index")
+                ->setParameter("bStart$index", $start)
+                ->setParameter("bEnd$index", $end);
+        }
+    }
+
+
+    private static function isDateString($value): bool
+    {
+        if (!is_string($value)) {
+            return false;
+        }
+
+        // Kiểm tra format YYYY-MM-DD hoặc YYYY-M-D
+        return (bool) preg_match('/^\d{4}-\d{1,2}-\d{1,2}$/', $value);
     }
 
 

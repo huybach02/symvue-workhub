@@ -4,7 +4,9 @@
         variant="plain"
         :label="title"
         hide-details
+        clearable
         @input="update($event.target.value)"
+        @click:clear="handleClear"
     />
 </template>
 
@@ -36,6 +38,13 @@ export default {
                 fieldType: "text",
                 type: "contain",
                 value: val,
+            });
+        },
+        handleClear() {
+            this.$emit("update", {
+                fieldType: "text",
+                type: "contain",
+                value: "",
             });
         },
     },

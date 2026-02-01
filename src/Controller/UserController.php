@@ -22,7 +22,6 @@ final class UserController extends AbstractController
     {
         $params = $request->query->all();
         $params = validateFilterParams($params);
-        ray($params);
 
         try {
             $result = $this->userService->findAll($params);

@@ -42,7 +42,7 @@
                         hide-details
                         class="mb-2"
                         clearable
-                        @update:model-value="onDateChange"
+                        @update:model-value="onDateFromChange"
                     />
                 </div>
 
@@ -202,6 +202,11 @@ export default {
             this.dateTo = null;
             this.emitUpdate();
         },
+        onDateFromChange() {
+            // Tự động reset dateTo khi dateFrom thay đổi
+            this.dateTo = null;
+            this.emitUpdate();
+        },
         onDateChange() {
             this.emitUpdate();
         },
@@ -216,17 +221,30 @@ export default {
                     let finalDateTo = this.dateTo;
 
                     // Nếu chỉ có dateFrom mà không có dateTo, tự động set dateTo = hôm nay
+                    // Nhưng chỉ khi dateFrom <= hôm nay (không cho phép chọn ngày tương lai)
                     if (this.dateFrom && !this.dateTo) {
                         const today = new Date();
-                        const year = today.getFullYear();
-                        const month = String(today.getMonth() + 1).padStart(
-                            2,
-                            "0",
-                        );
-                        const day = String(today.getDate()).padStart(2, "0");
-                        finalDateTo = `${year}-${month}-${day}`;
-                        // Cập nhật UI để hiển thị ngày đã tự động điền
-                        this.dateTo = finalDateTo;
+                        const selectedDate = new Date(this.dateFrom);
+
+                        // Reset time để so sánh chỉ ngày
+                        today.setHours(0, 0, 0, 0);
+                        selectedDate.setHours(0, 0, 0, 0);
+
+                        // Chỉ tự động fill dateTo nếu dateFrom <= today
+                        if (selectedDate <= today) {
+                            const year = today.getFullYear();
+                            const month = String(today.getMonth() + 1).padStart(
+                                2,
+                                "0",
+                            );
+                            const day = String(today.getDate()).padStart(
+                                2,
+                                "0",
+                            );
+                            finalDateTo = `${year}-${month}-${day}`;
+                            // Cập nhật UI để hiển thị ngày đã tự động điền
+                            this.dateTo = finalDateTo;
+                        }
                     }
 
                     // Nếu chỉ có dateTo mà không có dateFrom, giữ dateFrom = null

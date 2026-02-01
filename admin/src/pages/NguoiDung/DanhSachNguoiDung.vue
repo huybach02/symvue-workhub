@@ -15,8 +15,13 @@
                         v-for="col in columns"
                         :key="col.key"
                         :style="{
-                            width: col.width ? col.width + 'px' : 'auto',
-                            minWidth: col.minWidth + 'px',
+                            width: col.width ? col.width + 'px' : undefined,
+                            minWidth: col.minWidth
+                                ? col.minWidth + 'px'
+                                : undefined,
+                            maxWidth: col.maxWidth
+                                ? col.maxWidth + 'px'
+                                : undefined,
                         }"
                         class="v-data-table-header__th v-data-table-header-sticky"
                     >
@@ -52,6 +57,34 @@
                         </div>
                     </th>
                 </tr>
+            </template>
+
+            <template #[`item.action`]>
+                <div class="d-flex align-center justify-space-between">
+                    <v-btn icon size="small" variant="text" color="warning">
+                        <v-icon>mdi-pencil</v-icon>
+                    </v-btn>
+                    <v-btn
+                        icon
+                        size="small"
+                        variant="text"
+                        color="error"
+                        @click="showConfirmDelete = true"
+                    >
+                        <v-icon>mdi-delete</v-icon>
+                    </v-btn>
+                    <ConfirmDialog
+                        v-model="showConfirmDelete"
+                        :message="
+                            $t('media_library.delete_confirm_message', {
+                                count: 1,
+                            })
+                        "
+                        :loading="isDeleting"
+                        @confirm="handleDelete"
+                        @cancel="showConfirmDelete = false"
+                    />
+                </div>
             </template>
 
             <template #[`item.status`]="{ item }">
@@ -99,11 +132,13 @@ import FilterSelect from "@/components/filters/FilterSelect.vue";
 import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
 export default {
     name: "DataTable",
     components: {
         FilterPagination,
+        ConfirmDialog,
     },
     props: {
         users: {
@@ -144,7 +179,16 @@ export default {
     },
     data() {
         return {
+            showConfirmDelete: false,
+            isDeleting: false,
             headers: [
+                {
+                    key: "action",
+                    width: 65,
+                    minWidth: 65,
+                    maxWidth: 65,
+                    sortable: false,
+                },
                 {
                     title: this.$t("user.list.id"),
                     key: "id",
@@ -207,10 +251,19 @@ export default {
             ],
         };
     },
-
     computed: {
         items() {
             return this.users;
+        },
+    },
+    methods: {
+        handleDelete() {
+            this.isDeleting = true;
+            setTimeout(() => {
+                this.isDeleting = false;
+                this.showConfirmDelete = false;
+                this.$emit("reload");
+            }, 1000);
         },
     },
 };
