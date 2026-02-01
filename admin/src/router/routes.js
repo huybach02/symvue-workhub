@@ -96,6 +96,21 @@ export const routes = [
                         ).icon || "",
                 },
             },
+            {
+                path: "user-management/user",
+                name: NAME_ROUTES_CONFIG.user_management_user,
+                component: () => import("../pages/NguoiDung/NguoiDung.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.user_management_user,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.user_management_user,
+                        ).icon || "",
+                },
+            },
         ],
     },
 ];

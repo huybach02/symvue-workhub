@@ -29,9 +29,15 @@ export const menuSidebar = [
     },
     {
         title: i18n.global.t("sidebar.user_management"),
-        icon: "mdi-account",
+        icon: "mdi-account-group",
         value: NAME_ROUTES_CONFIG.user_management,
-        // Menu có children sẽ không có thuộc tính 'to'
-        children: [],
+        children: [
+            {
+                title: i18n.global.t("sidebar.user_management_user"),
+                icon: "mdi-account-outline",
+                value: NAME_ROUTES_CONFIG.user_management_user,
+                to: { name: NAME_ROUTES_CONFIG.user_management_user },
+            },
+        ],
     },
 ];

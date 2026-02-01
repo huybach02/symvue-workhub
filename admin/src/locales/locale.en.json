@@ -115,5 +115,58 @@
         "default_message": "Are you sure you want to perform this action?",
         "confirm_button": "Confirm",
         "cancel_button": "Cancel"
+    },
+    "filter": {
+        "date_range": {
+            "title": "Date range",
+            "select_type": "Select date type",
+            "from_date": "From date",
+            "to_date": "To date",
+            "date": "Date",
+            "types": {
+                "equal_to": "Date",
+                "less_than": "Less than date",
+                "greater_than": "Greater than date",
+                "less_than_or_equal_to": "Less than or equal to date",
+                "greater_than_or_equal_to": "Greater than or equal to date",
+                "between": "From date to date"
+            },
+            "display": {
+                "from": "From",
+                "to": "To"
+            }
+        },
+        "pagination": {
+            "showing": "Showing",
+            "to": "to",
+            "of": "of",
+            "records": "records",
+            "no_data": "No data",
+            "items_per_page": "Show:",
+            "first": "First",
+            "last": "Last"
+        }
+    },
+    "status_values": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "blocked": "Blocked"
+    },
+    "user": {
+        "list": {
+            "id": "ID",
+            "name": "Full name",
+            "role": "Role",
+            "status": "Status",
+            "created_at": "Created at",
+            "updated_at": "Updated at",
+            "no_data": "No matching data found"
+        },
+        "roles": {
+            "admin": "Admin",
+            "user": "User",
+            "manager": "Manager",
+            "staff": "Staff"
+        }
     }
 }

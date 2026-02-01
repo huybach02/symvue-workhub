@@ -30,5 +30,32 @@
             background-color: rgb(var(--v-theme-primary)) !important;
             color: white !important;
         }
+        .filter-header {
+            padding: 4px 12px !important;
+            color: black !important;
+        }
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-wrapper .v-data-table {
+            min-width: 600px;
+        }
+
+        @media (max-width: 768px) {
+            .table-wrapper {
+                box-shadow: inset -10px 0 10px -10px rgba(0, 0, 0, 0.1);
+            }
+        }
+        .v-data-table-header__th {
+            white-space: nowrap;
+            background: #ecf2f3 !important;
+        }
+
+        .table-wrapper :deep(.v-data-table-footer) {
+            border-top: 1px solid #e0e0e0;
+        }
     </style>
 </html>

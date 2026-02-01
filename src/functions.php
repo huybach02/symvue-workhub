@@ -39,3 +39,27 @@ if (!function_exists('generateRandomString')) {
         return $randomString;
     }
 }
+
+if (!function_exists('validateFilterParams')) {
+    function validateFilterParams(array &$params)
+    {
+        // Đảm bảo các tham số có giá trị mặc định
+        $params['page'] = isset($params['page']) ? (int) $params['page'] : 1;
+        $params['limit'] = isset($params['limit']) ? (int) $params['limit'] : 10;
+        $params['sort_direction'] = $params['sort_direction'] ?? 'desc';
+        $params['sort_column'] = $params['sort_column'] ?? 'createdAt';
+
+        // Validate filter parameters
+        if (isset($params['f']) && is_array($params['f'])) {
+            foreach ($params['f'] as $index => $filter) {
+                if (!isset($filter['field']) || !isset($filter['operator']) || !isset($filter['value'])) {
+                    unset($params['f'][$index]);
+                }
+            }
+            // Reindex array để đảm bảo index liên tục
+            $params['f'] = array_values($params['f']);
+        }
+
+        return $params;
+    }
+}

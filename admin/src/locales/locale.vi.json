@@ -42,7 +42,8 @@
         "permission_management": "Quản lý quyền",
         "system_config": "Thiết lập hệ thống",
         "system_config_general": "Cấu hình chung",
-        "system_config_working_time": "Thời gian làm việc"
+        "system_config_working_time": "Thời gian làm việc",
+        "user_management_user": "Người dùng"
     },
     "language": {
         "en": "English",
@@ -115,5 +116,58 @@
         "default_message": "Bạn có chắc chắn muốn thực hiện hành động này?",
         "confirm_button": "Xác nhận",
         "cancel_button": "Hủy"
+    },
+    "filter": {
+        "date_range": {
+            "title": "Khoảng thời gian",
+            "select_type": "Chọn kiểu ngày",
+            "from_date": "Từ ngày",
+            "to_date": "Đến ngày",
+            "date": "Ngày",
+            "types": {
+                "equal_to": "Ngày",
+                "less_than": "Nhỏ hơn ngày",
+                "greater_than": "Lớn hơn ngày",
+                "less_than_or_equal_to": "Nhỏ hơn hoặc bằng ngày",
+                "greater_than_or_equal_to": "Lớn hơn hoặc bằng ngày",
+                "between": "Từ ngày đến ngày"
+            },
+            "display": {
+                "from": "Từ",
+                "to": "Đến"
+            }
+        },
+        "pagination": {
+            "showing": "Hiển thị",
+            "to": "đến",
+            "of": "trong tổng số",
+            "records": "bản ghi",
+            "no_data": "Không có dữ liệu",
+            "items_per_page": "Hiển thị:",
+            "first": "Đầu",
+            "last": "Cuối"
+        }
+    },
+    "status_values": {
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động",
+        "blocked": "Bị khóa"
+    },
+    "user": {
+        "list": {
+            "id": "ID",
+            "name": "Họ tên",
+            "role": "Vai trò",
+            "status": "Trạng thái",
+            "created_at": "Ngày tạo",
+            "updated_at": "Ngày cập nhật",
+            "no_data": "Không tìm thấy dữ liệu phù hợp"
+        },
+        "roles": {
+            "admin": "Admin",
+            "user": "User",
+            "manager": "Manager",
+            "staff": "Staff"
+        }
     }
 }

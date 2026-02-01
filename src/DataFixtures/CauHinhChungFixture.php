@@ -23,7 +23,7 @@ class CauHinhChungFixture extends Fixture
             ],
             [
                 "ten_cau_hinh" => "XAC_THUC_2_YEU_TO",
-                "gia_tri" => "1",
+                "gia_tri" => "0",
                 "mo_ta" => "Xác thực 2 yếu tố (0: không, 1: có)",
             ],
             [
@@ -43,7 +43,7 @@ class CauHinhChungFixture extends Fixture
             ],
             [
                 "ten_cau_hinh" => "CHECK_THOI_GIAN_LAM_VIEC",
-                "gia_tri" => "1",
+                "gia_tri" => "0",
                 "mo_ta" => "Thời gian làm việc (0: không, 1: có)",
             ],
         ];

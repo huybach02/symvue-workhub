@@ -18,4 +18,5 @@ export const API_ROUTES_CONFIG = {
         restore: "/media/restore",
         deletePermanently: "/media/delete-permanently",
     },
+    user: "/user",
 };
