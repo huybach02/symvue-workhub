@@ -9,7 +9,7 @@
                 v-bind="field"
                 :error-messages="errorMessage"
                 class="mb-4"
-                label="Email"
+                :label="$t('field.email')"
                 prepend-inner-icon="mdi-account"
                 variant="outlined"
                 persistent-placeholder
@@ -21,7 +21,7 @@
                 v-bind="field"
                 :error-messages="errorMessage"
                 type="password"
-                :label="$t('auth.password')"
+                :label="$t('field.password')"
                 prepend-inner-icon="mdi-lock"
                 variant="outlined"
                 persistent-placeholder

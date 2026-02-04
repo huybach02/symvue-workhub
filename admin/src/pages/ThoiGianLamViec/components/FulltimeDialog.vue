@@ -29,7 +29,7 @@
                                     persistent-placeholder
                                 >
                                     <template #label>
-                                        {{ $t("thoi_gian_lam_viec.thu") }}
+                                        {{ $t("field.thu") }}
                                     </template>
                                 </v-text-field>
                             </VeeField>
@@ -46,9 +46,7 @@
                                     persistent-placeholder
                                 >
                                     <template #label>
-                                        {{
-                                            $t("thoi_gian_lam_viec.gio_bat_dau")
-                                        }}
+                                        {{ $t("field.gio_bat_dau") }}
                                     </template>
                                     <v-menu
                                         v-model="showMenuGioBatDau"
@@ -78,11 +76,7 @@
                                     persistent-placeholder
                                 >
                                     <template #label>
-                                        {{
-                                            $t(
-                                                "thoi_gian_lam_viec.gio_ket_thuc",
-                                            )
-                                        }}
+                                        {{ $t("field.gio_ket_thuc") }}
                                     </template>
                                     <v-menu
                                         v-model="showMenuGioKetThuc"
@@ -113,7 +107,7 @@
                                     persistent-placeholder
                                 >
                                     <template #label>
-                                        {{ $t("thoi_gian_lam_viec.ghi_chu") }}
+                                        {{ $t("field.ghi_chu") }}
                                     </template>
                                 </v-text-field>
                             </VeeField>

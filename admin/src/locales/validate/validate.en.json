@@ -1,0 +1,94 @@
+{
+    "validation": {
+        "mixed": {
+            "required": "{field} is required.",
+            "default": "{field} is invalid.",
+            "one_of": "{field} does not match."
+        },
+        "string": {
+            "email": "{field} must be a valid email.",
+            "min": "{field} must be at least {min} characters.",
+            "max": "{field} must be at most {max} characters.",
+            "length": "{field} must be exactly {length} characters."
+        },
+        "number": {
+            "min": "{field} must be greater than or equal to {min}.",
+            "max": "{field} must be less than or equal to {max}.",
+            "integer": "{field} must be an integer.",
+            "type_error": "{field} must be a number."
+        },
+        "date": {
+            "min": "{field} must be later than {min}.",
+            "max": "{field} must be earlier than {max}.",
+            "type_error": "{field} must be a valid date."
+        },
+        "password": {
+            "lowercase": "{field} must contain at least 1 lowercase letter.",
+            "uppercase": "{field} must contain at least 1 uppercase letter.",
+            "number": "{field} must contain at least 1 number.",
+            "special": "{field} must contain at least 1 special character."
+        },
+        "phone": {
+            "invalid": "{field} is not a valid VN phone number."
+        },
+        "file": {
+            "max_size": "{field} size is too large (Max: {max}MB).",
+            "invalid_type": "{field} has invalid file type."
+        },
+        "url": {
+            "invalid": "{field} must be a valid URL."
+        },
+        "array": {
+            "min": "{field} must have at least {min} items.",
+            "max": "{field} must have at most {max} items."
+        },
+        "select": {
+            "invalid": "{field} is invalid. Please select a value from the list."
+        },
+        "username": {
+            "invalid": "{field} can only contain letters, numbers and underscores."
+        },
+        "postal_code": {
+            "invalid": "{field} must be a 6-digit postal code."
+        },
+        "credit_card": {
+            "invalid": "{field} is not a valid credit card number."
+        },
+        "ip_address": {
+            "invalid": "{field} must be a valid {version} address."
+        },
+        "slug": {
+            "invalid": "{field} can only contain lowercase letters, numbers and hyphens."
+        },
+        "color": {
+            "invalid": "{field} must be a valid hex color code (e.g., #FFFFFF)."
+        },
+        "uuid": {
+            "invalid": "{field} must be a valid UUID."
+        },
+        "json": {
+            "invalid": "{field} must be a valid JSON string."
+        },
+        "time": {
+            "invalid": "{field} must be a valid time (HH:mm or HH:mm:ss)."
+        },
+        "age": {
+            "min": "{field} must be at least {min} years old.",
+            "max": "{field} must be at most {max} years old."
+        },
+        "percentage": {
+            "min": "{field} must be at least 0%.",
+            "max": "{field} must be at most 100%."
+        },
+        "currency": {
+            "min": "{field} must be at least {min}.",
+            "max": "{field} must be at most {max}."
+        },
+        "cccd": {
+            "invalid": "{field} must be a valid ID number (9 or 12 digits)."
+        },
+        "tax_code": {
+            "invalid": "{field} must be a valid tax code (10 digits or 10-XXX)."
+        }
+    }
+}

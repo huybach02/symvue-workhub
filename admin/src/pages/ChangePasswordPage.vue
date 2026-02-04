@@ -8,7 +8,7 @@
             <v-text-field
                 v-bind="field"
                 :error-messages="errorMessage"
-                :label="$t('auth.new_password')"
+                :label="$t('field.new_password')"
                 class="mb-4"
                 variant="outlined"
                 prepend-inner-icon="mdi-lock"
@@ -19,7 +19,7 @@
             <v-text-field
                 v-bind="field"
                 :error-messages="errorMessage"
-                :label="$t('auth.confirm_password')"
+                :label="$t('field.confirm_password')"
                 class="mb-4"
                 variant="outlined"
                 prepend-inner-icon="mdi-lock"

@@ -9,6 +9,7 @@ import * as directives from "vuetify/directives";
 import Toast, { useToast } from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import i18n from "./plugins/i18n";
+import setupYupLocale from "./plugins/yup-locale";
 
 const vuetify = createVuetify({
     components,
@@ -16,6 +17,8 @@ const vuetify = createVuetify({
 });
 
 export const toast = useToast();
+
+setupYupLocale();
 
 const app = createApp(App);
 

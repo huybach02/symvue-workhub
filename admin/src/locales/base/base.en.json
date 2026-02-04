@@ -1,0 +1,24 @@
+{
+    "base": {
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "save": "Save",
+        "back": "Back",
+        "edit": "Edit",
+        "delete": "Delete",
+        "status": "Status",
+        "created_at": "Created at",
+        "updated_at": "Updated at",
+        "no_data": "No matching data found"
+    },
+    "sidebar": {
+        "home": "Home",
+        "user_management": "User Management",
+        "role_management": "Role Management",
+        "permission_management": "Permission Management",
+        "system_config": "System Config",
+        "system_config_general": "General Config",
+        "system_config_working_time": "Working Time",
+        "user_management_user": "User"
+    }
+}

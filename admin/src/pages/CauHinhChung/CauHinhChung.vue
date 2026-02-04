@@ -2,6 +2,7 @@
     <div>
         <VeeForm
             v-if="dataLoaded"
+            ref="formRef"
             as="form"
             :validation-schema="cauHinhChungSchema"
             :initial-values="initialValues"
@@ -27,7 +28,7 @@
                         <v-btn
                             variant="tonal"
                             class="d-flex align-center"
-                            @click="isEditing = !isEditing"
+                            @click="cancelEdit"
                         >
                             <v-icon icon="mdi-close" size="18" class="mr-1" />
                             {{ $t("system_config.cancel_button") }}
@@ -282,6 +283,13 @@ export default {
                 this.isEditing = false;
             }
             this.$store.commit("unsetIsLoading");
+        },
+        cancelEdit() {
+            this.isEditing = false;
+            // Reset form validation và values về initialValues
+            if (this.$refs.formRef) {
+                this.$refs.formRef.resetForm();
+            }
         },
     },
 };

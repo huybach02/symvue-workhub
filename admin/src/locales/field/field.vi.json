@@ -1,0 +1,21 @@
+{
+    "field": {
+        "email": "Email",
+        "password": "Mật khẩu",
+        "new_password": "Mật khẩu mới",
+        "confirm_password": "Xác nhận mật khẩu",
+        "otp": "Mã OTP",
+        "thu": "Thứ",
+        "gio_bat_dau": "Giờ bắt đầu",
+        "gio_ket_thuc": "Giờ kết thúc",
+        "ghi_chu": "Ghi chú",
+        "soLanDangNhapSai": "Số lần đăng nhập sai",
+        "thoiGianTamKhoaTaiKhoan": "Thời gian tạm khóa tài khoản",
+        "xacThuc2YeuTo": "Xác thực 2 yếu tố",
+        "thoiGianHetHanMaOtp": "Thời gian hết hạn mã OTP",
+        "soThietBiDangNhapToiDa": "Số thiết bị đăng nhập tối đa",
+        "thoiHanXacThucLaiThietBi": "Thời hạn xác thực lại thiết bị",
+        "kiemTraThoiGianLamViec": "Kiểm tra thời gian làm việc",
+        "thoiGianHetHanThietBi": "Thời gian hết hạn thiết bị"
+    }
+}

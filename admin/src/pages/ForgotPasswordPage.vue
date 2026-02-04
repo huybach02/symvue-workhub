@@ -11,7 +11,7 @@
                 class="mb-4"
                 variant="outlined"
                 type="email"
-                label="Email"
+                :label="$t('field.email')"
                 @update:model-value="field.onChange"
             />
         </VeeField>
@@ -19,7 +19,7 @@
         <v-btn
             :loading="this.$store.state.isLoading"
             color="primary"
-            :text="$t('confirm')"
+            :text="$t('base.confirm')"
             type="submit"
             block
             size="large"

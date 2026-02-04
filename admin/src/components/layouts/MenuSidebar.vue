@@ -83,6 +83,17 @@ export default {
     font-weight: 700;
 }
 
+:deep(.v-list-item--active) {
+    background-color: rgba(var(--v-theme-primary), 0.1) !important;
+    color: rgb(var(--v-theme-primary)) !important;
+}
+
+/* Chỉ menu con trong group mới có màu nhạt hơn */
+/* :deep(.v-list-group__items .v-list-item--active) {
+    background-color: rgba(var(--v-theme-primary), 0.1) !important;
+    color: rgb(var(--v-theme-primary)) !important;
+} */
+
 :deep(.v-list-item) {
     height: 45px;
 }

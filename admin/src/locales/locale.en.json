@@ -1,26 +1,13 @@
 {
-    "validation": {
-        "mixed": {
-            "required": "This field is required",
-            "default": "Invalid value"
-        },
-        "string": {
-            "email": "Invalid email format",
-            "min": "Must be at least {min} characters",
-            "max": "Maximum {max} characters"
-        }
-    },
     "loading": "Loading...",
     "system_management": "System Management",
-    "confirm": "Confirm",
-    "cancel": "Cancel",
-    "save": "Save",
-    "back": "Back",
-    "edit": "Edit",
-    "delete": "Delete",
+    "status_values": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "blocked": "Blocked"
+    },
     "auth": {
         "login": "Login",
-        "password": "Password",
         "remember_me": "Remember me",
         "sign_in": "Sign in",
         "forgot_password": "Forgot password",
@@ -31,18 +18,7 @@
         "otp_code": "OTP Code",
         "resend_otp": "Resend OTP",
         "back_to_login": "Back to login",
-        "change_password": "Change new password",
-        "new_password": "New password",
-        "confirm_password": "Confirm password"
-    },
-    "sidebar": {
-        "home": "Home",
-        "user_management": "User Management",
-        "role_management": "Role Management",
-        "permission_management": "Permission Management",
-        "system_config": "System Config",
-        "system_config_general": "General Config",
-        "system_config_working_time": "Working Time"
+        "change_password": "Change new password"
     },
     "language": {
         "en": "English",
@@ -67,21 +43,18 @@
         "fulltime": "Fixed time",
         "parttime": "Shift time",
         "action": "Action",
-        "thu": "Day",
-        "gio_bat_dau": "Start time",
-        "gio_ket_thuc": "End time",
-        "ghi_chu": "Note",
         "thoi_gian_cap_nhat": "Updated time",
         "edit_button": "Edit",
         "save_button": "Save configuration",
         "cancel_button": "Cancel",
-        "edit": "Edit working time"
+        "edit": "Edit working time",
+        "thu": "Day",
+        "gio_bat_dau": "Start Time",
+        "gio_ket_thuc": "End Time",
+        "ghi_chu": "Note"
     },
     "ca_lam_viec": {
         "ten_ca": "Shift name",
-        "gio_bat_dau": "Start time",
-        "gio_ket_thuc": "End time",
-        "ghi_chu": "Note",
         "edit": "Edit shift",
         "create": "Create shift",
         "cancel_button": "Cancel",
@@ -150,20 +123,11 @@
             "last": "Last"
         }
     },
-    "status_values": {
-        "active": "Active",
-        "inactive": "Inactive",
-        "blocked": "Blocked"
-    },
     "user": {
-        "list": {
+        "columns": {
             "id": "ID",
             "name": "Full name",
-            "role": "Role",
-            "status": "Status",
-            "created_at": "Created at",
-            "updated_at": "Updated at",
-            "no_data": "No matching data found"
+            "role": "Role"
         },
         "roles": {
             "admin": "Admin",

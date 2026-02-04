@@ -108,7 +108,7 @@
                         color="grey-lighten-1"
                     />
                     <div class="text-grey-darken-1 mt-2">
-                        {{ $t("user.list.no_data") }}
+                        {{ $t("base.no_data") }}
                     </div>
                 </div>
             </template>
@@ -190,19 +190,19 @@ export default {
                     sortable: false,
                 },
                 {
-                    title: this.$t("user.list.id"),
+                    title: this.$t("user.columns.id"),
                     key: "id",
                     width: 50,
                     filterComponent: markRaw(FilterText),
                 },
                 {
-                    title: this.$t("user.list.name"),
+                    title: this.$t("user.columns.name"),
                     key: "name",
                     width: 200,
                     filterComponent: markRaw(FilterText),
                 },
                 {
-                    title: this.$t("user.list.role"),
+                    title: this.$t("user.columns.role"),
                     key: "maVaiTro",
                     width: 100,
                     filterComponent: markRaw(FilterSelect),
@@ -217,7 +217,7 @@ export default {
                     ],
                 },
                 {
-                    title: this.$t("user.list.status"),
+                    title: this.$t("base.status"),
                     key: "status",
                     width: 100,
                     filterComponent: markRaw(FilterSelect),
@@ -237,13 +237,13 @@ export default {
                             : this.$t("status_values.inactive"),
                 },
                 {
-                    title: this.$t("user.list.created_at"),
+                    title: this.$t("base.created_at"),
                     key: "createdAt",
                     width: 150,
                     filterComponent: markRaw(FilterDateRange),
                 },
                 {
-                    title: this.$t("user.list.updated_at"),
+                    title: this.$t("base.updated_at"),
                     key: "updatedAt",
                     width: 150,
                     filterComponent: markRaw(FilterDateRange),

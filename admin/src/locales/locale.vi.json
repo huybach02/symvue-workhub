@@ -1,26 +1,13 @@
 {
-    "validation": {
-        "mixed": {
-            "required": "Trường này là bắt buộc",
-            "default": "Giá trị không hợp lệ"
-        },
-        "string": {
-            "email": "Email không đúng định dạng",
-            "min": "Phải có ít nhất {min} ký tự",
-            "max": "Tối đa {max} ký tự"
-        }
-    },
     "loading": "Đang tải...",
     "system_management": "Hệ thống quản lý",
-    "confirm": "Xác nhận",
-    "cancel": "Hủy bỏ",
-    "save": "Lưu",
-    "back": "Quay lại",
-    "edit": "Chỉnh sửa",
-    "delete": "Xóa",
+    "status_values": {
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động",
+        "blocked": "Bị khóa"
+    },
     "auth": {
         "login": "Đăng nhập",
-        "password": "Mật khẩu",
         "remember_me": "Ghi nhớ tôi",
         "sign_in": "Đăng nhập",
         "forgot_password": "Quên mật khẩu",
@@ -31,19 +18,7 @@
         "otp_code": "Mã OTP",
         "resend_otp": "Gửi lại mã OTP",
         "back_to_login": "Quay lại đăng nhập",
-        "change_password": "Cập nhật mật khẩu mới",
-        "new_password": "Mật khẩu mới",
-        "confirm_password": "Xác nhận mật khẩu"
-    },
-    "sidebar": {
-        "home": "Trang chủ",
-        "user_management": "Quản lý người dùng",
-        "role_management": "Quản lý vai trò",
-        "permission_management": "Quản lý quyền",
-        "system_config": "Thiết lập hệ thống",
-        "system_config_general": "Cấu hình chung",
-        "system_config_working_time": "Thời gian làm việc",
-        "user_management_user": "Người dùng"
+        "change_password": "Cập nhật mật khẩu mới"
     },
     "language": {
         "en": "English",
@@ -68,21 +43,18 @@
         "fulltime": "Thời gian cố định",
         "parttime": "Thời gian theo ca làm việc",
         "action": "Hành động",
-        "thu": "Thứ",
-        "gio_bat_dau": "Giờ bắt đầu",
-        "gio_ket_thuc": "Giờ kết thúc",
-        "ghi_chu": "Ghi chú",
         "thoi_gian_cap_nhat": "Thời gian cập nhật",
         "edit_button": "Chỉnh sửa",
         "save_button": "Lưu cấu hình",
         "cancel_button": "Hủy bỏ",
-        "edit": "Chỉnh sửa thời gian làm việc"
+        "edit": "Chỉnh sửa thời gian làm việc",
+        "thu": "Thứ",
+        "gio_bat_dau": "Giờ bắt đầu",
+        "gio_ket_thuc": "Giờ kết thúc",
+        "ghi_chu": "Ghi chú"
     },
     "ca_lam_viec": {
         "ten_ca": "Tên ca",
-        "gio_bat_dau": "Giờ bắt đầu",
-        "gio_ket_thuc": "Giờ kết thúc",
-        "ghi_chu": "Ghi chú",
         "create": "Thêm ca làm việc",
         "edit": "Chỉnh sửa ca làm việc",
         "cancel_button": "Hủy bỏ",
@@ -151,20 +123,11 @@
             "last": "Cuối"
         }
     },
-    "status_values": {
-        "active": "Hoạt động",
-        "inactive": "Không hoạt động",
-        "blocked": "Bị khóa"
-    },
     "user": {
-        "list": {
+        "columns": {
             "id": "ID",
             "name": "Họ tên",
-            "role": "Vai trò",
-            "status": "Trạng thái",
-            "created_at": "Ngày tạo",
-            "updated_at": "Ngày cập nhật",
-            "no_data": "Không tìm thấy dữ liệu phù hợp"
+            "role": "Vai trò"
         },
         "roles": {
             "admin": "Admin",

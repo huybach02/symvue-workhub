@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-navigation-drawer location="left" permanent>
+        <v-navigation-drawer location="left" permanent width="276">
             <template v-slot:prepend>
                 <div
                     class="d-flex flex-column align-center justify-center pa-4"

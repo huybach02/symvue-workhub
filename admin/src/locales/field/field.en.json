@@ -1,0 +1,21 @@
+{
+    "field": {
+        "email": "Email",
+        "password": "Password",
+        "new_password": "New Password",
+        "confirm_password": "Confirm Password",
+        "otp": "OTP Code",
+        "thu": "Day",
+        "gio_bat_dau": "Start Time",
+        "gio_ket_thuc": "End Time",
+        "ghi_chu": "Note",
+        "soLanDangNhapSai": "Failed Login Attempts",
+        "thoiGianTamKhoaTaiKhoan": "Account Lock Duration",
+        "xacThuc2YeuTo": "Two-Factor Authentication",
+        "thoiGianHetHanMaOtp": "OTP Expiration Time",
+        "soThietBiDangNhapToiDa": "Maximum Login Devices",
+        "thoiHanXacThucLaiThietBi": "Device Re-authentication Period",
+        "kiemTraThoiGianLamViec": "Check Working Hours",
+        "thoiGianHetHanThietBi": "Device Expiration Time"
+    }
+}

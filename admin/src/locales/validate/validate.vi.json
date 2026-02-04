@@ -1,0 +1,94 @@
+{
+    "validation": {
+        "mixed": {
+            "required": "{field} là bắt buộc.",
+            "default": "{field} không hợp lệ.",
+            "one_of": "{field} không khớp."
+        },
+        "string": {
+            "email": "{field} phải là một email hợp lệ.",
+            "min": "{field} phải có ít nhất {min} ký tự.",
+            "max": "{field} không được quá {max} ký tự.",
+            "length": "{field} phải có đúng {length} ký tự."
+        },
+        "number": {
+            "min": "{field} phải lớn hơn hoặc bằng {min}.",
+            "max": "{field} phải nhỏ hơn hoặc bằng {max}.",
+            "integer": "{field} phải là số nguyên.",
+            "type_error": "{field} phải là một số hợp lệ."
+        },
+        "date": {
+            "min": "{field} phải từ ngày {min} trở đi.",
+            "max": "{field} phải trước ngày {max}.",
+            "type_error": "{field} không đúng định dạng ngày."
+        },
+        "password": {
+            "lowercase": "{field} phải chứa ít nhất 1 chữ thường.",
+            "uppercase": "{field} phải chứa ít nhất 1 chữ hoa.",
+            "number": "{field} phải chứa ít nhất 1 số.",
+            "special": "{field} phải chứa ít nhất 1 ký tự đặc biệt."
+        },
+        "phone": {
+            "invalid": "{field} không đúng định dạng số điện thoại VN."
+        },
+        "file": {
+            "max_size": "{field} kích thước quá lớn (Tối đa: {max}MB).",
+            "invalid_type": "{field} sai định dạng file."
+        },
+        "url": {
+            "invalid": "{field} phải là một URL hợp lệ."
+        },
+        "array": {
+            "min": "{field} phải có ít nhất {min} phần tử.",
+            "max": "{field} không được quá {max} phần tử."
+        },
+        "select": {
+            "invalid": "{field} không hợp lệ. Vui lòng chọn giá trị từ danh sách."
+        },
+        "username": {
+            "invalid": "{field} chỉ được chứa chữ cái, số và dấu gạch dưới."
+        },
+        "postal_code": {
+            "invalid": "{field} phải là mã bưu điện 6 chữ số."
+        },
+        "credit_card": {
+            "invalid": "{field} không phải là số thẻ tín dụng hợp lệ."
+        },
+        "ip_address": {
+            "invalid": "{field} phải là địa chỉ {version} hợp lệ."
+        },
+        "slug": {
+            "invalid": "{field} chỉ được chứa chữ thường, số và dấu gạch ngang."
+        },
+        "color": {
+            "invalid": "{field} phải là mã màu hex hợp lệ (vd: #FFFFFF)."
+        },
+        "uuid": {
+            "invalid": "{field} phải là UUID hợp lệ."
+        },
+        "json": {
+            "invalid": "{field} phải là chuỗi JSON hợp lệ."
+        },
+        "time": {
+            "invalid": "{field} phải là thời gian hợp lệ (HH:mm hoặc HH:mm:ss)."
+        },
+        "age": {
+            "min": "{field} phải từ {min} tuổi trở lên.",
+            "max": "{field} không được quá {max} tuổi."
+        },
+        "percentage": {
+            "min": "{field} phải từ 0% trở lên.",
+            "max": "{field} không được quá 100%."
+        },
+        "currency": {
+            "min": "{field} phải từ {min} trở lên.",
+            "max": "{field} không được quá {max}."
+        },
+        "cccd": {
+            "invalid": "{field} phải là số CMND (9 số) hoặc CCCD (12 số) hợp lệ."
+        },
+        "tax_code": {
+            "invalid": "{field} phải là mã số thuế hợp lệ (10 số hoặc 10-XXX)."
+        }
+    }
+}

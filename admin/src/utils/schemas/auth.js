@@ -1,26 +1,28 @@
 import * as yup from "yup";
-import { emailRule, passwordRule, confirmPasswordRule } from "./common";
+import {
+    buildConfirmPasswordRule,
+    buildEmailRule,
+    buildOtpRule,
+    buildStringRule,
+} from "../validationBuilder";
+import { i18n } from "@/plugins/i18n";
 
-// Schema cho form Đăng nhập
+const t = (key) => i18n.global.t(key);
+
 export const loginSchema = yup.object({
-    email: emailRule,
-    password: passwordRule,
+    email: buildEmailRule(t("field.email"), { required: true }),
+    password: buildStringRule(t("field.password"), { required: true }),
 });
 
-// Schema cho form Xác thực OTP
 export const verifyOtpSchema = yup.object({
-    otp: yup
-        .string()
-        .required("Mã OTP là bắt buộc")
-        .length(6, "Mã OTP phải có đúng 6 chữ số")
-        .matches(/^[0-9]+$/, "Mã OTP chỉ được chứa số"),
+    otp: buildOtpRule(t("field.otp"), { required: true }),
 });
 
 export const forgotPasswordSchema = yup.object({
-    email: emailRule,
+    email: buildEmailRule(t("field.email"), { required: true }),
 });
 
 export const changePasswordSchema = yup.object({
-    password: passwordRule,
-    confirm_password: confirmPasswordRule,
+    password: buildStringRule(t("field.password"), { required: true }),
+    confirm_password: buildConfirmPasswordRule(t("field.confirm_password")),
 });
