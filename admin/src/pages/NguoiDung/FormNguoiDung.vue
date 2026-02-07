@@ -211,7 +211,6 @@
                                 :items="['1', '2']"
                                 :error-messages="errorMessage"
                                 variant="outlined"
-                                :placeholder="`${$t('base.enter')} ${$t('field.bo_phan_mac_dinh')}`"
                             />
                         </VeeField>
                     </v-col>
@@ -302,7 +301,7 @@ export default {
                 ward: "",
                 address: "",
                 maBoPhan: "",
-                status: "",
+                status: 1,
             },
             provinceData: {},
             wardData: {},

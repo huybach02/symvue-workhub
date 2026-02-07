@@ -1,0 +1,66 @@
+<template>
+    <div>
+        <v-row>
+            <v-col cols="12">
+                <ThemSua{{MODULE_NAME}}
+                    :path="path"
+                    mode="create"
+                    @reload="getDanhSach"
+                />
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="12">
+                <DanhSach{{MODULE_NAME}}
+                    :path="path"
+                    :items="items"
+                    :total-items="totalItems"
+                    :loading="loading"
+                    @reload="getDanhSach"
+                />
+            </v-col>
+        </v-row>
+    </div>
+</template>
+
+<script>
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
+import DanhSach{{MODULE_NAME}} from "./DanhSach{{MODULE_NAME}}.vue";
+import { getListData } from "@/services/bases/getData";
+import ThemSua{{MODULE_NAME}} from "./ThemSua{{MODULE_NAME}}.vue";
+
+export default {
+    name: "{{MODULE_NAME}}",
+    components: {
+        DanhSach{{MODULE_NAME}},
+        ThemSua{{MODULE_NAME}},
+    },
+    data() {
+        return {
+            path: API_ROUTES_CONFIG.{{MODULE_LOWER}},
+            items: [],
+            totalItems: 0,
+            loading: false,
+        };
+    },
+    created() {
+        this.getDanhSach();
+    },
+    methods: {
+        getDanhSach: async function (params) {
+            try {
+                this.loading = true;
+                const response = await getListData(this.path, params);
+                this.items = response.data || [];
+                this.totalItems = response.total || 0;
+            } catch (error) {
+                console.error("Lỗi khi lấy danh sách:", error);
+            } finally {
+                this.loading = false;
+            }
+        },
+    },
+};
+</script>
+
+<style></style>

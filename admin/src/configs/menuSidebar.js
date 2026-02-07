@@ -11,32 +11,32 @@ export const menuSidebar = [
     {
         title: i18n.global.t("sidebar.system_config"),
         icon: "mdi-cog",
-        value: NAME_ROUTES_CONFIG.system_config,
+        value: NAME_ROUTES_CONFIG.systemConfig,
         children: [
             {
                 title: i18n.global.t("sidebar.system_config_general"),
                 icon: "mdi-cog-outline",
-                value: NAME_ROUTES_CONFIG.system_config_general,
-                to: { name: NAME_ROUTES_CONFIG.system_config_general },
+                value: NAME_ROUTES_CONFIG.systemConfigGeneral,
+                to: { name: NAME_ROUTES_CONFIG.systemConfigGeneral },
             },
             {
                 title: i18n.global.t("sidebar.system_config_working_time"),
                 icon: "mdi-clock-time-four-outline",
-                value: NAME_ROUTES_CONFIG.system_config_working_time,
-                to: { name: NAME_ROUTES_CONFIG.system_config_working_time },
+                value: NAME_ROUTES_CONFIG.systemConfigWorkingTime,
+                to: { name: NAME_ROUTES_CONFIG.systemConfigWorkingTime },
             },
         ],
     },
     {
         title: i18n.global.t("sidebar.user_management"),
         icon: "mdi-account-group",
-        value: NAME_ROUTES_CONFIG.user_management,
+        value: NAME_ROUTES_CONFIG.userManagement,
         children: [
             {
                 title: i18n.global.t("sidebar.user_management_user"),
                 icon: "mdi-account-outline",
-                value: NAME_ROUTES_CONFIG.user_management_user,
-                to: { name: NAME_ROUTES_CONFIG.user_management_user },
+                value: NAME_ROUTES_CONFIG.userManagementUser,
+                to: { name: NAME_ROUTES_CONFIG.userManagementUser },
             },
         ],
     },

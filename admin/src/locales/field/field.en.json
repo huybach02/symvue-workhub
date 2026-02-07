@@ -1,6 +1,7 @@
 {
     "field": {
         "email": "Email",
+        "name": "Name",
         "password": "Password",
         "new_password": "New Password",
         "confirm_password": "Confirm Password",
@@ -17,15 +18,15 @@
         "thoiHanXacThucLaiThietBi": "Device Re-authentication Period",
         "kiemTraThoiGianLamViec": "Check Working Hours",
         "thoiGianHetHanThietBi": "Device Expiration Time",
-        "name": "Name",
-        "phone": "Phone",
+        "ho_va_ten": "Full Name",
+        "so_dien_thoai": "Phone",
         "mat_khau": "Password",
         "xac_nhan_mat_khau": "Confirm Password",
         "ngay_sinh": "Birthday",
         "gioi_tinh": "Gender",
         "tinh_thanh_pho": "City/Province",
         "xa_phuong": "Ward/Commune",
-        "address": "Address",
+        "dia_chi": "Address",
         "bo_phan_mac_dinh": "Default Department",
         "trang_thai": "Status"
     }

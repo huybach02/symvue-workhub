@@ -66,48 +66,48 @@ export const routes = [
             },
             {
                 path: "config/general",
-                name: NAME_ROUTES_CONFIG.system_config_general,
+                name: NAME_ROUTES_CONFIG.systemConfigGeneral,
                 component: () =>
                     import("../pages/CauHinhChung/CauHinhChung.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.system_config_general,
+                            NAME_ROUTES_CONFIG.systemConfigGeneral,
                         ).title || "",
                     icon:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.system_config_general,
+                            NAME_ROUTES_CONFIG.systemConfigGeneral,
                         ).icon || "",
                 },
             },
             {
                 path: "config/working-time",
-                name: NAME_ROUTES_CONFIG.system_config_working_time,
+                name: NAME_ROUTES_CONFIG.systemConfigWorkingTime,
                 component: () =>
                     import("../pages/ThoiGianLamViec/ThoiGianLamViec.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.system_config_working_time,
+                            NAME_ROUTES_CONFIG.systemConfigWorkingTime,
                         ).title || "",
                     icon:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.system_config_working_time,
+                            NAME_ROUTES_CONFIG.systemConfigWorkingTime,
                         ).icon || "",
                 },
             },
             {
                 path: "user-management/user",
-                name: NAME_ROUTES_CONFIG.user_management_user,
+                name: NAME_ROUTES_CONFIG.userManagementUser,
                 component: () => import("../pages/NguoiDung/NguoiDung.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.user_management_user,
+                            NAME_ROUTES_CONFIG.userManagementUser,
                         ).title || "",
                     icon:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.user_management_user,
+                            NAME_ROUTES_CONFIG.userManagementUser,
                         ).icon || "",
                 },
             },
