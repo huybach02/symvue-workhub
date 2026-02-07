@@ -62,5 +62,20 @@
         .table-wrapper :deep(.v-data-table-footer) {
             border-top: 1px solid #e0e0e0;
         }
+        .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            z-index: 1;
+        }
+        .table-wrapper .v-table__wrapper {
+            max-height: none !important;
+            overflow-y: visible !important;
+            overflow-x: visible !important;
+        }
+
+        .table-wrapper .v-table {
+            height: auto !important;
+        }
     </style>
 </html>

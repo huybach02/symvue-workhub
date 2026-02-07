@@ -16,6 +16,17 @@
         "soThietBiDangNhapToiDa": "Số thiết bị đăng nhập tối đa",
         "thoiHanXacThucLaiThietBi": "Thời hạn xác thực lại thiết bị",
         "kiemTraThoiGianLamViec": "Kiểm tra thời gian làm việc",
-        "thoiGianHetHanThietBi": "Thời gian hết hạn thiết bị"
+        "thoiGianHetHanThietBi": "Thời gian hết hạn thiết bị",
+        "ho_va_ten": "Họ và tên",
+        "so_dien_thoai": "Số điện thoại",
+        "mat_khau": "Mật khẩu",
+        "xac_nhan_mat_khau": "Xác nhận mật khẩu",
+        "ngay_sinh": "Ngày sinh",
+        "gioi_tinh": "Giới tính",
+        "tinh_thanh_pho": "Tỉnh/Thành phố",
+        "xa_phuong": "Xã/Phường",
+        "dia_chi": "Địa chỉ",
+        "bo_phan_mac_dinh": "Bộ phận mặc định",
+        "trang_thai": "Trạng thái"
     }
 }

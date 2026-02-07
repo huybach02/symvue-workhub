@@ -9,7 +9,12 @@
         "status": "Status",
         "created_at": "Created at",
         "updated_at": "Updated at",
-        "no_data": "No matching data found"
+        "no_data": "No matching data found",
+        "enter": "Enter"
+    },
+    "title": {
+        "create": "Create",
+        "update": "Update"
     },
     "sidebar": {
         "home": "Home",
@@ -20,5 +25,9 @@
         "system_config_general": "General Config",
         "system_config_working_time": "Working Time",
         "user_management_user": "User"
+    },
+    "gender": {
+        "male": "Male",
+        "female": "Female"
     }
 }

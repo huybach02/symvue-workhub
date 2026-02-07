@@ -2,7 +2,11 @@
     <div>
         <v-row>
             <v-col cols="12">
-                <ThemNguoiDung :path="path" />
+                <ThemSuaNguoiDung
+                    :path="path"
+                    mode="create"
+                    @reload="getDanhSach"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -22,14 +26,14 @@
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import DanhSachNguoiDung from "./DanhSachNguoiDung.vue";
-import ThemNguoiDung from "./ThemNguoiDung.vue";
 import { getListData } from "@/services/bases/getData";
+import ThemSuaNguoiDung from "./ThemSuaNguoiDung.vue";
 
 export default {
     name: "NguoiDung",
     components: {
         DanhSachNguoiDung,
-        ThemNguoiDung,
+        ThemSuaNguoiDung,
     },
     data() {
         return {

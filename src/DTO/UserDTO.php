@@ -7,21 +7,45 @@ use Symfony\Component\Validator\Constraints as Assert;
 class UserDTO
 {
     public function __construct(
-        // TODO: Thêm các properties tương ứng với Entity
-        // Example với validation groups:
-        
-        // Field bắt buộc cho cả create và update
         #[Assert\NotBlank(groups: ['create', 'update'])]
-        #[Assert\Length(min: 3, max: 255, groups: ['create', 'update'])]
+        #[Assert\Length(min: 2, max: 255, groups: ['create', 'update'])]
         public readonly ?string $name = null,
-        
-        // Field chỉ bắt buộc khi create, optional khi update
+
         #[Assert\NotBlank(groups: ['create'])]
         #[Assert\Email(groups: ['create', 'update'])]
         public readonly ?string $email = null,
-        
-        // Field optional cho cả create và update
-        #[Assert\Length(max: 500, groups: ['create', 'update'])]
-        public readonly ?string $description = null,
+
+        #[Assert\NotBlank(groups: ['create', 'update'])]
+        #[Assert\Regex(pattern: '/^[0-9]{10,11}$/', message: 'Số điện thoại phải có 10-11 chữ số', groups: ['create', 'update'])]
+        public readonly ?string $phone = null,
+
+        #[Assert\NotBlank(groups: ['create', 'update'])]
+        #[Assert\Date(groups: ['create', 'update'])]
+        public readonly ?string $birthday = null,
+
+        #[Assert\NotBlank(groups: ['create', 'update'])]
+        #[Assert\Choice(choices: ['male', 'female', 'other'], groups: ['create', 'update'])]
+        public readonly ?string $gender = null,
+
+        #[Assert\NotBlank(groups: ['create', 'update'])]
+        #[Assert\Length(min: 1, max: 255, groups: ['create', 'update'])]
+        public readonly ?string $province = null,
+
+        #[Assert\NotBlank(groups: ['create', 'update'])]
+        #[Assert\Length(min: 1, max: 255, groups: ['create', 'update'])]
+        public readonly ?string $ward = null,
+
+        #[Assert\NotBlank(groups: ['create', 'update'])]
+        #[Assert\Length(min: 5, max: 500, groups: ['create', 'update'])]
+        public readonly ?string $address = null,
+
+        #[Assert\NotBlank(groups: ['create', 'update'])]
+        #[Assert\Length(max: 255, groups: ['create', 'update'])]
+        public readonly ?string $maBoPhan = null,
+
+        #[Assert\NotBlank(groups: ['create', 'update'])]
+        #[Assert\Choice(choices: [0, 1], groups: ['create', 'update'])]
+        public readonly ?int $status = null,
+
     ) {}
 }

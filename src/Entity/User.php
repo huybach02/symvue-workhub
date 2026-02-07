@@ -50,20 +50,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $gender = null;
 
-    #[ORM\Column(length: 10, nullable: true)]
-    private ?string $provinceId = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $province = null;
 
-    #[ORM\Column(length: 10, nullable: true)]
-    private ?string $districtId = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $district = null;
 
-    #[ORM\Column(length: 10, nullable: true)]
-    private ?string $wardId = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $ward = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $address = null;
 
-    #[ORM\Column(type: 'date', nullable: true)]
-    private ?\DateTimeInterface $birthday = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $birthday = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
@@ -83,8 +83,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'integer', options: ['default' => 1, 'comment' => '1: full time, 2: part time'])]
     private int $hinhThucLamViec = 1;
 
-    #[ORM\Column(length: 255)]
-    private ?string $maVaiTro = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $maBoPhan = null;
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $rememberToken = null;
@@ -221,38 +221,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getProvinceId(): ?string
+    public function getProvince(): ?string
     {
-        return $this->provinceId;
+        return $this->province;
     }
 
-    public function setProvinceId(?string $provinceId): static
+    public function setProvince(?string $province): static
     {
-        $this->provinceId = $provinceId;
+        $this->province = $province;
 
         return $this;
     }
 
-    public function getDistrictId(): ?string
+    public function getDistrict(): ?string
     {
-        return $this->districtId;
+        return $this->district;
     }
 
-    public function setDistrictId(?string $districtId): static
+    public function setDistrict(?string $district): static
     {
-        $this->districtId = $districtId;
+        $this->district = $district;
 
         return $this;
     }
 
-    public function getWardId(): ?string
+    public function getWard(): ?string
     {
-        return $this->wardId;
+        return $this->ward;
     }
 
-    public function setWardId(?string $wardId): static
+    public function setWard(?string $ward): static
     {
-        $this->wardId = $wardId;
+        $this->ward = $ward;
 
         return $this;
     }
@@ -274,7 +274,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->birthday;
     }
 
-    public function setBirthday(?\DateTimeInterface $birthday): static
+    public function setBirthday(?string $birthday): static
     {
         $this->birthday = $birthday;
 
@@ -353,14 +353,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getMaVaiTro(): ?string
+    public function getMaBoPhan(): ?string
     {
-        return $this->maVaiTro;
+        return $this->maBoPhan;
     }
 
-    public function setMaVaiTro(string $maVaiTro): static
+    public function setMaBoPhan(string $maBoPhan): static
     {
-        $this->maVaiTro = $maVaiTro;
+        $this->maBoPhan = $maBoPhan;
 
         return $this;
     }
@@ -408,15 +408,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'email' => $this->email,
             'phone' => $this->phone,
             'gender' => $this->gender,
-            'provinceId' => $this->provinceId,
-            'districtId' => $this->districtId,
-            'wardId' => $this->wardId,
+            'province' => $this->province,
+            'district' => $this->district,
+            'ward' => $this->ward,
             'address' => $this->address,
             'birthday' => $this->birthday,
             'image' => $this->image,
             'description' => $this->description,
             'status' => $this->status,
-            'maVaiTro' => $this->maVaiTro,
+            'maBoPhan' => $this->maBoPhan,
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];

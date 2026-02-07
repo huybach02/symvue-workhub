@@ -59,17 +59,20 @@
                 </tr>
             </template>
 
-            <template #[`item.action`]>
+            <template #[`item.action`]="{ item }">
                 <div class="d-flex align-center justify-space-between">
-                    <v-btn icon size="small" variant="text" color="warning">
-                        <v-icon>mdi-pencil</v-icon>
-                    </v-btn>
+                    <ThemSuaNguoiDung
+                        :path="path"
+                        mode="update"
+                        :item="item"
+                        @reload="$emit('reload')"
+                    />
                     <v-btn
                         icon
                         size="small"
                         variant="text"
                         color="error"
-                        @click="showConfirmDelete = true"
+                        @click="openDeleteDialog(item.id)"
                     >
                         <v-icon>mdi-delete</v-icon>
                     </v-btn>
@@ -133,14 +136,21 @@ import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import ThemSuaNguoiDung from "./ThemSuaNguoiDung.vue";
+import { deleteData } from "@/services/bases/deleteData";
 
 export default {
     name: "DataTable",
     components: {
         FilterPagination,
         ConfirmDialog,
+        ThemSuaNguoiDung,
     },
     props: {
+        path: {
+            type: String,
+            default: "",
+        },
         users: {
             type: Array,
             default: () => [],
@@ -181,6 +191,7 @@ export default {
         return {
             showConfirmDelete: false,
             isDeleting: false,
+            deletingId: null,
             headers: [
                 {
                     key: "action",
@@ -227,7 +238,7 @@ export default {
                             value: "1",
                         },
                         {
-                            title: this.$t("status_values.blocked"),
+                            title: this.$t("status_values.inactive"),
                             value: "0",
                         },
                     ],
@@ -257,13 +268,17 @@ export default {
         },
     },
     methods: {
-        handleDelete() {
+        openDeleteDialog(id) {
+            this.deletingId = id;
+            this.showConfirmDelete = true;
+        },
+        async handleDelete() {
             this.isDeleting = true;
-            setTimeout(() => {
-                this.isDeleting = false;
-                this.showConfirmDelete = false;
-                this.$emit("reload");
-            }, 1000);
+            await deleteData(this.path, this.deletingId);
+            this.isDeleting = false;
+            this.showConfirmDelete = false;
+            this.deletingId = null;
+            this.$emit("reload");
         },
     },
 };

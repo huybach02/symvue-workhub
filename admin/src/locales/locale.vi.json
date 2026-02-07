@@ -124,6 +124,7 @@
         }
     },
     "user": {
+        "title": "Người dùng",
         "columns": {
             "id": "ID",
             "name": "Họ tên",
