@@ -64,7 +64,7 @@ class FilterWithPagination
                 break;
 
             case self::OPERATORS['CONTAIN']:
-                $qb->andWhere("LOWER($field) LIKE LOWER(:$param)")->setParameter($param, "%$value%");
+                $qb->andWhere("LOWER(CONCAT($field, '')) LIKE LOWER(:$param)")->setParameter($param, "%$value%");
                 break;
 
             case self::OPERATORS['LESS_THAN']:

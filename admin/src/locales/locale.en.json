@@ -128,6 +128,8 @@
         "columns": {
             "id": "ID",
             "name": "Full name",
+            "email": "Email",
+            "phone": "Phone",
             "role": "Role"
         },
         "roles": {

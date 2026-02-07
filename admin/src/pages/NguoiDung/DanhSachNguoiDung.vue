@@ -203,7 +203,7 @@ export default {
                 {
                     title: this.$t("user.columns.id"),
                     key: "id",
-                    width: 50,
+                    width: 100,
                     filterComponent: markRaw(FilterText),
                 },
                 {
@@ -213,9 +213,21 @@ export default {
                     filterComponent: markRaw(FilterText),
                 },
                 {
+                    title: this.$t("user.columns.email"),
+                    key: "email",
+                    width: 200,
+                    filterComponent: markRaw(FilterText),
+                },
+                {
+                    title: this.$t("user.columns.phone"),
+                    key: "phone",
+                    width: 150,
+                    filterComponent: markRaw(FilterText),
+                },
+                {
                     title: this.$t("user.columns.role"),
                     key: "maVaiTro",
-                    width: 100,
+                    width: 120,
                     filterComponent: markRaw(FilterSelect),
                     items: [
                         { title: this.$t("user.roles.admin"), value: "ADMIN" },

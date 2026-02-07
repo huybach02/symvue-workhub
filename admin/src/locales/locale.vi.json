@@ -128,6 +128,8 @@
         "columns": {
             "id": "ID",
             "name": "Họ tên",
+            "email": "Email",
+            "phone": "Điện thoại",
             "role": "Vai trò"
         },
         "roles": {
