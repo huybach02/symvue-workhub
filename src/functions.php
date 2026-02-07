@@ -63,3 +63,53 @@ if (!function_exists('validateFilterParams')) {
         return $params;
     }
 }
+
+if (!function_exists('getProvinceByCode')) {
+    function getProvinceByCode(?string $provinceCode): string
+    {
+        if (!$provinceCode) {
+            return '';
+        }
+
+        $projectDir = dirname(__DIR__);
+        $filePath = $projectDir . '/public/province.json';
+
+        if (!file_exists($filePath)) {
+            throw new \Exception('File province.json không tồn tại');
+        }
+        $content = file_get_contents($filePath);
+        $items = json_decode($content, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception('File province.json không đúng định dạng JSON');
+        }
+
+        $filtered = array_filter($items, fn($item) => $item['code'] == $provinceCode);
+
+        return array_values($filtered)[0]['name'] ?? '';
+    }
+}
+
+if (!function_exists('getWardByCode')) {
+    function getWardByCode(?string $wardCode): string
+    {
+        if (!$wardCode) {
+            return '';
+        }
+
+        $projectDir = dirname(__DIR__);
+        $filePath = $projectDir . '/public/ward.json';
+
+        if (!file_exists($filePath)) {
+            throw new \Exception('File ward.json không tồn tại');
+        }
+        $content = file_get_contents($filePath);
+        $items = json_decode($content, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception('File ward.json không đúng định dạng JSON');
+        }
+
+        $filtered = array_filter($items, fn($item) => $item['code'] == $wardCode);
+
+        return array_values($filtered)[0]['name'] ?? '';
+    }
+}

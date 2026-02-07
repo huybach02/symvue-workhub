@@ -10,7 +10,8 @@
         "created_at": "Ngày tạo",
         "updated_at": "Ngày cập nhật",
         "no_data": "Không tìm thấy dữ liệu phù hợp",
-        "enter": "Nhập"
+        "enter": "Nhập",
+        "export_excel": "Xuất file excel"
     },
     "title": {
         "create": "Tạo",

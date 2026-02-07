@@ -10,7 +10,8 @@
         "created_at": "Created at",
         "updated_at": "Updated at",
         "no_data": "No matching data found",
-        "enter": "Enter"
+        "enter": "Enter",
+        "export_excel": "Export excel"
     },
     "title": {
         "create": "Create",

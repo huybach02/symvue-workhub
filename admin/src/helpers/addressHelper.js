@@ -1,13 +1,3 @@
-export async function loadProvinceData() {
-    try {
-        const response = await fetch("/province.json");
-        return await response.json();
-    } catch (error) {
-        console.error("Lỗi khi load dữ liệu province:", error);
-        return {};
-    }
-}
-
 export async function loadWardData() {
     try {
         const response = await fetch("/ward.json");
@@ -22,26 +12,8 @@ export function getProvinceOptions(provinceData) {
     return Object.values(provinceData);
 }
 
-export function getWardOptionsByProvince(
-    wardData,
-    provinceData,
-    selectedProvince,
-) {
-    if (!selectedProvince) {
-        return [];
-    }
-
-    const selectedProvinceObj = Object.values(provinceData).find(
-        (p) => p.code === selectedProvince,
-    );
-
-    if (!selectedProvinceObj) {
-        return [];
-    }
-
-    return Object.values(wardData).filter(
-        (ward) => ward.parent_code === selectedProvinceObj.code,
-    );
+export function getWardOptions(wardData) {
+    return Object.values(wardData);
 }
 
 export function findProvinceByCode(provinceData, provinceCode) {
@@ -55,10 +27,9 @@ export function findWardByCode(wardData, wardCode) {
 }
 
 export const addressHelper = {
-    loadProvinceData,
     loadWardData,
     getProvinceOptions,
-    getWardOptionsByProvince,
+    getWardOptions,
     findProvinceByCode,
     findWardByCode,
 };

@@ -270,6 +270,8 @@ import { functionHelper } from "@/helpers/functionHelper";
 import { addressHelper } from "@/helpers/addressHelper";
 import { userSchema } from "@/utils/schemas/user";
 import { constant } from "@/utils/constants/constant";
+import { getAllData } from "@/services/bases/getData";
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 
 export default {
     components: {
@@ -325,11 +327,7 @@ export default {
             return addressHelper.getProvinceOptions(this.provinceData);
         },
         wardOptions() {
-            return addressHelper.getWardOptionsByProvince(
-                this.wardData,
-                this.provinceData,
-                this.selectedProvince,
-            );
+            return addressHelper.getWardOptions(this.wardData);
         },
     },
     watch: {
@@ -349,10 +347,18 @@ export default {
             deep: true,
             immediate: true,
         },
+        selectedProvince: {
+            handler(value) {
+                if (value) {
+                    this.getWard(value);
+                }
+            },
+            deep: true,
+            immediate: true,
+        },
     },
     async mounted() {
-        await this.loadProvinceData();
-        await this.loadWardData();
+        await this.getProvince();
     },
     methods: {
         handleSubmit(values) {
@@ -377,11 +383,15 @@ export default {
                 wardField.setValue("");
             }
         },
-        async loadProvinceData() {
-            this.provinceData = await addressHelper.loadProvinceData();
+        async getProvince() {
+            const res = await getAllData(API_ROUTES_CONFIG.user + "/province");
+            this.provinceData = res;
         },
-        async loadWardData() {
-            this.wardData = await addressHelper.loadWardData();
+        async getWard(provinceId) {
+            const res = await getAllData(
+                API_ROUTES_CONFIG.user + "/ward/" + provinceId,
+            );
+            this.wardData = res;
         },
     },
 };

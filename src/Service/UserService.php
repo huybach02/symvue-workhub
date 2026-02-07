@@ -7,6 +7,7 @@ use App\DTO\UserDTO;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserService
@@ -14,7 +15,8 @@ class UserService
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $entityManager,
-        private UserPasswordHasherInterface $passwordHasher
+        private UserPasswordHasherInterface $passwordHasher,
+        private readonly ParameterBagInterface $parameterBag
     ) {}
 
     public function findAll(array $params): array
@@ -101,5 +103,45 @@ class UserService
 
         $this->entityManager->remove($item);
         $this->entityManager->flush();
+    }
+
+    public function getProvince(): array
+    {
+        $projectDir = $this->parameterBag->get('kernel.project_dir');
+        $filePath = $projectDir . '/public/province.json';
+
+        if (!file_exists($filePath)) {
+            throw new \Exception('File province.json không tồn tại');
+        }
+
+        $content = file_get_contents($filePath);
+        $items = json_decode($content, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception('File province.json không đúng định dạng JSON');
+        }
+
+        return $items ?? [];
+    }
+
+    public function getWard(string $provinceCode): array
+    {
+        $projectDir = $this->parameterBag->get('kernel.project_dir');
+        $filePath = $projectDir . '/public/ward.json';
+
+        if (!file_exists($filePath)) {
+            throw new \Exception('File ward.json không tồn tại');
+        }
+
+        $content = file_get_contents($filePath);
+        $items = json_decode($content, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception('File ward.json không đúng định dạng JSON');
+        }
+
+        $items = array_filter($items, fn($item) => $item['parent_code'] === $provinceCode);
+
+        return $items ?? [];
     }
 }

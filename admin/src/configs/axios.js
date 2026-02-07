@@ -47,7 +47,12 @@ axiosInstance.interceptors.request.use(
 
 // 2. Response Interceptor: Xử lý 401 & Refresh Token
 axiosInstance.interceptors.response.use(
-    (response) => (response.data ? response.data : response), // Trả về nguyên bản response (để code dưới tự xử lý .data)
+    (response) => {
+        if (response.config.responseType === "blob") {
+            return response;
+        }
+        return response.data ? response.data : response;
+    },
     async (error) => {
         const originalRequest = error.config;
 

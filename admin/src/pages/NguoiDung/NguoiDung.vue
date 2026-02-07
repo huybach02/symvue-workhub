@@ -7,6 +7,7 @@
                     mode="create"
                     @reload="getDanhSach"
                 />
+                <ExportDataExcel :path="path" />
             </v-col>
         </v-row>
         <v-row>
@@ -27,6 +28,7 @@
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import DanhSachNguoiDung from "./DanhSachNguoiDung.vue";
 import { getListData } from "@/services/bases/getData";
+import ExportDataExcel from "@/components/ExportDataExcel.vue";
 import ThemSuaNguoiDung from "./ThemSuaNguoiDung.vue";
 
 export default {
@@ -34,6 +36,7 @@ export default {
     components: {
         DanhSachNguoiDung,
         ThemSuaNguoiDung,
+        ExportDataExcel,
     },
     data() {
         return {

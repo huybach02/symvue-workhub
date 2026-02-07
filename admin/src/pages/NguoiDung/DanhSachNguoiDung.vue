@@ -60,7 +60,7 @@
             </template>
 
             <template #[`item.action`]="{ item }">
-                <div class="d-flex align-center justify-space-between">
+                <div class="d-flex align-center justify-start gap-1">
                     <ThemSuaNguoiDung
                         :path="path"
                         mode="update"
@@ -195,9 +195,9 @@ export default {
             headers: [
                 {
                     key: "action",
-                    width: 65,
-                    minWidth: 65,
-                    maxWidth: 65,
+                    width: 80,
+                    minWidth: 80,
+                    maxWidth: 80,
                     sortable: false,
                 },
                 {

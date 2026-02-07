@@ -4,10 +4,13 @@ namespace App\Controller;
 
 use App\Class\CustomResponse;
 use App\DTO\UserDTO;
+use App\Repository\UserRepository;
+use App\Service\Excel\Export\UserExportService;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -15,6 +18,8 @@ final class UserController extends AbstractController
 {
     public function __construct(
         private readonly UserService $userService,
+        private readonly UserExportService $userExportService,
+        private readonly UserRepository $userRepository
     ) {}
 
     #[Route('/user', methods: ['GET'])]
@@ -36,6 +41,37 @@ final class UserController extends AbstractController
                     'total_current' => $result['total_current'],
                 ]
             ]);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/user/export', methods: ['GET'])]
+    public function exportUsers(): Response
+    {
+        $users = $this->userRepository->findAll();
+        return $this->userExportService->exportUsers($users);
+    }
+
+    // API lấy data province
+    #[Route('/user/province', methods: ['GET'])]
+    public function getProvince(): JsonResponse
+    {
+        try {
+            $data = $this->userService->getProvince();
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    // API lấy data ward
+    #[Route('/user/ward/{provinceId}', methods: ['GET'])]
+    public function getWard(int $provinceId): JsonResponse
+    {
+        try {
+            $data = $this->userService->getWard($provinceId);
+            return CustomResponse::success($data);
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
