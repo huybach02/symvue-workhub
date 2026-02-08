@@ -6,6 +6,8 @@ use App\Class\CustomResponse;
 use App\DTO\UserDTO;
 use App\Repository\UserRepository;
 use App\Service\Excel\Export\UserExportService;
+use App\Service\Excel\Import\UserImportService;
+use App\Service\Excel\Template\UserTemplateImportService;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,6 +21,7 @@ final class UserController extends AbstractController
     public function __construct(
         private readonly UserService $userService,
         private readonly UserExportService $userExportService,
+        private readonly UserImportService $userImportService,
         private readonly UserRepository $userRepository
     ) {}
 
@@ -46,38 +49,7 @@ final class UserController extends AbstractController
         }
     }
 
-    #[Route('/user/export', methods: ['GET'])]
-    public function exportUsers(): Response
-    {
-        $users = $this->userRepository->findAll();
-        return $this->userExportService->exportUsers($users);
-    }
-
-    // API lấy data province
-    #[Route('/user/province', methods: ['GET'])]
-    public function getProvince(): JsonResponse
-    {
-        try {
-            $data = $this->userService->getProvince();
-            return CustomResponse::success($data);
-        } catch (\Throwable $th) {
-            return CustomResponse::error($th->getMessage());
-        }
-    }
-
-    // API lấy data ward
-    #[Route('/user/ward/{provinceId}', methods: ['GET'])]
-    public function getWard(int $provinceId): JsonResponse
-    {
-        try {
-            $data = $this->userService->getWard($provinceId);
-            return CustomResponse::success($data);
-        } catch (\Throwable $th) {
-            return CustomResponse::error($th->getMessage());
-        }
-    }
-
-    #[Route('/user/{id}', methods: ['GET'])]
+    #[Route('/user/{id}', methods: ['GET'], priority: -1)]
     public function getOne(int $id): JsonResponse
     {
         try {
@@ -119,6 +91,62 @@ final class UserController extends AbstractController
         try {
             $this->userService->delete($id);
             return CustomResponse::success([], t('success.deleted'));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/user/export', methods: ['GET'])]
+    public function exportUsers(): Response
+    {
+        $users = $this->userRepository->findAll();
+        return $this->userExportService->export($users);
+    }
+
+    #[Route('/user/import', methods: ['POST'])]
+    public function importUsers(Request $request): JsonResponse
+    {
+        $file = $request->files->get('file');
+        if (!$file) {
+            return CustomResponse::error(t('error.file_not_found'));
+        }
+
+        try {
+            $errorCount = $this->userImportService->import($file->getPathname(), $file->getClientOriginalName(), $this->getUser());
+            if ($errorCount > 0) {
+                return CustomResponse::error(t('error.imported_with_errors', ['%count%' => $errorCount]));
+            }
+            return CustomResponse::success([], t('success.imported'));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('user/template-import', methods: ['GET'])]
+    public function downloadTemplate(UserTemplateImportService $service): Response
+    {
+        return $service->generateUserTemplate();
+    }
+
+    // API lấy data province
+    #[Route('/user/province', methods: ['GET'])]
+    public function getProvince(): JsonResponse
+    {
+        try {
+            $data = $this->userService->getProvince();
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    // API lấy data ward
+    #[Route('/user/ward/{provinceId}', methods: ['GET'])]
+    public function getWard(int $provinceId): JsonResponse
+    {
+        try {
+            $data = $this->userService->getWard($provinceId);
+            return CustomResponse::success($data);
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }

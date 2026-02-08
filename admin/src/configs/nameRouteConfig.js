@@ -9,4 +9,5 @@ export const NAME_ROUTES_CONFIG = {
     systemConfigWorkingTime: "system.configWorkingTime",
     userManagement: "system.userManagement",
     userManagementUser: "system.userManagementUser",
+    lichSuImport: "system.lichSuImport",
 };

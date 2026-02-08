@@ -138,5 +138,22 @@
             "manager": "Manager",
             "staff": "Staff"
         }
+    },
+    "lich_su_import": {
+        "title": "Lịch sử import",
+        "columns": {
+            "id": "ID",
+            "fileName": "Tên file",
+            "entityType": "Loại dữ liệu",
+            "status": "Trạng thái",
+            "totalRows": "Tổng số dòng",
+            "successRows": "Số dòng thành công",
+            "errorRows": "Số dòng lỗi",
+            "errorDetails": "Chi tiết lỗi",
+            "createdAt": "Ngày tạo",
+            "row": "Dòng",
+            "rawData": "Dữ liệu gốc",
+            "errors": "Lỗi"
+        }
     }
 }

@@ -16,3 +16,20 @@ export const postData = async (path, data, callback = () => {}) => {
         handleAxiosError(error);
     }
 };
+
+export const postDataWithFile = async (path, data, callback = () => {}) => {
+    try {
+        const res = await axiosInstance.post(path, data, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+        if (res.success) {
+            toast.success(res.message);
+            callback();
+            return res.data;
+        } else {
+            toast.error(res.message);
+        }
+    } catch (error) {
+        handleAxiosError(error);
+    }
+};

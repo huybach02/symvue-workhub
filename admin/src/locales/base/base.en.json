@@ -11,7 +11,13 @@
         "updated_at": "Updated at",
         "no_data": "No matching data found",
         "enter": "Enter",
-        "export_excel": "Export excel"
+        "export_excel": "Export excel",
+        "import_excel": "Import excel",
+        "dowload_template_import_excel": "Dowload template import excel",
+        "upload": "Upload",
+        "error_detail": "Error detail import",
+        "view": "View",
+        "note": "Note:"
     },
     "title": {
         "create": "Create",
@@ -25,10 +31,17 @@
         "system_config": "System Config",
         "system_config_general": "General Config",
         "system_config_working_time": "Working Time",
-        "user_management_user": "User"
+        "user_management_user": "User",
+        "lich_su_import": "Import history"
     },
     "gender": {
         "male": "Male",
         "female": "Female"
+    },
+    "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "success": "Success",
+        "error": "Error"
     }
 }

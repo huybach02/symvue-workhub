@@ -39,9 +39,14 @@ class UserDTO
         #[Assert\Length(min: 5, max: 500, groups: ['create', 'update'])]
         public readonly ?string $address = null,
 
-        #[Assert\NotBlank(groups: ['create', 'update'])]
         #[Assert\Length(max: 255, groups: ['create', 'update'])]
         public readonly ?string $maBoPhan = null,
+
+        #[Assert\Choice(choices: [0, 1], groups: ['create', 'update'])]
+        public readonly ?int $hinhThucLamViec = null,
+
+        #[Assert\Choice(choices: [0, 1], groups: ['create', 'update'])]
+        public readonly ?int $isNgoaiGio = null,
 
         #[Assert\NotBlank(groups: ['create', 'update'])]
         #[Assert\Choice(choices: [0, 1], groups: ['create', 'update'])]

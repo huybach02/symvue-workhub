@@ -1,13 +1,14 @@
 <template>
     <div>
         <v-btn
-            :loading="isExporting"
+            :loading="isImporting"
             prepend-icon="mdi-microsoft-excel"
             color="success"
             variant="outlined"
-            @click="handleExport"
+            size="x-large"
+            @click="handleImport"
         >
-            {{ $t("base.export_excel") }}
+            {{ $t("base.dowload_template_import_excel") }}
         </v-btn>
     </div>
 </template>
@@ -25,14 +26,16 @@ export default {
     },
     data() {
         return {
-            isExporting: false,
+            isImporting: false,
         };
     },
     methods: {
-        async handleExport() {
-            this.isExporting = true;
+        async handleImport() {
+            this.isImporting = true;
             try {
-                const response = await exportData(this.path + "/export");
+                const response = await exportData(
+                    this.path + "/template-import",
+                );
 
                 const url = window.URL.createObjectURL(
                     new Blob([response.data]),
@@ -43,7 +46,7 @@ export default {
 
                 const contentDisposition =
                     response.headers?.["content-disposition"];
-                let fileName = `data_export_${new Date().toISOString().split("T")[0]}.xlsx`;
+                let fileName = `data_import_${new Date().toISOString().split("T")[0]}.xlsx`;
                 if (contentDisposition) {
                     const fileNameMatch =
                         contentDisposition.match(/filename="(.+)"/);
@@ -58,12 +61,12 @@ export default {
                 link.remove();
                 window.URL.revokeObjectURL(url);
 
-                toast.success("Xuất file thành công!");
+                toast.success("Tải file thành công!");
             } catch (error) {
-                console.error("Lỗi xuất file:", error);
-                toast.error("Có lỗi xảy ra khi xuất file.");
+                console.error("Lỗi tải file:", error);
+                toast.error("Có lỗi xảy ra khi tải file.");
             } finally {
-                this.isExporting = false;
+                this.isImporting = false;
             }
         },
     },

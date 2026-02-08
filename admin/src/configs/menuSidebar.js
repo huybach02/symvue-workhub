@@ -40,4 +40,10 @@ export const menuSidebar = [
             },
         ],
     },
+    {
+        title: i18n.global.t("sidebar.lich_su_import"),
+        icon: "mdi-history",
+        value: NAME_ROUTES_CONFIG.lichSuImport,
+        to: { name: NAME_ROUTES_CONFIG.lichSuImport },
+    },
 ];

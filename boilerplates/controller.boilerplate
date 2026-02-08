@@ -9,6 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 final class {{MODULE_NAME}}Controller extends AbstractController
 {
@@ -27,7 +29,7 @@ final class {{MODULE_NAME}}Controller extends AbstractController
         }
     }
 
-    #[Route('/{{MODULE_NAME_LOWER}}/{id}', methods: ['GET'])]
+    #[Route('/{{MODULE_NAME_LOWER}}/{id}', methods: ['GET'], priority: -1)]
     public function getOne(int $id): JsonResponse
     {
         try {
@@ -73,4 +75,36 @@ final class {{MODULE_NAME}}Controller extends AbstractController
             return CustomResponse::error($th->getMessage());
         }
     }
+
+    // #[Route('/{{MODULE_NAME_LOWER}}/export', methods: ['GET'])]
+    // public function export(): Response
+    // {
+    //     $data = $this->{{ENTITY_VAR}}Service->findAll();
+    //     return $this->{{ENTITY_VAR}}ExportService->export($data);
+    // }
+
+    // #[Route('/{{MODULE_NAME_LOWER}}/import', methods: ['POST'])]
+    // public function import(Request $request): JsonResponse
+    // {
+    //     $file = $request->files->get('file');
+    //     if (!$file) {
+    //         return CustomResponse::error(t('error.file_not_found'));
+    //     }
+
+    //     try {
+    //         $errorCount = $this->{{ENTITY_VAR}}ImportService->import($file->getPathname(), $file->getClientOriginalName(), $this->getUser());
+    //         if ($errorCount > 0) {
+    //             return CustomResponse::error(t('error.imported_with_errors', ['%count%' => $errorCount]));
+    //         }
+    //         return CustomResponse::success([], t('success.imported'));
+    //     } catch (\Throwable $th) {
+    //         return CustomResponse::error($th->getMessage());
+    //     }
+    // }
+
+    // #[Route('/{{MODULE_NAME_LOWER}}/template-import', methods: ['GET'])]
+    // public function downloadTemplate({{MODULE_NAME}}TemplateImportService $service): Response
+    // {
+    //     return $service->generate{{MODULE_NAME}}Template();
+    // }
 }

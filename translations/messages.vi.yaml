@@ -21,7 +21,11 @@ auth:
 error:
     not_found: "Không tìm thấy dữ liệu"
     exists: "Dữ liệu đã tồn tại"
+    file_not_found: "Không tìm thấy file"
+    imported_with_errors: "Import không thành công với %count% bản ghi lỗi. Vui lòng kiểm tra lại file import hoặc đến trang Lịch sử import để xem chi tiết"
 success:
     created: "Tạo mới thành công"
     updated: "Cập nhật thành công"
     deleted: "Xóa thành công"
+    imported: "Import thành công"
+    exported: "Export thành công"

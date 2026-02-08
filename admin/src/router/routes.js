@@ -111,6 +111,22 @@ export const routes = [
                         ).icon || "",
                 },
             },
+            {
+                path: "lich-su-import",
+                name: NAME_ROUTES_CONFIG.lichSuImport,
+                component: () =>
+                    import("../pages/LichSuImport/LichSuImport.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.lichSuImport,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.lichSuImport,
+                        ).icon || "",
+                },
+            },
         ],
     },
 ];

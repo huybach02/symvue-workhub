@@ -9,13 +9,13 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class UserExportService
 {
-    public function exportUsers(array $users): StreamedResponse
+    public function export(array $users): StreamedResponse
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
         // 1. Tạo Header
-        $headers = ['STT', 'Tên', 'Email', 'Số điện thoại', 'Giới tính', 'Ngày sinh', 'Tỉnh/Thành phố', 'Quận/Huyện', 'Địa chỉ', 'Hình thức làm việc', 'Cho phép ngoài giờ', 'Trạng thái'];
+        $headers = ['STT', 'Họ và tên', 'Email', 'Số điện thoại', 'Giới tính', 'Ngày sinh', 'Tỉnh/Thành phố', 'Quận/Huyện', 'Địa chỉ', 'Hình thức làm việc', 'Cho phép ngoài giờ', 'Trạng thái'];
         $columnLetter = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue($columnLetter . '1', $header);

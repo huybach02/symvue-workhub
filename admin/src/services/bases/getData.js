@@ -58,15 +58,10 @@ export const getListData = async (path, params = {}) => {
 
 export const exportData = async (path) => {
     try {
-        // Gọi axios trực tiếp thay vì dùng instance để tránh interceptor unwrap response
-        const resp = await axiosInstance.get(path + "/export", {
+        const resp = await axiosInstance.get(path, {
             responseType: "blob",
         });
 
-        // Vì interceptor đã unwrap response.data, nên resp chính là blob
-        // Nhưng ta cần cả headers nữa, nên phải wrap lại
-        // Tuy nhiên, interceptor đã làm mất headers rồi
-        // Giải pháp: Trả về raw axios response bằng cách bypass interceptor
         return resp;
     } catch (error) {
         handleAxiosError(error);

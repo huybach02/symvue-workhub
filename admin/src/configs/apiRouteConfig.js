@@ -19,4 +19,5 @@ export const API_ROUTES_CONFIG = {
         deletePermanently: "/media/delete-permanently",
     },
     user: "/user",
+    lichSuImport: "/lich-su-import",
 };

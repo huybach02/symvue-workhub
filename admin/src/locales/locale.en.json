@@ -138,5 +138,22 @@
             "manager": "Manager",
             "staff": "Staff"
         }
+    },
+    "lich_su_import": {
+        "title": "Import history",
+        "columns": {
+            "id": "ID",
+            "fileName": "File name",
+            "entityType": "Entity type",
+            "status": "Status",
+            "totalRows": "Total rows",
+            "successRows": "Success rows",
+            "errorRows": "Error rows",
+            "errorDetails": "Error details",
+            "createdAt": "Created at",
+            "row": "Row",
+            "rawData": "Raw data",
+            "errors": "Errors"
+        }
     }
 }

@@ -2,24 +2,7 @@
     <div>
         <v-row>
             <v-col cols="12">
-                <ThemSua{{MODULE_NAME}}
-                    :path="path"
-                    mode="create"
-                    @reload="getDanhSach"
-                />
-                <div class="d-flex ga-2">
-                    <ExportDataExcel :path="path" />
-                    <ImportDataExcel
-                        :path="path"
-                        :note="``"
-                        @reload="getDanhSach"
-                    />
-                </div>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="12">
-                <DanhSach{{MODULE_NAME}}
+                <DanhSachLichSuImport
                     :path="path"
                     :items="items"
                     :total-items="totalItems"
@@ -33,23 +16,17 @@
 
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import DanhSach{{MODULE_NAME}} from "./DanhSach{{MODULE_NAME}}.vue";
+import DanhSachLichSuImport from "./DanhSachLichSuImport.vue";
 import { getListData } from "@/services/bases/getData";
-import ThemSua{{MODULE_NAME}} from "./ThemSua{{MODULE_NAME}}.vue";
-import ExportDataExcel from "@/components/ExportDataExcel.vue";
-import ImportDataExcel from "@/components/ImportDataExcel.vue";
 
 export default {
-    name: "{{MODULE_NAME}}",
+    name: "LichSuImport",
     components: {
-        DanhSach{{MODULE_NAME}},
-        ThemSua{{MODULE_NAME}},
-        ExportDataExcel,
-        ImportDataExcel,
+        DanhSachLichSuImport,
     },
     data() {
         return {
-            path: API_ROUTES_CONFIG.{{MODULE_LOWER}},
+            path: API_ROUTES_CONFIG.lichSuImport,
             items: [],
             totalItems: 0,
             loading: false,
