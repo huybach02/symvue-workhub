@@ -9,17 +9,6 @@
 - ✅ INDEX-MATCH formulas tự động
 - ✅ Cột ẩn chứa giá trị code
 
-## 🎯 Lợi ích
-
-| Trước                       | Sau                             |
-| --------------------------- | ------------------------------- |
-| ~170 dòng code lặp lại      | ~80 dòng code gọn gàng          |
-| Khó bảo trì                 | Dễ bảo trì                      |
-| Copy-paste cho mỗi template | Tái sử dụng helper methods      |
-| Dễ lỗi khi thay đổi         | Thay đổi 1 chỗ, áp dụng toàn bộ |
-
----
-
 ## 🚀 Cách sử dụng nhanh
 
 ### Bước 1: Kế thừa BaseExcelTemplateHelper
@@ -410,7 +399,6 @@ class ProductTemplateImportService extends BaseExcelTemplateHelper
 - ✅ 3 dropdown với auto-mapping
 - ✅ 3 reference sheets tự động
 - ✅ 3 cột ẩn với INDEX-MATCH formulas
-- ✅ Chỉ ~70 dòng code thay vì ~200 dòng
 
 ---
 

@@ -1,10 +1,5 @@
 <template>
-    <v-dialog
-        v-model="isVisible"
-        max-width="500"
-        persistent
-        scrim="rgba(0, 0, 0, 0.5)"
-    >
+    <v-dialog v-model="isVisible" max-width="500" persistent>
         <v-card>
             <!-- Header -->
             <v-card-title class="text-h5 bg-error">

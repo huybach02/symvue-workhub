@@ -113,3 +113,51 @@ if (!function_exists('getWardByCode')) {
         return array_values($filtered)[0]['name'] ?? '';
     }
 }
+
+/**
+ * Convert tên cột Excel (A, B, C, AA, AB...) sang index số (0, 1, 2...)
+ * 
+ * @param string $column Tên cột Excel (VD: "A", "B", "AA", "AB")
+ * @return int Index số tương ứng (0-based)
+ * 
+ * @example
+ * excelColumnToIndex("A") => 0
+ * excelColumnToIndex("B") => 1
+ * excelColumnToIndex("Z") => 25
+ * excelColumnToIndex("AA") => 26
+ * excelColumnToIndex("AB") => 27
+ */
+if (!function_exists('excelColumnToIndex')) {
+    function excelColumnToIndex(string $column): int
+    {
+        $column = strtoupper($column);
+        $length = strlen($column);
+        $index = 0;
+
+        for ($i = 0; $i < $length; $i++) {
+            $index = $index * 26 + (ord($column[$i]) - ord('A') + 1);
+        }
+
+        return $index - 1; // Trả về 0-based index
+    }
+}
+
+/**
+ * Helper function để lấy giá trị từ row Excel theo tên cột
+ * 
+ * @param array $row Mảng dữ liệu từ Excel row
+ * @param string $column Tên cột Excel (VD: "A", "B", "AA")
+ * @param mixed $default Giá trị mặc định nếu không tồn tại
+ * @return mixed Giá trị tại cột đó hoặc giá trị mặc định
+ * 
+ * @example
+ * excelGetValue($row, "A") => Lấy giá trị cột A
+ * excelGetValue($row, "B", "default") => Lấy giá trị cột B, nếu null thì trả về "default"
+ */
+if (!function_exists('excelGetValue')) {
+    function excelGetValue(array $row, string $column, mixed $default = null): mixed
+    {
+        $index = excelColumnToIndex($column);
+        return $row[$index] ?? $default;
+    }
+}

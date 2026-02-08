@@ -76,17 +76,6 @@
                     >
                         <v-icon>mdi-delete</v-icon>
                     </v-btn>
-                    <ConfirmDialog
-                        v-model="showConfirmDelete"
-                        :message="
-                            $t('media_library.delete_confirm_message', {
-                                count: 1,
-                            })
-                        "
-                        :loading="isDeleting"
-                        @confirm="handleDelete"
-                        @cancel="showConfirmDelete = false"
-                    />
                 </div>
             </template>
 
@@ -124,6 +113,18 @@
             :items-per-page="query.limit"
             @update:page="onPageChange"
             @update:items-per-page="onLimitChange"
+        />
+
+        <ConfirmDialog
+            v-model="showConfirmDelete"
+            :message="
+                $t('media_library.delete_confirm_message', {
+                    count: 1,
+                })
+            "
+            :loading="isDeleting"
+            @confirm="handleDelete"
+            @cancel="showConfirmDelete = false"
         />
     </div>
 </template>

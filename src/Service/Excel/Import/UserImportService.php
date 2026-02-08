@@ -41,17 +41,17 @@ class UserImportService
             // Map dữ liệu từ Excel
             // ============== CHỖ CẦN SỬA 1 ==============
             $data = [
-                'name' => $row[0] ?? null,
-                'email' => $row[1] ?? null,
-                'phone' => $row[2] ?? null,
-                'gender' => $row[3] ?? null,
-                'birthday' => $row[4] ?? null,
-                'province' => $row[5] ?? null,
-                'ward' => $row[6] ?? null,
-                'address' => $row[7] ?? null,
-                'hinhThucLamViec' => (int)$row[8] ?? null,
-                'isNgoaiGio' => (int)$row[9] ?? null,
-                'status' => (int)$row[10] ?? null,
+                'name' => excelGetValue($row, 'A'),
+                'email' => excelGetValue($row, 'B'),
+                'phone' => excelGetValue($row, 'C'),
+                'gender' => excelGetValue($row, 'L'),
+                'birthday' => excelGetValue($row, 'E'),
+                'province' => excelGetValue($row, 'F'),
+                'ward' => excelGetValue($row, 'G'),
+                'address' => excelGetValue($row, 'H'),
+                'hinhThucLamViec' => (int)excelGetValue($row, 'M'),
+                'isNgoaiGio' => (int)excelGetValue($row, 'N'),
+                'status' => (int)excelGetValue($row, 'O'),
             ];
             // ============== HẾT CHỖ CẦN SỬA 1 ==============
 

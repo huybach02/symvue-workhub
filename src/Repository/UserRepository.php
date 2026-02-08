@@ -48,6 +48,23 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     //        ;
     //    }
 
+    /**
+     * Tìm user theo email, chỉ lấy những user chưa bị soft delete
+     * 
+     * @param string $email
+     * @return User|null
+     */
+    public function findActiveByEmail(string $email): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.email = :email')
+            ->andWhere('u.deletedAt IS NULL')
+            ->setParameter('email', $email)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
     //    public function findOneBySomeField($value): ?User
     //    {
     //        return $this->createQueryBuilder('u')

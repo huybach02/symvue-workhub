@@ -42,7 +42,7 @@ class UserDTO
         #[Assert\Length(max: 255, groups: ['create', 'update'])]
         public readonly ?string $maBoPhan = null,
 
-        #[Assert\Choice(choices: [0, 1], groups: ['create', 'update'])]
+        #[Assert\Choice(choices: [1, 2], groups: ['create', 'update'])]
         public readonly ?int $hinhThucLamViec = null,
 
         #[Assert\Choice(choices: [0, 1], groups: ['create', 'update'])]

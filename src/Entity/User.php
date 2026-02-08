@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Interface\ImageableInterface;
 use App\Traits\TimestampableTrait;
 use App\Repository\UserRepository;
 use App\Traits\SoftDeleteableTrait;
@@ -14,9 +15,13 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\UniqueConstraint(
+    name: 'UNIQ_IDENTIFIER_EMAIL',
+    fields: ['email'],
+    options: ['where' => 'deleted_at IS NULL'] // Chỉ unique khi chưa bị xóa
+)]
 #[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, ImageableInterface
 {
     use TimestampableTrait;
     use SoftDeleteableTrait;

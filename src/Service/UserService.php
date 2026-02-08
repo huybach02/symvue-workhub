@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Class\FilterWithPagination;
 use App\DTO\UserDTO;
 use App\Entity\User;
+use App\Repository\ImageRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -16,7 +17,8 @@ class UserService
         private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $entityManager,
         private UserPasswordHasherInterface $passwordHasher,
-        private readonly ParameterBagInterface $parameterBag
+        private readonly ParameterBagInterface $parameterBag,
+        private readonly ImageRepository $imageRepository,
     ) {}
 
     public function findAll(array $params): array
@@ -27,7 +29,11 @@ class UserService
 
         // Map collection to JSON
         $result['collection'] = array_map(
-            fn(User $item) => $item->jsonSerialize(),
+            function (User $user) {
+                $data = $user->jsonSerialize();
+                $data['image'] = $this->imageRepository->getImages($user, 'avatar');
+                return $data;
+            },
             $result['collection']
         );
 
@@ -65,6 +71,8 @@ class UserService
 
         $this->entityManager->persist($item);
         $this->entityManager->flush();
+
+        $this->imageRepository->addOneImage($item, "abc/123.jpg", "avatar");
 
         return $item->jsonSerialize();
     }
