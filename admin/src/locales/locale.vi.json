@@ -127,6 +127,7 @@
         "title": "Người dùng",
         "columns": {
             "id": "ID",
+            "avatar": "Ảnh đại diện",
             "name": "Họ tên",
             "email": "Email",
             "phone": "Điện thoại",

@@ -79,6 +79,17 @@
                 </div>
             </template>
 
+            <template #[`item.image`]="{ item }">
+                <div class="py-2">
+                    <v-avatar v-if="item.image" size="50">
+                        <v-img :src="item.image" :alt="item.name" cover />
+                    </v-avatar>
+                    <v-avatar v-else color="grey-lighten-2" size="50">
+                        <v-icon icon="mdi-account" color="grey-darken-1" />
+                    </v-avatar>
+                </div>
+            </template>
+
             <template #[`item.status`]="{ item }">
                 <v-chip
                     :color="item.status === 1 ? 'success' : 'error'"
@@ -135,6 +146,7 @@ import FilterText from "@/components/filters/FilterText.vue";
 import FilterSelect from "@/components/filters/FilterSelect.vue";
 import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterPagination from "@/components/filters/FilterPagination.vue";
+import FilterPlaceholder from "@/components/filters/FilterPlaceholder.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import ThemSuaNguoiDung from "./ThemSuaNguoiDung.vue";
@@ -204,8 +216,15 @@ export default {
                 {
                     title: this.$t("user.columns.id"),
                     key: "id",
-                    width: 100,
+                    width: 120,
                     filterComponent: markRaw(FilterText),
+                },
+                {
+                    title: this.$t("user.columns.avatar"),
+                    key: "image",
+                    width: 120,
+                    sortable: false,
+                    filterComponent: markRaw(FilterPlaceholder),
                 },
                 {
                     title: this.$t("user.columns.name"),
@@ -224,21 +243,6 @@ export default {
                     key: "phone",
                     width: 150,
                     filterComponent: markRaw(FilterText),
-                },
-                {
-                    title: this.$t("user.columns.role"),
-                    key: "maVaiTro",
-                    width: 120,
-                    filterComponent: markRaw(FilterSelect),
-                    items: [
-                        { title: this.$t("user.roles.admin"), value: "ADMIN" },
-                        { title: this.$t("user.roles.user"), value: "USER" },
-                        {
-                            title: this.$t("user.roles.manager"),
-                            value: "MANAGER",
-                        },
-                        { title: this.$t("user.roles.staff"), value: "STAFF" },
-                    ],
                 },
                 {
                     title: this.$t("base.status"),

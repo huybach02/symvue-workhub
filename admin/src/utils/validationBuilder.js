@@ -522,3 +522,27 @@ export const buildTaxCodeRule = (label, options = {}) => {
 
     return applyRequired(rule, required);
 };
+
+// Validate image/avatar (URL string hoặc object)
+export const buildImageRule = (label, options = {}) => {
+    const { required = true } = options;
+
+    let rule = yup
+        .mixed()
+        .label(label)
+        .test(
+            "is-valid-image",
+            ({ label }) => t("validation.image.invalid", { field: label }),
+            (value) => {
+                if (!value) return !required;
+                // Chấp nhận string (URL) hoặc object có thuộc tính path
+                if (typeof value === "string") return value.trim().length > 0;
+                if (typeof value === "object" && value !== null) {
+                    return value.path && typeof value.path === "string";
+                }
+                return false;
+            },
+        );
+
+    return applyRequired(rule, required);
+};

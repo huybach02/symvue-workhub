@@ -89,6 +89,9 @@
         },
         "tax_code": {
             "invalid": "{field} must be a valid tax code (10 digits or 10-XXX)."
+        },
+        "image": {
+            "invalid": "{field} is invalid. Please select an image."
         }
     }
 }

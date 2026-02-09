@@ -7,6 +7,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 class UserDTO
 {
     public function __construct(
+        #[Assert\Length(max: 255, groups: ['create', 'update'])]
+        public readonly ?string $avatar = null,
+
         #[Assert\NotBlank(groups: ['create', 'update'])]
         #[Assert\Length(min: 2, max: 255, groups: ['create', 'update'])]
         public readonly ?string $name = null,

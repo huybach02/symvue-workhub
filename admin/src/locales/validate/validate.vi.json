@@ -89,6 +89,9 @@
         },
         "tax_code": {
             "invalid": "{field} phải là mã số thuế hợp lệ (10 số hoặc 10-XXX)."
+        },
+        "image": {
+            "invalid": "{field} không hợp lệ. Vui lòng chọn ảnh."
         }
     }
 }

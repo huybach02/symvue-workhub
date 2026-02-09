@@ -48,7 +48,10 @@ class UserService
             throw new \Exception(t('error.not_found'));
         }
 
-        return $item->jsonSerialize();
+        $data = $item->jsonSerialize();
+        $data['image'] = $this->imageRepository->getImages($item, 'avatar');
+
+        return $data;
     }
 
     public function create(UserDTO $dto): array
@@ -72,7 +75,9 @@ class UserService
         $this->entityManager->persist($item);
         $this->entityManager->flush();
 
-        $this->imageRepository->addOneImage($item, "abc/123.jpg", "avatar");
+        if ($dto->avatar) {
+            $this->imageRepository->addOneImage($item, $dto->avatar, "avatar");
+        }
 
         return $item->jsonSerialize();
     }
@@ -97,6 +102,11 @@ class UserService
         $item->setStatus($dto->status);
 
         $this->entityManager->flush();
+
+        if ($dto->avatar) {
+            $this->imageRepository->removeImages($item);
+            $this->imageRepository->addOneImage($item, $dto->avatar, "avatar");
+        }
 
         return $item->jsonSerialize();
     }

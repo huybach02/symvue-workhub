@@ -3,15 +3,18 @@ import {
     buildStringRule,
     buildEmailRule,
     buildPhoneRule,
-    buildPasswordRule,
     buildDateRule,
-    buildNumberRule,
+    buildImageRule,
 } from "../validationBuilder";
 import { i18n } from "@/plugins/i18n";
 
 const t = (key) => i18n.global.t(key);
 
 export const userSchema = yup.object({
+    avatar: buildImageRule(t("field.anh_dai_dien"), {
+        required: false,
+    }),
+
     name: buildStringRule(t("field.ho_va_ten"), {
         required: true,
         min: 2,

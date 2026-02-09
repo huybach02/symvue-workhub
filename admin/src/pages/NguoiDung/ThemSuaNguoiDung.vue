@@ -44,6 +44,7 @@
                                 : $t('button.update')
                         "
                         :item="dataItem"
+                        :mode="mode"
                         @submit="onSubmit"
                         @cancel="dialog = false"
                     />

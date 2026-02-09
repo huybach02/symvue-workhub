@@ -127,6 +127,7 @@
         "title": "User",
         "columns": {
             "id": "ID",
+            "avatar": "Avatar",
             "name": "Full name",
             "email": "Email",
             "phone": "Phone",
