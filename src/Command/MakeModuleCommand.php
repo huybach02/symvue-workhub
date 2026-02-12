@@ -40,10 +40,10 @@ class MakeModuleCommand extends Command
         $moduleName = $input->getArgument('module');
         $entityName = $input->getOption('entity');
 
-        // Validate input
+        // Nếu không nhập --entity thì tự động lấy tên module làm tên entity
         if (!$entityName) {
-            $io->error('Option --entity là bắt buộc. VD: --entity=User');
-            return Command::FAILURE;
+            $entityName = $moduleName;
+            $io->note("Không tìm thấy option --entity, tự động sử dụng tên module: {$entityName}");
         }
 
         // Validate entity exists

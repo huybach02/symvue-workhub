@@ -25,6 +25,12 @@ export const menuSidebar = [
                 value: NAME_ROUTES_CONFIG.systemConfigWorkingTime,
                 to: { name: NAME_ROUTES_CONFIG.systemConfigWorkingTime },
             },
+            {
+                title: i18n.global.t("sidebar.bo_phan"),
+                icon: "mdi-account-multiple-outline",
+                value: NAME_ROUTES_CONFIG.boPhan,
+                to: { name: NAME_ROUTES_CONFIG.boPhan },
+            },
         ],
     },
     {

@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Class\FilterWithPagination;
 use App\DTO\{{MODULE_NAME}}DTO;
 use App\Entity\{{ENTITY_NAME}};
 use App\Repository\{{ENTITY_NAME}}Repository;
@@ -14,14 +15,19 @@ class {{MODULE_NAME}}Service
         private readonly EntityManagerInterface $entityManager,
     ) {}
 
-    public function findAll(): array
+    public function findAll(array $params): array
     {
-        $items = $this->{{ENTITY_VAR}}Repository->findAll();
+        $qb = $this->{{ENTITY_VAR}}Repository->createQueryBuilder('e');
 
-        return array_map(
+        $result = FilterWithPagination::findWithPagination($qb, $params, 'e');
+
+        // Map collection to JSON
+        $result['collection'] = array_map(
             fn({{ENTITY_NAME}} $item) => $item->jsonSerialize(),
-            $items
+            $result['collection']
         );
+
+        return $result;
     }
 
     public function findById(int $id): array

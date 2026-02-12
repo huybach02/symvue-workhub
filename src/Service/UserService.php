@@ -123,6 +123,27 @@ class UserService
         $this->entityManager->flush();
     }
 
+    public function getDataSelect(array $params): array
+    {
+        $qb = $this->userRepository->createQueryBuilder('u');
+
+        $result = FilterWithPagination::findWithPagination($qb, $params, 'u');
+
+        // Map collection to JSON
+        $result['collection'] = array_map(
+            function (User $user) {
+                $data = $user->jsonSerialize();
+                return [
+                    'label' => $data['name'],
+                    'value' => $data['id'],
+                ];
+            },
+            $result['collection']
+        );
+
+        return $result['collection'];
+    }
+
     public function getProvince(): array
     {
         $projectDir = $this->parameterBag->get('kernel.project_dir');

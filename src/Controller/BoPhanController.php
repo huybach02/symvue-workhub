@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Class\CustomResponse;
-use App\DTO\{{MODULE_NAME}}DTO;
-use App\Service\{{MODULE_NAME}}Service;
+use App\DTO\BoPhanDTO;
+use App\Service\BoPhanService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -12,20 +12,20 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final class {{MODULE_NAME}}Controller extends AbstractController
+final class BoPhanController extends AbstractController
 {
     public function __construct(
-        private readonly {{MODULE_NAME}}Service ${{ENTITY_VAR}}Service,
+        private readonly BoPhanService $boPhanService,
     ) {}
 
-    #[Route('/{{MODULE_NAME_LOWER}}', methods: ['GET'])]
+    #[Route('/bo-phan', methods: ['GET'])]
     public function getAll(Request $request): JsonResponse
     {
         $params = $request->query->all();
         $params = validateFilterParams($params);
 
         try {
-            $result = $this->{{ENTITY_VAR}}Service->findAll($params);
+            $result = $this->boPhanService->findAll($params);
             return CustomResponse::success([
                 'collection' => $result['collection'],
                 'total' => $result['total'],
@@ -42,61 +42,72 @@ final class {{MODULE_NAME}}Controller extends AbstractController
         }
     }
 
-    #[Route('/{{MODULE_NAME_LOWER}}/{id}', methods: ['GET'], priority: -1)]
+    #[Route('/bo-phan/{id}', methods: ['GET'], priority: -1)]
     public function getOne(int $id): JsonResponse
     {
         try {
-            $data = $this->{{ENTITY_VAR}}Service->findById($id);
+            $data = $this->boPhanService->findById($id);
             return CustomResponse::success($data);
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
     }
 
-    #[Route('/{{MODULE_NAME_LOWER}}', methods: ['POST'])]
+    #[Route('/bo-phan', methods: ['POST'])]
     public function create(
-        #[MapRequestPayload(validationGroups: ['create'])] {{MODULE_NAME}}DTO ${{ENTITY_VAR}}DTO
+        #[MapRequestPayload(validationGroups: ['create'])] BoPhanDTO $boPhanDTO
     ): JsonResponse {
         try {
-            $data = $this->{{ENTITY_VAR}}Service->create(${{ENTITY_VAR}}DTO);
+            $data = $this->boPhanService->create($boPhanDTO);
             return CustomResponse::success($data, t('success.created'));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
     }
 
-    #[Route('/{{MODULE_NAME_LOWER}}/{id}', methods: ['PUT'])]
+    #[Route('/bo-phan/{id}', methods: ['PUT'])]
     public function update(
         int $id,
-        #[MapRequestPayload(validationGroups: ['update'])] {{MODULE_NAME}}DTO ${{ENTITY_VAR}}DTO
+        #[MapRequestPayload(validationGroups: ['update'])] BoPhanDTO $boPhanDTO
     ): JsonResponse {
         try {
-            $data = $this->{{ENTITY_VAR}}Service->update($id, ${{ENTITY_VAR}}DTO);
+            $data = $this->boPhanService->update($id, $boPhanDTO);
             return CustomResponse::success($data, t('success.updated'));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
     }
 
-    #[Route('/{{MODULE_NAME_LOWER}}/{id}', methods: ['DELETE'])]
+    #[Route('/bo-phan/{id}', methods: ['DELETE'])]
     public function delete(int $id): JsonResponse
     {
         try {
-            $this->{{ENTITY_VAR}}Service->delete($id);
+            $this->boPhanService->delete($id);
             return CustomResponse::success([], t('success.deleted'));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
     }
 
-    // #[Route('/{{MODULE_NAME_LOWER}}/export', methods: ['GET'])]
+    #[Route('/bo-phan/permission', methods: ['GET'])]
+    public function getPermission(): JsonResponse
+    {
+        try {
+            $data = require __DIR__ . '/../../config/permission.php';
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    // #[Route('/bo-phan/export', methods: ['GET'])]
     // public function export(): Response
     // {
-    //     $data = $this->{{ENTITY_VAR}}Service->findAll();
-    //     return $this->{{ENTITY_VAR}}ExportService->export($data);
+    //     $data = $this->boPhanService->findAll();
+    //     return $this->boPhanExportService->export($data);
     // }
 
-    // #[Route('/{{MODULE_NAME_LOWER}}/import', methods: ['POST'])]
+    // #[Route('/bo-phan/import', methods: ['POST'])]
     // public function import(Request $request): JsonResponse
     // {
     //     $file = $request->files->get('file');
@@ -105,7 +116,7 @@ final class {{MODULE_NAME}}Controller extends AbstractController
     //     }
 
     //     try {
-    //         $errorCount = $this->{{ENTITY_VAR}}ImportService->import($file->getPathname(), $file->getClientOriginalName(), $this->getUser());
+    //         $errorCount = $this->boPhanImportService->import($file->getPathname(), $file->getClientOriginalName(), $this->getUser());
     //         if ($errorCount > 0) {
     //             return CustomResponse::error(t('error.imported_with_errors', ['%count%' => $errorCount]));
     //         }
@@ -115,9 +126,9 @@ final class {{MODULE_NAME}}Controller extends AbstractController
     //     }
     // }
 
-    // #[Route('/{{MODULE_NAME_LOWER}}/template-import', methods: ['GET'])]
-    // public function downloadTemplate({{MODULE_NAME}}TemplateImportService $service): Response
+    // #[Route('/bo-phan/template-import', methods: ['GET'])]
+    // public function downloadTemplate(BoPhanTemplateImportService $service): Response
     // {
-    //     return $service->generate{{MODULE_NAME}}Template();
+    //     return $service->generateBoPhanTemplate();
     // }
 }

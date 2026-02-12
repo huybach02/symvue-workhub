@@ -32,7 +32,8 @@
         "system_config_general": "General Config",
         "system_config_working_time": "Working Time",
         "user_management_user": "User",
-        "lich_su_import": "Import history"
+        "lich_su_import": "Import history",
+        "bo_phan": "Departments"
     },
     "gender": {
         "male": "Male",

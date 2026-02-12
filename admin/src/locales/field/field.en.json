@@ -29,6 +29,10 @@
         "xa_phuong": "Ward/Commune",
         "dia_chi": "Address",
         "bo_phan_mac_dinh": "Default Department",
-        "trang_thai": "Status"
+        "trang_thai": "Status",
+        "quan_ly_bo_phan": "Manager Department",
+        "ten_bo_phan": "Department Name",
+        "ma_bo_phan": "Department Code",
+        "phan_quyen": "Permission for department"
     }
 }

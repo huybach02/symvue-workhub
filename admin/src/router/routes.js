@@ -127,6 +127,21 @@ export const routes = [
                         ).icon || "",
                 },
             },
+            {
+                path: "bo-phan",
+                name: NAME_ROUTES_CONFIG.boPhan,
+                component: () => import("../pages/BoPhan/BoPhan.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.boPhan,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.boPhan,
+                        ).icon || "",
+                },
+            },
         ],
     },
 ];

@@ -61,7 +61,7 @@
 
             <template #[`item.action`]="{ item }">
                 <div class="d-flex align-center justify-space-between">
-                    <ThemSua{{MODULE_NAME}}
+                    <ThemSuaBoPhan
                         :path="path"
                         mode="update"
                         :item="item"
@@ -132,19 +132,19 @@
 import { markRaw } from "vue";
 import FilterText from "@/components/filters/FilterText.vue";
 import FilterSelect from "@/components/filters/FilterSelect.vue";
-import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import ThemSua{{MODULE_NAME}} from "./ThemSua{{MODULE_NAME}}.vue";
+import ThemSuaBoPhan from "./ThemSuaBoPhan.vue";
 import { deleteData } from "@/services/bases/deleteData";
+import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 
 export default {
-    name: "DanhSach{{MODULE_NAME}}",
+    name: "DanhSachBoPhan",
     components: {
         FilterPagination,
         ConfirmDialog,
-        ThemSua{{MODULE_NAME}},
+        ThemSuaBoPhan,
     },
     props: {
         path: {
@@ -201,14 +201,26 @@ export default {
                     sortable: false,
                 },
                 {
-                    title: this.$t("{{MODULE_SNAKE}}.columns.id"),
+                    title: this.$t("bo_phan.columns.id"),
                     key: "id",
-                    width: 50,
+                    width: 100,
                     filterComponent: markRaw(FilterText),
                 },
                 {
-                    title: this.$t("{{MODULE_SNAKE}}.columns.name"),
-                    key: "name",
+                    title: this.$t("bo_phan.columns.maBoPhan"),
+                    key: "maBoPhan",
+                    width: 200,
+                    filterComponent: markRaw(FilterText),
+                },
+                {
+                    title: this.$t("bo_phan.columns.tenBoPhan"),
+                    key: "tenBoPhan",
+                    width: 200,
+                    filterComponent: markRaw(FilterText),
+                },
+                {
+                    title: this.$t("bo_phan.columns.quanLyBoPhan"),
+                    key: "quanLyBoPhan",
                     width: 200,
                     filterComponent: markRaw(FilterText),
                 },
@@ -220,11 +232,11 @@ export default {
                     items: [
                         {
                             title: this.$t("status_values.active"),
-                            value: "1",
+                            value: 1,
                         },
                         {
                             title: this.$t("status_values.inactive"),
-                            value: "0",
+                            value: 0,
                         },
                     ],
                     value: (item) =>

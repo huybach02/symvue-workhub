@@ -20,4 +20,6 @@ export const API_ROUTES_CONFIG = {
     },
     user: "/user",
     lichSuImport: "/lich-su-import",
+    boPhan: "/bo-phan",
+    phanQuyenMacDinh: "/bo-phan/permission",
 };

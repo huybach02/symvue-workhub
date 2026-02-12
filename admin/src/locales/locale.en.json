@@ -156,5 +156,27 @@
             "rawData": "Raw data",
             "errors": "Errors"
         }
+    },
+    "bo_phan": {
+        "title": "Departments",
+        "columns": {
+            "id": "ID",
+            "maBoPhan": "Department code",
+            "tenBoPhan": "Department name",
+            "status": "Status",
+            "quanLyBoPhan": "Manager",
+            "phanQuyen": "Permissions"
+        },
+        "actions": {
+            "index": "View list",
+            "create": "Add new",
+            "show": "View detail",
+            "edit": "Edit",
+            "delete": "Delete",
+            "export": "Export file",
+            "import": "Import file",
+            "showMenu": "Show menu",
+            "all": "All"
+        }
     }
 }

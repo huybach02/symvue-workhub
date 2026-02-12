@@ -96,6 +96,20 @@ final class UserController extends AbstractController
         }
     }
 
+    #[Route('/user/select', methods: ['GET'])]
+    public function getDataSelect(Request $request): JsonResponse
+    {
+        $params = $request->query->all();
+        $params = validateFilterParams($params);
+
+        try {
+            $data = $this->userService->getDataSelect($params);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
     #[Route('/user/export', methods: ['GET'])]
     public function exportUsers(): Response
     {

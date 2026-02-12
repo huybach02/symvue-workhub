@@ -29,6 +29,10 @@
         "xa_phuong": "Xã/Phường",
         "dia_chi": "Địa chỉ",
         "bo_phan_mac_dinh": "Bộ phận mặc định",
-        "trang_thai": "Trạng thái"
+        "trang_thai": "Trạng thái",
+        "quan_ly_bo_phan": "Quản lý bộ phận",
+        "ten_bo_phan": "Tên bộ phận",
+        "ma_bo_phan": "Mã bộ phận",
+        "phan_quyen": "Phân quyền cho bộ phận"
     }
 }

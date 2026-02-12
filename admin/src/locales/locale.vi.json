@@ -156,5 +156,27 @@
             "rawData": "Dữ liệu gốc",
             "errors": "Lỗi"
         }
+    },
+    "bo_phan": {
+        "title": "Bộ phận",
+        "columns": {
+            "id": "ID",
+            "maBoPhan": "Mã bộ phận",
+            "tenBoPhan": "Tên bộ phận",
+            "status": "Trạng thái",
+            "quanLyBoPhan": "Quản lý bộ phận",
+            "phanQuyen": "Phân quyền"
+        },
+        "actions": {
+            "index": "Xem danh sách",
+            "create": "Thêm mới",
+            "show": "Xem chi tiết",
+            "edit": "Chỉnh sửa",
+            "delete": "Xóa",
+            "export": "Xuất file",
+            "import": "Import file",
+            "showMenu": "Hiển thị menu",
+            "all": "Tất cả"
+        }
     }
 }

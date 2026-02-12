@@ -56,3 +56,9 @@ services:
     App\Service\FileUploader:
         arguments:
             $targetDirectory: "%media_directory%"
+
+    # Doctrine Entity Listener để tự động điền created_by và updated_by
+    App\EventListener\ModifierEntityListener:
+        tags:
+            - { name: doctrine.event_listener, event: prePersist }
+            - { name: doctrine.event_listener, event: preUpdate }

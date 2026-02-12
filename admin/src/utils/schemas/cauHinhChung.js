@@ -41,8 +41,4 @@ export const cauHinhChungSchema = yup.object({
             required: true,
         },
     ),
-    thoiGianHetHanThietBi: buildNumberRule(t("field.thoiGianHetHanThietBi"), {
-        required: true,
-        min: 0,
-    }),
 });

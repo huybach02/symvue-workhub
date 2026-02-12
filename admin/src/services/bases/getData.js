@@ -1,3 +1,4 @@
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import axiosInstance from "@/configs/axios";
 import { handleAxiosError } from "@/helpers/axiosHelper";
 
@@ -30,8 +31,11 @@ export const getDataById = async (path, id) => {
 
 export const getDataSelect = async (path, params = {}) => {
     try {
-        const respSelect = await axiosInstance.get(path, {
-            params,
+        const respSelect = await axiosInstance.get(path + "/select", {
+            params: {
+                ...params,
+                limit: -1, // Lấy tất cả dữ liệu
+            },
         });
         if (respSelect.success) {
             return respSelect.data;
@@ -69,15 +73,15 @@ export const exportData = async (path) => {
     }
 };
 
-// export const getListPhanQuyenMacDinh = async () => {
-//     try {
-//         const resp = await axiosInstance.get(
-//             API_ROUTES_CONFIG.DANH_SACH_PHAN_QUYEN
-//         );
-//         if (resp.success) {
-//             return resp.data;
-//         }
-//     } catch (error) {
-//         handleAxiosError(error);
-//     }
-// };
+export const getListPhanQuyenMacDinh = async () => {
+    try {
+        const resp = await axiosInstance.get(
+            API_ROUTES_CONFIG.phanQuyenMacDinh,
+        );
+        if (resp.success) {
+            return resp.data;
+        }
+    } catch (error) {
+        handleAxiosError(error);
+    }
+};

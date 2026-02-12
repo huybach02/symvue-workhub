@@ -109,10 +109,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
     #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'owner')]
     private Collection $media;
 
+    /**
+     * @var Collection<int, BoPhan>
+     */
+    #[ORM\OneToMany(targetEntity: BoPhan::class, mappedBy: 'quanLyBoPhan')]
+    private Collection $boPhans;
+
     public function __construct()
     {
         $this->folders = new ArrayCollection();
         $this->media = new ArrayCollection();
+        $this->boPhans = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -481,6 +488,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
             // set the owning side to null (unless already changed)
             if ($medium->getOwner() === $this) {
                 $medium->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BoPhan>
+     */
+    public function getBoPhans(): Collection
+    {
+        return $this->boPhans;
+    }
+
+    public function addBoPhan(BoPhan $boPhan): static
+    {
+        if (!$this->boPhans->contains($boPhan)) {
+            $this->boPhans->add($boPhan);
+            $boPhan->setQuanLyBoPhan($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBoPhan(BoPhan $boPhan): static
+    {
+        if ($this->boPhans->removeElement($boPhan)) {
+            // set the owning side to null (unless already changed)
+            if ($boPhan->getQuanLyBoPhan() === $this) {
+                $boPhan->setQuanLyBoPhan(null);
             }
         }
 

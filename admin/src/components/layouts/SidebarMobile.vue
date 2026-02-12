@@ -20,6 +20,7 @@
             v-model="drawer"
             :location="$vuetify.display.mobile ? 'left' : undefined"
             temporary
+            width="276"
         >
             <MenuSidebar />
         </v-navigation-drawer>
@@ -55,7 +56,6 @@ export default {
     },
     methods: {
         goToProfile() {
-            // TODO: Navigate to profile page
             console.log("Go to profile");
         },
         async handleLogout() {

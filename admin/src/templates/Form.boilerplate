@@ -14,7 +14,7 @@
                         <v-col cols="12" md="4">
                             <VeeField v-slot="{ field, errorMessage }" name="name">
                                 <div class="mb-2">
-                                    {{ $t("field.ten") }}
+                                    {{ $t("field.name") }}
                                     <span class="text-red"> * </span>
                                 </div>
                                 <v-text-field
@@ -22,7 +22,7 @@
                                     :error-messages="errorMessage"
                                     type="text"
                                     variant="outlined"
-                                    :placeholder="`${$t('base.enter')} ${$t('field.ten')}`"
+                                    :placeholder="`${$t('base.enter')} ${$t('field.name')}`"
                                 />
                             </VeeField>
                         </v-col>
@@ -96,6 +96,10 @@ export default {
         item: {
             type: Object,
             default: null,
+        },
+        mode: {
+            type: String,
+            default: "create",
         },
     },
     emits: ["submit", "cancel"],

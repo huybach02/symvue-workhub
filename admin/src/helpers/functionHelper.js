@@ -41,4 +41,21 @@ export const functionHelper = {
         }
         return password;
     },
+    generateMa(tenBoPhan) {
+        // Bỏ dấu tiếng Việt
+        const withoutAccents = tenBoPhan
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/đ/g, "d")
+            .replace(/Đ/g, "D");
+
+        // Thay khoảng trắng và ký tự đặc biệt bằng dấu gạch dưới, chuyển thành chữ in hoa
+        const result = withoutAccents
+            .trim()
+            .replace(/\s+/g, "_")
+            .replace(/[^a-zA-Z0-9_]/g, "")
+            .toUpperCase();
+
+        return result;
+    },
 };

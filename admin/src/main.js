@@ -16,7 +16,9 @@ const vuetify = createVuetify({
     directives,
 });
 
-export const toast = useToast();
+export const toast = useToast({
+    position: "top-center",
+});
 
 setupYupLocale();
 
