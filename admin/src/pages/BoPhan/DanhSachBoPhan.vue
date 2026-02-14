@@ -39,6 +39,7 @@
                                 v-else
                                 :items="col.items"
                                 :title="col.title"
+                                :path="col.path"
                                 class="flex-grow-1"
                                 @update="(val) => onFilter(col.key, val)"
                             />
@@ -138,6 +139,8 @@ import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import ThemSuaBoPhan from "./ThemSuaBoPhan.vue";
 import { deleteData } from "@/services/bases/deleteData";
 import FilterDateRange from "@/components/filters/FilterDateRange.vue";
+import FilterAutoComplete from "@/components/filters/FilterAutoComplete.vue";
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 
 export default {
     name: "DanhSachBoPhan",
@@ -222,7 +225,8 @@ export default {
                     title: this.$t("bo_phan.columns.quanLyBoPhan"),
                     key: "quanLyBoPhan",
                     width: 200,
-                    filterComponent: markRaw(FilterText),
+                    filterComponent: markRaw(FilterAutoComplete),
+                    path: API_ROUTES_CONFIG.user,
                 },
                 {
                     title: this.$t("base.status"),

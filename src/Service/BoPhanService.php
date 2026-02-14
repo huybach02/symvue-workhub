@@ -20,7 +20,18 @@ class BoPhanService
     {
         $qb = $this->boPhanRepository->createQueryBuilder('bp');
 
-        $result = FilterWithPagination::findWithPagination($qb, $params, 'bp');
+        $result = FilterWithPagination::findWithPagination(
+            $qb,
+            $params,
+            'bp',
+            [
+                'quanLyBoPhan' => [
+                    'alias' => 'qlbp',
+                    'joinField' => 'bp.quanLyBoPhan',
+                    'targetField' => 'id'
+                ]
+            ]
+        );
 
         // Map collection to JSON
         $result['collection'] = array_map(

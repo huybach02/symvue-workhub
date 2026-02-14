@@ -24,13 +24,76 @@ class FilterWithPagination
     public static function findWithPagination(
         QueryBuilder $qb,
         array $filters,
-        string $alias = 't'
+        string $alias = 't',
+        array $relationFields = []
     ): array {
+
+        // Xử lý relation filters trước, và loại bỏ chúng khỏi $filters
+        $filters = self::processRelationFilters($qb, $filters, $alias, $relationFields);
 
         self::processFilters($qb, $filters, $alias);
         self::processSorting($qb, $filters, $alias);
 
         return self::processPagination($qb, $filters);
+    }
+
+    private static function processRelationFilters(
+        QueryBuilder $qb,
+        array $filters,
+        string $alias,
+        array $relationFields
+    ): array {
+        if (empty($relationFields) || !isset($filters['f']) || !is_array($filters['f'])) {
+            return $filters;
+        }
+
+        ray($filters, $relationFields);
+
+        $processedJoins = [];
+        $filtersToRemove = [];
+
+        foreach ($filters['f'] as $index => $filter) {
+            if (!self::isValidFilter($filter)) continue;
+
+            // Bỏ qua nếu không phải relation field
+            if (!isset($relationFields[$filter['field']])) continue;
+
+            $config = $relationFields[$filter['field']];
+
+            if (!in_array($config['alias'], $processedJoins)) {
+                $qb->leftJoin($config['joinField'], $config['alias']);
+                $processedJoins[] = $config['alias'];
+            }
+
+            self::applyRelationFilter(
+                $qb,
+                $config['alias'],
+                $config['targetField'] ?? 'id',
+                $filter['operator'],
+                $filter['value'],
+                $index
+            );
+
+            $filtersToRemove[] = $index;
+        }
+
+        foreach ($filtersToRemove as $index) {
+            unset($filters['f'][$index]);
+        }
+
+        return $filters;
+    }
+
+    private static function applyRelationFilter(
+        QueryBuilder $qb,
+        string $alias,
+        string $targetField,
+        string $operator,
+        $value,
+        int $index
+    ): void {
+        $field = "$alias.$targetField";
+        self::applyFilterCondition($qb, $field, $operator, $value, $index, 'rel_');
     }
 
 
@@ -52,9 +115,20 @@ class FilterWithPagination
 
     private static function applyFilter(QueryBuilder $qb, string $field, string $op, $value, int $index): void
     {
-        $param = "param_$index";
+        self::applyFilterCondition($qb, $field, $op, $value, $index);
+    }
 
-        switch ($op) {
+    private static function applyFilterCondition(
+        QueryBuilder $qb,
+        string $field,
+        string $operator,
+        $value,
+        int $index,
+        string $paramPrefix = 'param_'
+    ): void {
+        $param = "{$paramPrefix}{$index}";
+
+        switch ($operator) {
             case self::OPERATORS['EQUAL']:
                 $qb->andWhere("$field = :$param")->setParameter($param, $value);
                 break;
@@ -64,7 +138,8 @@ class FilterWithPagination
                 break;
 
             case self::OPERATORS['CONTAIN']:
-                $qb->andWhere("LOWER(CONCAT($field, '')) LIKE LOWER(:$param)")->setParameter($param, "%$value%");
+                $qb->andWhere("LOWER(CONCAT($field, '')) LIKE LOWER(:$param)")
+                    ->setParameter($param, "%$value%");
                 break;
 
             case self::OPERATORS['LESS_THAN']:
