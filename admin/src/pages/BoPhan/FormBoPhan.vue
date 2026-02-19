@@ -114,7 +114,22 @@
                             </div>
 
                             <!-- Bảng phân quyền -->
-                            <div class="permission-table-wrapper">
+                            <div
+                                class="permission-table-wrapper"
+                                style="position: relative"
+                            >
+                                <v-overlay
+                                    :model-value="permissionLoading"
+                                    contained
+                                    scrim="rgba(255, 255, 255, 0.6)"
+                                    class="align-center justify-center"
+                                >
+                                    <v-progress-circular
+                                        indeterminate
+                                        color="primary"
+                                        size="48"
+                                    />
+                                </v-overlay>
                                 <v-table
                                     class="permission-table"
                                     fixed-header
@@ -123,6 +138,11 @@
                                     <thead>
                                         <tr>
                                             <th class="text-left">Module</th>
+                                            <th class="text-left">
+                                                {{
+                                                    $t("bo_phan.vai_tro.title")
+                                                }}
+                                            </th>
                                             <th
                                                 v-for="action in availableActions"
                                                 :key="action.key"
@@ -136,56 +156,133 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr
+                                        <template
                                             v-for="(
                                                 permission, index
                                             ) in permissions"
                                             :key="permission.name"
                                         >
-                                            <td>
-                                                {{
-                                                    formatModuleName(
-                                                        permission.name,
-                                                    )
-                                                }}
-                                            </td>
-                                            <td
-                                                v-for="action in availableActions"
-                                                :key="action.key"
-                                                class="text-center"
-                                            >
-                                                <v-checkbox
-                                                    v-if="
-                                                        permission.actions[
-                                                            action.key
-                                                        ] !== undefined
-                                                    "
-                                                    v-model="
-                                                        permissionStates[index][
-                                                            action.key
-                                                        ]
-                                                    "
-                                                    color="primary"
-                                                    hide-details
-                                                    density="compact"
-                                                    class="d-inline-flex justify-center"
-                                                />
-                                            </td>
-                                            <td class="text-center">
-                                                <v-checkbox
-                                                    :model-value="
-                                                        isAllChecked(index)
-                                                    "
-                                                    color="primary"
-                                                    hide-details
-                                                    density="compact"
-                                                    class="d-inline-flex justify-center"
-                                                    @update:model-value="
-                                                        toggleAll(index, $event)
-                                                    "
-                                                />
-                                            </td>
-                                        </tr>
+                                            <!-- Row Quản lý -->
+                                            <tr>
+                                                <td
+                                                    :rowspan="2"
+                                                    class="module-name-cell"
+                                                >
+                                                    {{
+                                                        formatModuleName(
+                                                            permission.name,
+                                                        )
+                                                    }}
+                                                </td>
+                                                <td>
+                                                    {{
+                                                        $t(
+                                                            "bo_phan.vai_tro.manager",
+                                                        )
+                                                    }}
+                                                </td>
+                                                <td
+                                                    v-for="action in availableActions"
+                                                    :key="action.key"
+                                                    class="text-center"
+                                                >
+                                                    <v-checkbox
+                                                        v-if="
+                                                            permission.actions[
+                                                                action.key
+                                                            ] !== undefined
+                                                        "
+                                                        v-model="
+                                                            permissionStates[
+                                                                index
+                                                            ].manager[
+                                                                action.key
+                                                            ]
+                                                        "
+                                                        color="primary"
+                                                        hide-details
+                                                        density="compact"
+                                                        class="d-inline-flex justify-center"
+                                                    />
+                                                </td>
+                                                <td class="text-center">
+                                                    <v-checkbox
+                                                        :model-value="
+                                                            isAllChecked(
+                                                                index,
+                                                                'manager',
+                                                            )
+                                                        "
+                                                        color="primary"
+                                                        hide-details
+                                                        density="compact"
+                                                        class="d-inline-flex justify-center"
+                                                        @update:model-value="
+                                                            toggleAll(
+                                                                index,
+                                                                'manager',
+                                                                $event,
+                                                            )
+                                                        "
+                                                    />
+                                                </td>
+                                            </tr>
+                                            <!-- Row Nhân viên -->
+                                            <tr>
+                                                <td>
+                                                    {{
+                                                        $t(
+                                                            "bo_phan.vai_tro.employee",
+                                                        )
+                                                    }}
+                                                </td>
+                                                <td
+                                                    v-for="action in availableActions"
+                                                    :key="action.key"
+                                                    class="text-center"
+                                                >
+                                                    <v-checkbox
+                                                        v-if="
+                                                            permission.actions[
+                                                                action.key
+                                                            ] !== undefined
+                                                        "
+                                                        v-model="
+                                                            permissionStates[
+                                                                index
+                                                            ].employee[
+                                                                action.key
+                                                            ]
+                                                        "
+                                                        color="primary"
+                                                        hide-details
+                                                        density="compact"
+                                                        class="d-inline-flex justify-center"
+                                                    />
+                                                </td>
+                                                <td class="text-center">
+                                                    <v-checkbox
+                                                        :model-value="
+                                                            isAllChecked(
+                                                                index,
+                                                                'employee',
+                                                            )
+                                                        "
+                                                        color="primary"
+                                                        hide-details
+                                                        density="compact"
+                                                        class="d-inline-flex justify-center"
+                                                        @update:model-value="
+                                                            toggleAll(
+                                                                index,
+                                                                'employee',
+                                                                $event,
+                                                            )
+                                                        "
+                                                    />
+                                                </td>
+                                            </tr>
+                                        </template>
                                     </tbody>
                                 </v-table>
                             </div>
@@ -224,6 +321,7 @@ import {
 } from "@/services/bases/getData";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import { functionHelper } from "@/helpers/functionHelper";
+import { boPhanSchema } from "@/utils/schemas/boPhan";
 
 export default {
     components: {
@@ -248,7 +346,7 @@ export default {
     emits: ["submit", "cancel"],
     data() {
         return {
-            validationSchema: {},
+            validationSchema: boPhanSchema,
             initialValues: {
                 quanLyBoPhanId: "",
                 tenBoPhan: "",
@@ -258,6 +356,7 @@ export default {
             nguoiDungOptions: [],
             permissions: [],
             permissionStates: [],
+            permissionLoading: false,
             selectedQuanLyBoPhan: null,
         };
     },
@@ -320,7 +419,8 @@ export default {
             const permissionsData = this.permissions.map(
                 (permission, index) => ({
                     name: permission.name,
-                    actions: this.permissionStates[index],
+                    manager: this.permissionStates[index].manager,
+                    employee: this.permissionStates[index].employee,
                 }),
             );
 
@@ -344,25 +444,46 @@ export default {
             }
         },
         async getPermission() {
+            this.permissionLoading = true;
             try {
                 const response = await getListPhanQuyenMacDinh();
                 this.permissions = response;
 
                 this.initializePermissionStates();
+
+                if (this.item) {
+                    this.selectedQuanLyBoPhan = this.item.quanLyBoPhan;
+                    this.$nextTick(() => {
+                        if (this.$refs.formRef) {
+                            this.$refs.formRef.setValues(this.item);
+                        }
+                        if (
+                            this.item.phanQuyen &&
+                            this.item.phanQuyen.length > 0
+                        ) {
+                            this.fillPermissionStates(this.item.phanQuyen);
+                        }
+                    });
+                }
             } catch (error) {
                 console.error(error);
+            } finally {
+                this.permissionLoading = false;
             }
         },
         initializePermissionStates() {
             this.permissionStates = this.permissions.map((permission) => {
-                const state = {};
+                const managerState = {};
+                const employeeState = {};
                 Object.keys(permission.actions).forEach((action) => {
-                    state[action] =
+                    const defaultVal =
                         this.mode === "create"
                             ? permission.actions[action]
                             : false;
+                    managerState[action] = defaultVal;
+                    employeeState[action] = defaultVal;
                 });
-                return state;
+                return { manager: managerState, employee: employeeState };
             });
         },
         fillPermissionStates(phanQuyenData) {
@@ -372,13 +493,23 @@ export default {
                 );
 
                 if (moduleIndex !== -1) {
-                    Object.keys(phanQuyen.actions).forEach((actionKey) => {
-                        if (
-                            this.permissionStates[moduleIndex][actionKey] !==
-                            undefined
-                        ) {
-                            this.permissionStates[moduleIndex][actionKey] =
-                                phanQuyen.actions[actionKey];
+                    const roles = ["manager", "employee"];
+                    roles.forEach((role) => {
+                        if (phanQuyen[role]) {
+                            Object.keys(phanQuyen[role]).forEach(
+                                (actionKey) => {
+                                    if (
+                                        this.permissionStates[moduleIndex][
+                                            role
+                                        ][actionKey] !== undefined
+                                    ) {
+                                        this.permissionStates[moduleIndex][
+                                            role
+                                        ][actionKey] =
+                                            phanQuyen[role][actionKey];
+                                    }
+                                },
+                            );
                         }
                     });
                 }
@@ -392,8 +523,8 @@ export default {
                 .join(" ");
         },
         // Kiểm tra xem tất cả các switch trong row có được check không
-        isAllChecked(index) {
-            const state = this.permissionStates[index];
+        isAllChecked(index, role) {
+            const state = this.permissionStates[index]?.[role];
             if (!state) return false;
 
             const permission = this.permissions[index];
@@ -402,12 +533,12 @@ export default {
             return availableKeys.every((key) => state[key] === true);
         },
         // Toggle tất cả các switch trong row
-        toggleAll(index, value) {
+        toggleAll(index, role, value) {
             const permission = this.permissions[index];
             const availableKeys = Object.keys(permission.actions);
 
             availableKeys.forEach((key) => {
-                this.permissionStates[index][key] = value;
+                this.permissionStates[index][role][key] = value;
             });
         },
     },
@@ -444,5 +575,11 @@ export default {
 
 .permission-table :deep(tbody tr:hover) {
     background-color: #fafafa;
+}
+
+.module-name-cell {
+    vertical-align: middle;
+    font-weight: 500;
+    border-right: 1px solid #e0e0e0;
 }
 </style>

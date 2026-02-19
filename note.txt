@@ -35,3 +35,10 @@ php bin/console make:controller Api\CauHinhChungController
             // Giả lập xử lý nặng
             return 'Dữ liệu này được lấy từ Redis Cloud lúc ' . date('H:i:s');
         });
+
+
+Command cronjob 
+php bin/console messenger:consume scheduler_default -vv
+
+Chạy ngay lập tức
+php bin/console app:rebuild-user-permissions-cache

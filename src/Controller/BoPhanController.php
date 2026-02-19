@@ -89,6 +89,20 @@ final class BoPhanController extends AbstractController
         }
     }
 
+    #[Route('/bo-phan/select', methods: ['GET'])]
+    public function getDataSelect(Request $request): JsonResponse
+    {
+        $params = $request->query->all();
+        $params = validateFilterParams($params);
+
+        try {
+            $data = $this->boPhanService->getDataSelect($params);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
     #[Route('/bo-phan/permission', methods: ['GET'])]
     public function getPermission(): JsonResponse
     {

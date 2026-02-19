@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20260208150928 extends AbstractMigration
+final class Version20260218150614 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -22,12 +22,14 @@ final class Version20260208150928 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('DROP INDEX uniq_identifier_email');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_IDENTIFIER_EMAIL ON "user" (email) WHERE deleted_at IS NULL');
+        $this->addSql('ALTER TABLE user_permission ADD is_custom BOOLEAN DEFAULT false');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('DROP INDEX UNIQ_IDENTIFIER_EMAIL');
-        $this->addSql('CREATE UNIQUE INDEX uniq_identifier_email ON "user" (email)');
+        $this->addSql('CREATE UNIQUE INDEX uniq_identifier_email ON "user" (email) WHERE (deleted_at IS NULL)');
+        $this->addSql('ALTER TABLE user_permission DROP is_custom');
     }
 }

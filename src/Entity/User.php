@@ -88,8 +88,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
     #[ORM\Column(type: 'integer', options: ['default' => 1, 'comment' => '1: full time, 2: part time'])]
     private int $hinhThucLamViec = 1;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $maBoPhan = null;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $boPhanId = null;
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $rememberToken = null;
@@ -365,14 +365,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
         return $this;
     }
 
-    public function getMaBoPhan(): ?string
+    public function getBoPhanId(): ?int
     {
-        return $this->maBoPhan;
+        return $this->boPhanId;
     }
 
-    public function setMaBoPhan(string $maBoPhan): static
+    public function setBoPhanId(?int $boPhanId): static
     {
-        $this->maBoPhan = $maBoPhan;
+        $this->boPhanId = $boPhanId;
 
         return $this;
     }
@@ -428,7 +428,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
             'image' => $this->image,
             'description' => $this->description,
             'status' => $this->status,
-            'maBoPhan' => $this->maBoPhan,
+            'boPhanId' => $this->boPhanId,
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];

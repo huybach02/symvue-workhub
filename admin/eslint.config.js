@@ -16,6 +16,7 @@ export default [
             "no-undef": "error",
             "no-unused-vars": "warn",
             "vue/multi-word-component-names": "off",
+            "vue/no-v-for-template-key": "off",
             indent: ["error", 4],
             "vue/html-indent": ["error", 4],
             "vue/script-indent": ["error", 4, { baseIndent: 0 }],

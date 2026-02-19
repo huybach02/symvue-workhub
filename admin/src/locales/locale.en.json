@@ -167,6 +167,11 @@
             "quanLyBoPhan": "Manager",
             "phanQuyen": "Permissions"
         },
+        "vai_tro": {
+            "title": "Role",
+            "manager": "Manager",
+            "employee": "Employee"
+        },
         "actions": {
             "index": "View list",
             "create": "Add new",

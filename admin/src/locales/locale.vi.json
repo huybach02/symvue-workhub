@@ -167,6 +167,11 @@
             "quanLyBoPhan": "Quản lý bộ phận",
             "phanQuyen": "Phân quyền"
         },
+        "vai_tro": {
+            "title": "Vai trò",
+            "manager": "Quản lý",
+            "employee": "Nhân viên"
+        },
         "actions": {
             "index": "Xem danh sách",
             "create": "Thêm mới",

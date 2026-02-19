@@ -49,7 +49,7 @@ export const userSchema = yup.object({
         max: 500,
     }),
 
-    maBoPhan: buildStringRule(t("field.bo_phan_mac_dinh"), {
+    boPhanId: buildStringRule(t("field.bo_phan_mac_dinh"), {
         required: true,
     }),
 

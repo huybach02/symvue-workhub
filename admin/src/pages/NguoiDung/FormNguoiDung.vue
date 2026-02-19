@@ -225,18 +225,25 @@
                     <v-row>
                         <v-col cols="12" md="4">
                             <VeeField
-                                v-slot="{ field, errorMessage }"
-                                name="maBoPhan"
+                                v-slot="{ field, errorMessage, handleChange }"
+                                name="boPhanId"
                             >
                                 <div class="mb-2">
                                     {{ $t("field.bo_phan_mac_dinh") }}
                                     <span class="text-red"> * </span>
                                 </div>
-                                <v-select
-                                    v-bind="field"
-                                    :items="['1', '2']"
+                                <v-autocomplete
+                                    :model-value="field.value"
+                                    name="boPhanId"
+                                    :items="boPhanData"
+                                    item-title="label"
+                                    item-value="value"
                                     :error-messages="errorMessage"
                                     variant="outlined"
+                                    clearable
+                                    :placeholder="`${$t('base.enter')} ${$t('field.bo_phan_mac_dinh')}`"
+                                    @update:model-value="handleChange"
+                                    @blur="field.onBlur"
                                 />
                             </VeeField>
                         </v-col>
@@ -298,7 +305,7 @@ import { functionHelper } from "@/helpers/functionHelper";
 import { addressHelper } from "@/helpers/addressHelper";
 import { userSchema } from "@/utils/schemas/user";
 import { constant } from "@/utils/constants/constant";
-import { getAllData } from "@/services/bases/getData";
+import { getAllData, getDataSelect } from "@/services/bases/getData";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import ImageSelector from "@/components/ImageSelector.vue";
 import LoadingForm from "@/components/LoadingForm.vue";
@@ -344,7 +351,9 @@ export default {
             },
             provinceData: {},
             wardData: {},
+            boPhanData: [],
             selectedProvince: "",
+            selectedBoPhan: null,
         };
     },
     computed: {
@@ -374,6 +383,9 @@ export default {
                     if (value.province) {
                         this.selectedProvince = value.province;
                     }
+                    if (value.boPhanId) {
+                        this.selectedBoPhan = value.boPhanId;
+                    }
                     this.$nextTick(() => {
                         if (this.$refs.formRef) {
                             const formData = {
@@ -399,7 +411,7 @@ export default {
         },
     },
     async mounted() {
-        await this.getProvince();
+        await Promise.all([this.getProvince(), this.getBoPhan()]);
     },
     methods: {
         handleSubmit(values) {
@@ -433,6 +445,10 @@ export default {
                 API_ROUTES_CONFIG.user + "/ward/" + provinceId,
             );
             this.wardData = res;
+        },
+        async getBoPhan() {
+            const res = await getDataSelect(API_ROUTES_CONFIG.boPhan);
+            this.boPhanData = res;
         },
     },
 };

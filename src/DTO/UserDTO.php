@@ -43,7 +43,7 @@ class UserDTO
         public readonly ?string $address = null,
 
         #[Assert\Length(max: 255, groups: ['create', 'update'])]
-        public readonly ?string $maBoPhan = null,
+        public readonly ?int $boPhanId = null,
 
         #[Assert\Choice(choices: [1, 2], groups: ['create', 'update'])]
         public readonly ?int $hinhThucLamViec = null,

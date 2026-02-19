@@ -11,8 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 final class AuthController extends AbstractController
 {
@@ -22,7 +21,7 @@ final class AuthController extends AbstractController
     ) {}
 
     #[Route("/auth/me", methods: ["GET"])]
-    public function me(#[CurrentUser] ?User $user, CacheInterface $appCache)
+    public function me(#[CurrentUser] ?User $user)
     {
         if (null === $user) {
             return CustomResponse::error(t("auth.me.not_found"), 401);
@@ -35,7 +34,7 @@ final class AuthController extends AbstractController
     public function logout(
         Request $request,
         RefreshTokenManagerInterface $refreshTokenManager,
-        CacheInterface $cache,
+        CacheItemPoolInterface $cache,
     ) {
         // 1. Xử lý Refresh Token
         $payload = $request->toArray();
@@ -57,12 +56,11 @@ final class AuthController extends AbstractController
             // Tạo một key unique cho token này
             $tokenKey = "blacklist_" . md5($accessToken);
 
-            // Lưu vào cache.
-            // Thời gian sống nên set bằng TTL của token (ví dụ 3600s).
-            $cache->get($tokenKey, function (ItemInterface $item) {
-                $item->expiresAfter(3600 * 24); // Token sẽ bị chặn trong 1 ngày
-                return true;
-            });
+            // Lưu vào cache với TTL = 1 ngày (Redis native TTL)
+            $item = $cache->getItem($tokenKey);
+            $item->set(true);
+            $item->expiresAfter(3600 * 24); // Token sẽ bị chặn trong 1 ngày
+            $cache->save($item);
         }
 
         return CustomResponse::success([], t("auth.logout.success"));

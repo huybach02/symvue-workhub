@@ -10,6 +10,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Service\BoPhanService;
 
 class UserService
 {
@@ -19,6 +20,7 @@ class UserService
         private UserPasswordHasherInterface $passwordHasher,
         private readonly ParameterBagInterface $parameterBag,
         private readonly ImageRepository $imageRepository,
+        private readonly BoPhanService $boPhanService,
     ) {}
 
     public function findAll(array $params): array
@@ -69,7 +71,7 @@ class UserService
         $item->setProvince($dto->province);
         $item->setWard($dto->ward);
         $item->setAddress($dto->address);
-        $item->setMaBoPhan($dto->maBoPhan);
+        $item->setBoPhanId($dto->boPhanId);
         $item->setStatus($dto->status);
 
         $this->entityManager->persist($item);
@@ -78,6 +80,8 @@ class UserService
         if ($dto->avatar) {
             $this->imageRepository->addOneImage($item, $dto->avatar, "avatar");
         }
+
+        $this->boPhanService->handleAddUserPermission($item->getId(), $dto->boPhanId, true);
 
         return $item->jsonSerialize();
     }
@@ -98,7 +102,7 @@ class UserService
         $item->setProvince($dto->province);
         $item->setWard($dto->ward);
         $item->setAddress($dto->address);
-        $item->setMaBoPhan($dto->maBoPhan);
+        $item->setBoPhanId($dto->boPhanId);
         $item->setStatus($dto->status);
 
         $this->entityManager->flush();
@@ -107,6 +111,8 @@ class UserService
             $this->imageRepository->removeImages($item);
             $this->imageRepository->addOneImage($item, $dto->avatar, "avatar");
         }
+
+        $this->boPhanService->handleAddUserPermission($item->getId(), $dto->boPhanId, true);
 
         return $item->jsonSerialize();
     }
