@@ -27,10 +27,10 @@
                 <tr v-for="item in data" :key="item.id">
                     <td>
                         <v-btn
-                            color="primary"
-                            variant="tonal"
+                            color="warning"
+                            variant="outlined"
                             icon="mdi-pencil"
-                            size="x-small"
+                            size="small"
                             @click="handleEdit(item)"
                         />
                     </td>

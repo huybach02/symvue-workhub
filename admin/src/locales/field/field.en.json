@@ -33,6 +33,7 @@
         "quan_ly_bo_phan": "Manager Department",
         "ten_bo_phan": "Department Name",
         "ma_bo_phan": "Department Code",
-        "phan_quyen": "Permission for department"
+        "phan_quyen": "Permission for department",
+        "bo_phan_moi": "New Department"
     }
 }

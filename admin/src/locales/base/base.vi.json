@@ -11,8 +11,8 @@
         "updated_at": "Ngày cập nhật",
         "no_data": "Không tìm thấy dữ liệu phù hợp",
         "enter": "Nhập",
-        "export_excel": "Xuất file excel",
-        "import_excel": "Nhập file excel",
+        "export_excel": "Xuất excel",
+        "import_excel": "Nhập excel",
         "dowload_template_import_excel": "Tải file excel mẫu",
         "upload": "Tải lên",
         "error_detail": "Chi tiết lỗi import",
@@ -20,11 +20,11 @@
         "note": "Ghi chú: "
     },
     "title": {
-        "create": "Tạo",
+        "create": "Thêm mới",
         "update": "Cập nhật"
     },
     "button": {
-        "create": "Tạo mới",
+        "create": "Thêm mới",
         "update": "Cập nhật",
         "delete": "Xóa",
         "cancel": "Hủy bỏ",

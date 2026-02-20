@@ -9,8 +9,8 @@
                             <v-btn
                                 v-bind="props"
                                 icon="mdi-plus"
-                                size="x-small"
-                                variant="tonal"
+                                size="small"
+                                variant="outlined"
                                 color="primary"
                                 @click="$emit('open-dialog', thoiGianLamViec)"
                             />
@@ -34,7 +34,7 @@
                             <v-btn
                                 icon="mdi-trash-can-outline"
                                 size="x-small"
-                                variant="tonal"
+                                variant="outlined"
                                 color="error"
                                 @click="deleteCaLamViec(caLamViec.id)"
                             />

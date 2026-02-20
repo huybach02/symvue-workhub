@@ -61,22 +61,32 @@
             </template>
 
             <template #[`item.action`]="{ item }">
-                <div class="d-flex align-center justify-space-between">
-                    <ThemSuaBoPhan
-                        :path="path"
-                        mode="update"
-                        :item="item"
-                        @reload="$emit('reload')"
-                    />
-                    <v-btn
-                        icon
-                        size="small"
-                        variant="text"
-                        color="error"
-                        @click="openDeleteDialog(item.id)"
-                    >
-                        <v-icon>mdi-delete</v-icon>
-                    </v-btn>
+                <div class="d-flex align-center justify-space-between ga-1">
+                    <v-tooltip :text="$t('button.update')" location="top">
+                        <template #activator="{ props: tooltipProps }">
+                            <ThemSuaBoPhan
+                                v-bind="tooltipProps"
+                                :path="path"
+                                mode="update"
+                                :item="item"
+                                @reload="$emit('reload')"
+                            />
+                        </template>
+                    </v-tooltip>
+                    <v-tooltip :text="$t('button.delete')" location="top">
+                        <template #activator="{ props: tooltipProps }">
+                            <v-btn
+                                v-bind="tooltipProps"
+                                icon
+                                size="small"
+                                variant="outlined"
+                                color="error"
+                                @click="openDeleteDialog(item.id)"
+                            >
+                                <v-icon>mdi-delete</v-icon>
+                            </v-btn>
+                        </template>
+                    </v-tooltip>
                     <ConfirmDialog
                         v-model="showConfirmDelete"
                         :message="
@@ -198,9 +208,9 @@ export default {
             headers: [
                 {
                     key: "action",
-                    width: 65,
-                    minWidth: 65,
-                    maxWidth: 65,
+                    width: 85,
+                    minWidth: 85,
+                    maxWidth: 85,
                     sortable: false,
                 },
                 {

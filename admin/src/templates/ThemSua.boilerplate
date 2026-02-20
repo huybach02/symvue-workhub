@@ -14,7 +14,7 @@
                     v-if="mode === 'update'"
                     icon
                     size="small"
-                    variant="text"
+                    variant="outlined"
                     color="warning"
                     @click="dialog = true"
                 >

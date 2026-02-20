@@ -170,7 +170,7 @@
         "vai_tro": {
             "title": "Role",
             "manager": "Manager",
-            "employee": "Employee"
+            "employee": "Member"
         },
         "actions": {
             "index": "View list",
@@ -182,6 +182,20 @@
             "import": "Import file",
             "showMenu": "Show menu",
             "all": "All"
+        },
+        "button": {
+            "update": "Update permission",
+            "resetPermissionDefault": "Reset permission default",
+            "delete": "Delete department",
+            "viewDepartment": "View Department of user"
+        },
+        "text": {
+            "departmentOfUser": "Department of user",
+            "isMemberOf": "Is member of",
+            "isManagerOf": "Is manager of",
+            "department": "Department",
+            "notBelongsToAnyDepartment": "Not belongs to any department",
+            "default": "Default"
         }
     }
 }

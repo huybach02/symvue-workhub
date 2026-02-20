@@ -14,7 +14,7 @@
                     v-if="mode === 'update'"
                     icon
                     size="small"
-                    variant="text"
+                    variant="outlined"
                     color="warning"
                     @click="dialog = true"
                 >
@@ -25,7 +25,9 @@
         <v-dialog v-model="dialog" max-width="1400" scrollable persistent>
             <v-card
                 :title="mode === 'create' ? titleCreate : titleUpdate"
-                prepend-icon="mdi-plus"
+                :prepend-icon="
+                    mode === 'create' ? 'mdi-plus' : 'mdi-pencil-outline'
+                "
                 class="position-relative"
             >
                 <v-btn

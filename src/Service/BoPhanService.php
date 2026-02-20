@@ -188,6 +188,7 @@ class BoPhanService
 
         if ($userPermission) {
             $userPermission->setPhanQuyen($permissions);
+            $userPermission->setIsDefault($isDefault);
             $this->entityManager->persist($userPermission);
         } else {
             $userPermission = new UserPermission();
@@ -295,7 +296,7 @@ class BoPhanService
         $cacheKey = "user_permissions_" . $userId;
         $item = $this->cache->getItem($cacheKey);
         $item->set($result);
-        $item->expiresAfter(3600 * 24 * 30); // 1 tháng
+        $item->expiresAfter(3600 * 24 * 90); // 90 ngày
         $this->cache->save($item);
     }
 }

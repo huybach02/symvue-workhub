@@ -1,12 +1,7 @@
 <template>
     <div>
         <v-row>
-            <v-col cols="12">
-                <ThemSuaNguoiDung
-                    :path="path"
-                    mode="create"
-                    @reload="getDanhSach"
-                />
+            <v-col cols="12" md="5">
                 <div class="d-flex ga-2">
                     <ExportDataExcel :path="path" />
                     <ImportDataExcel
@@ -15,6 +10,13 @@
                         @reload="getDanhSach"
                     />
                 </div>
+            </v-col>
+            <v-col cols="12" md="7">
+                <ThemSuaNguoiDung
+                    :path="path"
+                    mode="create"
+                    @reload="getDanhSach"
+                />
             </v-col>
         </v-row>
         <v-row>

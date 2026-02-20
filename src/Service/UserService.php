@@ -4,8 +4,11 @@ namespace App\Service;
 
 use App\Class\FilterWithPagination;
 use App\DTO\UserDTO;
+use App\Entity\BoPhan;
 use App\Entity\User;
+use App\Entity\UserPermission;
 use App\Repository\ImageRepository;
+use App\Repository\UserPermissionRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -188,5 +191,102 @@ class UserService
         $items = array_filter($items, fn($item) => $item['parent_code'] === $provinceCode);
 
         return $items ?? [];
+    }
+
+    public function getUserDepartment(int $userId): array
+    {
+        $conn = $this->entityManager->getConnection();
+        $sql = '
+            SELECT up.*, bp.ten_bo_phan, bp.ma_bo_phan, u.name
+            FROM user_permission up
+            LEFT JOIN bo_phan bp ON bp.id = up.bo_phan_id
+            LEFT JOIN "user" u ON u.id = up.user_id
+            WHERE up.user_id = :userId
+            ORDER BY up.id DESC
+        ';
+        $items = $conn->executeQuery($sql, ['userId' => $userId])->fetchAllAssociative();
+
+        foreach ($items as $key => $item) {
+            $items[$key]['phan_quyen'] = json_decode($item['phan_quyen'], true);
+        }
+
+        return $items;
+    }
+
+    public function updatePhanQuyen(int $permissionId, array $phanQuyen): void
+    {
+        $userPermission = $this->entityManager->getRepository(\App\Entity\UserPermission::class)->find($permissionId);
+
+        if (!$userPermission) {
+            throw new \Exception("Không tìm thấy bản ghi phân quyền với ID: $permissionId");
+        }
+
+        $userPermission->setPhanQuyen($phanQuyen);
+        $userPermission->setIsCustom(true);
+
+        $this->entityManager->flush();
+
+        $this->boPhanService->mergeUserPermissions($userPermission->getUserId());
+    }
+
+    public function addUserDepartment(int $userId, int $boPhanId): void
+    {
+        $checkExist = $this->entityManager->getRepository(UserPermission::class)->findOneBy([
+            'userId' => $userId,
+            'boPhanId' => $boPhanId,
+        ]);
+
+        if ($checkExist) {
+            throw new \Exception("Người dùng đã thuộc bộ phận này. Vui lòng chọn lại");
+        }
+
+        $boPhan =  $this->entityManager->getRepository(BoPhan::class)->find($boPhanId);
+
+        $employeePermissions = [];
+        foreach ($boPhan->getPhanQuyen() as $permission) {
+            $employeePermissions[] = [
+                "name" => $permission['name'],
+                "actions" => $permission['employee'],
+            ];
+        }
+
+        $userPermission = new UserPermission();
+        $userPermission->setUserId($userId);
+        $userPermission->setBoPhanId($boPhanId);
+        $userPermission->setPhanQuyen($employeePermissions);
+        $this->entityManager->persist($userPermission);
+        $this->entityManager->flush();
+
+        $this->boPhanService->mergeUserPermissions($userId);
+    }
+
+    public function resetOrDeletePermission(int $userId, int $permissionId, string $action): void
+    {
+        $userPermission = $this->entityManager->getRepository(UserPermission::class)->find($permissionId);
+
+        if (!$userPermission) {
+            throw new \Exception("Không tìm thấy bản ghi phân quyền với ID: $permissionId");
+        }
+
+        if ($action === 'delete') {
+            $this->entityManager->remove($userPermission);
+            $this->entityManager->flush();
+        } else {
+            $boPhan =  $this->entityManager->getRepository(BoPhan::class)->find($userPermission->getBoPhanId());
+
+            $employeePermissions = [];
+            foreach ($boPhan->getPhanQuyen() as $permission) {
+                $employeePermissions[] = [
+                    "name" => $permission['name'],
+                    "actions" => $userPermission->isManager() ? $permission['manager'] : $permission['employee'],
+                ];
+            }
+
+            $userPermission->setPhanQuyen($employeePermissions);
+            $userPermission->setIsCustom(false);
+            $this->entityManager->flush();
+        }
+
+        $this->boPhanService->mergeUserPermissions($userId);
     }
 }

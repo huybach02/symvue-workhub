@@ -170,7 +170,7 @@
         "vai_tro": {
             "title": "Vai trò",
             "manager": "Quản lý",
-            "employee": "Nhân viên"
+            "employee": "Thành viên"
         },
         "actions": {
             "index": "Xem danh sách",
@@ -182,6 +182,20 @@
             "import": "Import file",
             "showMenu": "Hiển thị menu",
             "all": "Tất cả"
+        },
+        "button": {
+            "update": "Cập nhật phân quyền",
+            "resetPermissionDefault": "Khôi phục phân quyền mặc định của bộ phận",
+            "delete": "Xóa bộ phận",
+            "viewDepartment": "Xem Phòng ban/Bộ phận của người dùng"
+        },
+        "text": {
+            "departmentOfUser": "Phòng ban/Bộ phận của người dùng",
+            "isMemberOf": "Là thành viên của",
+            "isManagerOf": "Là quản lý của",
+            "department": "Phòng ban/Bộ phận",
+            "notBelongsToAnyDepartment": " Người dùng chưa thuộc phòng ban nào",
+            "default": "Mặc định"
         }
     }
 }

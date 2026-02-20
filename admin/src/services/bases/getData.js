@@ -15,12 +15,17 @@ export const getAllData = async (path, params = {}) => {
     }
 };
 
-export const getDataById = async (path, id) => {
+export const getDataById = async (path, id, slug = "") => {
     try {
         if (id === undefined) {
             return;
         }
-        const resp = await axiosInstance.get(`${path}/${id}`);
+        let resp;
+        if (slug) {
+            resp = await axiosInstance.get(`${path}/${id}/${slug}`);
+        } else {
+            resp = await axiosInstance.get(`${path}/${id}`);
+        }
         if (resp.success) {
             return resp.data;
         }

@@ -60,22 +60,45 @@
             </template>
 
             <template #[`item.action`]="{ item }">
-                <div class="d-flex align-center justify-start gap-1">
-                    <ThemSuaNguoiDung
-                        :path="path"
-                        mode="update"
-                        :item="item"
-                        @reload="$emit('reload')"
-                    />
-                    <v-btn
-                        icon
-                        size="small"
-                        variant="text"
-                        color="error"
-                        @click="openDeleteDialog(item.id)"
+                <div class="d-flex align-center justify-start ga-1">
+                    <v-tooltip
+                        :text="$t('bo_phan.button.viewDepartment')"
+                        location="top"
                     >
-                        <v-icon>mdi-delete</v-icon>
-                    </v-btn>
+                        <template #activator="{ props: tooltipProps }">
+                            <BoPhanCuaNguoiDung
+                                v-bind="tooltipProps"
+                                :path="path"
+                                :item="item"
+                                @reload="$emit('reload')"
+                            />
+                        </template>
+                    </v-tooltip>
+                    <v-tooltip :text="$t('button.update')" location="top">
+                        <template #activator="{ props: tooltipProps }">
+                            <ThemSuaNguoiDung
+                                v-bind="tooltipProps"
+                                :path="path"
+                                mode="update"
+                                :item="item"
+                                @reload="$emit('reload')"
+                            />
+                        </template>
+                    </v-tooltip>
+                    <v-tooltip :text="$t('button.delete')" location="top">
+                        <template #activator="{ props: tooltipProps }">
+                            <v-btn
+                                v-bind="tooltipProps"
+                                icon
+                                size="small"
+                                variant="outlined"
+                                color="error"
+                                @click="openDeleteDialog(item.id)"
+                            >
+                                <v-icon>mdi-delete</v-icon>
+                            </v-btn>
+                        </template>
+                    </v-tooltip>
                 </div>
             </template>
 
@@ -151,6 +174,7 @@ import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import ThemSuaNguoiDung from "./ThemSuaNguoiDung.vue";
 import { deleteData } from "@/services/bases/deleteData";
+import BoPhanCuaNguoiDung from "./BoPhanCuaNguoiDung.vue";
 
 export default {
     name: "DataTable",
@@ -158,6 +182,7 @@ export default {
         FilterPagination,
         ConfirmDialog,
         ThemSuaNguoiDung,
+        BoPhanCuaNguoiDung,
     },
     props: {
         path: {
@@ -208,9 +233,9 @@ export default {
             headers: [
                 {
                     key: "action",
-                    width: 80,
-                    minWidth: 80,
-                    maxWidth: 80,
+                    width: 140,
+                    minWidth: 140,
+                    maxWidth: 140,
                     sortable: false,
                 },
                 {

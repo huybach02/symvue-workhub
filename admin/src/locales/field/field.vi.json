@@ -33,6 +33,7 @@
         "quan_ly_bo_phan": "Quản lý bộ phận",
         "ten_bo_phan": "Tên bộ phận",
         "ma_bo_phan": "Mã bộ phận",
-        "phan_quyen": "Phân quyền cho bộ phận"
+        "phan_quyen": "Phân quyền cho bộ phận",
+        "bo_phan_moi": "Bộ phận mới"
     }
 }
