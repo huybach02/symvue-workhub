@@ -62,7 +62,11 @@
 
             <template #[`item.action`]="{ item }">
                 <div class="d-flex align-center justify-space-between ga-1">
-                    <v-tooltip :text="$t('button.update')" location="top">
+                    <v-tooltip
+                        v-if="permission?.show"
+                        :text="$t('button.update')"
+                        location="top"
+                    >
                         <template #activator="{ props: tooltipProps }">
                             <ThemSuaBoPhan
                                 v-bind="tooltipProps"
@@ -73,7 +77,11 @@
                             />
                         </template>
                     </v-tooltip>
-                    <v-tooltip :text="$t('button.delete')" location="top">
+                    <v-tooltip
+                        v-if="permission?.delete"
+                        :text="$t('button.delete')"
+                        location="top"
+                    >
                         <template #activator="{ props: tooltipProps }">
                             <v-btn
                                 v-bind="tooltipProps"
@@ -175,6 +183,10 @@ export default {
         loading: {
             type: Boolean,
             default: false,
+        },
+        permission: {
+            type: Object,
+            default: () => ({}),
         },
     },
     emits: ["reload"],

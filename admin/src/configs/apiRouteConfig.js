@@ -6,10 +6,7 @@ export const API_ROUTES_CONFIG = {
     forgotPassword: "/auth/forgot-password",
     changePassword: "/auth/change-password",
     cauHinhChung: "/cau-hinh-chung",
-    thoiGianLamViec: {
-        fulltime: "/thoi-gian-lam-viec/fulltime",
-        parttime: "/thoi-gian-lam-viec/parttime",
-    },
+    thoiGianLamViec: "/thoi-gian-lam-viec",
     media: {
         upload: "/media/upload",
         getAll: "/media",
@@ -18,7 +15,7 @@ export const API_ROUTES_CONFIG = {
         restore: "/media/restore",
         deletePermanently: "/media/delete-permanently",
     },
-    user: "/user",
+    user: "/nguoi-dung",
     lichSuImport: "/lich-su-import",
     boPhan: "/bo-phan",
     phanQuyenMacDinh: "/bo-phan/permission",

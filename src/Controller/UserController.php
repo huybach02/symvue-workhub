@@ -25,7 +25,7 @@ final class UserController extends AbstractController
         private readonly UserRepository $userRepository
     ) {}
 
-    #[Route('/user', methods: ['GET'])]
+    #[Route('/nguoi-dung', methods: ['GET'])]
     public function getAll(Request $request): JsonResponse
     {
         $params = $request->query->all();
@@ -49,7 +49,7 @@ final class UserController extends AbstractController
         }
     }
 
-    #[Route('/user/{id}', methods: ['GET'], priority: -1)]
+    #[Route('/nguoi-dung/{id}', methods: ['GET'], priority: -1)]
     public function getOne(int $id): JsonResponse
     {
         try {
@@ -60,7 +60,7 @@ final class UserController extends AbstractController
         }
     }
 
-    #[Route('/user', methods: ['POST'])]
+    #[Route('/nguoi-dung', methods: ['POST'])]
     public function create(
         #[MapRequestPayload(validationGroups: ['create'])] UserDTO $userDTO
     ): JsonResponse {
@@ -72,7 +72,7 @@ final class UserController extends AbstractController
         }
     }
 
-    #[Route('/user/{id}', methods: ['PUT'])]
+    #[Route('/nguoi-dung/{id}', methods: ['PUT'])]
     public function update(
         int $id,
         #[MapRequestPayload(validationGroups: ['update'])] UserDTO $userDTO
@@ -85,7 +85,7 @@ final class UserController extends AbstractController
         }
     }
 
-    #[Route('/user/{id}', methods: ['DELETE'])]
+    #[Route('/nguoi-dung/{id}', methods: ['DELETE'])]
     public function delete(int $id): JsonResponse
     {
         try {
@@ -96,7 +96,7 @@ final class UserController extends AbstractController
         }
     }
 
-    #[Route('/user/select', methods: ['GET'])]
+    #[Route('/nguoi-dung/select', methods: ['GET'])]
     public function getDataSelect(Request $request): JsonResponse
     {
         $params = $request->query->all();
@@ -110,14 +110,14 @@ final class UserController extends AbstractController
         }
     }
 
-    #[Route('/user/export', methods: ['GET'])]
+    #[Route('/nguoi-dung/export', methods: ['GET'])]
     public function exportUsers(): Response
     {
         $users = $this->userRepository->findAll();
         return $this->userExportService->export($users);
     }
 
-    #[Route('/user/import', methods: ['POST'])]
+    #[Route('/nguoi-dung/import', methods: ['POST'])]
     public function importUsers(Request $request): JsonResponse
     {
         $file = $request->files->get('file');
@@ -136,14 +136,14 @@ final class UserController extends AbstractController
         }
     }
 
-    #[Route('user/template-import', methods: ['GET'])]
+    #[Route('/nguoi-dung/template-import', methods: ['GET'])]
     public function downloadTemplate(UserTemplateImportService $service): Response
     {
         return $service->generateUserTemplate();
     }
 
     // API lấy data province
-    #[Route('/user/province', methods: ['GET'])]
+    #[Route('/nguoi-dung/province', methods: ['GET'])]
     public function getProvince(): JsonResponse
     {
         try {
@@ -155,7 +155,7 @@ final class UserController extends AbstractController
     }
 
     // API lấy data ward
-    #[Route('/user/ward/{provinceId}', methods: ['GET'])]
+    #[Route('/nguoi-dung/ward/{provinceId}', methods: ['GET'])]
     public function getWard(int $provinceId): JsonResponse
     {
         try {
@@ -166,7 +166,7 @@ final class UserController extends AbstractController
         }
     }
 
-    #[Route('/user/{id}/department', methods: ['GET'])]
+    #[Route('/nguoi-dung/{id}/department', methods: ['GET'])]
     public function getUserDepartment(int $id): JsonResponse
     {
         try {
@@ -177,7 +177,7 @@ final class UserController extends AbstractController
         }
     }
 
-    #[Route('/user/{id}/department', methods: ['POST'])]
+    #[Route('/nguoi-dung/{id}/department', methods: ['POST'])]
     public function addUserDepartment(int $id, Request $request): JsonResponse
     {
         try {
@@ -190,7 +190,7 @@ final class UserController extends AbstractController
         }
     }
 
-    #[Route('/user/{id}/department/{permissionId}', methods: ['PATCH'])]
+    #[Route('/nguoi-dung/{id}/department/{permissionId}', methods: ['PATCH'])]
     public function updateUserDepartment(int $id, int $permissionId, Request $request): JsonResponse
     {
         try {
@@ -203,7 +203,7 @@ final class UserController extends AbstractController
         }
     }
 
-    #[Route('/user/{id}/department/{permissionId}', methods: ['POST'])]
+    #[Route('/nguoi-dung/{id}/department/{permissionId}', methods: ['POST'])]
     public function resetOrDeletePermission(int $id, int $permissionId, Request $request): JsonResponse
     {
         try {

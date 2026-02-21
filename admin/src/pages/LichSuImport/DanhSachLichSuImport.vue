@@ -283,6 +283,12 @@ export default {
                     filterComponent: markRaw(FilterText),
                 },
                 {
+                    title: this.$t("lich_su_import.columns.createdAt"),
+                    key: "createdAt",
+                    width: 100,
+                    filterComponent: markRaw(FilterText),
+                },
+                {
                     key: "action",
                     width: 80,
                     minWidth: 80,

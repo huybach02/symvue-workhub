@@ -44,5 +44,17 @@ return [
             "showMenu" => true
         ]
     ],
-
+    [
+        "name" => "bo-phan",
+        "actions" => [
+            "index" => true,
+            "create" => true,
+            "show" => true,
+            "edit" => true,
+            "delete" => true,
+            "export" => true,
+            "import" => true,
+            "showMenu" => true
+        ]
+    ],
 ];

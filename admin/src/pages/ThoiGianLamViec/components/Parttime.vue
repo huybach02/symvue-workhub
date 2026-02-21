@@ -3,6 +3,7 @@
         <v-row class="g-2">
             <v-col v-for="item in data" :key="item.id" cols="12" md="3">
                 <ParttimeCard
+                    :permission="permission"
                     :thoi-gian-lam-viec="item"
                     :is-refresh="isRefresh"
                     @open-dialog="openDialog"
@@ -31,6 +32,12 @@ export default {
         ParttimeCard,
         ParttimeDialog,
     },
+    props: {
+        permission: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
     data() {
         return {
             data: [],
@@ -47,7 +54,8 @@ export default {
             try {
                 this.$store.commit("setIsLoading");
                 const response = await getAllData(
-                    API_ROUTES_CONFIG.thoiGianLamViec.fulltime,
+                    API_ROUTES_CONFIG.thoiGianLamViec,
+                    { type: "fulltime" },
                 );
                 this.$store.commit("unsetIsLoading");
                 this.data = response;

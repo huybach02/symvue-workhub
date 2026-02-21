@@ -7,6 +7,7 @@
                     <v-tooltip text="Thêm ca làm việc" location="top">
                         <template v-slot:activator="{ props }">
                             <v-btn
+                                v-if="permission.create"
                                 v-bind="props"
                                 icon="mdi-plus"
                                 size="small"
@@ -32,6 +33,7 @@
 
                         <template v-slot:append>
                             <v-btn
+                                v-if="permission.delete"
                                 icon="mdi-trash-can-outline"
                                 size="x-small"
                                 variant="outlined"
@@ -48,7 +50,7 @@
 
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import { getDataById } from "@/services/bases/getData";
+import { getAllData } from "@/services/bases/getData";
 
 export default {
     props: {
@@ -59,6 +61,10 @@ export default {
         isRefresh: {
             type: Boolean,
             required: true,
+        },
+        permission: {
+            type: Object,
+            default: () => ({}),
         },
     },
     emits: ["open-dialog"],
@@ -79,9 +85,12 @@ export default {
         async fetchCaLamViecList() {
             try {
                 this.$store.commit("setIsLoading");
-                const response = await getDataById(
-                    API_ROUTES_CONFIG.thoiGianLamViec.parttime,
-                    this.thoiGianLamViec.id,
+                const response = await getAllData(
+                    API_ROUTES_CONFIG.thoiGianLamViec,
+                    {
+                        type: "parttime",
+                        thoiGianLamViecId: this.thoiGianLamViec.id,
+                    },
                 );
                 this.caLamViecList = response;
                 this.$store.commit("unsetIsLoading");

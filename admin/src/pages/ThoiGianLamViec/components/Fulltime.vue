@@ -27,6 +27,7 @@
                 <tr v-for="item in data" :key="item.id">
                     <td>
                         <v-btn
+                            v-if="permission.show"
                             color="warning"
                             variant="outlined"
                             icon="mdi-pencil"
@@ -60,6 +61,12 @@ export default {
     components: {
         FulltimeDialog,
     },
+    props: {
+        permission: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
     data() {
         return {
             data: [],
@@ -69,13 +76,15 @@ export default {
     },
     created() {
         this.fetchData();
+        console.log(this.permission);
     },
     methods: {
         async fetchData() {
             try {
                 this.$store.commit("setIsLoading");
                 const response = await getAllData(
-                    API_ROUTES_CONFIG.thoiGianLamViec.fulltime,
+                    API_ROUTES_CONFIG.thoiGianLamViec,
+                    { type: "fulltime" },
                 );
                 this.$store.commit("unsetIsLoading");
                 this.data = response;

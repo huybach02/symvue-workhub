@@ -180,7 +180,7 @@ export default {
             this.$store.commit("setIsLoading");
             values.thoiGianLamViecId = this.thoiGianLamViec.id;
             const response = await postData(
-                API_ROUTES_CONFIG.thoiGianLamViec.parttime,
+                API_ROUTES_CONFIG.thoiGianLamViec,
                 values,
             );
             if (response) {

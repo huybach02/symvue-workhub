@@ -92,7 +92,7 @@
 
                     <!-- Không có dữ liệu -->
                     <v-alert
-                        v-else-if="departments.length === 0"
+                        v-else-if="departments.length === 0 && boPhanLoaded"
                         type="warning"
                         variant="tonal"
                         class="mt-2"
@@ -371,6 +371,7 @@ export default {
             boPhanData: [],
             boPhanSelected: null,
             showConfirmDelete: false,
+            boPhanLoaded: false,
         };
     },
     computed: {
@@ -399,6 +400,11 @@ export default {
     watch: {
         async dialog(isOpen) {
             if (isOpen) {
+                // Chỉ load danh sách bộ phận 1 lần duy nhất
+                if (!this.boPhanLoaded) {
+                    await this.getBoPhan();
+                    this.boPhanLoaded = true;
+                }
                 await this.loadDepartments();
             } else {
                 this.departments = [];
@@ -406,9 +412,6 @@ export default {
                 this.savingIndex = null;
             }
         },
-    },
-    created() {
-        this.getBoPhan();
     },
     methods: {
         async loadDepartments() {

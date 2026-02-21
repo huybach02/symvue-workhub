@@ -65,7 +65,7 @@ export const routes = [
                 },
             },
             {
-                path: "config/general",
+                path: "cau-hinh-chung",
                 name: NAME_ROUTES_CONFIG.systemConfigGeneral,
                 component: () =>
                     import("../pages/CauHinhChung/CauHinhChung.vue"),
@@ -81,7 +81,7 @@ export const routes = [
                 },
             },
             {
-                path: "config/working-time",
+                path: "thoi-gian-lam-viec",
                 name: NAME_ROUTES_CONFIG.systemConfigWorkingTime,
                 component: () =>
                     import("../pages/ThoiGianLamViec/ThoiGianLamViec.vue"),
@@ -97,7 +97,7 @@ export const routes = [
                 },
             },
             {
-                path: "user-management/user",
+                path: "nguoi-dung",
                 name: NAME_ROUTES_CONFIG.userManagementUser,
                 component: () => import("../pages/NguoiDung/NguoiDung.vue"),
                 meta: {

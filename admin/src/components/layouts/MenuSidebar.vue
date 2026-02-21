@@ -1,6 +1,6 @@
 <template>
     <v-list density="compact" nav>
-        <template v-for="(item, index) in menuSidebar">
+        <template v-for="(item, index) in filteredMenu">
             <!-- Menu có children (nested menu) -->
             <v-list-group
                 v-if="item.children && item.children.length > 0"
@@ -45,6 +45,8 @@
 
 <script>
 import { menuSidebar } from "@/configs/menuSidebar";
+import { useSidebarPermission } from "@/hooks/useSidebarPermission";
+
 export default {
     data() {
         return {
@@ -52,6 +54,9 @@ export default {
         };
     },
     computed: {
+        filteredMenu() {
+            return useSidebarPermission(menuSidebar);
+        },
         activeItem() {
             return this.$route.name;
         },

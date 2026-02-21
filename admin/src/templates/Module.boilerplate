@@ -57,9 +57,6 @@ export default {
             loading: false,
         };
     },
-    created() {
-        this.getDanhSach();
-    },
     methods: {
         getDanhSach: async function (params) {
             try {

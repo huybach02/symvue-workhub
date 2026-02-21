@@ -7,4 +7,5 @@ export const constant = {
         { value: 1, key: "status.active" },
         { value: 0, key: "status.inactive" },
     ],
+    ROUTE_PUBLIC: ["dashboard", "profile", "lich-su-import"],
 };

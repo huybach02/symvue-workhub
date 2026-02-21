@@ -3,6 +3,7 @@
         <v-row>
             <v-col cols="12">
                 <ThemSuaBoPhan
+                    v-if="permission?.create"
                     :path="path"
                     mode="create"
                     @reload="getDanhSach"
@@ -12,10 +13,12 @@
         <v-row>
             <v-col cols="12">
                 <DanhSachBoPhan
+                    v-if="permission?.index"
                     :path="path"
                     :items="items"
                     :total-items="totalItems"
                     :loading="loading"
+                    :permission="permission"
                     @reload="getDanhSach"
                 />
             </v-col>
@@ -28,6 +31,7 @@ import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import DanhSachBoPhan from "./DanhSachBoPhan.vue";
 import { getListData } from "@/services/bases/getData";
 import ThemSuaBoPhan from "./ThemSuaBoPhan.vue";
+import { usePermission } from "@/hooks/usePermission";
 
 export default {
     name: "BoPhan",
@@ -43,8 +47,10 @@ export default {
             loading: false,
         };
     },
-    created() {
-        this.getDanhSach();
+    computed: {
+        permission() {
+            return usePermission(this.path);
+        },
     },
     methods: {
         getDanhSach: async function (params) {

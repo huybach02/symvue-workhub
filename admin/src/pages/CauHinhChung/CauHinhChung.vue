@@ -8,43 +8,57 @@
             :initial-values="initialValues"
             @submit="onSubmit"
         >
-            <v-row v-if="!isEditing">
-                <v-col cols="12">
-                    <div class="d-flex ga-2 justify-end">
-                        <v-btn
-                            color="primary"
-                            class="d-flex align-center"
-                            @click="isEditing = !isEditing"
-                        >
-                            <v-icon icon="mdi-pencil" size="18" class="mr-1" />
-                            {{ $t("system_config.edit_button") }}
-                        </v-btn>
-                    </div>
-                </v-col>
-            </v-row>
-            <v-row v-else>
-                <v-col cols="12">
-                    <div class="d-flex ga-2 justify-end">
-                        <v-btn
-                            variant="tonal"
-                            class="d-flex align-center"
-                            @click="cancelEdit"
-                        >
-                            <v-icon icon="mdi-close" size="18" class="mr-1" />
-                            {{ $t("system_config.cancel_button") }}
-                        </v-btn>
-                        <v-btn
-                            :loading="this.$store.state.isLoading"
-                            color="primary"
-                            class="d-flex align-center"
-                            type="submit"
-                        >
-                            <v-icon icon="mdi-check" size="18" class="mr-1" />
-                            {{ $t("system_config.save_button") }}
-                        </v-btn>
-                    </div>
-                </v-col>
-            </v-row>
+            <div v-if="permission?.edit">
+                <v-row v-if="!isEditing">
+                    <v-col cols="12">
+                        <div class="d-flex ga-2 justify-end">
+                            <v-btn
+                                color="primary"
+                                class="d-flex align-center"
+                                @click="isEditing = !isEditing"
+                            >
+                                <v-icon
+                                    icon="mdi-pencil"
+                                    size="18"
+                                    class="mr-1"
+                                />
+                                {{ $t("system_config.edit_button") }}
+                            </v-btn>
+                        </div>
+                    </v-col>
+                </v-row>
+                <v-row v-else>
+                    <v-col cols="12">
+                        <div class="d-flex ga-2 justify-end">
+                            <v-btn
+                                variant="tonal"
+                                class="d-flex align-center"
+                                @click="cancelEdit"
+                            >
+                                <v-icon
+                                    icon="mdi-close"
+                                    size="18"
+                                    class="mr-1"
+                                />
+                                {{ $t("system_config.cancel_button") }}
+                            </v-btn>
+                            <v-btn
+                                :loading="this.$store.state.isLoading"
+                                color="primary"
+                                class="d-flex align-center"
+                                type="submit"
+                            >
+                                <v-icon
+                                    icon="mdi-check"
+                                    size="18"
+                                    class="mr-1"
+                                />
+                                {{ $t("system_config.save_button") }}
+                            </v-btn>
+                        </div>
+                    </v-col>
+                </v-row>
+            </div>
 
             <v-divider class="my-5" />
 
@@ -210,6 +224,8 @@
 
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
+import { NAME_ROUTES_CONFIG } from "@/configs/nameRouteConfig";
+import { usePermission } from "@/hooks/usePermission";
 import { getAllData } from "@/services/bases/getData";
 import { postData } from "@/services/bases/postData";
 import { cauHinhChungSchema } from "@/utils/schemas/cauHinhChung";
@@ -235,6 +251,11 @@ export default {
                 soThietBiDangNhapToiDa: 0,
             },
         };
+    },
+    computed: {
+        permission() {
+            return usePermission(API_ROUTES_CONFIG.cauHinhChung);
+        },
     },
     created() {
         this.getAll();

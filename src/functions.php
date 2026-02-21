@@ -161,3 +161,33 @@ if (!function_exists('excelGetValue')) {
         return $row[$index] ?? $default;
     }
 }
+
+if (!function_exists('convertMethod')) {
+    function convertMethod(string $path, string $method): string
+    {
+        $pathArr = explode("/", $path);
+
+        if (count($pathArr) === 1) {
+            switch ($method) {
+                case "GET":
+                    return "index";
+                case "POST":
+                    return "create";
+            }
+        }
+
+        if (count($pathArr) > 1) {
+            switch ($method) {
+                case "GET":
+                    return "show";
+                case "PUT":
+                case "PATCH":
+                    return "edit";
+                case "DELETE":
+                    return "delete";
+            }
+        }
+
+        return "index";
+    }
+}

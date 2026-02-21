@@ -429,6 +429,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
             'description' => $this->description,
             'status' => $this->status,
             'boPhanId' => $this->boPhanId,
+            'roles' => $this->roles,
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];

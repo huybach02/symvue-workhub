@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Class\CustomResponse;
 use App\Entity\User;
+use App\Repository\BoPhanRepository;
 use App\Service\AuthService;
 use App\Service\DeviceInfoService;
 use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
@@ -18,6 +19,8 @@ final class AuthController extends AbstractController
     public function __construct(
         private readonly AuthService $authService,
         private readonly DeviceInfoService $deviceInfoService,
+        private readonly CacheItemPoolInterface $cache,
+        private readonly BoPhanRepository $boPhanRepository,
     ) {}
 
     #[Route("/auth/me", methods: ["GET"])]
@@ -27,7 +30,19 @@ final class AuthController extends AbstractController
             return CustomResponse::error(t("auth.me.not_found"), 401);
         }
 
-        return CustomResponse::success($user->jsonSerialize());
+        $key = "user_permissions_" . $user->getId();
+
+        $userPermission = $this->cache->getItem($key)->get();
+
+        $userData = $user->jsonSerialize();
+        $userData['permissions'] = $userPermission;
+
+        if ($user->getBoPhanId()) {
+            $boPhan = $this->boPhanRepository->find($user->getBoPhanId());
+            $userData['boPhan'] = $boPhan->jsonSerialize();
+        }
+
+        return CustomResponse::success($userData);
     }
 
     #[Route("/auth/logout", methods: ["POST"])]

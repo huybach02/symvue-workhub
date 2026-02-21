@@ -1,22 +1,27 @@
 <template>
     <NotAuthenticatedMiddleware>
-        <v-card>
-            <v-layout>
-                <SidebarMobile v-if="isMobile" />
-                <SidebarPC v-else />
-                <v-main style="min-height: 100vh; overflow-y: auto">
-                    <v-progress-linear
-                        v-if="$store.state.isLoading"
-                        color="primary"
-                        indeterminate
-                        height="5"
-                    />
-                    <v-card class="ma-2 pa-4 main-content-card" elevation="3">
-                        <router-view />
-                    </v-card>
-                </v-main>
-            </v-layout>
-        </v-card>
+        <PermissionMiddleware>
+            <v-card>
+                <v-layout>
+                    <SidebarMobile v-if="isMobile" />
+                    <SidebarPC v-else />
+                    <v-main style="min-height: 100vh; overflow-y: auto">
+                        <v-progress-linear
+                            v-if="$store.state.isLoading"
+                            color="primary"
+                            indeterminate
+                            height="5"
+                        />
+                        <v-card
+                            class="ma-2 pa-4 main-content-card"
+                            elevation="3"
+                        >
+                            <router-view />
+                        </v-card>
+                    </v-main>
+                </v-layout>
+            </v-card>
+        </PermissionMiddleware>
     </NotAuthenticatedMiddleware>
 </template>
 
@@ -25,6 +30,7 @@ import { mapGetters } from "vuex";
 import NotAuthenticatedMiddleware from "@/middlewares/NotAuthenticatedMiddleware.vue";
 import SidebarPC from "./SidebarPC.vue";
 import SidebarMobile from "./SidebarMobile.vue";
+import PermissionMiddleware from "@/middlewares/PermissionMiddleware.vue";
 
 export default {
     name: "MainLayout",
@@ -32,6 +38,7 @@ export default {
         SidebarPC,
         SidebarMobile,
         NotAuthenticatedMiddleware,
+        PermissionMiddleware,
     },
     computed: {
         ...mapGetters("auth", ["currentUser"]),

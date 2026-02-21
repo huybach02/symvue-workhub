@@ -20,10 +20,10 @@
 
             <v-tabs-window v-model="tab" class="mt-5">
                 <v-tabs-window-item value="one">
-                    <Fulltime />
+                    <Fulltime :permission="permission" />
                 </v-tabs-window-item>
                 <v-tabs-window-item value="two">
-                    <Parttime />
+                    <Parttime :permission="permission" />
                 </v-tabs-window-item>
             </v-tabs-window>
         </v-defaults-provider>
@@ -31,6 +31,7 @@
 </template>
 
 <script>
+import { usePermission } from "@/hooks/usePermission";
 import Fulltime from "./components/Fulltime.vue";
 import Parttime from "./components/Parttime.vue";
 
@@ -43,6 +44,11 @@ export default {
         return {
             tab: "one",
         };
+    },
+    computed: {
+        permission() {
+            return usePermission("/thoi-gian-lam-viec");
+        },
     },
     methods: {
         changeTab(tab) {

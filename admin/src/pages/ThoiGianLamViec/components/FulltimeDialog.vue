@@ -138,7 +138,7 @@
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import { functionHelper } from "@/helpers/functionHelper";
-import { getDataById } from "@/services/bases/getData";
+import { getAllData } from "@/services/bases/getData";
 import { putData } from "@/services/bases/updateData";
 import { Form as VeeForm, Field as VeeField } from "vee-validate";
 
@@ -200,9 +200,10 @@ export default {
             if (this.itemEdit) {
                 this.dataLoaded = false;
                 this.$store.commit("setIsLoading");
-                const response = await getDataById(
-                    API_ROUTES_CONFIG.thoiGianLamViec.fulltime,
-                    this.itemEdit.id,
+                // Lấy chi tiết fulltime theo query param: ?type=fulltime&id=X
+                const response = await getAllData(
+                    API_ROUTES_CONFIG.thoiGianLamViec,
+                    { type: "fulltime", id: this.itemEdit.id },
                 );
                 if (response) {
                     this.initialValues = response;
@@ -213,9 +214,10 @@ export default {
         },
         async onSubmit(values) {
             this.$store.commit("setIsLoading");
+            // Cập nhật fulltime theo query param: ?type=fulltime&id=X
             const response = await putData(
-                API_ROUTES_CONFIG.thoiGianLamViec.fulltime,
-                this.itemEdit.id,
+                `${API_ROUTES_CONFIG.thoiGianLamViec}?type=fulltime&id=${this.itemEdit.id}`,
+                null,
                 values,
             );
             if (response) {

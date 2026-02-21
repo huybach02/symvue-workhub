@@ -19,7 +19,8 @@ export const patchData = async (path, id, data, callback = () => {}) => {
 
 export const putData = async (path, id, data, callback = () => {}) => {
     try {
-        const resp = await axiosInstance.put(`${path}/${id}`, data);
+        const url = id != null ? `${path}/${id}` : path;
+        const resp = await axiosInstance.put(url, data);
         if (resp.success) {
             toast.success(resp.message);
             callback();

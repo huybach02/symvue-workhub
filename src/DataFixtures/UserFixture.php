@@ -40,7 +40,6 @@ class UserFixture extends Fixture
         $admin->setName('Administrator');
         $admin->setPassword($this->passwordHasher->hashPassword($admin, 'password'));
         $admin->setRoles(['ROLE_ADMIN']);
-        $admin->setMaVaiTro('ADMIN');
         $admin->setPhone('0901234567');
         $admin->setGender('male');
         $admin->setStatus(1);
@@ -63,13 +62,12 @@ class UserFixture extends Fixture
 
             // Vai trò
             $maVaiTro = $faker->randomElement($roles);
-            $user->setMaVaiTro($maVaiTro);
             $user->setRoles(['ROLE_' . $maVaiTro]);
 
             // Thông tin cá nhân
             $user->setPhone($faker->optional(0.8)->numerify('09########'));
             $user->setGender($faker->randomElement($genders));
-            $user->setBirthday($faker->optional(0.7)->dateTimeBetween('-60 years', '-18 years'));
+            $user->setBirthday($faker->optional(0.7)->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'));
             $user->setDescription($faker->optional(0.5)->sentence(10));
 
             // Địa chỉ (sử dụng ID giả cho province, district, ward)

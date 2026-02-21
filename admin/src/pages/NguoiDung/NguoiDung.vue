@@ -3,8 +3,9 @@
         <v-row>
             <v-col cols="12" md="5">
                 <div class="d-flex ga-2">
-                    <ExportDataExcel :path="path" />
+                    <ExportDataExcel v-if="permission?.export" :path="path" />
                     <ImportDataExcel
+                        v-if="permission?.import"
                         :path="path"
                         :note="`Mật khẩu mặc định của tất cả người dùng sau khi import là 'password'`"
                         @reload="getDanhSach"
@@ -13,6 +14,7 @@
             </v-col>
             <v-col cols="12" md="7">
                 <ThemSuaNguoiDung
+                    v-if="permission?.create"
                     :path="path"
                     mode="create"
                     @reload="getDanhSach"
@@ -22,10 +24,12 @@
         <v-row>
             <v-col cols="12">
                 <DanhSachNguoiDung
+                    v-if="permission?.index"
                     :path="path"
                     :users="users"
                     :total-items="totalItems"
                     :loading="loading"
+                    :permission="permission"
                     @reload="getDanhSach"
                 />
             </v-col>
@@ -40,6 +44,7 @@ import { getListData } from "@/services/bases/getData";
 import ThemSuaNguoiDung from "./ThemSuaNguoiDung.vue";
 import ExportDataExcel from "@/components/ExportDataExcel.vue";
 import ImportDataExcel from "@/components/ImportDataExcel.vue";
+import { usePermission } from "@/hooks/usePermission";
 
 export default {
     name: "NguoiDung",
@@ -57,8 +62,10 @@ export default {
             loading: false,
         };
     },
-    created() {
-        this.getDanhSach();
+    computed: {
+        permission() {
+            return usePermission(this.path);
+        },
     },
     methods: {
         getDanhSach: async function (params) {

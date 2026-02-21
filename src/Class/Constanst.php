@@ -66,4 +66,32 @@ final class Constanst
         "Saturday" => "Thứ 7",
         "Sunday" => "Chủ nhật",
     ];
+
+    /**
+     * Map URL path prefix → tên module trong hệ thống permission.
+     * Key: prefix của URL route (phải khớp với đầu path, dùng str_starts_with)
+     * Value: tên module tương ứng trong UserPermission->phanQuyen[]['name']
+     * Cần cập nhật khi thêm module mới vào hệ thống.
+     */
+    const ROUTE_PERMISSION_MAP = [
+        '/cau-hinh-chung'       => 'cau-hinh-chung',
+        '/thoi-gian-lam-viec'   => 'thoi-gian-lam-viec',
+        '/user'                 => 'nguoi-dung',
+        '/bo-phan'              => 'bo-phan',
+    ];
+
+    /**
+     * Map HTTP method → tên action trong permission.
+     * GET /list       → index
+     * GET /{id}       → show  (được xác định khi path có segment là số)
+     * POST            → create
+     * PUT / PATCH     → edit
+     * DELETE          → delete
+     */
+    const METHOD_ACTION_MAP = [
+        'POST'   => 'create',
+        'PUT'    => 'edit',
+        'PATCH'  => 'edit',
+        'DELETE' => 'delete',
+    ];
 }
