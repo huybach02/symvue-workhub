@@ -42,6 +42,28 @@ final class BoPhanController extends AbstractController
         }
     }
 
+    #[Route('/bo-phan/{id}/thanh-vien', methods: ['GET'])]
+    public function getMembers(int $id): JsonResponse
+    {
+        try {
+            $data = $this->boPhanService->getMembers($id);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/bo-phan/{id}/thanh-vien/{userId}', methods: ['DELETE'])]
+    public function removeMember(int $id, int $userId): JsonResponse
+    {
+        try {
+            $this->boPhanService->removeMember($id, $userId);
+            return CustomResponse::success([], t('success.deleted'));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
     #[Route('/bo-phan/{id}', methods: ['GET'], priority: -1)]
     public function getOne(int $id): JsonResponse
     {

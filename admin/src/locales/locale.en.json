@@ -187,7 +187,8 @@
             "update": "Update permission",
             "resetPermissionDefault": "Reset permission default",
             "delete": "Delete department",
-            "viewDepartment": "View Department of user"
+            "viewDepartment": "View Department of user",
+            "userList": "User list"
         },
         "text": {
             "departmentOfUser": "Department of user",
@@ -195,7 +196,13 @@
             "isManagerOf": "Is manager of",
             "department": "Department",
             "notBelongsToAnyDepartment": "Not belongs to any department",
-            "default": "Default"
+            "default": "Default",
+            "userList": "User list of department {tenBoPhan}",
+            "viewMembers": "View member list",
+            "noMembers": "This department has no members yet",
+            "manager": "Manager",
+            "totalMembers": "Total: {count} members",
+            "removeMemberConfirm": "Are you sure you want to remove '{name}' from department '{tenBoPhan}'?"
         }
     }
 }

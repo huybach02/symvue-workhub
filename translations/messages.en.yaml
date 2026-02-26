@@ -25,6 +25,8 @@ error:
     imported_with_errors: "Import failed with %count% errors. Please check the import file or go to the Import History page for details"
     quan_ly_bo_phan_exist: "%name% is already the manager of %bo_phan%"
     bo_phan_exist: "Department/Division %name% with code %ma_bo_phan% already exists"
+    bo_phan_has_user: "Department/Division %name% has members. Please remove all members before deleting the department"
+    user_is_manager: "User %name% is already the manager of %bo_phan%. Please transfer management before deleting"
 success:
     created: "Created successfully"
     updated: "Updated successfully"

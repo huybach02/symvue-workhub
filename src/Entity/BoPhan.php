@@ -108,8 +108,8 @@ class BoPhan
             'tenBoPhan' => $this->tenBoPhan,
             'status' => $this->status,
             'phanQuyen' => $this->phanQuyen,
-            'quanLyBoPhanId' => $this->quanLyBoPhan->getId(),
-            'quanLyBoPhan' => $this->quanLyBoPhan->getName(),
+            'quanLyBoPhanId' => $this->quanLyBoPhan?->getId(),
+            'quanLyBoPhan' => $this->quanLyBoPhan?->getName(),
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];

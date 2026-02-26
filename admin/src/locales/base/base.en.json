@@ -30,7 +30,8 @@
         "cancel": "Cancel",
         "save": "Save",
         "back": "Back",
-        "close": "Close"
+        "close": "Close",
+        "remove": "Remove"
     },
     "sidebar": {
         "home": "Home",

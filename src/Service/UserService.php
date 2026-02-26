@@ -128,6 +128,18 @@ class UserService
             throw new \Exception(t('error.not_found'));
         }
 
+        // Nếu user này là quản lý của 1 bộ phận thì báo lỗi không cho xóa
+        $checkIsManager = $this->entityManager->getRepository(BoPhan::class)->findOneBy([
+            'quanLyBoPhan' => $item,
+        ]);
+
+        if ($checkIsManager) {
+            throw new \Exception(t('error.user_is_manager', [
+                '%name%' => $item->getName(),
+                '%bo_phan%' => $checkIsManager->getTenBoPhan(),
+            ]));
+        }
+
         $this->entityManager->remove($item);
         $this->entityManager->flush();
     }
@@ -241,6 +253,7 @@ class UserService
         }
 
         $boPhan =  $this->entityManager->getRepository(BoPhan::class)->find($boPhanId);
+        $user = $this->entityManager->getRepository(User::class)->find($userId);
 
         $employeePermissions = [];
         foreach ($boPhan->getPhanQuyen() as $permission) {
@@ -254,8 +267,16 @@ class UserService
         $userPermission->setUserId($userId);
         $userPermission->setBoPhanId($boPhanId);
         $userPermission->setPhanQuyen($employeePermissions);
+        if (!$user->getBoPhanId()) {
+            $userPermission->setIsDefault(true);
+        }
         $this->entityManager->persist($userPermission);
         $this->entityManager->flush();
+
+        if (!$user->getBoPhanId()) {
+            $user->setBoPhanId($boPhanId);
+            $this->entityManager->flush();
+        }
 
         $this->boPhanService->mergeUserPermissions($userId);
     }

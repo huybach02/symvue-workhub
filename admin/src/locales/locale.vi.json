@@ -187,7 +187,8 @@
             "update": "Cập nhật phân quyền",
             "resetPermissionDefault": "Khôi phục phân quyền mặc định của bộ phận",
             "delete": "Xóa bộ phận",
-            "viewDepartment": "Xem Phòng ban/Bộ phận của người dùng"
+            "viewDepartment": "Xem Phòng ban/Bộ phận của người dùng",
+            "userList": "Danh sách thành viên"
         },
         "text": {
             "departmentOfUser": "Phòng ban/Bộ phận của người dùng",
@@ -195,7 +196,13 @@
             "isManagerOf": "Là quản lý của",
             "department": "Phòng ban/Bộ phận",
             "notBelongsToAnyDepartment": " Người dùng chưa thuộc phòng ban nào",
-            "default": "Mặc định"
+            "default": "Mặc định",
+            "userList": "Danh sách thành viên của bộ phận {tenBoPhan}",
+            "viewMembers": "Xem danh sách thành viên",
+            "noMembers": "Bộ phận chưa có thành viên nào",
+            "manager": "Quản lý",
+            "totalMembers": "Tổng số: {count} thành viên",
+            "removeMemberConfirm": "Bạn có chắc muốn loại {name} khỏi bộ phận '{tenBoPhan}' không?"
         }
     }
 }

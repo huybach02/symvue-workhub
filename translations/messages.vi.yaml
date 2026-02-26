@@ -25,6 +25,8 @@ error:
     imported_with_errors: "Import không thành công với %count% bản ghi lỗi. Vui lòng kiểm tra lại file import hoặc đến trang Lịch sử import để xem chi tiết"
     quan_ly_bo_phan_exist: "%name% đã là quản lý của bộ phận %bo_phan%"
     bo_phan_exist: "Phòng ban/Bộ phận %name% với mã %ma_bo_phan% đã tồn tại"
+    bo_phan_has_user: "Phòng ban/Bộ phận %name% có tồn tại thành viên. Vui lòng xóa hết thành viên trước khi xóa Phòng ban/Bộ phận"
+    user_is_manager: "Người dùng %name% đã là quản lý của bộ phận %bo_phan%. Vui lòng chuyển đổi quản lý trước khi xóa"
 success:
     created: "Tạo mới thành công"
     updated: "Cập nhật thành công"

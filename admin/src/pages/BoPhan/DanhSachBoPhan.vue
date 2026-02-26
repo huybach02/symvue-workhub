@@ -1,140 +1,151 @@
 <template>
     <div class="table-wrapper">
-        <v-data-table
-            :items="items"
-            :headers="headers"
-            :sort-by="sortArray"
-            :items-per-page="-1"
-            hide-default-footer
-            :loading="loading"
-            @update:options="onOptions"
+        <div
+            class="table-scroll-container"
+            :style="{ '--table-min-width': tableMinWidth + 'px' }"
         >
-            <template #headers="{ columns, isSorted, getSortIcon, toggleSort }">
-                <tr>
-                    <th
-                        v-for="col in columns"
-                        :key="col.key"
-                        :style="{
-                            width: col.width ? col.width + 'px' : undefined,
-                            minWidth: col.minWidth
-                                ? col.minWidth + 'px'
-                                : undefined,
-                            maxWidth: col.maxWidth
-                                ? col.maxWidth + 'px'
-                                : undefined,
-                        }"
-                        class="v-data-table-header__th v-data-table-header-sticky"
-                    >
-                        <div
-                            class="d-flex align-center justify-space-between py-2"
-                        >
-                            <template v-if="!col.filterComponent">
-                                <span class="v-data-table-header__content">{{
-                                    col.title
-                                }}</span>
-                            </template>
-
-                            <component
-                                :is="col.filterComponent"
-                                v-else
-                                :items="col.items"
-                                :title="col.title"
-                                :path="col.path"
-                                class="flex-grow-1"
-                                @update="(val) => onFilter(col.key, val)"
-                            />
-
-                            <v-icon
-                                v-if="col.sortable !== false"
-                                :icon="getSortIcon(col)"
-                                :class="{
-                                    'v-data-table-header__sort-icon': true,
-                                    'v-data-table-header__sort-icon--active':
-                                        isSorted(col),
-                                }"
-                                size="small"
-                                @click="() => toggleSort(col)"
-                            />
-                        </div>
-                    </th>
-                </tr>
-            </template>
-
-            <template #[`item.action`]="{ item }">
-                <div class="d-flex align-center justify-space-between ga-1">
-                    <v-tooltip
-                        v-if="permission?.show"
-                        :text="$t('button.update')"
-                        location="top"
-                    >
-                        <template #activator="{ props: tooltipProps }">
-                            <ThemSuaBoPhan
-                                v-bind="tooltipProps"
-                                :path="path"
-                                mode="update"
-                                :item="item"
-                                @reload="$emit('reload')"
-                            />
-                        </template>
-                    </v-tooltip>
-                    <v-tooltip
-                        v-if="permission?.delete"
-                        :text="$t('button.delete')"
-                        location="top"
-                    >
-                        <template #activator="{ props: tooltipProps }">
-                            <v-btn
-                                v-bind="tooltipProps"
-                                icon
-                                size="small"
-                                variant="outlined"
-                                color="error"
-                                @click="openDeleteDialog(item.id)"
-                            >
-                                <v-icon>mdi-delete</v-icon>
-                            </v-btn>
-                        </template>
-                    </v-tooltip>
-                    <ConfirmDialog
-                        v-model="showConfirmDelete"
-                        :message="
-                            $t('media_library.delete_confirm_message', {
-                                count: 1,
-                            })
-                        "
-                        :loading="isDeleting"
-                        @confirm="handleDelete"
-                        @cancel="showConfirmDelete = false"
-                    />
-                </div>
-            </template>
-
-            <template #[`item.status`]="{ item }">
-                <v-chip
-                    :color="item.status === 1 ? 'success' : 'error'"
-                    size="small"
+            <v-data-table
+                :items="items"
+                :headers="headers"
+                :sort-by="sortArray"
+                :items-per-page="-1"
+                hide-default-footer
+                :loading="loading"
+                @update:options="onOptions"
+            >
+                <template
+                    #headers="{ columns, isSorted, getSortIcon, toggleSort }"
                 >
-                    {{
-                        item.status === 1
-                            ? $t("status_values.active")
-                            : $t("status_values.inactive")
-                    }}
-                </v-chip>
-            </template>
+                    <tr>
+                        <th
+                            v-for="col in columns"
+                            :key="col.key"
+                            :style="{
+                                width: col.width ? col.width + 'px' : undefined,
+                                minWidth: col.minWidth
+                                    ? col.minWidth + 'px'
+                                    : undefined,
+                                maxWidth: col.maxWidth
+                                    ? col.maxWidth + 'px'
+                                    : undefined,
+                            }"
+                            class="v-data-table-header__th v-data-table-header-sticky"
+                        >
+                            <div
+                                class="d-flex align-center justify-space-between py-2"
+                            >
+                                <template v-if="!col.filterComponent">
+                                    <span class="v-data-table-header__content">
+                                        {{ col.title }}
+                                    </span>
+                                </template>
 
-            <template #no-data>
-                <div class="pa-8 text-center">
-                    <v-icon
-                        icon="mdi-database-off-outline"
-                        size="large"
-                        color="grey-lighten-1"
-                    />
-                    <div class="text-grey-darken-1 mt-2">
-                        {{ $t("base.no_data") }}
+                                <component
+                                    :is="col.filterComponent"
+                                    v-else
+                                    :items="col.items"
+                                    :title="col.title"
+                                    :path="col.path"
+                                    class="flex-grow-1"
+                                    @update="(val) => onFilter(col.key, val)"
+                                />
+
+                                <v-icon
+                                    v-if="col.sortable !== false"
+                                    :icon="getSortIcon(col)"
+                                    :class="{
+                                        'v-data-table-header__sort-icon': true,
+                                        'v-data-table-header__sort-icon--active':
+                                            isSorted(col),
+                                    }"
+                                    size="small"
+                                    @click="() => toggleSort(col)"
+                                />
+                            </div>
+                        </th>
+                    </tr>
+                </template>
+
+                <template #[`item.action`]="{ item }">
+                    <div class="d-flex align-center justify-space-between ga-1">
+                        <v-tooltip
+                            v-if="permission?.show"
+                            :text="$t('bo_phan.button.userList')"
+                            location="top"
+                        >
+                            <template #activator="{ props: tooltipProps }">
+                                <DanhSachThanhVien
+                                    v-bind="tooltipProps"
+                                    :path="path"
+                                    :item="item"
+                                    :permission="permission"
+                                    @reload="$emit('reload')"
+                                />
+                            </template>
+                        </v-tooltip>
+                        <v-tooltip
+                            v-if="permission?.show"
+                            :text="$t('button.update')"
+                            location="top"
+                        >
+                            <template #activator="{ props: tooltipProps }">
+                                <ThemSuaBoPhan
+                                    v-bind="tooltipProps"
+                                    :path="path"
+                                    mode="update"
+                                    :item="item"
+                                    @reload="$emit('reload')"
+                                />
+                            </template>
+                        </v-tooltip>
+                        <v-tooltip
+                            v-if="permission?.delete"
+                            :text="$t('button.delete')"
+                            location="top"
+                        >
+                            <template #activator="{ props: tooltipProps }">
+                                <v-btn
+                                    v-bind="tooltipProps"
+                                    icon
+                                    size="small"
+                                    variant="outlined"
+                                    color="error"
+                                    @click="openDeleteDialog(item.id)"
+                                >
+                                    <v-icon>mdi-delete</v-icon>
+                                </v-btn>
+                            </template>
+                        </v-tooltip>
                     </div>
-                </div>
-            </template>
-        </v-data-table>
+                </template>
+
+                <template #[`item.status`]="{ item }">
+                    <v-chip
+                        :color="item.status === 1 ? 'success' : 'error'"
+                        size="small"
+                    >
+                        {{
+                            item.status === 1
+                                ? $t("status_values.active")
+                                : $t("status_values.inactive")
+                        }}
+                    </v-chip>
+                </template>
+
+                <template #no-data>
+                    <div class="pa-8 text-center">
+                        <v-icon
+                            icon="mdi-database-off-outline"
+                            size="large"
+                            color="grey-lighten-1"
+                        />
+                        <div class="text-grey-darken-1 mt-2">
+                            {{ $t("base.no_data") }}
+                        </div>
+                    </div>
+                </template>
+            </v-data-table>
+        </div>
 
         <!-- Custom Pagination -->
         <FilterPagination
@@ -143,6 +154,17 @@
             :items-per-page="query.limit"
             @update:page="onPageChange"
             @update:items-per-page="onLimitChange"
+        />
+        <ConfirmDialog
+            v-model="showConfirmDelete"
+            :message="
+                $t('media_library.delete_confirm_message', {
+                    count: 1,
+                })
+            "
+            :loading="isDeleting"
+            @confirm="handleDelete"
+            @cancel="showConfirmDelete = false"
         />
     </div>
 </template>
@@ -159,6 +181,7 @@ import { deleteData } from "@/services/bases/deleteData";
 import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterAutoComplete from "@/components/filters/FilterAutoComplete.vue";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
+import DanhSachThanhVien from "./DanhSachThanhVien.vue";
 
 export default {
     name: "DanhSachBoPhan",
@@ -166,6 +189,7 @@ export default {
         FilterPagination,
         ConfirmDialog,
         ThemSuaBoPhan,
+        DanhSachThanhVien,
     },
     props: {
         path: {
@@ -220,15 +244,15 @@ export default {
             headers: [
                 {
                     key: "action",
-                    width: 85,
-                    minWidth: 85,
-                    maxWidth: 85,
+                    width: 140,
+                    minWidth: 140,
+                    maxWidth: 140,
                     sortable: false,
                 },
                 {
                     title: this.$t("bo_phan.columns.id"),
                     key: "id",
-                    width: 100,
+                    width: 120,
                     filterComponent: markRaw(FilterText),
                 },
                 {
@@ -246,14 +270,14 @@ export default {
                 {
                     title: this.$t("bo_phan.columns.quanLyBoPhan"),
                     key: "quanLyBoPhan",
-                    width: 200,
+                    width: 250,
                     filterComponent: markRaw(FilterAutoComplete),
                     path: API_ROUTES_CONFIG.user,
                 },
                 {
                     title: this.$t("base.status"),
                     key: "status",
-                    width: 100,
+                    width: 170,
                     filterComponent: markRaw(FilterSelect),
                     items: [
                         {
@@ -279,11 +303,18 @@ export default {
                 {
                     title: this.$t("base.updated_at"),
                     key: "updatedAt",
-                    width: 150,
+                    width: 170,
                     filterComponent: markRaw(FilterDateRange),
                 },
             ],
         };
+    },
+    computed: {
+        tableMinWidth() {
+            return this.headers.reduce((total, col) => {
+                return total + (col.width || col.minWidth || 0);
+            }, 0);
+        },
     },
     methods: {
         openDeleteDialog(id) {
@@ -302,4 +333,14 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.table-scroll-container {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.table-scroll-container :deep(.v-data-table),
+.table-scroll-container :deep(table) {
+    min-width: var(--table-min-width, 600px);
+}
+</style>

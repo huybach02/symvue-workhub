@@ -9,14 +9,14 @@
                     color="primary"
                     @click="dialog = true"
                 >
-                    <v-icon>mdi-account-multiple-outline</v-icon>
+                    <v-icon>mdi-office-building</v-icon>
                 </v-btn>
             </v-col>
         </v-row>
         <v-dialog v-model="dialog" max-width="1400" scrollable persistent>
             <v-card
                 :title="`${$t('bo_phan.text.departmentOfUser')} ${item.name}`"
-                prepend-icon="mdi-account-multiple-outline"
+                prepend-icon="mdi-office-building"
                 class="position-relative card-wrap-title"
             >
                 <v-btn

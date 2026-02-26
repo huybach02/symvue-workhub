@@ -140,6 +140,18 @@ class BoPhanService
             throw new \Exception(t('error.not_found'));
         }
 
+        $userPermissions = $this->entityManager->getRepository(UserPermission::class)->findBy([
+            'boPhanId' => $id,
+        ]);
+
+        if (count($userPermissions) > 1) {
+            throw new \Exception(t('error.bo_phan_has_user', ['%name%' => $item->getTenBoPhan(), '%ma_bo_phan%' => $item->getMaBoPhan()]));
+        }
+
+        foreach ($userPermissions as $userPermission) {
+            $this->entityManager->remove($userPermission);
+        }
+
         $this->entityManager->remove($item);
         $this->entityManager->flush();
     }
@@ -262,6 +274,82 @@ class BoPhanService
         foreach ($userPermissions as $userPermission) {
             $this->mergeUserPermissions($userPermission->getUserId());
         }
+    }
+
+    public function getMembers(int $boPhanId): array
+    {
+        $boPhan = $this->boPhanRepository->find($boPhanId);
+
+        if (!$boPhan) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $userPermissions = $this->entityManager
+            ->getRepository(UserPermission::class)
+            ->findBy(['boPhanId' => $boPhanId]);
+
+        if (empty($userPermissions)) {
+            return [];
+        }
+
+        $userIds = array_map(fn(UserPermission $up) => $up->getUserId(), $userPermissions);
+        $managerUserIds = array_map(
+            fn(UserPermission $up) => $up->getUserId(),
+            array_filter($userPermissions, fn(UserPermission $up) => $up->isManager() === true)
+        );
+
+        $users = $this->entityManager
+            ->getRepository(User::class)
+            ->findBy(['id' => $userIds]);
+
+        $result = array_map(function (User $user) use ($managerUserIds) {
+            return [
+                'id' => $user->getId(),
+                'name' => $user->getName(),
+                'email' => $user->getEmail(),
+                'phone' => $user->getPhone(),
+                'image' => $user->getImage(),
+                'status' => $user->getStatus(),
+                'isManager' => in_array($user->getId(), $managerUserIds),
+            ];
+        }, $users);
+
+        usort($result, fn($a, $b) => $b['isManager'] <=> $a['isManager']);
+
+        return $result;
+    }
+
+    public function removeMember(int $boPhanId, int $userId): void
+    {
+        $boPhan = $this->boPhanRepository->find($boPhanId);
+
+        if (!$boPhan) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $userPermissions = $this->entityManager
+            ->getRepository(UserPermission::class)
+            ->findBy([
+                'boPhanId' => $boPhanId,
+                'userId' => $userId,
+            ]);
+
+        if (empty($userPermissions)) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        foreach ($userPermissions as $userPermission) {
+            $this->entityManager->remove($userPermission);
+        }
+
+        $user = $this->entityManager->find(User::class, $userId);
+        if ($user && $user->getBoPhanId() === $boPhanId) {
+            $user->setBoPhanId(null);
+        }
+
+        $this->entityManager->flush();
+
+        $this->mergeUserPermissions($userId);
     }
 
     public function mergeUserPermissions(int $userId): void

@@ -3,8 +3,9 @@
         <v-row>
             <v-col cols="12" md="5">
                 <div class="d-flex ga-2">
-                    <ExportDataExcel :path="path" />
+                    <ExportDataExcel v-if="permission?.export" :path="path" />
                     <ImportDataExcel
+                        v-if="permission?.import"
                         :path="path"
                         :note="``"
                         @reload="getDanhSach"
@@ -13,6 +14,7 @@
             </v-col>
             <v-col cols="12" md="7">
                 <ThemSua{{MODULE_NAME}}
+                    v-if="permission?.create"
                     :path="path"
                     mode="create"
                     @reload="getDanhSach"
@@ -22,10 +24,12 @@
         <v-row>
             <v-col cols="12">
                 <DanhSach{{MODULE_NAME}}
+                    v-if="permission?.index"
                     :path="path"
                     :items="items"
                     :total-items="totalItems"
                     :loading="loading"
+                    :permission="permission"
                     @reload="getDanhSach"
                 />
             </v-col>
@@ -40,6 +44,7 @@ import { getListData } from "@/services/bases/getData";
 import ThemSua{{MODULE_NAME}} from "./ThemSua{{MODULE_NAME}}.vue";
 import ExportDataExcel from "@/components/ExportDataExcel.vue";
 import ImportDataExcel from "@/components/ImportDataExcel.vue";
+import { usePermission } from "@/hooks/usePermission";
 
 export default {
     name: "{{MODULE_NAME}}",
@@ -56,6 +61,11 @@ export default {
             totalItems: 0,
             loading: false,
         };
+    },
+    computed: {
+        permission() {
+            return usePermission(this.path);
+        },
     },
     methods: {
         getDanhSach: async function (params) {

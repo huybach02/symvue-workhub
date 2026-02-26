@@ -159,19 +159,23 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px;
+    padding: 12px 16px;
     border-top: 1px solid rgba(0, 0, 0, 0.12);
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .pagination-info {
     font-size: 14px;
     color: rgba(0, 0, 0, 0.6);
+    white-space: nowrap;
 }
 
 .pagination-controls {
     display: flex;
     align-items: center;
-    gap: 24px;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .items-per-page {
@@ -183,11 +187,12 @@ export default {
 .items-per-page .label {
     font-size: 14px;
     color: rgba(0, 0, 0, 0.6);
+    white-space: nowrap;
 }
 
 .items-per-page .v-select {
-    width: 100px;
-    min-width: 100px;
+    width: 90px;
+    min-width: 90px;
 }
 
 .items-per-page :deep(.v-field__input) {
@@ -198,6 +203,51 @@ export default {
 .page-navigation {
     display: flex;
     align-items: center;
-    gap: 4px;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+
+/* Responsive: màn hình nhỏ (< 600px) */
+@media (max-width: 599px) {
+    .filter-pagination {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 12px;
+        gap: 10px;
+    }
+
+    .pagination-info {
+        font-size: 13px;
+        white-space: normal;
+    }
+
+    .pagination-controls {
+        width: 100%;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    /* Ẩn label "Hiển thị:" trên màn hình rất nhỏ */
+    .items-per-page .label {
+        display: none;
+    }
+
+    .page-navigation {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2px;
+    }
+}
+
+/* Responsive: màn hình trung bình (600px - 960px) */
+@media (min-width: 600px) and (max-width: 959px) {
+    .filter-pagination {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .pagination-controls {
+        gap: 12px;
+    }
 }
 </style>
