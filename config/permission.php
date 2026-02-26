@@ -52,8 +52,6 @@ return [
             "show" => true,
             "edit" => true,
             "delete" => true,
-            "export" => true,
-            "import" => true,
             "showMenu" => true
         ]
     ],

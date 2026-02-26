@@ -80,10 +80,15 @@ class MakeModuleCommand extends Command
             $this->writeFile($dtoPath, $dtoContent);
             $io->success("DTO đã được tạo: {$dtoPath}");
 
+            // Chèn permission mới vào file permission.php
+            $this->appendPermission($moduleName);
+            $io->success("Permission cho module '{$moduleName}' đã được thêm vào config/permission.php");
+
             $io->note([
                 'Các file đã được tạo thành công!',
                 'Lưu ý: Cập nhật properties trong DTO (xem TODO comments)',
                 'Và cập nhật logic mapping trong Service (xem TODO comments)',
+                'Permission mặc định đã được thêm vào config/permission.php (kiểm tra và điều chỉnh nếu cần)',
             ]);
 
             return Command::SUCCESS;
@@ -129,5 +134,50 @@ class MakeModuleCommand extends Command
         // Convert PascalCase to kebab-case
         $result = preg_replace('/([a-z])([A-Z])/', '$1-$2', $string);
         return strtolower($result);
+    }
+
+    private function appendPermission(string $moduleName): void
+    {
+        $permissionFilePath = $this->projectDir . '/config/permission.php';
+
+        if (!file_exists($permissionFilePath)) {
+            throw new \Exception("File permission không tồn tại: {$permissionFilePath}");
+        }
+
+        $moduleName = $this->toKebabCase($moduleName);
+
+        // Tạo đoạn code item permission cần chèn vào cuối mảng
+        $newItem = <<<PHP
+    [
+        "name" => "{$moduleName}",
+        "actions" => [
+            "index" => true,
+            "create" => true,
+            "show" => true,
+            "edit" => true,
+            "delete" => true,
+            "showMenu" => true
+        ]
+    ],
+PHP;
+
+        $content = file_get_contents($permissionFilePath);
+
+        // Kiểm tra nếu permission đã tồn tại thì bỏ qua, tránh thêm trùng
+        if (str_contains($content, '"name" => "' . $moduleName . '"')) {
+            throw new \Exception("Permission cho module '{$moduleName}' đã tồn tại trong permission.php");
+        }
+
+        // Tìm vị trí dấu ]; cuối cùng và chèn item mới vào trước nó
+        $lastBracketPos = strrpos($content, '];');
+        if ($lastBracketPos === false) {
+            throw new \Exception('Không tìm thấy cấu trúc mảng hợp lệ trong file permission.php');
+        }
+
+        $updatedContent = substr($content, 0, $lastBracketPos)
+            . $newItem
+            . substr($content, $lastBracketPos);
+
+        file_put_contents($permissionFilePath, $updatedContent);
     }
 }

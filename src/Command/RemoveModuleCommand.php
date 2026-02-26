@@ -118,10 +118,58 @@ class RemoveModuleCommand extends Command
 
         if ($deletedCount > 0) {
             $io->success("Đã xóa thành công {$deletedCount} file(s) của module '{$moduleName}'.");
+
+            // Xóa permission tương ứng khỏi file permission.php
+            try {
+                $removed = $this->removePermission($moduleName);
+                if ($removed) {
+                    $io->success("Permission của module '{$moduleName}' đã được xóa khỏi config/permission.php");
+                } else {
+                    $io->warning("Không tìm thấy permission của module '{$moduleName}' trong config/permission.php (có thể đã bị xóa thủ công)");
+                }
+            } catch (\Exception $e) {
+                $io->warning('Không thể cập nhật permission.php: ' . $e->getMessage());
+            }
+
             return Command::SUCCESS;
         } else {
             $io->error('Không có file nào được xóa.');
             return Command::FAILURE;
         }
+    }
+
+    private function removePermission(string $moduleName): bool
+    {
+        $permissionFilePath = $this->projectDir . '/config/permission.php';
+
+        if (!file_exists($permissionFilePath)) {
+            throw new \Exception("File permission không tồn tại: {$permissionFilePath}");
+        }
+
+        $moduleNameKebab = $this->toKebabCase($moduleName);
+
+        $content = file_get_contents($permissionFilePath);
+
+        // T\u00ecm v\u00e0 x\u00f3a to\u00e0n b\u1ed9 block item c\u00f3 name t\u01b0\u01a1ng \u1ee9ng trong m\u1ea3ng
+        // Pattern kh\u1edbp v\u1edbi c\u1ea3 \r\n (Windows) l\u1eabn \n (Unix)
+        $pattern = '/\r?\n    \[\r?\n        "name" => "' . preg_quote($moduleNameKebab, '/') . '",\r?\n        "actions" => \[[\s\S]*?\]\r?\n    \],/';
+
+        $updatedContent = preg_replace($pattern, '', $content);
+
+        if ($updatedContent === $content) {
+            // Không tìm thấy item nào khớp
+            return false;
+        }
+
+        file_put_contents($permissionFilePath, $updatedContent);
+
+        return true;
+    }
+
+    private function toKebabCase(string $string): string
+    {
+        // Convert PascalCase sang kebab-case
+        $result = preg_replace('/([a-z])([A-Z])/', '$1-$2', $string);
+        return strtolower($result);
     }
 }
