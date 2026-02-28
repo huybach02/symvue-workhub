@@ -54,5 +54,13 @@
         "inactive": "Inactive",
         "success": "Success",
         "error": "Error"
+    },
+    "thong-bao": {
+        "title": "Notification",
+        "read_all": "Read all",
+        "no_notification": "No notifications",
+        "total": "Total",
+        "unread": "Unread",
+        "read": "Read"
     }
 }

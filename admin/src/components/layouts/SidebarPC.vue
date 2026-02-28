@@ -35,7 +35,11 @@
                     <span>{{ title }}</span>
                 </div>
             </v-app-bar-title>
-            <UserDropdown @logout="handleLogout" />
+            <div class="d-flex align-center justify-end ga-10">
+                <NotificationRealtime />
+
+                <UserDropdown @logout="handleLogout" />
+            </div>
         </v-app-bar>
     </div>
 </template>
@@ -45,11 +49,13 @@ import { authService } from "@/services/authService";
 import MenuSidebar from "./MenuSidebar.vue";
 import { NAME_ROUTES_CONFIG } from "@/configs/nameRouteConfig";
 import UserDropdown from "@/components/UserDropdown.vue";
+import NotificationRealtime from "@/components/NotificationRealtime.vue";
 
 export default {
     components: {
         MenuSidebar,
         UserDropdown,
+        NotificationRealtime,
     },
     data() {
         return {

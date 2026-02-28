@@ -95,7 +95,6 @@ export default {
         async onSubmit(values) {
             this.$store.commit("setIsLoading");
             const response = await authService.login(values);
-            console.log(response);
 
             if (response.success) {
                 this.$router.push({ name: NAME_ROUTES_CONFIG.dashboard });

@@ -15,6 +15,9 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Mercure\Jwt\TokenFactoryInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 
 #[AsEventListener(event: Events::AUTHENTICATION_SUCCESS, method: 'onAuthenticationSuccess', priority: -10)]
 class AuthenticationSuccessListener
@@ -27,6 +30,10 @@ class AuthenticationSuccessListener
         private readonly DeviceInfoService $deviceInfoService,
         private readonly AuthService $authService,
         private CacheItemPoolInterface $cache,
+        #[Autowire('%kernel.project_dir%')] private readonly string $projectDir,
+
+        #[Target('defaultTokenFactory')]
+        private readonly TokenFactoryInterface $tokenFactory
     ) {}
 
     public function onAuthenticationSuccess(AuthenticationSuccessEvent $event): void
@@ -45,6 +52,11 @@ class AuthenticationSuccessListener
             'email' => $userEntity->getEmail(),
         ];
         $this->handleRefreshTokenTTL($data);
+
+        $mercureConfig = require $this->projectDir . '/config/mercure.php';
+        $token = $this->tokenFactory->create($mercureConfig['subscribeTopics']);
+
+        $data['mercure_token'] = $token;
 
         $finalDataPayload = array_merge(
             $data,

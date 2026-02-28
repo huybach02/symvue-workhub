@@ -32,7 +32,8 @@ class PermissionListener
         'api/auth/me',
         'api/auth/logout',
         'api/auth/change-password',
-        'api/auth/forgot-password'
+        'api/auth/forgot-password',
+        'api/mercure/danh-sach-thong-bao',
     ];
 
     public function onKernelRequest(RequestEvent $event): void

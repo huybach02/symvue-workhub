@@ -22,6 +22,12 @@ export const authService = {
                 if (response.data.device_id) {
                     localStorage.setItem("device_id", response.data.device_id);
                 }
+                if (response.data.mercure_token) {
+                    localStorage.setItem(
+                        "mercure_token",
+                        response.data.mercure_token,
+                    );
+                }
                 return response;
             }
             return response;
@@ -65,6 +71,7 @@ export const authService = {
                 toast.success(response.message);
                 localStorage.removeItem("token");
                 localStorage.removeItem("refresh_token");
+                localStorage.removeItem("mercure_token");
                 // localStorage.removeItem("device_id");
                 return response;
             }

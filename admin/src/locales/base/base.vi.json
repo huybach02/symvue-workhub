@@ -54,5 +54,13 @@
         "inactive": "Không hoạt động",
         "success": "Thành công",
         "error": "Thất bại"
+    },
+    "thong-bao": {
+        "title": "Thông báo",
+        "read_all": "Đọc tất cả",
+        "no_notification": "Không có thông báo nào",
+        "total": "Tổng",
+        "unread": "Chưa đọc",
+        "read": "Đã đọc"
     }
 }
