@@ -43,7 +43,8 @@
         "system_config_working_time": "Thời gian làm việc",
         "user_management_user": "Người dùng",
         "lich_su_import": "Lịch sử import",
-        "bo_phan": "Phòng ban/Bộ phận"
+        "bo_phan": "Phòng ban/Bộ phận",
+        "thong_bao": "Quản lý thông báo"
     },
     "gender": {
         "male": "Nam",

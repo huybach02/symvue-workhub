@@ -9,6 +9,13 @@ if (!function_exists('t')) {
     }
 }
 
+if (!function_exists('isAdmin')) {
+    function isAdmin($user)
+    {
+        return in_array("ROLE_ADMIN", $user->getRoles(), true);
+    }
+}
+
 // Hàm format từ số giây sang chuỗi string (nếu < 60 giây thì format giây, nếu >= 60 giây thì format phút giây)
 if (!function_exists('formatSeconds')) {
     function formatSeconds($seconds)

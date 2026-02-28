@@ -142,6 +142,21 @@ export const routes = [
                         ).icon || "",
                 },
             },
-        ],
+                    {
+                path: "thong-bao",
+                name: NAME_ROUTES_CONFIG.thongBao,
+                component: () => import("../pages/ThongBao/ThongBao.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.thongBao,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.thongBao,
+                        ).icon || "",
+                },
+            },
+],
     },
 ];

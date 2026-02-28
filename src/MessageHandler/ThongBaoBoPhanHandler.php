@@ -44,8 +44,9 @@ final class ThongBaoBoPhanHandler
             $thongBao->setBody($message->getBody());
             $thongBao->setLink($message->getLink());
             $thongBao->setIcon('mdi-bell-outline');
-            $thongBao->setColor('primary');
+            $thongBao->setColor($message->getType());
             $thongBao->setSeen(false);
+            $thongBao->setCreatedAt($message->getCreatedAt());
 
             $this->entityManager->persist($thongBao);
 

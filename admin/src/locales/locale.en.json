@@ -204,5 +204,30 @@
             "totalMembers": "Total: {count} members",
             "removeMemberConfirm": "Are you sure you want to remove '{name}' from department '{tenBoPhan}'?"
         }
+    },
+    "thong_bao": {
+        "title": "Notification",
+        "columns": {
+            "id": "ID",
+            "title": "Title",
+            "body": "Content",
+            "type": "Type notification",
+            "fromUser": "From user",
+            "sendTo": "Send to",
+            "createdAt": "Created at"
+        },
+        "options": {
+            "sendTo": {
+                "all": "All",
+                "department": "Department",
+                "user": "User"
+            },
+            "type": {
+                "primary": "Default notification",
+                "info": "Information",
+                "warning": "Warning",
+                "error": "Emergency"
+            }
+        }
     }
 }

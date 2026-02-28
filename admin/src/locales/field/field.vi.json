@@ -34,6 +34,13 @@
         "ten_bo_phan": "Tên bộ phận",
         "ma_bo_phan": "Mã bộ phận",
         "phan_quyen": "Phân quyền cho bộ phận",
-        "bo_phan_moi": "Bộ phận mới"
+        "bo_phan_moi": "Bộ phận mới",
+        "sendTo": "Gửi thông báo đến",
+        "bo_phan": "Bộ phận",
+        "nguoi_nhan": "Người nhận",
+        "title": "Tiêu đề",
+        "content": "Nội dung",
+        "type": "Loại thông báo",
+        "body": "Nội dung"
     }
 }

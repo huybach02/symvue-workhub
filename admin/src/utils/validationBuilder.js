@@ -546,3 +546,22 @@ export const buildImageRule = (label, options = {}) => {
 
     return applyRequired(rule, required);
 };
+
+// Validate có điều kiện dựa trên giá trị của một field khác trong cùng form.
+export const buildConditionalRule = (label, dependsOn, when) => {
+    const checkCondition =
+        typeof when === "function" ? when : (val) => val === when;
+
+    return yup
+        .mixed()
+        .nullable()
+        .test(`${dependsOn}-${label}-conditional`, "", function (value) {
+            const dependedValue = this.parent?.[dependsOn];
+            if (!checkCondition(dependedValue)) return true;
+            if (value !== null && value !== undefined && value !== "")
+                return true;
+            return this.createError({
+                message: t("validation.mixed.required", { field: label }),
+            });
+        });
+};

@@ -11,6 +11,8 @@ final class ThongBaoHeThongMessage
         private readonly string $title,
         private readonly string $body,
         private readonly string $code,
+        private readonly string $type = "primary",
+        private readonly ?\DateTimeInterface $createdAt = null,
         private readonly string $link = ""
     ) {}
 
@@ -37,5 +39,15 @@ final class ThongBaoHeThongMessage
     public function getCode(): string
     {
         return $this->code;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
     }
 }

@@ -21,7 +21,7 @@ php bin/console make:fixture CategoryFixtures
 
 
 Chạy worker để xử lý message (ví dụ: gửi email)
-php bin/console messenger:consume async --memory-limit=128M
+php bin/console messenger:consume async --memory-limit=128M -vv
 
 
 

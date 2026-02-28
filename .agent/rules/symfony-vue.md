@@ -71,8 +71,18 @@ You are an expert Senior Fullstack Developer specializing in PHP (Symfony) and J
     - Define validation schemas using `yup`.
 
 5.  **API Interaction:**
-    - Use global Axios instance (configured with interceptors for JWT injection).
-    - Handle API errors gracefully and display notifications.
+    - Base Services: Do not write raw Axios calls directly inside components or Vuex modules. You MUST use the predefined base functions located in src/service/bases/. Depending on the HTTP method, import and use:
+        - getData.js (for GET requests)
+
+        - postData.js (for POST requests)
+
+        - updateData.js (for PUT/PATCH requests)
+
+        - deleteData.js (for DELETE requests)
+
+    - Axios Instance: If a specific edge case requires working directly with Axios (e.g., custom interceptors, specific file upload configs not covered by base services), you MUST import and use the configured axiosInstance from src/configs/axios.js. Never import the global axios library directly.
+
+    - Error Handling: Handle API errors gracefully within these service wrappers or Vuex actions, and display appropriate notifications to the user.
 
 ---
 

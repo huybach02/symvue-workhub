@@ -34,6 +34,13 @@
         "ten_bo_phan": "Department Name",
         "ma_bo_phan": "Department Code",
         "phan_quyen": "Permission for department",
-        "bo_phan_moi": "New Department"
+        "bo_phan_moi": "New Department",
+        "sendTo": "Send Notification To",
+        "bo_phan": "Department",
+        "nguoi_nhan": "Recipient",
+        "title": "Title",
+        "content": "Content",
+        "type": "Notification Type",
+        "body": "Content"
     }
 }

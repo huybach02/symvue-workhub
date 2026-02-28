@@ -3,15 +3,12 @@
 namespace App\Entity;
 
 use App\Repository\ThongBaoRepository;
-use App\Traits\TimestampableTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ThongBaoRepository::class)]
 class ThongBao
 {
-    use TimestampableTrait;
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -43,6 +40,15 @@ class ThongBao
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $link = null;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isCreated = false;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $typeNotification = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $createdAt = null;
 
     public function getId(): ?int
     {
@@ -157,6 +163,42 @@ class ThongBao
         return $this;
     }
 
+    public function isCreated(): ?bool
+    {
+        return $this->isCreated;
+    }
+
+    public function setIsCreated(bool $isCreated): static
+    {
+        $this->isCreated = $isCreated;
+
+        return $this;
+    }
+
+    public function getTypeNotification(): ?string
+    {
+        return $this->typeNotification;
+    }
+
+    public function setTypeNotification(string $typeNotification): static
+    {
+        $this->typeNotification = $typeNotification;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
         return [
@@ -168,6 +210,7 @@ class ThongBao
             'color' => $this->color,
             'seen' => $this->seen,
             'link' => $this->link,
+            'typeNotification' => $this->typeNotification,
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
         ];
     }

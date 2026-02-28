@@ -33,3 +33,8 @@ success:
     deleted: "Deleted successfully"
     imported: "Imported successfully"
     exported: "Exported successfully"
+thong_bao:
+    type:
+        all: "All system"
+        department: "Department/Division"
+        user: "User"

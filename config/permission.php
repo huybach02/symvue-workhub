@@ -55,4 +55,12 @@ return [
             "showMenu" => true
         ]
     ],
+    [
+        "name" => "thong-bao",
+        "actions" => [
+            "index" => true,
+            "create" => true,
+            "showMenu" => true
+        ]
+    ],
 ];

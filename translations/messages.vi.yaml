@@ -33,3 +33,8 @@ success:
     deleted: "Xóa thành công"
     imported: "Import thành công"
     exported: "Export thành công"
+thong_bao:
+    type:
+        all: "Toàn hệ thống"
+        department: "Phòng ban/Bộ phận"
+        user: "Người dùng"

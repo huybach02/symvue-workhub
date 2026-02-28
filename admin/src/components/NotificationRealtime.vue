@@ -2,18 +2,30 @@
     <div class="notification-wrapper">
         <PopupNotification ref="popup" :drawer-open="drawer" />
 
-        <v-btn icon variant="text" class="notification-btn" @click="openDrawer">
-            <v-badge
-                :content="badgeLabel"
-                :model-value="unreadCount > 0"
-                color="error"
-                location="top end"
-                :offset-x="-2"
-                :offset-y="-2"
+        <div :class="{ 'bell-pulse-wrapper': unreadCount > 0 }">
+            <v-btn
+                icon
+                variant="text"
+                class="notification-btn"
+                @click="openDrawer"
             >
-                <v-icon size="26">mdi-bell-outline</v-icon>
-            </v-badge>
-        </v-btn>
+                <v-badge
+                    :content="badgeLabel"
+                    :model-value="unreadCount > 0"
+                    color="error"
+                    location="top end"
+                    :offset-x="-2"
+                    :offset-y="-2"
+                >
+                    <v-icon
+                        size="26"
+                        :class="{ 'bell-shake': unreadCount > 0 }"
+                    >
+                        mdi-bell-outline
+                    </v-icon>
+                </v-badge>
+            </v-btn>
+        </div>
 
         <Teleport to="body">
             <v-navigation-drawer
@@ -82,38 +94,58 @@
                                 :class="{ 'unread-item': !item.seen }"
                                 class="notification-item px-4 py-3"
                                 style="cursor: pointer"
-                                @click="markAsRead(item.code)"
                             >
-                                <template #prepend>
+                                <p
+                                    class="text-caption text-grey font-weight-regular mb-1 text-right"
+                                    style="margin: 0 0 4px 0"
+                                >
+                                    {{ functionHelper.timeAgo(item.createdAt) }}
+                                </p>
+
+                                <div class="d-flex align-center ga-5">
                                     <v-avatar
                                         size="36"
                                         :color="item.color"
-                                        class="mr-3"
+                                        class="flex-shrink-0"
                                     >
                                         <v-icon size="18" color="white">
                                             {{ item.icon }}
                                         </v-icon>
                                     </v-avatar>
-                                </template>
 
-                                <v-list-item-title
-                                    class="text-body-2 font-weight-medium mb-1"
-                                >
-                                    <div
-                                        class="d-flex align-center justify-space-between"
-                                    >
-                                        <b>{{ item.title }}</b>
-                                        <span
-                                            class="text-caption text-grey font-weight-regular ms-2 flex-shrink-0"
+                                    <div class="flex-grow-1">
+                                        <div
+                                            class="text-body-2 font-weight-medium"
+                                            style="
+                                                white-space: normal;
+                                                word-break: break-word;
+                                            "
                                         >
-                                            {{ item.time }}
-                                        </span>
+                                            <b>{{ item.title }}</b>
+                                        </div>
+                                        <div
+                                            class="text-caption text-medium-emphasis mt-1 text-justify"
+                                        >
+                                            {{ item.body }}
+                                        </div>
                                     </div>
-                                </v-list-item-title>
+                                </div>
+
                                 <div
-                                    class="text-caption text-medium-emphasis mt-1"
+                                    v-if="!item.seen"
+                                    class="d-flex justify-end mt-2"
                                 >
-                                    {{ item.body }}
+                                    <v-btn
+                                        icon
+                                        variant="tonal"
+                                        size="small"
+                                        color="success"
+                                        @click="markAsRead(item.code)"
+                                    >
+                                        <v-icon size="16">
+                                            mdi-checkbox-marked-circle-outline
+                                        </v-icon>
+                                    </v-btn>
                                 </div>
                             </v-list-item>
                             <v-divider
@@ -143,6 +175,7 @@
 import axiosInstance from "@/configs/axios";
 import { mapGetters } from "vuex";
 import PopupNotification from "./PopupNotification.vue";
+import { functionHelper } from "@/helpers/functionHelper";
 
 export default {
     name: "NotificationRealtime",
@@ -152,6 +185,7 @@ export default {
     data() {
         return {
             drawer: false,
+            functionHelper,
         };
     },
     computed: {
@@ -218,8 +252,86 @@ export default {
     align-items: center;
 }
 
+.bell-shake {
+    transform-origin: top center;
+    animation: bell-ring 3s ease infinite;
+}
+
+@keyframes bell-ring {
+    0% {
+        transform: rotate(0deg);
+    }
+    5% {
+        transform: rotate(18deg);
+    }
+    10% {
+        transform: rotate(-16deg);
+    }
+    15% {
+        transform: rotate(14deg);
+    }
+    20% {
+        transform: rotate(-12deg);
+    }
+    25% {
+        transform: rotate(8deg);
+    }
+    30% {
+        transform: rotate(-4deg);
+    }
+    35% {
+        transform: rotate(2deg);
+    }
+    40% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
 .notification-btn {
     position: relative;
+}
+
+/* Vòng tròn pulse lan ra khi có thông báo chưa đọc */
+.bell-pulse-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bell-pulse-wrapper::before,
+.bell-pulse-wrapper::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: transparent;
+    border: 2px solid rgb(var(--v-theme-error));
+    opacity: 0;
+    pointer-events: none;
+    animation: pulse-ring 2.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+.bell-pulse-wrapper::after {
+    animation-delay: 1s;
+}
+
+@keyframes pulse-ring {
+    0% {
+        transform: scale(0.6);
+        opacity: 0.8;
+    }
+    80% {
+        transform: scale(1.35);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1.35);
+        opacity: 0;
+    }
 }
 
 .drawer-header {

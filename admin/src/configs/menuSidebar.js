@@ -58,4 +58,11 @@ export const menuSidebar = [
         value: NAME_ROUTES_CONFIG.lichSuImport,
         to: { name: NAME_ROUTES_CONFIG.lichSuImport },
     },
+    {
+        title: i18n.global.t("sidebar.thong_bao"),
+        key: "thong-bao",
+        icon: "mdi-bell",
+        value: NAME_ROUTES_CONFIG.thongBao,
+        to: { name: NAME_ROUTES_CONFIG.thongBao },
+    },
 ];

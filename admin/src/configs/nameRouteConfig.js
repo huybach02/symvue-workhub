@@ -11,4 +11,5 @@ export const NAME_ROUTES_CONFIG = {
     userManagementUser: "system.userManagementUser",
     lichSuImport: "system.lichSuImport",
     boPhan: "system.boPhan",
+    thongBao: "system.thongBao",
 };

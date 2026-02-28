@@ -204,5 +204,30 @@
             "totalMembers": "Tổng số: {count} thành viên",
             "removeMemberConfirm": "Bạn có chắc muốn loại {name} khỏi bộ phận '{tenBoPhan}' không?"
         }
+    },
+    "thong_bao": {
+        "title": "Thông báo",
+        "columns": {
+            "id": "ID",
+            "title": "Tiêu đề",
+            "body": "Nội dung",
+            "type": "Loại thông báo",
+            "fromUser": "Gửi từ",
+            "sendTo": "Gửi đến",
+            "createdAt": "Ngày tạo"
+        },
+        "options": {
+            "sendTo": {
+                "all": "Toàn hệ thống",
+                "department": "Phòng ban/Bộ phận",
+                "user": "Người dùng"
+            },
+            "type": {
+                "primary": "Thông báo mặc định",
+                "info": "Thông tin",
+                "warning": "Cảnh báo",
+                "error": "Khẩn cấp"
+            }
+        }
     }
 }

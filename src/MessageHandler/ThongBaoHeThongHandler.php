@@ -38,9 +38,10 @@ final class ThongBaoHeThongHandler
             $thongBao->setTitle($message->getTitle());
             $thongBao->setBody($message->getBody());
             $thongBao->setIcon("mdi-bell-outline");
-            $thongBao->setColor("primary");
+            $thongBao->setColor($message->getType());
             $thongBao->setSeen(false);
             $thongBao->setLink($message->getLink());
+            $thongBao->setCreatedAt($message->getCreatedAt());
 
             $this->entityManager->persist($thongBao);
 
