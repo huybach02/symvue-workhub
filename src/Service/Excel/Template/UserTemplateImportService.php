@@ -1,15 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service\Excel\Template;
 
+use App\Repository\BoPhanRepository;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Repository\UserRepository;
 
 class UserTemplateImportService extends BaseExcelTemplateHelper
 {
-    public function __construct(private UserRepository $userRepository) {}
+    public function __construct(private UserRepository $userRepository, private BoPhanRepository $boPhanRepository) {}
 
     public function generateUserTemplate(): StreamedResponse
     {
@@ -19,101 +24,114 @@ class UserTemplateImportService extends BaseExcelTemplateHelper
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Users_Import');
 
-        // Header - Cột hiển thị (người dùng nhập)
+        /**
+         * Cấu trúc cột (đồng bộ với Export và Import):
+         * A=STT (bỏ trống, ImportService bỏ qua), B=Mã NV, C=Họ tên, D=Giới tính,
+         * E=Ngày sinh, F=CMND, G=Ngày cấp CMND, H=Nơi cấp CMND,
+         * I=Ngày vào làm, J=Trạng thái (dropdown → code), K=Email,
+         * L=SĐT, M=Tỉnh/TP, N=Xã/Phường, O=Địa chỉ
+         *
+         * Cột ẩn chứa code (tự động điền bởi dropdown mapping):
+         * P=gender_code, Q=status_code
+         */
         $headers = [
-            'Họ và tên (*)',           // A
-            'Email (*)',               // B
-            'Số điện thoại (*)',       // C
-            'Giới tính (*)',           // D - Dropdown text
-            'Ngày sinh (*)',           // E
-            'Tỉnh/Thành phố (*)',      // F
-            'Quận/Huyện (*)',          // G
-            'Địa chỉ (*)',             // H
-            'Hình thức làm việc (*)',  // I - Dropdown text
-            'Cho phép ngoài giờ (*)',  // J - Dropdown text
-            'Trạng thái (*)',          // K - Dropdown text
+            'A' => 'STT',
+            'B' => 'Mã nhân viên (*)',
+            'C' => 'Họ và tên (*)',
+            'D' => 'Giới tính (*)',
+            'E' => 'Ngày sinh (*) (YYYY-MM-DD)',
+            'F' => 'CMND/CCCD',
+            'G' => 'Ngày cấp CMND/CCCD (YYYY-MM-DD)',
+            'H' => 'Nơi cấp CMND/CCCD',
+            'I' => 'Ngày vào làm (YYYY-MM-DD)',
+            'J' => 'Trạng thái (*)',
+            'K' => 'Email (*)',
+            'L' => 'Số điện thoại (*)',
+            'M' => 'Bộ phận (*)',
+            // 'N' => 'Tỉnh/Thành phố (*)',
+            // 'O' => 'Xã/Phường (*)',
+            // 'P' => 'Địa chỉ (*)',
         ];
 
-        $columnLetter = 'A';
-        foreach ($headers as $header) {
-            $sheet->setCellValue($columnLetter . '1', $header);
-            $sheet->getStyle($columnLetter . '1')->getFont()->setBold(true);
-            $columnLetter++;
+        foreach ($headers as $col => $label) {
+            $cell = $col . '1';
+            $sheet->setCellValue($cell, $label);
+            $sheet->getStyle($cell)->getFont()->setBold(true);
+            $sheet->getStyle($cell)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle($cell)->getFill()
+                ->setFillType(Fill::FILL_SOLID)
+                ->getStartColor()->setRGB('DBEAFE'); // Nền xanh nhạt
         }
 
         // Dữ liệu mẫu (Row 2)
         $sheet->fromArray([
-            'Nguyễn Văn A',
-            'email@example.com',
-            '0123456789',
-            'Nam',                  // D: Giới tính
-            '1990-01-01',
-            'Hà Nội',
-            'Quận Hoàn Kiếm',
-            'Số 123, Đường ABC',
-            'Cố định',              // I: Hình thức làm việc
-            'Có',                   // J: Cho phép ngoài giờ
-            'Hoạt động'             // K: Trạng thái
+            '',                      // A: STT (bỏ trống)
+            'NV001',                 // B: Mã nhân viên
+            'Nguyễn Văn A',          // C: Họ và tên
+            'Nam',                   // D: Giới tính (dropdown)
+            '1990-01-15',            // E: Ngày sinh
+            '123456789',             // F: CMND/CCCD
+            '2015-06-20',            // G: Ngày cấp CMND/CCCD
+            'Cục Cảnh sát QLHC về TTXH',  // H: Nơi cấp
+            '2020-01-01',            // I: Ngày vào làm
+            'Hoạt động',            // J: Trạng thái (dropdown)
+            'email@example.com',     // K: Email
+            '0912345678',            // L: Số điện thoại
+            // 'Hà Nội',                // M: Tỉnh/Thành phố
+            // 'Phường Hàng Bông',      // N: Xã/Phường
+            // 'Số 123, Đường Đinh Tiên Hoàng', // O: Địa chỉ
         ], null, 'A2');
 
         // --- SETUP DROPDOWN VỚI AUTO-MAPPING ---
-        // Cấu hình tất cả dropdown cần thiết
+        // Dropdown sẽ hiển thị text thân thiện, cột ẩn lưu code để import
+
+        $boPhanList = $this->boPhanRepository->findAll();
+        $boPhanMappings = [];
+        foreach ($boPhanList as $boPhan) {
+            $boPhanMappings[$boPhan->getId()] = $boPhan->getTenBoPhan();
+        }
+
         $dropdownConfigs = [
             [
-                'sourceColumn' => 'D',
-                'targetColumn' => 'L',
+                'sourceColumn' => 'D',       // Cột hiển thị dropdown
+                'targetColumn' => 'P',       // Cột ẩn chứa giá trị code
                 'refSheetName' => 'Giới tính',
                 'mappings' => [
-                    'male' => 'Nam',
+                    'male'   => 'Nam',
                     'female' => 'Nữ',
                 ],
-                'promptTitle' => 'Chọn giới tính',
+                'promptTitle'   => 'Chọn giới tính',
                 'promptMessage' => 'Chọn Nam hoặc Nữ',
-                'headerName' => 'gender_code',
+                'headerName'    => 'gender_code',
             ],
             [
-                'sourceColumn' => 'I',
-                'targetColumn' => 'M',
-                'refSheetName' => 'Hình thức làm việc',
-                'mappings' => [
-                    '1' => 'Cố định',
-                    '2' => 'Thời vụ',
-                ],
-                'promptTitle' => 'Chọn hình thức làm việc',
-                'promptMessage' => 'Chọn Cố định hoặc Thời vụ',
-                'headerName' => 'hinhThucLamViec_code',
-            ],
-            [
-                'sourceColumn' => 'J',
-                'targetColumn' => 'N',
-                'refSheetName' => 'Cho phép ngoài giờ',
-                'mappings' => [
-                    '0' => 'Không',
-                    '1' => 'Có',
-                ],
-                'promptTitle' => 'Cho phép ngoài giờ',
-                'promptMessage' => 'Chọn Không hoặc Có',
-                'headerName' => 'isNgoaiGio_code',
-            ],
-            [
-                'sourceColumn' => 'K',
-                'targetColumn' => 'O',
+                'sourceColumn' => 'J',       // Cột hiển thị dropdown
+                'targetColumn' => 'Q',       // Cột ẩn chứa giá trị code
                 'refSheetName' => 'Trạng thái',
                 'mappings' => [
-                    '0' => 'Không hoạt động',
                     '1' => 'Hoạt động',
+                    '0' => 'Không hoạt động',
                 ],
-                'promptTitle' => 'Chọn trạng thái',
-                'promptMessage' => 'Chọn Không hoạt động hoặc Hoạt động',
-                'headerName' => 'status_code',
+                'promptTitle'   => 'Chọn trạng thái',
+                'promptMessage' => 'Chọn Hoạt động hoặc Không hoạt động',
+                'headerName'    => 'status_code',
+            ],
+            [
+                'sourceColumn' => 'M',       // Cột hiển thị dropdown
+                'targetColumn' => 'R',       // Cột ẩn chứa giá trị code
+                'refSheetName' => 'Bộ phận',
+                'mappings' => $boPhanMappings,
+                'promptTitle'   => 'Chọn bộ phận',
+                'promptMessage' => 'Chọn bộ phận',
+                'headerName'    => 'bo_phan_code',
             ],
         ];
 
         // Tự động setup tất cả dropdown với 1 dòng code
         $this->setupMultipleDropdowns($spreadsheet, $sheet, $dropdownConfigs);
 
-        // Auto-size cho các cột hiển thị (A-K)
-        foreach (range('A', 'K') as $col) {
+        // Auto-size cho tất cả các cột hiển thị (A-O)
+        foreach (array_keys($headers) as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 

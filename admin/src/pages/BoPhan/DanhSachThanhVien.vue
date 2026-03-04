@@ -23,7 +23,7 @@
         </v-row>
 
         <!-- Dialog danh sách thành viên -->
-        <v-dialog v-model="dialog" max-width="600" scrollable persistent>
+        <v-dialog v-model="dialog" max-width="1000" scrollable persistent>
             <v-card
                 :title="
                     $t('bo_phan.text.userList', { tenBoPhan: item.tenBoPhan })
@@ -40,6 +40,38 @@
                 />
 
                 <v-card-text class="">
+                    <!-- Select autocomple để add thành viên vào bộ phận -->
+                    <v-row align="end" class="mb-2">
+                        <v-col cols="12" md="10">
+                            <div class="mb-2">
+                                {{ $t("field.thanh_vien_moi") }}
+                                <span class="text-red"> * </span>
+                            </div>
+                            <v-autocomplete
+                                v-model="nguoiDungSelected"
+                                name="boPhanId"
+                                :items="danhSachNguoiDung"
+                                item-title="label"
+                                item-value="value"
+                                variant="outlined"
+                                clearable
+                                hide-details
+                                :placeholder="`${$t('base.enter')} ${$t('field.thanh_vien_moi')}`"
+                            />
+                        </v-col>
+                        <v-col cols="12" md="2">
+                            <v-btn
+                                color="primary"
+                                prepend-icon="mdi-plus"
+                                size="large"
+                                :loading="adding"
+                                @click="addMember"
+                            >
+                                {{ $t("button.create") }}
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+
                     <div
                         v-if="loading"
                         class="d-flex justify-center align-center pa-6"
@@ -145,7 +177,6 @@
             </v-card>
         </v-dialog>
 
-        <!-- Dialog xác nhận xóa thành viên -->
         <ConfirmDialog
             v-model="confirmDialog"
             :message="
@@ -163,9 +194,12 @@
 </template>
 
 <script>
-import { getDataById } from "@/services/bases/getData";
+import { getDataById, getDataSelect } from "@/services/bases/getData";
+import { postData } from "@/services/bases/postData";
 import { deleteData } from "@/services/bases/deleteData";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
+import { toast } from "@/main";
 
 export default {
     components: { ConfirmDialog },
@@ -192,15 +226,26 @@ export default {
             confirmDialog: false,
             selectedMember: null,
             removing: false,
+            nguoiDungData: [],
+            nguoiDungSelected: null,
+            adding: false,
         };
     },
-    computed: {},
+    computed: {
+        danhSachNguoiDung() {
+            return this.nguoiDungData.filter((item) => {
+                return !this.members.some((member) => member.id === item.value);
+            });
+        },
+    },
     watch: {
         async dialog(isOpen) {
             if (isOpen) {
-                await this.fetchMembers();
+                // Load song song danh sách thành viên và danh sách người dùng cho autocomplete
+                await Promise.all([this.fetchMembers(), this.getNguoiDung()]);
             } else {
                 this.members = [];
+                this.nguoiDungSelected = null;
             }
         },
     },
@@ -238,6 +283,32 @@ export default {
                 this.$emit("reload");
             } finally {
                 this.removing = false;
+            }
+        },
+        async getNguoiDung() {
+            const res = await getDataSelect(API_ROUTES_CONFIG.user);
+            this.nguoiDungData = res ?? [];
+        },
+
+        async addMember() {
+            if (!this.nguoiDungSelected) {
+                toast.error(this.$t("bo_phan.text.selectUserRequired"));
+                return;
+            }
+
+            this.adding = true;
+            try {
+                const res = await postData(
+                    `${this.path}/${this.item.id}/thanh-vien`,
+                    { user_id: this.nguoiDungSelected },
+                );
+                if (res) {
+                    this.nguoiDungSelected = null;
+                    await this.fetchMembers();
+                    this.$emit("reload");
+                }
+            } finally {
+                this.adding = false;
             }
         },
     },

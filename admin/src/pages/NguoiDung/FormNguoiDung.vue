@@ -9,272 +9,436 @@
             @submit="handleSubmit"
         >
             <v-row>
-                <v-col cols="3">
-                    <VeeField
-                        v-slot="{ handleChange, errorMessage, value }"
-                        name="avatar"
-                    >
-                        <ImageSelector
-                            :label="$t('field.anh_dai_dien')"
-                            :required="false"
-                            :is-multiple="false"
-                            :model-value="value"
-                            :error-message="errorMessage"
-                            @selected="handleChange($event?.path || null)"
-                        />
-                    </VeeField>
-                </v-col>
+                <!-- ===== THÔNG TIN CÁ NHÂN ===== -->
                 <v-col cols="12">
-                    <v-row>
-                        <v-col cols="12" md="4">
-                            <VeeField
-                                v-slot="{ field, errorMessage }"
-                                name="name"
-                            >
-                                <div class="mb-2">
-                                    {{ $t("field.ho_va_ten") }}
-                                    <span class="text-red"> * </span>
-                                </div>
-                                <v-text-field
-                                    v-bind="field"
-                                    :error-messages="errorMessage"
-                                    type="text"
-                                    variant="outlined"
-                                    :placeholder="`${$t('base.enter')} ${$t('field.ho_va_ten')}`"
-                                />
-                            </VeeField>
-                        </v-col>
-                        <v-col cols="12" md="4">
-                            <VeeField
-                                v-slot="{ field, errorMessage }"
-                                name="email"
-                            >
-                                <div class="mb-2">
-                                    {{ $t("field.email") }}
-                                    <span class="text-red"> * </span>
-                                </div>
-                                <v-text-field
-                                    v-bind="field"
-                                    :error-messages="errorMessage"
-                                    type="text"
-                                    variant="outlined"
-                                    :placeholder="`${$t('base.enter')} ${$t('field.email')}`"
-                                />
-                            </VeeField>
-                        </v-col>
-                        <v-col cols="12" md="4">
-                            <VeeField
-                                v-slot="{ field, errorMessage }"
-                                name="phone"
-                            >
-                                <div class="mb-2">
-                                    {{ $t("field.so_dien_thoai") }}
-                                    <span class="text-red"> * </span>
-                                </div>
-                                <v-text-field
-                                    v-bind="field"
-                                    :error-messages="errorMessage"
-                                    type="text"
-                                    variant="outlined"
-                                    :placeholder="`${$t('base.enter')} ${$t('field.so_dien_thoai')}`"
-                                />
-                            </VeeField>
-                        </v-col>
-                    </v-row>
+                    <div class="form-section">
+                        <div class="form-section__title">Thông tin cá nhân</div>
+                        <v-row>
+                            <!-- Ảnh đại diện - nằm riêng 1 dòng -->
+                            <v-col cols="12" md="4">
+                                <VeeField
+                                    v-slot="{
+                                        handleChange,
+                                        errorMessage,
+                                        value,
+                                    }"
+                                    name="avatar"
+                                >
+                                    <ImageSelector
+                                        :label="$t('field.anh_dai_dien')"
+                                        :required="false"
+                                        :is-multiple="false"
+                                        :model-value="value"
+                                        :error-message="errorMessage"
+                                        @selected="
+                                            handleChange($event?.path || null)
+                                        "
+                                    />
+                                </VeeField>
+                            </v-col>
+
+                            <!-- Các trường thông tin cá nhân -->
+
+                            <!-- Mã nhân viên -->
+                            <v-col cols="12" md="4">
+                                <VeeField
+                                    v-slot="{ field, errorMessage }"
+                                    name="maNhanVien"
+                                >
+                                    <div class="mb-2">
+                                        {{ $t("field.ma_nhan_vien") }}
+                                        <span class="text-red"> * </span>
+                                    </div>
+                                    <v-text-field
+                                        v-bind="field"
+                                        :error-messages="errorMessage"
+                                        type="text"
+                                        variant="outlined"
+                                        :placeholder="`${$t('base.enter')} ${$t('field.ma_nhan_vien')}`"
+                                    />
+                                </VeeField>
+                            </v-col>
+
+                            <!-- Họ và tên -->
+                            <v-col cols="12" md="4">
+                                <VeeField
+                                    v-slot="{ field, errorMessage }"
+                                    name="name"
+                                >
+                                    <div class="mb-2">
+                                        {{ $t("field.ho_va_ten") }}
+                                        <span class="text-red"> * </span>
+                                    </div>
+                                    <v-text-field
+                                        v-bind="field"
+                                        :error-messages="errorMessage"
+                                        type="text"
+                                        variant="outlined"
+                                        :placeholder="`${$t('base.enter')} ${$t('field.ho_va_ten')}`"
+                                    />
+                                </VeeField>
+                            </v-col>
+
+                            <!-- Giới tính -->
+                            <v-col cols="12" md="4">
+                                <VeeField
+                                    v-slot="{
+                                        field,
+                                        errorMessage,
+                                        handleChange,
+                                        handleBlur,
+                                    }"
+                                    name="gender"
+                                >
+                                    <div class="mb-2">
+                                        {{ $t("field.gioi_tinh") }}
+                                        <span class="text-red"> * </span>
+                                    </div>
+                                    <v-select
+                                        :model-value="field.value"
+                                        :items="genderOptions"
+                                        item-title="text"
+                                        item-value="value"
+                                        :error-messages="errorMessage"
+                                        variant="outlined"
+                                        :placeholder="`${$t('base.enter')} ${$t('field.gioi_tinh')}`"
+                                        @update:model-value="handleChange"
+                                        @blur="handleBlur"
+                                    />
+                                </VeeField>
+                            </v-col>
+
+                            <!-- Ngày sinh -->
+                            <v-col cols="12" md="4">
+                                <VeeField
+                                    v-slot="{
+                                        field,
+                                        errorMessage,
+                                        handleChange,
+                                        handleBlur,
+                                    }"
+                                    name="birthday"
+                                >
+                                    <div class="mb-2">
+                                        {{ $t("field.ngay_sinh") }}
+                                        <span class="text-red"> * </span>
+                                    </div>
+                                    <DatePicker
+                                        :model-value="field.value"
+                                        :error-messages="errorMessage"
+                                        :placeholder="`${$t('base.enter')} ${$t('field.ngay_sinh')}`"
+                                        @update:model-value="
+                                            (value) => {
+                                                handleChange(value);
+                                                handleBlur();
+                                            }
+                                        "
+                                        @blur="handleBlur"
+                                    />
+                                </VeeField>
+                            </v-col>
+
+                            <!-- CMND/CCCD -->
+                            <v-col cols="12" md="4">
+                                <VeeField
+                                    v-slot="{ field, errorMessage }"
+                                    name="cmnd"
+                                >
+                                    <div class="mb-2">
+                                        {{ $t("field.cmnd") }}
+                                    </div>
+                                    <v-text-field
+                                        v-bind="field"
+                                        :error-messages="errorMessage"
+                                        type="text"
+                                        variant="outlined"
+                                        :placeholder="`${$t('base.enter')} ${$t('field.cmnd')}`"
+                                    />
+                                </VeeField>
+                            </v-col>
+
+                            <!-- Ngày cấp CMND/CCCD -->
+                            <v-col cols="12" md="4">
+                                <VeeField
+                                    v-slot="{
+                                        field,
+                                        errorMessage,
+                                        handleChange,
+                                        handleBlur,
+                                    }"
+                                    name="ngayCapCmnd"
+                                >
+                                    <div class="mb-2">
+                                        {{ $t("field.ngay_cap_cmnd") }}
+                                    </div>
+                                    <DatePicker
+                                        :model-value="field.value"
+                                        :error-messages="errorMessage"
+                                        :placeholder="`${$t('base.enter')} ${$t('field.ngay_cap_cmnd')}`"
+                                        @update:model-value="
+                                            (value) => {
+                                                handleChange(value);
+                                                handleBlur();
+                                            }
+                                        "
+                                        @blur="handleBlur"
+                                    />
+                                </VeeField>
+                            </v-col>
+
+                            <!-- Nơi cấp CMND/CCCD -->
+                            <v-col cols="12" md="4">
+                                <VeeField
+                                    v-slot="{ field, errorMessage }"
+                                    name="noiCapCmnd"
+                                >
+                                    <div class="mb-2">
+                                        {{ $t("field.noi_cap_cmnd") }}
+                                    </div>
+                                    <v-text-field
+                                        v-bind="field"
+                                        :error-messages="errorMessage"
+                                        type="text"
+                                        variant="outlined"
+                                        :placeholder="`${$t('base.enter')} ${$t('field.noi_cap_cmnd')}`"
+                                    />
+                                </VeeField>
+                            </v-col>
+                        </v-row>
+                    </div>
                 </v-col>
 
+                <!-- ===== THÔNG TIN CÔNG VIỆC ===== -->
                 <v-col cols="12">
-                    <v-row>
-                        <v-col cols="12" md="4">
-                            <VeeField
-                                v-slot="{
-                                    field,
-                                    errorMessage,
-                                    handleChange,
-                                    handleBlur,
-                                }"
-                                name="birthday"
-                            >
-                                <div class="mb-2">
-                                    {{ $t("field.ngay_sinh") }}
-                                    <span class="text-red"> * </span>
-                                </div>
-                                <DatePicker
-                                    :model-value="field.value"
-                                    :error-messages="errorMessage"
-                                    :placeholder="`${$t('base.enter')} ${$t('field.ngay_sinh')}`"
-                                    @update:model-value="
-                                        (value) => {
-                                            handleChange(value);
-                                            handleBlur();
-                                        }
-                                    "
-                                    @blur="handleBlur"
-                                />
-                            </VeeField>
-                        </v-col>
-                        <v-col cols="12" md="4">
-                            <VeeField
-                                v-slot="{
-                                    field,
-                                    errorMessage,
-                                    handleChange,
-                                    handleBlur,
-                                }"
-                                name="gender"
-                            >
-                                <div class="mb-2">
-                                    {{ $t("field.gioi_tinh") }}
-                                    <span class="text-red"> * </span>
-                                </div>
-                                <v-select
-                                    :model-value="field.value"
-                                    :items="genderOptions"
-                                    item-title="text"
-                                    item-value="value"
-                                    :error-messages="errorMessage"
-                                    variant="outlined"
-                                    :placeholder="`${$t('base.enter')} ${$t('field.gioi_tinh')}`"
-                                    @update:model-value="handleChange"
-                                    @blur="handleBlur"
-                                />
-                            </VeeField>
-                        </v-col>
-                    </v-row>
-                </v-col>
-
-                <v-col cols="12">
-                    <v-row>
-                        <v-col cols="12" md="4">
-                            <VeeField
-                                v-slot="{ field, errorMessage, handleChange }"
-                                name="province"
-                            >
-                                <div class="mb-2">
-                                    {{ $t("field.tinh_thanh_pho") }}
-                                    <span class="text-red"> * </span>
-                                </div>
-                                <v-autocomplete
-                                    :model-value="field.value"
-                                    name="province"
-                                    :items="provinceOptions"
-                                    item-title="name_with_type"
-                                    item-value="code"
-                                    :error-messages="errorMessage"
-                                    variant="outlined"
-                                    clearable
-                                    :placeholder="`${$t('base.enter')} ${$t('field.tinh_thanh_pho')}`"
-                                    @update:model-value="
-                                        (value) => {
-                                            handleChange(value);
-                                            handleProvinceChange(value);
-                                        }
-                                    "
-                                    @blur="field.onBlur"
-                                />
-                            </VeeField>
-                        </v-col>
-                        <v-col cols="12" md="4">
-                            <VeeField
-                                ref="wardField"
-                                v-slot="{ field, errorMessage, handleChange }"
-                                name="ward"
-                            >
-                                <div class="mb-2">
-                                    {{ $t("field.xa_phuong") }}
-                                    <span class="text-red"> * </span>
-                                </div>
-                                <v-autocomplete
-                                    :key="selectedProvince"
-                                    :model-value="field.value"
-                                    name="ward"
-                                    :items="wardOptions"
-                                    item-title="name_with_type"
-                                    item-value="code"
-                                    :error-messages="errorMessage"
-                                    variant="outlined"
-                                    clearable
-                                    :placeholder="`${$t('base.enter')} ${$t('field.xa_phuong')}`"
-                                    @update:model-value="handleChange"
-                                    @blur="field.onBlur"
-                                />
-                            </VeeField>
-                        </v-col>
-                        <v-col cols="12" md="4">
-                            <VeeField
-                                v-slot="{ field, errorMessage }"
-                                name="address"
-                            >
-                                <div class="mb-2">
-                                    {{ $t("field.dia_chi") }}
-                                    <span class="text-red"> * </span>
-                                </div>
-                                <v-text-field
-                                    v-bind="field"
-                                    :error-messages="errorMessage"
-                                    type="text"
-                                    variant="outlined"
-                                    :placeholder="`${$t('base.enter')} ${$t('field.dia_chi')}`"
-                                />
-                            </VeeField>
-                        </v-col>
-                    </v-row>
-                </v-col>
-
-                <v-col cols="12">
-                    <v-row>
-                        <v-col cols="12" md="4">
-                            <VeeField
-                                v-slot="{ field, errorMessage, handleChange }"
-                                name="boPhanId"
-                            >
-                                <div class="mb-2">
-                                    {{ $t("field.bo_phan_mac_dinh") }}
-                                    <span class="text-red"> * </span>
-                                </div>
-                                <v-autocomplete
-                                    :model-value="field.value"
+                    <div class="form-section">
+                        <div class="form-section__title">
+                            Thông tin công việc
+                        </div>
+                        <v-row>
+                            <!-- Phòng ban/Bộ phận mặc định -->
+                            <v-col cols="12" md="4">
+                                <VeeField
+                                    v-slot="{
+                                        field,
+                                        errorMessage,
+                                        handleChange,
+                                    }"
                                     name="boPhanId"
-                                    :items="boPhanData"
-                                    item-title="label"
-                                    item-value="value"
-                                    :error-messages="errorMessage"
-                                    variant="outlined"
-                                    clearable
-                                    :placeholder="`${$t('base.enter')} ${$t('field.bo_phan_mac_dinh')}`"
-                                    @update:model-value="handleChange"
-                                    @blur="field.onBlur"
-                                />
-                            </VeeField>
-                        </v-col>
-                        <v-col cols="12" md="4">
-                            <VeeField
-                                v-slot="{
-                                    field,
-                                    errorMessage,
-                                    handleChange,
-                                    handleBlur,
-                                }"
-                                name="status"
-                            >
-                                <div class="mb-2">
-                                    {{ $t("field.trang_thai") }}
-                                    <span class="text-red"> * </span>
-                                </div>
-                                <v-select
-                                    :model-value="field.value"
-                                    :items="statusOptions"
-                                    item-title="text"
-                                    item-value="value"
-                                    :error-messages="errorMessage"
-                                    variant="outlined"
-                                    :placeholder="`${$t('base.enter')} ${$t('field.trang_thai')}`"
-                                    @update:model-value="handleChange"
-                                    @blur="handleBlur"
-                                />
-                            </VeeField>
-                        </v-col>
-                    </v-row>
+                                >
+                                    <div class="mb-2">
+                                        {{ $t("field.bo_phan_mac_dinh") }}
+                                        <span class="text-red"> * </span>
+                                    </div>
+                                    <v-autocomplete
+                                        :model-value="field.value"
+                                        name="boPhanId"
+                                        :items="boPhanData"
+                                        item-title="label"
+                                        item-value="value"
+                                        :error-messages="errorMessage"
+                                        variant="outlined"
+                                        clearable
+                                        :placeholder="`${$t('base.enter')} ${$t('field.bo_phan_mac_dinh')}`"
+                                        @update:model-value="handleChange"
+                                        @blur="field.onBlur"
+                                    />
+                                </VeeField>
+                            </v-col>
+
+                            <!-- Ngày vào làm -->
+                            <v-col cols="12" md="4">
+                                <VeeField
+                                    v-slot="{
+                                        field,
+                                        errorMessage,
+                                        handleChange,
+                                        handleBlur,
+                                    }"
+                                    name="ngayVaoLam"
+                                >
+                                    <div class="mb-2">
+                                        {{ $t("field.ngay_vao_lam") }}
+                                    </div>
+                                    <DatePicker
+                                        :model-value="field.value"
+                                        :error-messages="errorMessage"
+                                        :placeholder="`${$t('base.enter')} ${$t('field.ngay_vao_lam')}`"
+                                        @update:model-value="
+                                            (value) => {
+                                                handleChange(value);
+                                                handleBlur();
+                                            }
+                                        "
+                                        @blur="handleBlur"
+                                    />
+                                </VeeField>
+                            </v-col>
+
+                            <!-- Trạng thái làm việc -->
+                            <v-col cols="12" md="4">
+                                <VeeField
+                                    v-slot="{
+                                        field,
+                                        errorMessage,
+                                        handleChange,
+                                        handleBlur,
+                                    }"
+                                    name="status"
+                                >
+                                    <div class="mb-2">
+                                        {{ $t("field.trang_thai_lam_viec") }}
+                                        <span class="text-red"> * </span>
+                                    </div>
+                                    <v-select
+                                        :model-value="field.value"
+                                        :items="statusOptions"
+                                        item-title="text"
+                                        item-value="value"
+                                        :error-messages="errorMessage"
+                                        variant="outlined"
+                                        :placeholder="`${$t('base.enter')} ${$t('field.trang_thai_lam_viec')}`"
+                                        @update:model-value="handleChange"
+                                        @blur="handleBlur"
+                                    />
+                                </VeeField>
+                            </v-col>
+                        </v-row>
+                    </div>
+                </v-col>
+
+                <!-- ===== THÔNG TIN LIÊN HỆ ===== -->
+                <v-col cols="12">
+                    <div class="form-section">
+                        <div class="form-section__title">Thông tin liên hệ</div>
+                        <v-row>
+                            <!-- Email -->
+                            <v-col cols="12" md="4">
+                                <VeeField
+                                    v-slot="{ field, errorMessage }"
+                                    name="email"
+                                >
+                                    <div class="mb-2">
+                                        {{ $t("field.email") }}
+                                        <span class="text-red"> * </span>
+                                    </div>
+                                    <v-text-field
+                                        v-bind="field"
+                                        :error-messages="errorMessage"
+                                        type="text"
+                                        variant="outlined"
+                                        :placeholder="`${$t('base.enter')} ${$t('field.email')}`"
+                                    />
+                                </VeeField>
+                            </v-col>
+
+                            <!-- Số điện thoại -->
+                            <v-col cols="12" md="4">
+                                <VeeField
+                                    v-slot="{ field, errorMessage }"
+                                    name="phone"
+                                >
+                                    <div class="mb-2">
+                                        {{ $t("field.so_dien_thoai") }}
+                                        <span class="text-red"> * </span>
+                                    </div>
+                                    <v-text-field
+                                        v-bind="field"
+                                        :error-messages="errorMessage"
+                                        type="text"
+                                        variant="outlined"
+                                        :placeholder="`${$t('base.enter')} ${$t('field.so_dien_thoai')}`"
+                                    />
+                                </VeeField>
+                            </v-col>
+
+                            <!-- Tỉnh/Thành phố -->
+                            <v-col cols="12" md="4">
+                                <VeeField
+                                    v-slot="{
+                                        field,
+                                        errorMessage,
+                                        handleChange,
+                                    }"
+                                    name="province"
+                                >
+                                    <div class="mb-2">
+                                        {{ $t("field.tinh_thanh_pho") }}
+                                        <span class="text-red"> * </span>
+                                    </div>
+                                    <v-autocomplete
+                                        :model-value="field.value"
+                                        name="province"
+                                        :items="provinceOptions"
+                                        item-title="name_with_type"
+                                        item-value="code"
+                                        :error-messages="errorMessage"
+                                        variant="outlined"
+                                        clearable
+                                        :placeholder="`${$t('base.enter')} ${$t('field.tinh_thanh_pho')}`"
+                                        @update:model-value="
+                                            (value) => {
+                                                handleChange(value);
+                                                handleProvinceChange(value);
+                                            }
+                                        "
+                                        @blur="field.onBlur"
+                                    />
+                                </VeeField>
+                            </v-col>
+
+                            <!-- Xã/Phường -->
+                            <v-col cols="12" md="4">
+                                <VeeField
+                                    ref="wardField"
+                                    v-slot="{
+                                        field,
+                                        errorMessage,
+                                        handleChange,
+                                    }"
+                                    name="ward"
+                                >
+                                    <div class="mb-2">
+                                        {{ $t("field.xa_phuong") }}
+                                        <span class="text-red"> * </span>
+                                    </div>
+                                    <v-autocomplete
+                                        :key="selectedProvince"
+                                        :model-value="field.value"
+                                        name="ward"
+                                        :items="wardOptions"
+                                        item-title="name_with_type"
+                                        item-value="code"
+                                        :error-messages="errorMessage"
+                                        variant="outlined"
+                                        clearable
+                                        :placeholder="`${$t('base.enter')} ${$t('field.xa_phuong')}`"
+                                        @update:model-value="handleChange"
+                                        @blur="field.onBlur"
+                                    />
+                                </VeeField>
+                            </v-col>
+
+                            <!-- Địa chỉ -->
+                            <v-col cols="12" md="4">
+                                <VeeField
+                                    v-slot="{ field, errorMessage }"
+                                    name="address"
+                                >
+                                    <div class="mb-2">
+                                        {{ $t("field.dia_chi") }}
+                                        <span class="text-red"> * </span>
+                                    </div>
+                                    <v-text-field
+                                        v-bind="field"
+                                        :error-messages="errorMessage"
+                                        type="text"
+                                        variant="outlined"
+                                        :placeholder="`${$t('base.enter')} ${$t('field.dia_chi')}`"
+                                    />
+                                </VeeField>
+                            </v-col>
+                        </v-row>
+                    </div>
                 </v-col>
 
                 <!-- Nút cancel và create/update -->
@@ -338,16 +502,21 @@ export default {
             validationSchema: userSchema,
             initialValues: {
                 avatar: null,
+                maNhanVien: "",
                 name: "",
+                gender: "",
+                birthday: "",
+                cmnd: "",
+                ngayCapCmnd: "",
+                noiCapCmnd: "",
+                boPhanId: "",
+                ngayVaoLam: "",
+                status: 1,
                 email: "",
                 phone: "",
-                birthday: "",
-                gender: "",
                 province: "",
                 ward: "",
                 address: "",
-                maBoPhan: "",
-                status: 1,
             },
             provinceData: {},
             wardData: {},
@@ -411,7 +580,11 @@ export default {
         },
     },
     async mounted() {
-        await Promise.all([this.getProvince(), this.getBoPhan()]);
+        await Promise.all([
+            this.getProvince(),
+            this.getBoPhan(),
+            this.getMaNhanVien(),
+        ]);
     },
     methods: {
         handleSubmit(values) {
@@ -450,8 +623,46 @@ export default {
             const res = await getDataSelect(API_ROUTES_CONFIG.boPhan);
             this.boPhanData = res;
         },
+        async getMaNhanVien() {
+            if (this.mode !== "create") return;
+            const res = await getAllData(
+                API_ROUTES_CONFIG.user + "/get-ma-nhan-vien",
+            );
+            this.$nextTick(() => {
+                if (this.$refs.formRef) {
+                    this.$refs.formRef.setFieldValue("maNhanVien", res);
+                }
+            });
+        },
     },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+/* Border bao quanh mỗi phần của form */
+.form-section {
+    border: 1px solid #1976d2;
+    border-radius: 10px;
+    padding: 20px 20px 8px;
+    position: relative;
+    margin-top: 8px;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+    background-color: #fff;
+}
+
+/* Tiêu đề nổi lên phía trên đường border */
+.form-section__title {
+    position: absolute;
+    top: -14px;
+    left: 14px;
+    background-color: #1976d2;
+    color: #ffffff;
+    padding: 2px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    box-shadow: 0 2px 6px rgba(25, 118, 210, 0.35);
+}
+</style>

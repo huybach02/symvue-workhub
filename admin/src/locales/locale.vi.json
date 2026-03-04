@@ -131,7 +131,8 @@
             "name": "Họ tên",
             "email": "Email",
             "phone": "Điện thoại",
-            "role": "Vai trò"
+            "role": "Vai trò",
+            "ma_nhan_vien": "Mã nhân viên"
         },
         "roles": {
             "admin": "Admin",

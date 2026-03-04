@@ -118,6 +118,10 @@ class BoPhanService
 
         $user = $this->entityManager->find(User::class, $dto->quanLyBoPhanId);
 
+        // Lưu lại quản lý cũ trước khi thay đổi
+        $oldManager = $item->getQuanLyBoPhan();
+        $isManagerChanged = $oldManager && $oldManager->getId() !== $user->getId();
+
         $item->setQuanLyBoPhan($user);
         $item->setTenBoPhan($dto->tenBoPhan);
         $item->setMaBoPhan($dto->maBoPhan);
@@ -125,6 +129,11 @@ class BoPhanService
         $item->setPhanQuyen($dto->permissions);
 
         $this->entityManager->flush();
+
+        // Xử lý hạ cấp permission của quản lý cũ nếu có thay đổi người quản lý
+        if ($isManagerChanged) {
+            $this->handleOldManagerPermission($id, $oldManager->getId(), $dto->permissions);
+        }
 
         // Cập nhật permission cho manager và employee
         $this->handleUpdateAllUserPermission($item->getId(), $dto->permissions, $user->getId());
@@ -214,6 +223,36 @@ class BoPhanService
         $this->entityManager->flush();
 
         $this->mergeUserPermissions($userId);
+    }
+
+    public function handleOldManagerPermission(int $boPhanId, int $oldManagerId, array $permissions): void
+    {
+        $oldManagerPermission = $this->entityManager->getRepository(UserPermission::class)->findOneBy([
+            'userId' => $oldManagerId,
+            'boPhanId' => $boPhanId,
+        ]);
+
+        if (!$oldManagerPermission) {
+            return;
+        }
+
+        // Kiểm tra xem quản lý cũ có phải là thành viên thực sự của bộ phận không
+        // (nếu isManager=true và chỉ có bản ghi này thì họ chỉ là manager, không phải employee)
+        // Hạ cấp xuống employee permission và bỏ cờ isManager
+        $employeePermissions = [];
+        foreach ($permissions as $permission) {
+            $employeePermissions[] = [
+                "name" => $permission['name'],
+                "actions" => $permission['employee'],
+            ];
+        }
+
+        $oldManagerPermission->setIsManager(false);
+        $oldManagerPermission->setPhanQuyen($employeePermissions);
+        $this->entityManager->persist($oldManagerPermission);
+        $this->entityManager->flush();
+
+        $this->mergeUserPermissions($oldManagerId);
     }
 
     public function handleUpdateAllUserPermission(int $boPhanId, array $permissions, ?int $managerId = null): void
@@ -386,5 +425,31 @@ class BoPhanService
         $item->set($result);
         $item->expiresAfter(3600 * 24 * 90); // 90 ngày
         $this->cache->save($item);
+    }
+
+    public function addMemberToBoPhan(int $userId, int $boPhanId): void
+    {
+        $boPhan = $this->boPhanRepository->find($boPhanId);
+        if (!$boPhan) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $user = $this->entityManager->find(User::class, $userId);
+        if (!$user) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $existingPermission = $this->entityManager
+            ->getRepository(UserPermission::class)
+            ->findOneBy([
+                'boPhanId' => $boPhanId,
+                'userId' => $userId,
+            ]);
+
+        if ($existingPermission) {
+            throw new \Exception(t('error.user_already_member'));
+        }
+
+        $this->handleAddUserPermission($userId, $boPhanId);
     }
 }

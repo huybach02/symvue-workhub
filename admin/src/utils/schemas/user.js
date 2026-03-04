@@ -5,6 +5,7 @@ import {
     buildPhoneRule,
     buildDateRule,
     buildImageRule,
+    buildCccdRule,
 } from "../validationBuilder";
 import { i18n } from "@/plugins/i18n";
 
@@ -15,12 +16,53 @@ export const userSchema = yup.object({
         required: false,
     }),
 
+    // Thông tin cá nhân
+    maNhanVien: buildStringRule(t("field.ma_nhan_vien"), {
+        required: true,
+        max: 50,
+    }),
+
     name: buildStringRule(t("field.ho_va_ten"), {
         required: true,
         min: 2,
         max: 255,
     }),
 
+    gender: buildStringRule(t("field.gioi_tinh"), {
+        required: true,
+    }),
+
+    birthday: buildDateRule(t("field.ngay_sinh"), {
+        required: true,
+    }),
+
+    cmnd: buildCccdRule(t("field.cmnd"), {
+        required: true,
+    }),
+
+    ngayCapCmnd: buildDateRule(t("field.ngay_cap_cmnd"), {
+        required: true,
+    }),
+
+    noiCapCmnd: buildStringRule(t("field.noi_cap_cmnd"), {
+        required: true,
+        max: 255,
+    }),
+
+    // Thông tin công việc
+    boPhanId: buildStringRule(t("field.bo_phan_mac_dinh"), {
+        required: true,
+    }),
+
+    ngayVaoLam: buildDateRule(t("field.ngay_vao_lam"), {
+        required: true,
+    }),
+
+    status: buildStringRule(t("field.trang_thai_lam_viec"), {
+        required: true,
+    }),
+
+    // Thông tin liên hệ
     email: buildEmailRule(t("field.email"), {
         required: true,
     }),
@@ -29,16 +71,10 @@ export const userSchema = yup.object({
         required: true,
     }),
 
-    birthday: buildDateRule(t("field.ngay_sinh"), {
-        required: true,
-    }),
-    gender: buildStringRule(t("field.gioi_tinh"), {
-        required: true,
-    }),
-
     province: buildStringRule(t("field.tinh_thanh_pho"), {
         required: true,
     }),
+
     ward: buildStringRule(t("field.xa_phuong"), {
         required: true,
     }),
@@ -47,13 +83,5 @@ export const userSchema = yup.object({
         required: true,
         min: 5,
         max: 500,
-    }),
-
-    boPhanId: buildStringRule(t("field.bo_phan_mac_dinh"), {
-        required: true,
-    }),
-
-    status: buildStringRule(t("field.trang_thai"), {
-        required: true,
     }),
 });

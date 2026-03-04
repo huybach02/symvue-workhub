@@ -110,6 +110,17 @@ final class UserController extends AbstractController
         }
     }
 
+    #[Route('/nguoi-dung/get-ma-nhan-vien', methods: ['GET'])]
+    public function getMaNhanVien(): JsonResponse
+    {
+        try {
+            $data = $this->userService->getMaNhanVien();
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
     #[Route('/nguoi-dung/export', methods: ['GET'])]
     public function exportUsers(): Response
     {

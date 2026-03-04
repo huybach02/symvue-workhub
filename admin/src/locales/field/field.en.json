@@ -41,6 +41,13 @@
         "title": "Title",
         "content": "Content",
         "type": "Notification Type",
-        "body": "Content"
+        "body": "Content",
+        "ma_nhan_vien": "Employee Code",
+        "cmnd": "ID Card/CCCD",
+        "ngay_cap_cmnd": "ID Card Issue Date",
+        "noi_cap_cmnd": "ID Card Issue Place",
+        "ngay_vao_lam": "Start Date",
+        "trang_thai_lam_viec": "Work Status",
+        "thanh_vien_moi": "New Member"
     }
 }

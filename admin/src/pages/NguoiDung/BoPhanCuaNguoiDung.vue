@@ -38,7 +38,7 @@
                             <v-autocomplete
                                 v-model="boPhanSelected"
                                 name="boPhanId"
-                                :items="boPhanData"
+                                :items="danhSachBoPhan"
                                 item-title="label"
                                 item-value="value"
                                 variant="outlined"
@@ -395,6 +395,13 @@ export default {
         },
         managerCount() {
             return this.departments.filter((d) => d.is_manager).length;
+        },
+        danhSachBoPhan() {
+            return this.boPhanData.filter((item) => {
+                return !this.departments.some(
+                    (dept) => dept.bo_phan_id === item.value,
+                );
+            });
         },
     },
     watch: {

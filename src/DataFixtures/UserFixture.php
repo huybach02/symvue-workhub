@@ -6,11 +6,12 @@ namespace App\DataFixtures;
 
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UserFixture extends Fixture
+class UserFixture extends Fixture implements FixtureGroupInterface
 {
     private const int NUMBER_OF_USERS = 100;
 
@@ -18,9 +19,15 @@ class UserFixture extends Fixture
         private readonly UserPasswordHasherInterface $passwordHasher
     ) {}
 
+    // Khai báo fixture này thuộc group "user"
+    public static function getGroups(): array
+    {
+        return ['user'];
+    }
+
     public function load(ObjectManager $manager): void
     {
-        $faker = Factory::create('en_US'); // Sử dụng locale Tiếng Việt
+        $faker = Factory::create('vi_VN'); // Sử dụng locale Tiếng Việt
 
         $images = [
             "https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg",
@@ -51,11 +58,13 @@ class UserFixture extends Fixture
         $roles = ['USER', 'MANAGER', 'STAFF'];
         $genders = ['male', 'female'];
 
+        $maNhanVien = 1;
         // Tạo các user ngẫu nhiên
         for ($i = 0; $i < self::NUMBER_OF_USERS; $i++) {
             $user = new User();
 
             // Thông tin cơ bản
+            $user->setMaNhanVien('NV' . str_pad((string) $maNhanVien++, 5, '0', STR_PAD_LEFT));
             $user->setEmail($faker->unique()->safeEmail());
             $user->setName($faker->name());
             $user->setPassword($this->passwordHasher->hashPassword($user, 'password'));
@@ -67,7 +76,7 @@ class UserFixture extends Fixture
             // Thông tin cá nhân
             $user->setPhone($faker->optional(0.8)->numerify('09########'));
             $user->setGender($faker->randomElement($genders));
-            $user->setBirthday($faker->optional(0.7)->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'));
+            $user->setBirthday($faker->optional(0.7)->dateTimeBetween('-60 years', '-18 years')?->format('Y-m-d'));
             $user->setDescription($faker->optional(0.5)->sentence(10));
 
             // Địa chỉ (sử dụng ID giả cho province, district, ward)

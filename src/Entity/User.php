@@ -91,6 +91,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $boPhanId = null;
 
+    #[ORM\Column(length: 50, nullable: true, unique: true)]
+    private ?string $maNhanVien = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $cmnd = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $ngayCapCmnd = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $noiCapCmnd = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $ngayVaoLam = null;
+
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $rememberToken = null;
 
@@ -377,6 +392,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
         return $this;
     }
 
+    public function getMaNhanVien(): ?string
+    {
+        return $this->maNhanVien;
+    }
+
+    public function setMaNhanVien(?string $maNhanVien): static
+    {
+        $this->maNhanVien = $maNhanVien;
+
+        return $this;
+    }
+
+    public function getCmnd(): ?string
+    {
+        return $this->cmnd;
+    }
+
+    public function setCmnd(?string $cmnd): static
+    {
+        $this->cmnd = $cmnd;
+
+        return $this;
+    }
+
+    public function getNgayCapCmnd(): ?string
+    {
+        return $this->ngayCapCmnd;
+    }
+
+    public function setNgayCapCmnd(?string $ngayCapCmnd): static
+    {
+        $this->ngayCapCmnd = $ngayCapCmnd;
+
+        return $this;
+    }
+
+    public function getNoiCapCmnd(): ?string
+    {
+        return $this->noiCapCmnd;
+    }
+
+    public function setNoiCapCmnd(?string $noiCapCmnd): static
+    {
+        $this->noiCapCmnd = $noiCapCmnd;
+
+        return $this;
+    }
+
+    public function getNgayVaoLam(): ?string
+    {
+        return $this->ngayVaoLam;
+    }
+
+    public function setNgayVaoLam(?string $ngayVaoLam): static
+    {
+        $this->ngayVaoLam = $ngayVaoLam;
+
+        return $this;
+    }
+
     public function getRememberToken(): ?string
     {
         return $this->rememberToken;
@@ -429,6 +504,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
             'description' => $this->description,
             'status' => $this->status,
             'boPhanId' => $this->boPhanId,
+            'maNhanVien' => $this->maNhanVien,
+            'cmnd' => $this->cmnd,
+            'ngayCapCmnd' => $this->ngayCapCmnd,
+            'noiCapCmnd' => $this->noiCapCmnd,
+            'ngayVaoLam' => $this->ngayVaoLam,
             'roles' => $this->roles,
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),

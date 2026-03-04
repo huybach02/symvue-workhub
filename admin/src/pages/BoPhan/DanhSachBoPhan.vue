@@ -336,6 +336,7 @@ export default {
 <style scoped>
 .table-scroll-container {
     overflow-x: auto;
+    overflow-y: hidden;
     width: 100%;
 }
 

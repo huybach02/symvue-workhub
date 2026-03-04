@@ -65,17 +65,38 @@ class UserService
 
         $password = generateRandomString(10);
 
+        $checkMaNhanVien = $this->userRepository->findOneBy([
+            'maNhanVien' => $dto->maNhanVien,
+        ]);
+
+        if ($checkMaNhanVien) {
+            throw new \Exception(t('error.ma_nhan_vien_exists', [
+                '%ma_nhan_vien%' => $dto->maNhanVien,
+            ]));
+        }
+
+        // Thông tin cá nhân
+        $item->setMaNhanVien($dto->maNhanVien);
         $item->setName($dto->name);
+        $item->setGender($dto->gender);
+        $item->setBirthday($dto->birthday);
+        $item->setCmnd($dto->cmnd);
+        $item->setNgayCapCmnd($dto->ngayCapCmnd);
+        $item->setNoiCapCmnd($dto->noiCapCmnd);
+
+        // Thông tin công việc
+        $item->setBoPhanId($dto->boPhanId);
+        $item->setNgayVaoLam($dto->ngayVaoLam);
+        $item->setStatus($dto->status);
+
+        // Thông tin liên hệ
         $item->setEmail($dto->email);
         $item->setPhone($dto->phone);
-        $item->setPassword($this->passwordHasher->hashPassword($item, $password));
-        $item->setBirthday($dto->birthday);
-        $item->setGender($dto->gender);
         $item->setProvince($dto->province);
         $item->setWard($dto->ward);
         $item->setAddress($dto->address);
-        $item->setBoPhanId($dto->boPhanId);
-        $item->setStatus($dto->status);
+
+        $item->setPassword($this->passwordHasher->hashPassword($item, $password));
 
         $this->entityManager->persist($item);
         $this->entityManager->flush();
@@ -97,16 +118,26 @@ class UserService
             throw new \Exception(t('error.not_found'));
         }
 
+        // Thông tin cá nhân
+        $item->setMaNhanVien($dto->maNhanVien);
         $item->setName($dto->name);
+        $item->setGender($dto->gender);
+        $item->setBirthday($dto->birthday);
+        $item->setCmnd($dto->cmnd);
+        $item->setNgayCapCmnd($dto->ngayCapCmnd);
+        $item->setNoiCapCmnd($dto->noiCapCmnd);
+
+        // Thông tin công việc
+        $item->setBoPhanId($dto->boPhanId);
+        $item->setNgayVaoLam($dto->ngayVaoLam);
+        $item->setStatus($dto->status);
+
+        // Thông tin liên hệ
         $item->setEmail($dto->email);
         $item->setPhone($dto->phone);
-        $item->setBirthday($dto->birthday);
-        $item->setGender($dto->gender);
         $item->setProvince($dto->province);
         $item->setWard($dto->ward);
         $item->setAddress($dto->address);
-        $item->setBoPhanId($dto->boPhanId);
-        $item->setStatus($dto->status);
 
         $this->entityManager->flush();
 
@@ -165,20 +196,31 @@ class UserService
         return $result['collection'];
     }
 
+    public function getMaNhanVien(): string
+    {
+        $conn = $this->entityManager->getConnection();
+        $sql = "SELECT MAX(CAST(SUBSTRING(ma_nhan_vien FROM 3) AS INTEGER)) FROM \"user\" WHERE ma_nhan_vien ~ '^NV[0-9]+$'";
+        $maxSoThuTu = (int) $conn->executeQuery($sql)->fetchOne();
+
+        $newSoThuTu = $maxSoThuTu + 1;
+
+        return "NV" . str_pad((string) $newSoThuTu, 5, '0', STR_PAD_LEFT);
+    }
+
     public function getProvince(): array
     {
         $projectDir = $this->parameterBag->get('kernel.project_dir');
         $filePath = $projectDir . '/public/province.json';
 
         if (!file_exists($filePath)) {
-            throw new \Exception('File province.json không tồn tại');
+            throw new \Exception(t('error.province_file_not_found'));
         }
 
         $content = file_get_contents($filePath);
         $items = json_decode($content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception('File province.json không đúng định dạng JSON');
+            throw new \Exception(t('error.province_file_invalid_json'));
         }
 
         return $items ?? [];
@@ -190,14 +232,14 @@ class UserService
         $filePath = $projectDir . '/public/ward.json';
 
         if (!file_exists($filePath)) {
-            throw new \Exception('File ward.json không tồn tại');
+            throw new \Exception(t('error.ward_file_not_found'));
         }
 
         $content = file_get_contents($filePath);
         $items = json_decode($content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception('File ward.json không đúng định dạng JSON');
+            throw new \Exception(t('error.ward_file_invalid_json'));
         }
 
         $items = array_filter($items, fn($item) => $item['parent_code'] === $provinceCode);
@@ -230,7 +272,7 @@ class UserService
         $userPermission = $this->entityManager->getRepository(\App\Entity\UserPermission::class)->find($permissionId);
 
         if (!$userPermission) {
-            throw new \Exception("Không tìm thấy bản ghi phân quyền với ID: $permissionId");
+            throw new \Exception(t('error.permission_not_found', ['%id%' => $permissionId]));
         }
 
         $userPermission->setPhanQuyen($phanQuyen);
@@ -249,7 +291,7 @@ class UserService
         ]);
 
         if ($checkExist) {
-            throw new \Exception("Người dùng đã thuộc bộ phận này. Vui lòng chọn lại");
+            throw new \Exception(t('error.user_already_in_department'));
         }
 
         $boPhan =  $this->entityManager->getRepository(BoPhan::class)->find($boPhanId);
@@ -286,10 +328,14 @@ class UserService
         $userPermission = $this->entityManager->getRepository(UserPermission::class)->find($permissionId);
 
         if (!$userPermission) {
-            throw new \Exception("Không tìm thấy bản ghi phân quyền với ID: $permissionId");
+            throw new \Exception(t('error.permission_not_found', ['%id%' => $permissionId]));
         }
 
         if ($action === 'delete') {
+            if ($userPermission->isManager()) {
+                throw new \Exception(t('error.cannot_delete_manager_department'));
+            }
+
             $this->entityManager->remove($userPermission);
             $this->entityManager->flush();
         } else {

@@ -272,6 +272,12 @@ export default {
                     filterComponent: markRaw(FilterPlaceholder),
                 },
                 {
+                    title: this.$t("user.columns.ma_nhan_vien"),
+                    key: "maNhanVien",
+                    width: 200,
+                    filterComponent: markRaw(FilterText),
+                },
+                {
                     title: this.$t("user.columns.name"),
                     key: "name",
                     width: 200,
@@ -312,7 +318,7 @@ export default {
                 {
                     title: this.$t("base.created_at"),
                     key: "createdAt",
-                    width: 150,
+                    width: 170,
                     filterComponent: markRaw(FilterDateRange),
                 },
                 {

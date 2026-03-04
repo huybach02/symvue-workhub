@@ -6,6 +6,7 @@ use App\DTO\UserDTO;
 use App\Entity\ImportLog;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Service\BoPhanService;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -17,14 +18,15 @@ class UserImportService
         private EntityManagerInterface $em,
         private UserRepository $userRepository,
         private ValidatorInterface $validator,
-        private DenormalizerInterface $serializer
+        private DenormalizerInterface $serializer,
+        private readonly BoPhanService $boPhanService,
     ) {}
 
     public function import($filePath, $originalFileName, $user)
     {
         $spreadsheet = IOFactory::load($filePath);
         $sheet = $spreadsheet->getSheet(0);
-        $rows = $sheet->toArray();
+        $rows = $sheet->toArray(null, true, false, false);
 
         $log = new ImportLog();
         $log->setFileName($originalFileName);
@@ -38,20 +40,28 @@ class UserImportService
         for ($i = 1; $i < count($rows); $i++) {
             $row = $rows[$i];
 
-            // Map dữ liệu từ Excel
-            // ============== CHỖ CẦN SỬA 1 ==============
+            // Map dữ liệu từ Excel theo đúng thứ tự cột của file export
+            // A=STT (bỏ qua), B=Mã NV, C=Họ tên, D=Giới tính (hiển thị),
+            // E=Ngày sinh, F=CMND, G=Ngày cấp CMND, H=Nơi cấp CMND, I=Ngày vào làm,
+            // J=Trạng thái (hiển thị), K=Email, L=SĐT, M=Tỉnh/TP, N=Xã/Phường, O=Địa chỉ
+            // P=gender_code (ẩn, do dropdown tự điền), Q=status_code (ẩn, do dropdown tự điền)
             $data = [
-                'name' => excelGetValue($row, 'A'),
-                'email' => excelGetValue($row, 'B'),
-                'phone' => excelGetValue($row, 'C'),
-                'gender' => excelGetValue($row, 'L'),
-                'birthday' => excelGetValue($row, 'E'),
-                'province' => excelGetValue($row, 'F'),
-                'ward' => excelGetValue($row, 'G'),
-                'address' => excelGetValue($row, 'H'),
-                'hinhThucLamViec' => (int)excelGetValue($row, 'M'),
-                'isNgoaiGio' => (int)excelGetValue($row, 'N'),
-                'status' => (int)excelGetValue($row, 'O'),
+                // Thông tin cá nhân
+                'maNhanVien'  => excelGetValue($row, 'B'),
+                'name'        => excelGetValue($row, 'C'),
+                'gender'      => excelGetValue($row, 'P') ?: excelGetValue($row, 'D'),
+                'birthday'    => excelGetValue($row, 'E'),
+                'cmnd'        => (string)excelGetValue($row, 'F'),
+                'ngayCapCmnd' => excelGetValue($row, 'G'),
+                'noiCapCmnd'  => excelGetValue($row, 'H'),
+                'ngayVaoLam'  => excelGetValue($row, 'I'),
+                'status'      => (int)(excelGetValue($row, 'Q') !== null ? excelGetValue($row, 'Q') : excelGetValue($row, 'J')),
+                'email'       => excelGetValue($row, 'K'),
+                'phone'       => excelGetValue($row, 'L'),
+                'boPhanId'    => (int)(excelGetValue($row, 'R') ?: excelGetValue($row, 'M')),
+                // 'province'    => excelGetValue($row, 'M'),
+                // 'ward'        => excelGetValue($row, 'N'),
+                // 'address'     => excelGetValue($row, 'O'),
             ];
             // ============== HẾT CHỖ CẦN SỬA 1 ==============
 
@@ -85,18 +95,39 @@ class UserImportService
                     continue;
                 }
 
+                // Kiểm tra mã nhân viên đã tồn tại chưa
+                if ($dto->maNhanVien && $this->userRepository->findOneBy(['maNhanVien' => $dto->maNhanVien])) {
+                    $errorCount++;
+                    $errorDetails[] = [
+                        'row' => $i + 1,
+                        'data_raw' => $data,
+                        'errors' => ['Mã nhân viên này đã tồn tại trong hệ thống.']
+                    ];
+                    continue;
+                }
+
                 $user = new User();
+
+                // Thông tin cá nhân
+                $user->setMaNhanVien($dto->maNhanVien);
                 $user->setName($dto->name);
-                $user->setEmail($dto->email);
-                $user->setPhone($dto->phone);
                 $user->setGender($dto->gender);
                 $user->setBirthday($dto->birthday);
+                $user->setCmnd($dto->cmnd);
+                $user->setNgayCapCmnd($dto->ngayCapCmnd);
+                $user->setNoiCapCmnd($dto->noiCapCmnd);
+
+                // Thông tin công việc
+                $user->setNgayVaoLam($dto->ngayVaoLam);
+                $user->setStatus($dto->status);
+
+                // Thông tin liên hệ
+                $user->setEmail($dto->email);
+                $user->setPhone($dto->phone);
+                $user->setBoPhanId($dto->boPhanId);
                 // $user->setProvince($dto->province);
                 // $user->setWard($dto->ward);
-                $user->setAddress($dto->address);
-                $user->setHinhThucLamViec($dto->hinhThucLamViec);
-                $user->setIsNgoaiGio($dto->isNgoaiGio);
-                $user->setStatus($dto->status);
+                // $user->setAddress($dto->address);
 
                 $user->setPassword(password_hash('password', PASSWORD_DEFAULT));
 
@@ -104,12 +135,14 @@ class UserImportService
 
 
                 $this->em->persist($user);
+                $this->em->flush();
+
+                if ($dto->boPhanId) {
+                    $this->boPhanService->handleAddUserPermission($user->getId(), $dto->boPhanId, true);
+                }
+
                 $successCount++;
             }
-        }
-
-        if ($successCount > 0) {
-            $this->em->flush();
         }
         $log->setTotalRows($successCount + $errorCount);
         $log->setSuccessRows($successCount);

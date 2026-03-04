@@ -54,7 +54,7 @@ if (!function_exists('validateFilterParams')) {
         $params['page'] = isset($params['page']) ? (int) $params['page'] : 1;
         $params['limit'] = isset($params['limit']) ? (int) $params['limit'] : 10;
         $params['sort_direction'] = $params['sort_direction'] ?? 'desc';
-        $params['sort_column'] = $params['sort_column'] ?? 'createdAt';
+        $params['sort_column'] = $params['sort_column'] ?? 'id';
 
         // Validate filter parameters
         if (isset($params['f']) && is_array($params['f'])) {

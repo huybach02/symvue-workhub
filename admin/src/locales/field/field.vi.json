@@ -41,6 +41,13 @@
         "title": "Tiêu đề",
         "content": "Nội dung",
         "type": "Loại thông báo",
-        "body": "Nội dung"
+        "body": "Nội dung",
+        "ma_nhan_vien": "Mã nhân viên",
+        "cmnd": "CMND/CCCD",
+        "ngay_cap_cmnd": "Ngày cấp CMND/CCCD",
+        "noi_cap_cmnd": "Nơi cấp CMND/CCCD",
+        "ngay_vao_lam": "Ngày vào làm",
+        "trang_thai_lam_viec": "Trạng thái làm việc",
+        "thanh_vien_moi": "Thành viên mới"
     }
 }
