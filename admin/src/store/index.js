@@ -2,6 +2,7 @@ import { createStore } from "vuex";
 import auth from "./modules/auth";
 import media from "./modules/media";
 import mercure from "./modules/mercure";
+import chat from "./modules/chat";
 
 const store = createStore({
     state() {
@@ -22,6 +23,7 @@ const store = createStore({
         auth,
         media,
         mercure,
+        chat,
     },
 });
 

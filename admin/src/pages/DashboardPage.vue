@@ -17,18 +17,14 @@ import axiosInstance from "@/configs/axios";
 export default {
     data() {
         return {
-            // Trạng thái đang gửi request
             isSending: false,
         };
     },
     methods: {
-        // Gọi API backend để publish một event lên Mercure Hub
         async sendTestNotification() {
             this.isSending = true;
             try {
-                const res = await axiosInstance.post(
-                    "/mercure/thong-bao-he-thong",
-                );
+                const res = await axiosInstance.get("/mercure/test");
                 console.log("[Mercure] API publish response:", res);
             } catch (error) {
                 console.error("[Mercure] Lỗi khi gửi thông báo:", error);

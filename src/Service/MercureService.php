@@ -185,7 +185,7 @@ class MercureService
             'icon'   => 'mdi-bell-outline',
             'color'  => 'primary',
             'seen'   => false,
-            'createdAt' => new \DateTime(),
+            'createdAt' => (new \DateTime())->format('Y-m-d H:i:s'),
         ];
 
         $update = new Update(
@@ -246,8 +246,6 @@ class MercureService
 
         $update = new Update($topic, json_encode($data), false);
         $this->hub->publish($update);
-
-        ray($type);
 
         $this->messageBus->dispatch(
             new ThongBaoCaNhanMessage($fromUserId, $toUserId, $title, $body, $code, $type, $createdAt, $link)

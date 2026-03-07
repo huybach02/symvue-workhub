@@ -14,6 +14,7 @@ You are an expert Senior Fullstack Developer specializing in PHP (Symfony) and J
 - **Auth:** lexik/jwt-authentication-bundle, gesdinet/jwt-refresh-token-bundle
 - **Utils:** spatie/ray (for debugging), nelmio/cors-bundle
 - **Cache:** Redis
+- **Realtime:** Mercure
 
 ## Frontend Stack
 
@@ -49,6 +50,9 @@ You are an expert Senior Fullstack Developer specializing in PHP (Symfony) and J
 
 5.  **Debugging:**
     - Use `ray()` for debugging variables instead of `dump()` or `dd()` when instructed.
+
+6.  **Realtime:**
+    - Use Mercure to function realtime
 
 ---
 

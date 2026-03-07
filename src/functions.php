@@ -198,3 +198,34 @@ if (!function_exists('convertMethod')) {
         return "index";
     }
 }
+
+if (!function_exists('formatMessageTime')) {
+    function formatMessageTime(?\DateTimeImmutable $dt): ?string
+    {
+        if ($dt === null) {
+            return null;
+        }
+
+        $now   = new \DateTimeImmutable();
+        $today = $now->setTime(0, 0, 0);
+        $yesterday = $today->modify('-1 day');
+        $dtDay = $dt->setTime(0, 0, 0);
+
+        if ($dtDay == $today) {
+            return $dt->format('H:i');
+        }
+
+        if ($dtDay == $yesterday) {
+            return 'Hôm qua';
+        }
+
+        // Trong tuần hiện tại: hiện tên thứ
+        $weekAgo = $today->modify('-6 days');
+        if ($dtDay >= $weekAgo) {
+            $days = ['CN', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+            return $days[(int)$dt->format('w')];
+        }
+
+        return $dt->format('d/m');
+    }
+}

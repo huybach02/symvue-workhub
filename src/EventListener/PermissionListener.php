@@ -90,7 +90,7 @@ class PermissionListener
     }
 
     // Các từ khóa trong path sẽ được bỏ qua kiểm tra quyền
-    protected array $excludedKeywords = ['select', 'import', 'export', 'template-import', 'media'];
+    protected array $excludedKeywords = ['select', 'import', 'export', 'template-import', 'media', 'conversation', 'message'];
 
     protected function shouldExcludeRoute(string $path): bool
     {

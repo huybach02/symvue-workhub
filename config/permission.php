@@ -63,4 +63,14 @@ return [
             "showMenu" => true
         ]
     ],
-];
+    [
+        "name" => "message",
+        "actions" => [
+            "index" => true,
+            "create" => true,
+            "show" => true,
+            "edit" => true,
+            "delete" => true,
+            "showMenu" => true
+        ]
+    ],];

@@ -14,6 +14,7 @@
             </v-toolbar-title>
 
             <div class="d-flex align-center ga-2">
+                <ChatRealTime />
                 <NotificationRealtime />
                 <UserDropdown @logout="handleLogout" />
             </div>
@@ -36,12 +37,14 @@ import MenuSidebar from "./MenuSidebar.vue";
 import { authService } from "@/services/authService";
 import UserDropdown from "@/components/UserDropdown.vue";
 import NotificationRealtime from "@/components/NotificationRealtime.vue";
+import ChatRealTime from "@/components/ChatRealTime.vue";
 
 export default {
     components: {
         MenuSidebar,
         UserDropdown,
         NotificationRealtime,
+        ChatRealTime,
     },
     data() {
         return {

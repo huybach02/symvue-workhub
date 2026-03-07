@@ -36,6 +36,8 @@
                 </div>
             </v-app-bar-title>
             <div class="d-flex align-center justify-end ga-10">
+                <ChatRealTime />
+
                 <NotificationRealtime />
 
                 <UserDropdown @logout="handleLogout" />
@@ -50,12 +52,14 @@ import MenuSidebar from "./MenuSidebar.vue";
 import { NAME_ROUTES_CONFIG } from "@/configs/nameRouteConfig";
 import UserDropdown from "@/components/UserDropdown.vue";
 import NotificationRealtime from "@/components/NotificationRealtime.vue";
+import ChatRealTime from "@/components/ChatRealTime.vue";
 
 export default {
     components: {
         MenuSidebar,
         UserDropdown,
         NotificationRealtime,
+        ChatRealTime,
     },
     data() {
         return {

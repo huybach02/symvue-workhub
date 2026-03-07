@@ -20,4 +20,6 @@ export const API_ROUTES_CONFIG = {
     boPhan: "/bo-phan",
     phanQuyenMacDinh: "/bo-phan/permission",
     thongBao: "/thong-bao",
+    conversation: "/conversation",
+    message: "/message",
 };

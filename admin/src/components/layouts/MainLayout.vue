@@ -99,8 +99,24 @@ export default {
                 };
                 this.eventSource.onmessage = (event) => {
                     const data = JSON.parse(event.data);
-                    this.$store.commit("mercure/ADD_NOTIFICATION", data);
-                    this.$store.commit("mercure/SET_POPUP_NOTIFICATION", data);
+                    switch (data.type) {
+                        case "message":
+                            this.$store.commit("chat/PUSH_MESSAGE", {
+                                conversationId: data.conversationId,
+                                message: data,
+                            });
+                            break;
+                        default:
+                            this.$store.commit(
+                                "mercure/ADD_NOTIFICATION",
+                                data,
+                            );
+                            this.$store.commit(
+                                "mercure/SET_POPUP_NOTIFICATION",
+                                data,
+                            );
+                            break;
+                    }
                 };
                 this.eventSource.onerror = (err) => {
                     console.error("[Mercure] Lỗi kết nối:", err);
