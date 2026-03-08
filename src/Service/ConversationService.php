@@ -10,6 +10,7 @@ use App\Entity\Conversation;
 use App\Entity\ConversationUser;
 use App\Entity\User;
 use App\Repository\ConversationRepository;
+use App\Repository\ConversationUserRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -17,6 +18,7 @@ class ConversationService
 {
     public function __construct(
         private readonly ConversationRepository $conversationRepository,
+        private readonly ConversationUserRepository $conversationUserRepository,
         private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $entityManager,
     ) {}
@@ -90,7 +92,7 @@ class ConversationService
             }
 
             $data['unread']     = $myEntry?->getUnreadCount() ?? 0;
-            $data['online']     = true;
+            $data['online']     = false;
 
             // Với conversation private: lấy tên/avatar/id từ user đối diện
             $partner = $partnerEntry?->getMember();
@@ -175,5 +177,25 @@ class ConversationService
 
         $this->entityManager->remove($item);
         $this->entityManager->flush();
+    }
+
+    public function markAsRead(int $conversationId, User $currentUser): void
+    {
+        $conversation = $this->conversationRepository->find($conversationId);
+
+        if (!$conversation) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        // Tìm bản ghi ConversationUser của current user trong conversation này
+        $convUser = $this->conversationUserRepository->findOneBy([
+            'conversation' => $conversation,
+            'member'       => $currentUser,
+        ]);
+
+        if ($convUser) {
+            $convUser->resetUnread(); // unreadCount = 0, lastReadAt = now
+            $this->entityManager->flush();
+        }
     }
 }

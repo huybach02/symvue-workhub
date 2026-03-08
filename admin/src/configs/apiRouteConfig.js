@@ -22,4 +22,5 @@ export const API_ROUTES_CONFIG = {
     thongBao: "/thong-bao",
     conversation: "/conversation",
     message: "/message",
+    presence: "/presence",
 };

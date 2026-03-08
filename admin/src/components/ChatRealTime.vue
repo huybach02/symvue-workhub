@@ -1,4 +1,4 @@
-﻿<template>
+<template>
     <div class="chat-wrapper">
         <div :class="{ 'chat-pulse-wrapper': unreadCount > 0 }">
             <v-btn icon variant="text" class="chat-btn" @click="dialog = true">
@@ -127,6 +127,7 @@ import { postData } from "@/services/bases/postData";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import ChatConversationList from "./chat/ChatConversationList.vue";
 import ChatWindow from "./chat/ChatWindow.vue";
+import presenceService from "@/services/presenceService";
 
 export default {
     name: "ChatRealTime",
@@ -149,17 +150,14 @@ export default {
 
     computed: {
         ...mapGetters("auth", ["currentUser"]),
-        ...mapGetters("chat", ["messagesByConversation"]),
+        ...mapGetters("chat", ["messagesByConversation", "totalUnread"]),
 
         currentUserId() {
             return this.currentUser?.id ?? null;
         },
 
         unreadCount() {
-            return this.conversations.reduce(
-                (sum, c) => sum + (c.unread ?? 0),
-                0,
-            );
+            return this.totalUnread;
         },
 
         badgeLabel() {
@@ -184,6 +182,7 @@ export default {
                 this.mobileScreen = 0;
                 this.activeConversation = null;
                 this.isTyping = false;
+                this.$store.commit("chat/SET_ACTIVE_CONVERSATION", null);
             }
         },
     },
@@ -198,16 +197,36 @@ export default {
             this.conversations = (data ?? []).map((conv) => ({
                 ...conv,
                 unread: conv.unread ?? 0,
-                online: conv.online ?? false,
                 lastMessage: conv.lastMessage ?? "",
                 time: conv.time ?? null,
             }));
+
+            // Khởi tạo unread map trong Vuex từ dữ liệu API
+            const unreadMap = {};
+            this.conversations.forEach((conv) => {
+                if (conv.id) unreadMap[conv.id] = conv.unread ?? 0;
+            });
+            this.$store.commit("chat/SET_UNREAD_MAP", unreadMap);
+
+            // Load trạng thái online ban đầu cho tất cả conversations và lưu vào Vuex
+            const userIds = this.conversations
+                .map((c) => c.receiverId)
+                .filter(Boolean);
+
+            if (userIds.length > 0) {
+                const statuses = await presenceService.fetchStatuses(userIds);
+                if (statuses && Object.keys(statuses).length > 0) {
+                    this.$store.commit("chat/SET_ONLINE_STATUSES", statuses);
+                }
+            }
         },
 
         async openConversation(conv) {
             this.activeConversation = conv;
-            conv.unread = 0;
             this.isLoadingMessages = true;
+            this.$store.commit("chat/SET_ACTIVE_CONVERSATION", conv.id);
+            this.$store.commit("chat/RESET_UNREAD", conv.id);
+            postData(`${API_ROUTES_CONFIG.conversation}/${conv.id}/read`);
             await this.loadMessageOfConversation(conv.id);
             this.isLoadingMessages = false;
         },

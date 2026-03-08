@@ -38,7 +38,7 @@
                     </v-avatar>
                     <span
                         class="online-dot"
-                        :class="conversation.online ? 'online' : 'offline'"
+                        :class="isUserOnline(conversation.receiverId) ? 'online' : 'offline'"
                     />
                 </div>
 
@@ -51,11 +51,11 @@
                     >
                         <v-icon
                             size="10"
-                            :color="conversation.online ? 'success' : 'grey'"
+                            :color="isUserOnline(conversation.receiverId) ? 'success' : 'grey'"
                         >
                             mdi-circle
                         </v-icon>
-                        {{ conversation.online ? "Đang hoạt động" : "Offline" }}
+                        {{ isUserOnline(conversation.receiverId) ? "Đang hoạt động" : "Offline" }}
                     </div>
                 </div>
 
@@ -291,6 +291,8 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
     name: "ChatWindow",
 
@@ -331,6 +333,8 @@ export default {
     },
 
     computed: {
+        ...mapGetters("chat", ["isUserOnline"]),
+
         normalizedMessages() {
             return (this.messages ?? []).map((msg) => ({
                 ...msg,

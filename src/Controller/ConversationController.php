@@ -74,6 +74,20 @@ final class ConversationController extends AbstractController
         }
     }
 
+    #[Route('/conversation/{id}/read', methods: ['POST'], priority: 1)]
+    public function markAsRead(int $id): JsonResponse
+    {
+        /** @var \App\Entity\User $currentUser */
+        $currentUser = $this->getUser();
+
+        try {
+            $this->conversationService->markAsRead($id, $currentUser);
+            return CustomResponse::success(['type' => 'message'], t('success.updated'));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
     // #[Route('/conversation/{id}', methods: ['PUT'])]
     // public function update(
     //     int $id,

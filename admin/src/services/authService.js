@@ -2,6 +2,7 @@ import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import axiosInstance from "@/configs/axios";
 import { handleAxiosError } from "@/helpers/axiosHelper";
 import { toast } from "@/main";
+import presenceService from "@/services/presenceService";
 
 export const authService = {
     login: async (data) => {
@@ -60,6 +61,8 @@ export const authService = {
     },
     logout: async () => {
         try {
+            await presenceService.stopPresence();
+
             const refreshToken = localStorage.getItem("refresh_token");
             const response = await axiosInstance.post(
                 API_ROUTES_CONFIG.logout,

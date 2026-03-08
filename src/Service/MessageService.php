@@ -8,6 +8,7 @@ use App\Entity\Message;
 use App\Entity\User;
 use App\Message\ChatMessage;
 use App\Repository\ConversationRepository;
+use App\Repository\ConversationUserRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,6 +28,7 @@ class MessageService
         private readonly EntityManagerInterface $entityManager,
         private readonly UserRepository $userRepository,
         private readonly ConversationRepository $conversationRepository,
+        private readonly ConversationUserRepository $conversationUserRepository,
         #[Autowire('%kernel.project_dir%')] private readonly string $projectDir,
     ) {
         $this->mercureConfig = require $this->projectDir . '/config/mercure.php';
@@ -77,6 +79,7 @@ class MessageService
             'code'           => $code,
             'conversationId' => $dto->conversationId,
             'senderId'       => $currentUser->getId(),
+            'senderName'     => $currentUser->getName(),
             'receiverId'     => $dto->receiverId,
             'content'        => $dto->content,
             'images'         => [],
@@ -89,6 +92,19 @@ class MessageService
         ];
 
         $payload = json_encode($data);
+
+        // Tăng unread count của người nhận trong DB
+        $conversation = $this->conversationRepository->find($dto->conversationId);
+        if ($conversation) {
+            $receiverConvUser = $this->conversationUserRepository->findOneBy([
+                'conversation' => $conversation,
+                'member'       => $this->userRepository->find($dto->receiverId),
+            ]);
+            if ($receiverConvUser) {
+                $receiverConvUser->incrementUnread();
+                $this->entityManager->flush();
+            }
+        }
 
         // Publish đến receiver để receiver nhận được tin nhắn mới
         $topicReceiver = str_replace(':userId', (string) $dto->receiverId, $topicTemplate);

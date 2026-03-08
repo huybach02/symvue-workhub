@@ -108,7 +108,7 @@
                                         <span
                                             class="online-dot"
                                             :class="
-                                                conv.online
+                                                isUserOnline(conv.receiverId)
                                                     ? 'online'
                                                     : 'offline'
                                             "
@@ -123,7 +123,7 @@
                                                 class="text-body-2 font-weight-medium text-truncate"
                                                 :class="{
                                                     'font-weight-bold':
-                                                        conv.unread > 0,
+                                                        unreadByConversation(conv.id) > 0,
                                                 }"
                                             >
                                                 {{ conv.nameUser }}
@@ -141,15 +141,15 @@
                                                 class="text-caption text-medium-emphasis text-truncate"
                                                 :class="{
                                                     'text-high-emphasis font-weight-medium':
-                                                        conv.unread > 0,
+                                                        unreadByConversation(conv.id) > 0,
                                                 }"
                                                 style="max-width: 180px"
                                             >
                                                 {{ conv.lastMessage }}
                                             </span>
                                             <v-badge
-                                                v-if="conv.unread > 0"
-                                                :content="conv.unread"
+                                                v-if="unreadByConversation(conv.id) > 0"
+                                                :content="unreadByConversation(conv.id)"
                                                 color="error"
                                                 inline
                                                 class="flex-shrink-0 ms-1"
@@ -279,6 +279,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import { getAllData } from "@/services/bases/getData";
 
@@ -312,6 +313,8 @@ export default {
     },
 
     computed: {
+        ...mapGetters("chat", ["isUserOnline", "unreadByConversation"]),
+
         totalUnread() {
             return this.conversations.reduce((sum, c) => sum + c.unread, 0);
         },
@@ -359,6 +362,7 @@ export default {
             this.availableUsers = data ?? [];
             this.isSearchingUsers = false;
         },
+
         async handleStartConversation(user) {
             this.$emit("start-conversation", user);
         },

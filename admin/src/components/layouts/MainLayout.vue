@@ -34,6 +34,7 @@ import PermissionMiddleware from "@/middlewares/PermissionMiddleware.vue";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import { topicMercure } from "@/configs/topicMercure";
 import axiosInstance from "@/configs/axios";
+import presenceService from "@/services/presenceService";
 
 export default {
     name: "MainLayout",
@@ -71,6 +72,7 @@ export default {
         if (this.eventSource) {
             this.eventSource.close();
         }
+        presenceService.stopPresence();
     },
     methods: {
         async connectMercure() {
@@ -96,15 +98,49 @@ export default {
                 this.eventSource.onopen = () => {
                     this.connectionStatus = "connected";
                     console.log("[Mercure] Kết nối thành công!");
+
+                    presenceService.startPresence();
                 };
+
                 this.eventSource.onmessage = (event) => {
                     const data = JSON.parse(event.data);
                     switch (data.type) {
+                        case "presence":
+                            this.$store.commit("chat/SET_USER_ONLINE", {
+                                userId: data.userId,
+                                online: data.online,
+                            });
+                            break;
                         case "message":
                             this.$store.commit("chat/PUSH_MESSAGE", {
                                 conversationId: data.conversationId,
                                 message: data,
                             });
+                            // Chỉ xử lý khi conversation đó không đang được mở
+                            if (
+                                this.$store.state.chat.activeConversationId !==
+                                data.conversationId
+                            ) {
+                                // Tăng unread count
+                                this.$store.commit(
+                                    "chat/INCREMENT_UNREAD",
+                                    data.conversationId,
+                                );
+                                // Hiện popup notification
+                                this.$store.commit(
+                                    "mercure/SET_POPUP_NOTIFICATION",
+                                    {
+                                        title:
+                                            "[Tin nhắn mới] Từ: " +
+                                            (data.senderName || ""),
+                                        body: data.content || "",
+                                        time: data.time || "Vừa xong",
+                                        icon: "mdi-chat-outline",
+                                        color: "primary",
+                                        duration: 5000,
+                                    },
+                                );
+                            }
                             break;
                         default:
                             this.$store.commit(
@@ -113,11 +149,15 @@ export default {
                             );
                             this.$store.commit(
                                 "mercure/SET_POPUP_NOTIFICATION",
-                                data,
+                                {
+                                    ...data,
+                                    title: "[Thông báo mới] " + data.title,
+                                },
                             );
                             break;
                     }
                 };
+
                 this.eventSource.onerror = (err) => {
                     console.error("[Mercure] Lỗi kết nối:", err);
                     this.connectionStatus = "error";
