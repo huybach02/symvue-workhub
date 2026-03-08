@@ -6,6 +6,9 @@ export const postData = async (path, data, callback = () => {}) => {
     try {
         const res = await axiosInstance.post(path, data);
         if (res.success) {
+            if (res.data.type == "message") {
+                return res.data;
+            }
             toast.success(res.message);
             callback();
             return res.data;

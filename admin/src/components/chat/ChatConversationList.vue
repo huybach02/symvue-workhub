@@ -362,6 +362,12 @@ export default {
         async handleStartConversation(user) {
             this.$emit("start-conversation", user);
         },
+
+        removeAvailableUser(userId) {
+            this.availableUsers = this.availableUsers.filter(
+                (u) => u.id !== userId,
+            );
+        },
     },
 };
 </script>

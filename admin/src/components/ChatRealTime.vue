@@ -33,6 +33,7 @@
             >
                 <div class="chat-sidebar">
                     <ChatConversationList
+                        ref="convList"
                         :conversations="conversations"
                         :active-conversation-id="
                             activeConversation ? activeConversation.id : null
@@ -92,6 +93,7 @@
             <v-card class="d-flex flex-column" style="height: 100%">
                 <ChatConversationList
                     v-if="mobileScreen === 0"
+                    ref="convList"
                     :conversations="conversations"
                     :active-conversation-id="
                         activeConversation ? activeConversation.id : null
@@ -237,6 +239,7 @@ export default {
                     this.conversations.unshift(newConv);
                     this.openConversation(newConv);
                 }
+                this.$refs.convList?.removeAvailableUser(user.id);
             }
         },
 

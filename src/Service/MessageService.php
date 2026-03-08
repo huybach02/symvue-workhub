@@ -6,6 +6,7 @@ use App\Class\FilterWithPagination;
 use App\DTO\MessageDTO;
 use App\Entity\Message;
 use App\Entity\User;
+use App\Message\ChatMessage;
 use App\Repository\ConversationRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
@@ -13,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class MessageService
 {
@@ -20,6 +22,7 @@ class MessageService
 
     public function __construct(
         private HubInterface $hub,
+        private MessageBusInterface $messageBus,
         private readonly MessageRepository $messageRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly UserRepository $userRepository,
@@ -65,26 +68,7 @@ class MessageService
     public function create(MessageDTO $dto, User $currentUser): array
     {
         $code = uniqid();
-
         $time = new \DateTimeImmutable();
-
-        $item = new Message();
-
-        $sender = $currentUser;
-        $receiver = $this->userRepository->find($dto->receiverId);
-        $conversation = $this->conversationRepository->find($dto->conversationId);
-
-        $item->setSender($sender);
-        $item->setReceiver($receiver);
-        $item->setConversation($conversation);
-        $item->setContent($dto->content);
-        $item->setTime($time);
-
-        $conversation->setLastMessage($dto->content);
-        $conversation->setLastMessageAt($time);
-
-        $this->entityManager->persist($item);
-        $this->entityManager->flush();
 
         $topicTemplate = $this->mercureConfig['topics']['message'];
 
@@ -101,7 +85,7 @@ class MessageService
             'seenAt'         => null,
             'isDeleted'      => false,
             'deletedAt'      => null,
-            'time' => formatMessageTime($time),
+            'time'           => formatMessageTime($time),
         ];
 
         $payload = json_encode($data);
@@ -114,7 +98,18 @@ class MessageService
         $topicSender = str_replace(':userId', (string) $currentUser->getId(), $topicTemplate);
         $this->hub->publish(new Update($topicSender, $payload, false));
 
-        return $item->jsonSerialize();
+        $this->messageBus->dispatch(
+            new ChatMessage(
+                $code,
+                $currentUser->getId(),
+                $dto->receiverId,
+                $dto->conversationId,
+                $dto->content,
+                $time
+            )
+        );
+
+        return $data;
     }
 
     public function update(int $id, MessageDTO $dto): array

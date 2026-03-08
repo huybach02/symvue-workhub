@@ -95,7 +95,7 @@
                 <div style="flex: 1" />
                 <div
                     v-for="(msg, index) in normalizedMessages"
-                    :key="msg.id || index"
+                    :key="msg.code || index"
                     class="message-row"
                     :class="msg.isMine ? 'justify-end' : 'justify-start'"
                 >
@@ -179,10 +179,12 @@
                                 v-if="msg.isMine"
                                 size="12"
                                 :color="
-                                    msg.seen ? 'white' : 'rgba(255,255,255,0.5)'
+                                    msg.isSeen
+                                        ? 'white'
+                                        : 'rgba(255,255,255,0.5)'
                                 "
                             >
-                                {{ msg.seen ? "mdi-check-all" : "mdi-check" }}
+                                {{ msg.isSeen ? "mdi-check-all" : "mdi-check" }}
                             </v-icon>
                         </div>
                     </div>

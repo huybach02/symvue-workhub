@@ -14,6 +14,9 @@ class Message
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $code = null;
+
     #[ORM\ManyToOne(inversedBy: 'messages')]
     private ?Conversation $conversation = null;
 
@@ -50,6 +53,18 @@ class Message
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): static
+    {
+        $this->code = $code;
+
+        return $this;
     }
 
     public function getConversation(): ?Conversation
@@ -188,6 +203,7 @@ class Message
     {
         return [
             'id' => $this->id,
+            'code' => $this->code,
             'conversationId' => $this->conversation?->getId(),
             'senderId' => $this->sender?->getId(),
             'receiverId' => $this->receiver?->getId(),

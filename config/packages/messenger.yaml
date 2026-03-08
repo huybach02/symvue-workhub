@@ -25,3 +25,6 @@ framework:
             # Route your messages to the transports
             # 'App\Message\YourMessage': async
             App\Message\ThongBaoHeThongMessage: async
+            App\Message\ThongBaoCaNhanMessage: async
+            App\Message\ThongBaoBoPhanMessage: async
+            App\Message\ChatMessage: async
