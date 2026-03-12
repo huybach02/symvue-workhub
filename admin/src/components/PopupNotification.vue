@@ -23,7 +23,9 @@
                         <div class="toast-content">
                             <div class="toast-title">{{ toast.title }}</div>
                             <div class="toast-message">{{ toast.body }}</div>
-                            <div class="toast-time">{{ toast.time }}</div>
+                            <div class="toast-time">
+                                {{ formatMessageTime(toast.time) }}
+                            </div>
                         </div>
 
                         <v-btn
@@ -57,6 +59,8 @@
 </template>
 
 <script>
+import { functionHelper } from "@/helpers/functionHelper";
+
 export default {
     name: "PopupNotification",
     props: {
@@ -88,6 +92,9 @@ export default {
     },
 
     methods: {
+        formatMessageTime(dateString) {
+            return functionHelper.formatMessageTime(dateString);
+        },
         push(notification) {
             const duration = notification.duration || 5000;
             const id = this.nextId++;

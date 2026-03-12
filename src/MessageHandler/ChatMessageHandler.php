@@ -21,7 +21,6 @@ final class ChatMessageHandler
 
     public function __invoke(ChatMessage $message): void
     {
-        ray(123);
 
         $sender       = $this->entityManager->getReference(User::class, $message->getSenderId());
         $receiver     = $this->entityManager->getReference(User::class, $message->getReceiverId());
@@ -33,10 +32,12 @@ final class ChatMessageHandler
         $item->setReceiver($receiver);
         $item->setConversation($conversation);
         $item->setContent($message->getContent());
-        $item->setTime($message->getTime());
+        $item->setImages($message->getImages());
+        $item->setFiles($message->getFiles());
+        $item->setTime(new \DateTimeImmutable($message->getTime()));
 
-        $conversation->setLastMessage($message->getContent());
-        $conversation->setLastMessageAt($message->getTime());
+        $conversation->setLastMessage($message->getLastMessage());
+        $conversation->setLastMessageAt(new \DateTimeImmutable($message->getTime()));
 
         $this->entityManager->persist($item);
         $this->entityManager->flush();

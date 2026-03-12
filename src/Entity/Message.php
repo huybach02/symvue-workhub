@@ -29,10 +29,10 @@ class Message
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $content = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $images = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $files = null;
 
     #[ORM\Column(nullable: true, options: ['default' => false])]
@@ -212,7 +212,7 @@ class Message
             'files' => $this->files,
             'isSeen' => $this->isSeen,
             'seenAt' => $this->seenAt?->format('Y-m-d H:i:s'),
-            'time' =>  $this->time ? formatMessageTime($this->time) : null,
+            'time' =>  $this->time?->format('Y-m-d H:i:s'),
             'isDeleted' => $this->isDeleted,
             'deletedAt' => $this->deletedAt?->format('Y-m-d H:i:s'),
         ];

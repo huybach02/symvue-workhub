@@ -13,6 +13,7 @@ use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -67,12 +68,35 @@ class MessageService
         return array_map(fn(Message $msg) => $msg->jsonSerialize(), $messages);
     }
 
-    public function create(MessageDTO $dto, User $currentUser): array
+    public function create(Request $request, MessageDTO $dto, User $currentUser): array
     {
         $code = uniqid();
         $time = new \DateTimeImmutable();
+        $baseUrl = $request->getSchemeAndHttpHost();
 
         $topicTemplate = $this->mercureConfig['topics']['message'];
+
+        $images = [];
+        $files  = [];
+
+        if (!empty($dto->imageFiles)) {
+            $images = array_map(fn($image) => uploadFile($image, 'chats/images', $baseUrl), $dto->imageFiles);
+        }
+
+        if (!empty($dto->files)) {
+            $files = array_map(function ($file) use ($baseUrl) {
+                $originalName = $file->getClientOriginalName();
+                $size         = $file->getSize();
+                $mime         = $file->getMimeType();
+                $url          = uploadFile($file, 'chats/files', $baseUrl);
+                return [
+                    'name' => $originalName,
+                    'url'  => $url,
+                    'size' => $size,
+                    'mime' => $mime,
+                ];
+            }, $dto->files);
+        }
 
         $data = [
             'type'           => 'message',
@@ -82,13 +106,13 @@ class MessageService
             'senderName'     => $currentUser->getName(),
             'receiverId'     => $dto->receiverId,
             'content'        => $dto->content,
-            'images'         => [],
-            'files'          => [],
+            'images'         => $images,
+            'files'          => $files,
             'isSeen'         => false,
             'seenAt'         => null,
             'isDeleted'      => false,
             'deletedAt'      => null,
-            'time'           => formatMessageTime($time),
+            'time'           => $time->format('Y-m-d H:i:s'),
         ];
 
         $payload = json_encode($data);
@@ -114,6 +138,15 @@ class MessageService
         $topicSender = str_replace(':userId', (string) $currentUser->getId(), $topicTemplate);
         $this->hub->publish(new Update($topicSender, $payload, false));
 
+        $lastMessage = '';
+        if (!$dto->content && count($images) > 0) {
+            $lastMessage = t('chat.has_sent_image', ['%count%' => count($images)]);
+        } elseif (!$dto->content && count($files) > 0) {
+            $lastMessage = t('chat.has_sent_file', ['%count%' => count($files)]);
+        } else {
+            $lastMessage = $dto->content;
+        }
+
         $this->messageBus->dispatch(
             new ChatMessage(
                 $code,
@@ -121,7 +154,10 @@ class MessageService
                 $dto->receiverId,
                 $dto->conversationId,
                 $dto->content,
-                $time
+                $images,
+                $files,
+                $lastMessage,
+                $time->format('Y-m-d H:i:s')
             )
         );
 

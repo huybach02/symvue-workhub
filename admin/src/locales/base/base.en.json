@@ -17,7 +17,9 @@
         "upload": "Upload",
         "error_detail": "Error detail import",
         "view": "View",
-        "note": "Note:"
+        "note": "Note:",
+        "yesterday": "Yesterday",
+        "today": "Today"
     },
     "title": {
         "create": "Create",

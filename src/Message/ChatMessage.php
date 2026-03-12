@@ -11,8 +11,11 @@ final class ChatMessage
         private readonly int $senderId,
         private readonly int $receiverId,
         private readonly int $conversationId,
-        private readonly string $content,
-        private readonly \DateTimeImmutable $time
+        private readonly ?string $content,
+        private readonly array $images,
+        private readonly array $files,
+        private readonly string $lastMessage,
+        private readonly string $time
     ) {}
 
     public function getCode(): string
@@ -35,12 +38,27 @@ final class ChatMessage
         return $this->conversationId;
     }
 
-    public function getContent(): string
+    public function getContent(): ?string
     {
         return $this->content;
     }
 
-    public function getTime(): \DateTimeImmutable
+    public function getImages(): array
+    {
+        return $this->images;
+    }
+
+    public function getFiles(): array
+    {
+        return $this->files;
+    }
+
+    public function getLastMessage(): string
+    {
+        return $this->lastMessage;
+    }
+
+    public function getTime(): string
     {
         return $this->time;
     }

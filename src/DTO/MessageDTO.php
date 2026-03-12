@@ -13,7 +13,10 @@ class MessageDTO
         #[Assert\NotBlank(groups: ['create'])]
         public readonly ?int $conversationId = null,
 
-        #[Assert\NotBlank(groups: ['create'])]
         public readonly ?string $content = null,
+
+        public ?array $imageFiles = null,
+
+        public ?array $files = null,
     ) {}
 }

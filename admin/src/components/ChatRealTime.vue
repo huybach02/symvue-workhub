@@ -123,7 +123,7 @@
 <script>
 import { mapGetters } from "vuex";
 import { getAllData } from "@/services/bases/getData";
-import { postData } from "@/services/bases/postData";
+import { postData, postDataWithFile } from "@/services/bases/postData";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import ChatConversationList from "./chat/ChatConversationList.vue";
 import ChatWindow from "./chat/ChatWindow.vue";
@@ -262,20 +262,85 @@ export default {
             }
         },
 
-        async sendMessage(content) {
-            if (!content || !this.activeConversation) return;
+        async sendMessage(content, imageFiles = [], fileFiles = []) {
+            if (
+                !content &&
+                (!imageFiles || imageFiles.length === 0) &&
+                (!fileFiles || fileFiles.length === 0)
+            )
+                return;
+            if (!this.activeConversation) return;
 
-            await postData(API_ROUTES_CONFIG.message, {
-                conversationId: this.activeConversation.id,
-                receiverId: this.activeConversation.receiverId,
-                content: content,
-            });
+            const hasImages = imageFiles && imageFiles.length > 0;
+            const hasFiles = fileFiles && fileFiles.length > 0;
+
+            if (hasImages || hasFiles) {
+                const formData = new FormData();
+                formData.append("conversationId", this.activeConversation.id);
+                formData.append(
+                    "receiverId",
+                    this.activeConversation.receiverId,
+                );
+                if (content) {
+                    formData.append("content", content);
+                }
+
+                imageFiles.forEach((file) => {
+                    formData.append("imageFiles[]", file);
+                });
+
+                fileFiles.forEach((file) => {
+                    formData.append("files[]", file);
+                });
+
+                await postDataWithFile(API_ROUTES_CONFIG.message, formData);
+            } else {
+                await postData(API_ROUTES_CONFIG.message, {
+                    conversationId: this.activeConversation.id,
+                    receiverId: this.activeConversation.receiverId,
+                    content: content,
+                });
+            }
 
             const conv = this.conversations.find(
                 (c) => c.id === this.activeConversation.id,
             );
             if (conv) {
-                conv.lastMessage = content;
+                if (content) {
+                    conv.lastMessage = content;
+                } else if (
+                    !content &&
+                    imageFiles &&
+                    imageFiles.length > 0 &&
+                    (!fileFiles || fileFiles.length === 0)
+                ) {
+                    conv.lastMessage = this.$t("chat.has_sent_image", {
+                        count: imageFiles.length,
+                    });
+                } else if (
+                    !content &&
+                    fileFiles &&
+                    fileFiles.length > 0 &&
+                    (!imageFiles || imageFiles.length === 0)
+                ) {
+                    conv.lastMessage = this.$t("chat.has_sent_file", {
+                        count: fileFiles.length,
+                    });
+                } else if (
+                    !content &&
+                    imageFiles &&
+                    imageFiles.length > 0 &&
+                    fileFiles &&
+                    fileFiles.length > 0
+                ) {
+                    conv.lastMessage = this.$t(
+                        "chat.has_sent_images_and_files",
+                        {
+                            imageCount: imageFiles.length,
+                            fileCount: fileFiles.length,
+                        },
+                    );
+                }
                 conv.time = new Date().toLocaleTimeString("vi-VN", {
                     hour: "2-digit",
                     minute: "2-digit",

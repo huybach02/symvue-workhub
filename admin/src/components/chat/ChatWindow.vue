@@ -38,7 +38,11 @@
                     </v-avatar>
                     <span
                         class="online-dot"
-                        :class="isUserOnline(conversation.receiverId) ? 'online' : 'offline'"
+                        :class="
+                            isUserOnline(conversation.receiverId)
+                                ? 'online'
+                                : 'offline'
+                        "
                     />
                 </div>
 
@@ -51,11 +55,19 @@
                     >
                         <v-icon
                             size="10"
-                            :color="isUserOnline(conversation.receiverId) ? 'success' : 'grey'"
+                            :color="
+                                isUserOnline(conversation.receiverId)
+                                    ? 'success'
+                                    : 'grey'
+                            "
                         >
                             mdi-circle
                         </v-icon>
-                        {{ isUserOnline(conversation.receiverId) ? "Đang hoạt động" : "Offline" }}
+                        {{
+                            isUserOnline(conversation.receiverId)
+                                ? "Đang hoạt động"
+                                : "Offline"
+                        }}
                     </div>
                 </div>
 
@@ -129,28 +141,41 @@
                         class="message-bubble"
                         :class="msg.isMine ? 'my-bubble' : 'their-bubble'"
                     >
-                        <template v-if="msg.type === 'image'">
-                            <v-img
-                                :src="msg.content"
-                                width="200"
-                                rounded="lg"
-                                class="mb-1"
-                            />
+                        <template v-if="msg.images?.length > 0">
+                            <div class="d-flex flex-wrap ga-2 mb-2">
+                                <v-img
+                                    v-for="(image, index) in msg.images"
+                                    :key="index"
+                                    :src="image"
+                                    width="100"
+                                    height="100"
+                                    rounded="lg"
+                                    class="mb-1"
+                                />
+                            </div>
                         </template>
 
-                        <template v-else-if="msg.type === 'file'">
-                            <div class="file-bubble d-flex align-center ga-2">
-                                <v-icon color="primary" size="24">
+                        <template v-if="msg.files?.length > 0">
+                            <div
+                                v-for="(file, fIndex) in msg.files"
+                                :key="fIndex"
+                                class="file-bubble d-flex align-center ga-2 mb-1"
+                            >
+                                <v-icon
+                                    :color="msg.isMine ? 'white' : 'primary'"
+                                    size="24"
+                                >
                                     mdi-file-document-outline
                                 </v-icon>
-                                <div>
+                                <div class="flex-grow-1 text-truncate">
                                     <div
-                                        class="text-caption font-weight-medium"
+                                        class="text-caption font-weight-medium text-truncate"
+                                        style="max-width: 160px"
                                     >
-                                        {{ msg.fileName }}
+                                        {{ file.name }}
                                     </div>
                                     <div class="text-caption text-grey">
-                                        {{ msg.fileSize }}
+                                        {{ formatFileSize(file.size) }}
                                     </div>
                                 </div>
                                 <v-btn
@@ -158,33 +183,34 @@
                                     variant="text"
                                     size="x-small"
                                     class="ms-auto"
+                                    :href="file.url"
+                                    target="_blank"
+                                    download
                                 >
                                     <v-icon size="16">mdi-download</v-icon>
                                 </v-btn>
                             </div>
                         </template>
 
-                        <template v-else>
-                            <span class="text-body-2">{{ msg.content }}</span>
-                        </template>
+                        <span class="text-body-2">{{ msg.content }}</span>
 
-                        <div class="message-meta d-flex align-center ga-1 mt-1">
-                            <span
+                        <div class="message-meta d-flex align-center ga-1 mt-2">
+                            <p
                                 class="text-caption"
                                 style="font-size: 10px; opacity: 0.7"
                             >
-                                {{ msg.time }}
-                            </span>
+                                {{ formatTime(msg.time) }}
+                            </p>
                             <v-icon
                                 v-if="msg.isMine"
                                 size="12"
-                                :color="
-                                    msg.isSeen
-                                        ? 'white'
-                                        : 'rgba(255,255,255,0.5)'
-                                "
+                                color="rgba(255, 255, 255, 0.5)"
                             >
-                                {{ msg.isSeen ? "mdi-check-all" : "mdi-check" }}
+                                {{
+                                    msg.isSeen
+                                        ? "mdi-check-circle-outline"
+                                        : "mdi-check"
+                                }}
                             </v-icon>
                         </div>
                     </div>
@@ -238,28 +264,152 @@
 
         <div class="chat-input-area px-4 py-2 flex-shrink-0">
             <div class="d-flex align-center ga-1 mb-2">
-                <v-btn icon variant="text" size="x-small" color="grey">
-                    <v-icon size="18">mdi-emoticon-outline</v-icon>
-                    <v-tooltip activator="parent" location="top">
-                        Emoji
-                    </v-tooltip>
-                </v-btn>
-                <v-btn icon variant="text" size="x-small" color="grey">
+                <v-menu
+                    :close-on-content-click="false"
+                    location="top"
+                    offset="10"
+                >
+                    <template #activator="{ props }">
+                        <v-btn
+                            icon
+                            variant="text"
+                            size="x-small"
+                            color="grey"
+                            v-bind="props"
+                        >
+                            <v-icon size="18">mdi-emoticon-outline</v-icon>
+                            <v-tooltip activator="parent" location="top">
+                                Emoji
+                            </v-tooltip>
+                        </v-btn>
+                    </template>
+                    <Picker
+                        :data="emojiIndex"
+                        set="twitter"
+                        @select="onSelectEmoji"
+                    />
+                </v-menu>
+                <v-btn
+                    icon
+                    variant="text"
+                    size="x-small"
+                    color="grey"
+                    @click="triggerFileSelect"
+                >
                     <v-icon size="18">mdi-paperclip</v-icon>
                     <v-tooltip activator="parent" location="top">
-                        Đính kèm file
+                        Đính kèm file (tối đa 10 file)
                     </v-tooltip>
                 </v-btn>
-                <v-btn icon variant="text" size="x-small" color="grey">
+                <v-btn
+                    icon
+                    variant="text"
+                    size="x-small"
+                    color="grey"
+                    @click="triggerImageSelect"
+                >
                     <v-icon size="18">mdi-image-outline</v-icon>
                     <v-tooltip activator="parent" location="top">
-                        Gửi ảnh
+                        Gửi ảnh (tối đa 10 ảnh)
                     </v-tooltip>
                 </v-btn>
+                <input
+                    ref="imageInput"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    style="display: none"
+                    @change="handleImageSelected"
+                />
+                <input
+                    ref="fileInput"
+                    type="file"
+                    multiple
+                    style="display: none"
+                    @change="handleFileSelected"
+                />
+            </div>
+
+            <div
+                v-if="selectedImages.length > 0"
+                class="d-flex align-center ga-2 mb-2 px-2 pb-2 flex-wrap"
+            >
+                <div
+                    v-for="(img, index) in selectedImages"
+                    :key="index"
+                    class="position-relative"
+                    style="width: fit-content"
+                >
+                    <img
+                        :src="img.preview"
+                        style="
+                            max-width: 80px;
+                            max-height: 80px;
+                            border-radius: 8px;
+                            border: 1px solid #e0e0e0;
+                            object-fit: contain;
+                        "
+                    />
+                    <v-btn
+                        icon
+                        size="x-small"
+                        color="error"
+                        variant="flat"
+                        class="position-absolute"
+                        style="
+                            top: -8px;
+                            right: -8px;
+                            z-index: 1;
+                            min-width: 20px;
+                            width: 20px;
+                            height: 20px;
+                        "
+                        @click="removeSelectedImage(index)"
+                    >
+                        <v-icon size="12">mdi-close</v-icon>
+                    </v-btn>
+                </div>
+            </div>
+
+            <!-- Preview danh sách file đã chọn -->
+            <div
+                v-if="selectedFiles.length > 0"
+                class="d-flex flex-column ga-1 mb-2 px-2"
+            >
+                <div
+                    v-for="(f, index) in selectedFiles"
+                    :key="index"
+                    class="file-preview-item d-flex align-center ga-2"
+                >
+                    <v-icon color="primary" size="20"
+                        >mdi-file-document-outline</v-icon
+                    >
+                    <div class="flex-grow-1 text-truncate">
+                        <div
+                            class="text-caption font-weight-medium text-truncate"
+                            style="max-width: 180px"
+                        >
+                            {{ f.name }}
+                        </div>
+                        <div class="text-caption text-grey">
+                            {{ formatFileSize(f.size) }}
+                        </div>
+                    </div>
+                    <v-btn
+                        icon
+                        size="x-small"
+                        variant="text"
+                        color="error"
+                        @click="removeSelectedFile(index)"
+                    >
+                        <v-icon size="14">mdi-close</v-icon>
+                    </v-btn>
+                </div>
             </div>
 
             <div class="d-flex align-end ga-2">
                 <v-textarea
+                    ref="chatInput"
                     v-model="newMessage"
                     variant="outlined"
                     density="compact"
@@ -274,7 +424,11 @@
                     @keydown.enter.shift.exact="newMessage += '\n'"
                 />
                 <v-btn
-                    :disabled="!newMessage.trim()"
+                    :disabled="
+                        !newMessage.trim() &&
+                        selectedImages.length === 0 &&
+                        selectedFiles.length === 0
+                    "
                     color="primary"
                     icon
                     size="small"
@@ -292,10 +446,20 @@
 
 <script>
 import { mapGetters } from "vuex";
+import data from "emoji-mart-vue-fast/data/all.json";
+import "emoji-mart-vue-fast/css/emoji-mart.css";
+import { Picker, EmojiIndex } from "emoji-mart-vue-fast/src";
+import { functionHelper } from "@/helpers/functionHelper";
+import { toast } from "@/main";
+import { constant } from "@/utils/constants/constant";
+
+let emojiIndex = new EmojiIndex(data);
 
 export default {
     name: "ChatWindow",
-
+    components: {
+        Picker,
+    },
     props: {
         conversation: {
             type: Object,
@@ -329,6 +493,10 @@ export default {
         return {
             newMessage: "",
             showScrollBtn: false,
+            emojiIndex: emojiIndex,
+            emojisOutput: "",
+            selectedImages: [], // Mảng chứa objects { file, preview }
+            selectedFiles: [], // Mảng chứa File objects đã chọn
         };
     },
 
@@ -385,6 +553,9 @@ export default {
     },
 
     methods: {
+        formatTime(timeString) {
+            return functionHelper.formatMessageTime(timeString);
+        },
         showAvatar(index) {
             if (index === 0) return true;
             return (
@@ -411,11 +582,136 @@ export default {
 
         handleSend() {
             const content = this.newMessage.trim();
-            if (!content) return;
-            this.$emit("send", content);
+            if (
+                !content &&
+                this.selectedImages.length === 0 &&
+                this.selectedFiles.length === 0
+            )
+                return;
+
+            const imageFiles = this.selectedImages.map((img) => img.file);
+            const fileFiles = [...this.selectedFiles];
+            this.$emit("send", content, imageFiles, fileFiles);
+
             this.newMessage = "";
+            this.removeAllSelectedImages();
+            this.selectedFiles = [];
             this.showScrollBtn = false;
             this.$nextTick(() => this.scrollToBottom());
+        },
+
+        triggerImageSelect() {
+            if (this.$refs.imageInput) {
+                this.$refs.imageInput.value = "";
+                this.$refs.imageInput.click();
+            }
+        },
+
+        handleImageSelected(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            const maxImages = constant.MAX_IMAGE_UPLOAD;
+            const validImages = Array.from(files).filter((file) =>
+                file.type.startsWith("image/"),
+            );
+            const imagesToAdd = validImages.slice(0, maxImages);
+
+            imagesToAdd.forEach((file) => {
+                this.selectedImages.push({
+                    file: file,
+                    preview: URL.createObjectURL(file),
+                });
+            });
+
+            setTimeout(() => {
+                this.scrollToBottom();
+            }, 100);
+
+            event.target.value = null;
+        },
+
+        removeSelectedImage(index) {
+            const img = this.selectedImages[index];
+            if (img && img.preview) {
+                URL.revokeObjectURL(img.preview);
+            }
+            this.selectedImages.splice(index, 1);
+        },
+
+        removeAllSelectedImages() {
+            this.selectedImages.forEach((img) => {
+                if (img.preview) {
+                    URL.revokeObjectURL(img.preview);
+                }
+            });
+            this.selectedImages = [];
+        },
+
+        triggerFileSelect() {
+            if (this.$refs.fileInput) {
+                this.$refs.fileInput.value = "";
+                this.$refs.fileInput.click();
+            }
+        },
+
+        handleFileSelected(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            const maxFiles = constant.MAX_FILE_UPLOAD;
+            const validFiles = Array.from(files).filter(
+                (file) => !file.type.startsWith("image/"),
+            );
+            const filesToAdd = validFiles.slice(0, maxFiles);
+
+            filesToAdd.forEach((file) => {
+                this.selectedFiles.push(file);
+            });
+
+            setTimeout(() => {
+                this.scrollToBottom();
+            }, 100);
+
+            event.target.value = null;
+        },
+
+        removeSelectedFile(index) {
+            this.selectedFiles.splice(index, 1);
+        },
+
+        formatFileSize(bytes) {
+            if (bytes === 0) return "0 B";
+            const k = 1024;
+            const sizes = ["B", "KB", "MB", "GB"];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return (
+                parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i]
+            );
+        },
+
+        onSelectEmoji(emoji) {
+            const emojiChar = emoji.native;
+            const textarea = this.$refs.chatInput.$el.querySelector("textarea");
+
+            if (textarea) {
+                const startPos = textarea.selectionStart;
+                const endPos = textarea.selectionEnd;
+
+                this.newMessage =
+                    this.newMessage.substring(0, startPos) +
+                    emojiChar +
+                    this.newMessage.substring(endPos);
+                this.$nextTick(() => {
+                    textarea.focus();
+                    textarea.setSelectionRange(
+                        startPos + emojiChar.length,
+                        startPos + emojiChar.length,
+                    );
+                });
+            } else {
+                this.newMessage += emojiChar;
+            }
         },
     },
 };
@@ -557,5 +853,12 @@ export default {
 
 .chat-input-area {
     background-color: #fff;
+}
+
+.file-preview-item {
+    background-color: #f5f7fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 6px 10px;
 }
 </style>

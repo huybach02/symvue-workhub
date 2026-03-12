@@ -123,7 +123,9 @@
                                                 class="text-body-2 font-weight-medium text-truncate"
                                                 :class="{
                                                     'font-weight-bold':
-                                                        unreadByConversation(conv.id) > 0,
+                                                        unreadByConversation(
+                                                            conv.id,
+                                                        ) > 0,
                                                 }"
                                             >
                                                 {{ conv.nameUser }}
@@ -131,7 +133,9 @@
                                             <span
                                                 class="text-caption text-grey flex-shrink-0 ms-2"
                                             >
-                                                {{ conv.time }}
+                                                {{
+                                                    formatMessageTime(conv.time)
+                                                }}
                                             </span>
                                         </div>
                                         <div
@@ -141,15 +145,25 @@
                                                 class="text-caption text-medium-emphasis text-truncate"
                                                 :class="{
                                                     'text-high-emphasis font-weight-medium':
-                                                        unreadByConversation(conv.id) > 0,
+                                                        unreadByConversation(
+                                                            conv.id,
+                                                        ) > 0,
                                                 }"
                                                 style="max-width: 180px"
                                             >
                                                 {{ conv.lastMessage }}
                                             </span>
                                             <v-badge
-                                                v-if="unreadByConversation(conv.id) > 0"
-                                                :content="unreadByConversation(conv.id)"
+                                                v-if="
+                                                    unreadByConversation(
+                                                        conv.id,
+                                                    ) > 0
+                                                "
+                                                :content="
+                                                    unreadByConversation(
+                                                        conv.id,
+                                                    )
+                                                "
                                                 color="error"
                                                 inline
                                                 class="flex-shrink-0 ms-1"
@@ -282,6 +296,7 @@
 import { mapGetters } from "vuex";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import { getAllData } from "@/services/bases/getData";
+import { functionHelper } from "@/helpers/functionHelper";
 
 export default {
     name: "ChatConversationList",
@@ -352,6 +367,10 @@ export default {
     },
 
     methods: {
+        formatMessageTime(dateString) {
+            return functionHelper.formatMessageTime(dateString);
+        },
+
         async fetchAvailableUsers(keyword) {
             const data = await getAllData(
                 API_ROUTES_CONFIG.conversation + "/search",

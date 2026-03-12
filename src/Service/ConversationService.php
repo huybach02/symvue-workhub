@@ -11,6 +11,7 @@ use App\Entity\ConversationUser;
 use App\Entity\User;
 use App\Repository\ConversationRepository;
 use App\Repository\ConversationUserRepository;
+use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -21,6 +22,7 @@ class ConversationService
         private readonly ConversationUserRepository $conversationUserRepository,
         private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly MessageRepository $messageRepository,
     ) {}
 
     public function search(array $params, User $currentUser): array
@@ -101,7 +103,7 @@ class ConversationService
             $data['avatarUser'] = $partner?->getImage() ?? $conv->getAvatar();
 
             // Format thời gian tin nhắn cuối cho FE
-            $data['time'] = formatMessageTime($conv->getLastMessageAt());
+            $data['time'] = $conv->getLastMessageAt()?->format('Y-m-d H:i:s');
 
             return $data;
         }, $conversations);
@@ -195,6 +197,21 @@ class ConversationService
 
         if ($convUser) {
             $convUser->resetUnread(); // unreadCount = 0, lastReadAt = now
+            $this->entityManager->flush();
+        }
+
+        $messages = $this->messageRepository->findBy([
+            'conversation' => $conversation,
+            'receiver'       => $currentUser,
+            'isSeen'         => false,
+        ]);
+
+        foreach ($messages as $msg) {
+            $msg->setIsSeen(true);
+            $msg->setSeenAt(new \DateTimeImmutable());
+        }
+
+        if (count($messages) > 0) {
             $this->entityManager->flush();
         }
     }

@@ -19,4 +19,6 @@ export const constant = {
         { value: "warning", key: "thong_bao.options.type.warning" },
         { value: "error", key: "thong_bao.options.type.error" },
     ],
+    MAX_IMAGE_UPLOAD: 10,
+    MAX_FILE_UPLOAD: 10,
 };

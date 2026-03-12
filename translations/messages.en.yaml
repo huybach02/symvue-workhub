@@ -47,3 +47,7 @@ thong_bao:
         all: "All system"
         department: "Department/Division"
         user: "User"
+chat:
+    has_sent_image: "Sent %count% images"
+    has_sent_file: "Sent %count% files"
+    has_sent_images_and_files: "Sent %imageCount% images and %fileCount% files"

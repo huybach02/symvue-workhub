@@ -55,14 +55,18 @@ final class MessageController extends AbstractController
 
     #[Route('/message', methods: ['POST'])]
     public function create(
+        Request $request,
         #[MapRequestPayload(validationGroups: ['create'])] MessageDTO $messageDTO
     ): JsonResponse {
 
         /** @var \App\Entity\User $currentUser */
         $currentUser = $this->getUser();
 
+        $messageDTO->imageFiles = $request->files->all('imageFiles');
+        $messageDTO->files      = $request->files->all('files');
+
         try {
-            $data = $this->messageService->create($messageDTO, $currentUser);
+            $data = $this->messageService->create($request, $messageDTO, $currentUser);
             return CustomResponse::success($data, t('success.created'));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());

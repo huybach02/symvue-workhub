@@ -17,7 +17,9 @@
         "upload": "Tải lên",
         "error_detail": "Chi tiết lỗi import",
         "view": "Xem",
-        "note": "Ghi chú: "
+        "note": "Ghi chú: ",
+        "yesterday": "Hôm qua",
+        "today": "Hôm nay"
     },
     "title": {
         "create": "Thêm mới",

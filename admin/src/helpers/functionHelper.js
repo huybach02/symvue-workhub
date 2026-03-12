@@ -1,4 +1,6 @@
 import { menuSidebar } from "@/configs/menuSidebar";
+import dayjs from "dayjs";
+import i18n from "@/plugins/i18n";
 
 export const functionHelper = {
     findMenuItemByValue(value) {
@@ -80,5 +82,22 @@ export const functionHelper = {
             .toUpperCase();
 
         return result;
+    },
+    formatMessageTime(dateString) {
+        if (!dateString) return "";
+        const date = dayjs(dateString);
+        if (!date.isValid()) return dateString;
+        const today = dayjs().startOf("day");
+        const yesterday = dayjs().subtract(1, "day").startOf("day");
+        const messageDate = date.startOf("day");
+
+        const timeFormatted = date.format("HH:mm");
+        if (messageDate.isSame(today)) {
+            return i18n.global.t("base.today") + ` ${timeFormatted}`;
+        } else if (messageDate.isSame(yesterday)) {
+            return i18n.global.t("base.yesterday") + ` ${timeFormatted}`;
+        } else {
+            return date.format("DD/MM/YYYY HH:mm");
+        }
     },
 };
