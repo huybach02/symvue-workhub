@@ -53,4 +53,4 @@ jobs:
                       docker image prune -af
                       docker builder prune -af
 
-                      echo "Deploy completed successfully."
+                      echo "====> Deploy completed successfully."
