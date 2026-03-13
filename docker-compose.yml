@@ -10,7 +10,7 @@ services:
             MERCURE_URL: http://mercure/.well-known/mercure
             MERCURE_PUBLIC_URL: http://localhost:3000/.well-known/mercure
         volumes:
-            - ./var:/var/www/html/var
+            - symfony_var:/var/www/html/var
             - ./config/jwt:/var/www/html/config/jwt
 
     be-nginx:
@@ -50,6 +50,9 @@ services:
             APP_ENV: prod
             MERCURE_URL: http://mercure/.well-known/mercure
             MERCURE_PUBLIC_URL: http://localhost:3000/.well-known/mercure
+        volumes:
+            - symfony_var:/var/www/html/var
+            - ./config/jwt:/var/www/html/config/jwt
         depends_on:
             - be-php
 
@@ -65,3 +68,6 @@ services:
                 cors_origins *
         ports:
             - "3000:80"
+
+volumes:
+    symfony_var:
