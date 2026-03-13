@@ -8,7 +8,7 @@ services:
         environment:
             APP_ENV: prod
             MERCURE_URL: http://mercure/.well-known/mercure
-            MERCURE_PUBLIC_URL: http://localhost:3000/.well-known/mercure
+            MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-https://mercure-erp.huybach02.io.vn/.well-known/mercure}
         volumes:
             - symfony_var:/var/www/html/var
             - symfony_uploads:/var/www/html/public/uploads
@@ -18,8 +18,8 @@ services:
         image: nginx:alpine
         container_name: symfony_nginx
         restart: unless-stopped
-        ports:
-            - "8000:80"
+        expose:
+            - "80"
         volumes:
             - ./public:/var/www/html/public
             - symfony_uploads:/var/www/html/public/uploads
@@ -32,12 +32,12 @@ services:
             context: ./admin
             dockerfile: Dockerfile
             args:
-                VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000/api}
-                VITE_MERCURE_URL: ${VITE_MERCURE_URL:-http://localhost:3000/.well-known/mercure}
+                VITE_API_BASE_URL: ${VITE_API_BASE_URL:-https://api-erp.huybach02.io.vn/api}
+                VITE_MERCURE_URL: ${VITE_MERCURE_URL:-https://mercure-erp.huybach02.io.vn/.well-known/mercure}
         container_name: vue_admin
         restart: unless-stopped
-        ports:
-            - "80:80"
+        expose:
+            - "80"
         depends_on:
             - be-nginx
 
@@ -51,7 +51,7 @@ services:
         environment:
             APP_ENV: prod
             MERCURE_URL: http://mercure/.well-known/mercure
-            MERCURE_PUBLIC_URL: http://localhost:3000/.well-known/mercure
+            MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-https://mercure-erp.huybach02.io.vn/.well-known/mercure}
         volumes:
             - symfony_var:/var/www/html/var
             - ./config/jwt:/var/www/html/config/jwt
@@ -64,13 +64,31 @@ services:
         restart: unless-stopped
         environment:
             SERVER_NAME: :80
-            MERCURE_PUBLISHER_JWT_KEY: "071c26246473e3a27780cfddf6123f5df4116fb8fc6f1456e04fabbeb8dd193a"
-            MERCURE_SUBSCRIBER_JWT_KEY: "071c26246473e3a27780cfddf6123f5df4116fb8fc6f1456e04fabbeb8dd193a"
+            MERCURE_PUBLISHER_JWT_KEY: ${MERCURE_JWT_SECRET:-071c26246473e3a27780cfddf6123f5df4116fb8fc6f1456e04fabbeb8dd193a}
+            MERCURE_SUBSCRIBER_JWT_KEY: ${MERCURE_JWT_SECRET:-071c26246473e3a27780cfddf6123f5df4116fb8fc6f1456e04fabbeb8dd193a}
             MERCURE_EXTRA_DIRECTIVES: |
-                cors_origins *
+                cors_origins https://erp.huybach02.io.vn https://api-erp.huybach02.io.vn https://mercure-erp.huybach02.io.vn
+        expose:
+            - "80"
+
+    npm:
+        image: jc21/nginx-proxy-manager:latest
+        container_name: nginx_proxy_manager
+        restart: unless-stopped
         ports:
-            - "3000:80"
+            - "80:80"
+            - "81:81"
+            - "443:443"
+        volumes:
+            - npm_data:/data
+            - npm_letsencrypt:/etc/letsencrypt
+        depends_on:
+            - fe-nginx
+            - be-nginx
+            - mercure
 
 volumes:
     symfony_var:
     symfony_uploads:
+    npm_data:
+    npm_letsencrypt:
