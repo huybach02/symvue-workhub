@@ -1,0 +1,67 @@
+services:
+    be-php:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: symfony_php
+        restart: unless-stopped
+        environment:
+            APP_ENV: prod
+            MERCURE_URL: http://mercure/.well-known/mercure
+            MERCURE_PUBLIC_URL: http://localhost:3000/.well-known/mercure
+        volumes:
+            - ./var:/var/www/html/var
+            - ./config/jwt:/var/www/html/config/jwt
+
+    be-nginx:
+        image: nginx:alpine
+        container_name: symfony_nginx
+        restart: unless-stopped
+        ports:
+            - "8000:80"
+        volumes:
+            - ./public:/var/www/html/public
+            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+            - be-php
+
+    fe-nginx:
+        build:
+            context: ./admin
+            dockerfile: Dockerfile
+            args:
+                VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000/api}
+                VITE_MERCURE_URL: ${VITE_MERCURE_URL:-http://localhost:3000/.well-known/mercure}
+        container_name: vue_admin
+        restart: unless-stopped
+        ports:
+            - "80:80"
+        depends_on:
+            - be-nginx
+
+    messenger:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: symfony_messenger
+        restart: unless-stopped
+        command: php bin/console messenger:consume async -vv --time-limit=3600 --memory-limit=128M
+        environment:
+            APP_ENV: prod
+            MERCURE_URL: http://mercure/.well-known/mercure
+            MERCURE_PUBLIC_URL: http://localhost:3000/.well-known/mercure
+        depends_on:
+            - be-php
+
+    mercure:
+        image: dunglas/mercure
+        container_name: mercure_hub
+        restart: unless-stopped
+        environment:
+            SERVER_NAME: :80
+            MERCURE_PUBLISHER_JWT_KEY: "071c26246473e3a27780cfddf6123f5df4116fb8fc6f1456e04fabbeb8dd193a"
+            MERCURE_SUBSCRIBER_JWT_KEY: "071c26246473e3a27780cfddf6123f5df4116fb8fc6f1456e04fabbeb8dd193a"
+            MERCURE_EXTRA_DIRECTIVES: |
+                cors_origins http://localhost http://127.0.0.1
+        ports:
+            - "3000:80"
