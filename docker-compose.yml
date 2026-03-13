@@ -62,6 +62,6 @@ services:
             MERCURE_PUBLISHER_JWT_KEY: "071c26246473e3a27780cfddf6123f5df4116fb8fc6f1456e04fabbeb8dd193a"
             MERCURE_SUBSCRIBER_JWT_KEY: "071c26246473e3a27780cfddf6123f5df4116fb8fc6f1456e04fabbeb8dd193a"
             MERCURE_EXTRA_DIRECTIVES: |
-                cors_origins http://localhost http://127.0.0.1
+                cors_origins *
         ports:
             - "3000:80"
