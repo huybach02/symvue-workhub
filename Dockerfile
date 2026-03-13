@@ -44,7 +44,7 @@ COPY . .
 RUN composer dump-autoload --optimize --classmap-authoritative --no-dev && \
     APP_ENV=prod APP_DEBUG=0 composer run-script --no-dev post-install-cmd
 
-RUN mkdir -p var/cache var/log && \
-    chmod -R 777 var
+RUN mkdir -p var/cache var/log public/uploads && \
+    chmod -R 777 var public/uploads
 
 CMD ["php-fpm"]
