@@ -48,6 +48,10 @@ class PermissionListener
 
         $user = $this->security->getUser();
 
+        if (!str_starts_with($path, '/api')) {
+            return;
+        }
+
         if ($this->shouldExcludeRoute($path)) {
             return;
         }
