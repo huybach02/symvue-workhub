@@ -2,9 +2,12 @@
 
 namespace App\Service;
 
+use App\Class\Constanst;
 use App\Class\FilterWithPagination;
 use App\DTO\BoPhanDTO;
 use App\Entity\BoPhan;
+use App\Entity\Conversation;
+use App\Entity\ConversationUser;
 use App\Entity\User;
 use App\Entity\UserPermission;
 use App\Repository\BoPhanRepository;
@@ -103,6 +106,21 @@ class BoPhanService
         $this->entityManager->persist($userPermission);
         $this->entityManager->flush();
 
+        $conversation = new Conversation();
+        $conversation->setType(Constanst::TYPE_CONVERSATION['department']);
+        $conversation->setName($item->getTenBoPhan());
+        $this->entityManager->persist($conversation);
+        $this->entityManager->flush();
+
+        $item->setConversation($conversation);
+        $this->entityManager->flush();
+
+        $conversationUser = new ConversationUser();
+        $conversationUser->setConversation($conversation);
+        $conversationUser->setMember($user);
+        $this->entityManager->persist($conversationUser);
+        $this->entityManager->flush();
+
         $this->mergeUserPermissions($user->getId());
 
         return $item->jsonSerialize();
@@ -159,6 +177,15 @@ class BoPhanService
 
         foreach ($userPermissions as $userPermission) {
             $this->entityManager->remove($userPermission);
+        }
+
+        $conversation = $item->getConversation();
+        if ($conversation) {
+            foreach ($conversation->getConversationUsers() as $conversationUser) {
+                $this->entityManager->remove($conversationUser);
+            }
+            $item->setConversation(null);
+            $this->entityManager->remove($conversation);
         }
 
         $this->entityManager->remove($item);
@@ -386,6 +413,20 @@ class BoPhanService
             $user->setBoPhanId(null);
         }
 
+        $conversation = $boPhan->getConversation();
+        if ($conversation) {
+            $conversationUser = $this->entityManager
+                ->getRepository(ConversationUser::class)
+                ->findOneBy([
+                    'conversation' => $conversation,
+                    'member' => $user,
+                ]);
+
+            if ($conversationUser) {
+                $this->entityManager->remove($conversationUser);
+            }
+        }
+
         $this->entityManager->flush();
 
         $this->mergeUserPermissions($userId);
@@ -451,5 +492,11 @@ class BoPhanService
         }
 
         $this->handleAddUserPermission($userId, $boPhanId);
+
+        $conversationUser = new ConversationUser();
+        $conversationUser->setConversation($boPhan->getConversation());
+        $conversationUser->setMember($user);
+        $this->entityManager->persist($conversationUser);
+        $this->entityManager->flush();
     }
 }

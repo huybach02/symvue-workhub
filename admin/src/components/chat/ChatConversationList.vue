@@ -106,6 +106,7 @@
                                             </span>
                                         </v-avatar>
                                         <span
+                                            v-if="conv.type === 'private'"
                                             class="online-dot"
                                             :class="
                                                 isUserOnline(conv.receiverId)
@@ -128,7 +129,14 @@
                                                         ) > 0,
                                                 }"
                                             >
-                                                {{ conv.nameUser }}
+                                                {{
+                                                    conv.type === "department"
+                                                        ? "[" +
+                                                          $t("chat.group") +
+                                                          "] " +
+                                                          conv.name
+                                                        : conv.nameUser
+                                                }}
                                             </span>
                                             <span
                                                 class="text-caption text-grey flex-shrink-0 ms-2"
@@ -339,7 +347,9 @@ export default {
             const query = this.searchQuery.toLowerCase();
             return this.conversations.filter(
                 (c) =>
-                    (c.nameUser ?? "").toLowerCase().includes(query) ||
+                    (c.nameUser ?? c.name ?? "")
+                        .toLowerCase()
+                        .includes(query) ||
                     (c.lastMessage ?? "").toLowerCase().includes(query),
             );
         },

@@ -234,6 +234,7 @@
     "chat": {
         "has_sent_image": "Đã gửi {count} ảnh",
         "has_sent_file": "Đã gửi {count} file",
-        "has_sent_images_and_files": "Đã gửi {imageCount} ảnh và {fileCount} file"
+        "has_sent_images_and_files": "Đã gửi {imageCount} ảnh và {fileCount} file",
+        "group": "Nhóm"
     }
 }

@@ -48,6 +48,9 @@ class Conversation
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'conversation')]
     private Collection $messages;
 
+    #[ORM\OneToOne(inversedBy: 'conversation', cascade: ['persist', 'remove'])]
+    private ?BoPhan $boPhan = null;
+
     public function __construct()
     {
         $this->conversationUsers = new ArrayCollection();
@@ -189,6 +192,18 @@ class Conversation
                 $message->setConversation(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getBoPhan(): ?BoPhan
+    {
+        return $this->boPhan;
+    }
+
+    public function setBoPhan(?BoPhan $boPhan): static
+    {
+        $this->boPhan = $boPhan;
 
         return $this;
     }

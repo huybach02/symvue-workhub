@@ -9,7 +9,7 @@ final class ChatMessage
     public function __construct(
         private readonly string $code,
         private readonly int $senderId,
-        private readonly int $receiverId,
+        private readonly ?int $receiverId,
         private readonly int $conversationId,
         private readonly ?string $content,
         private readonly array $images,
@@ -28,7 +28,7 @@ final class ChatMessage
         return $this->senderId;
     }
 
-    public function getReceiverId(): int
+    public function getReceiverId(): ?int
     {
         return $this->receiverId;
     }

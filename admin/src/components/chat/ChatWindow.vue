@@ -37,6 +37,7 @@
                         </span>
                     </v-avatar>
                     <span
+                        v-if="conversation.type === 'private'"
                         class="online-dot"
                         :class="
                             isUserOnline(conversation.receiverId)
@@ -48,7 +49,7 @@
 
                 <div class="flex-grow-1">
                     <div class="text-body-2 font-weight-bold">
-                        {{ conversation.nameUser }}
+                        {{ conversationTitle }}
                     </div>
                     <div
                         class="text-caption text-grey d-flex align-center ga-1"
@@ -204,7 +205,7 @@
                                 {{ formatTime(msg.time) }}
                             </p>
                             <v-icon
-                                v-if="msg.isMine"
+                                v-if="msg.isMine && conversation.type === 'private'"
                                 size="12"
                                 color="rgba(255, 255, 255, 0.5)"
                             >
@@ -522,6 +523,9 @@ export default {
                         ? msg.isMine
                         : Number(msg.senderId) === Number(this.currentUserId),
             }));
+        },
+        conversationTitle() {
+            return this.conversation?.nameUser || this.conversation?.name || "";
         },
     },
 

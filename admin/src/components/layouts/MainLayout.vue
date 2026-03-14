@@ -93,7 +93,8 @@ export default {
 
         scheduleMarkConversationRead(conversationId) {
             if (!conversationId) return;
-            if ((this.pendingReadTimers[conversationId] ?? []).length > 0) return;
+            if ((this.pendingReadTimers[conversationId] ?? []).length > 0)
+                return;
 
             const delays = [0, 300, 1000];
             this.pendingReadTimers[conversationId] = delays.map((delay) =>
@@ -164,6 +165,11 @@ export default {
                             });
                             break;
                         case "message":
+                            window.dispatchEvent(
+                                new CustomEvent("chat:message", {
+                                    detail: data,
+                                }),
+                            );
                             this.$store.commit("chat/PUSH_MESSAGE", {
                                 conversationId: data.conversationId,
                                 message: data,
@@ -171,7 +177,7 @@ export default {
                             if (
                                 this.$store.state.chat.activeConversationId ===
                                     data.conversationId &&
-                                Number(data.receiverId) ===
+                                Number(data.senderId) !==
                                     Number(this.currentUser?.id)
                             ) {
                                 this.scheduleMarkConversationRead(

@@ -23,13 +23,15 @@ final class ChatMessageHandler
     {
 
         $sender       = $this->entityManager->getReference(User::class, $message->getSenderId());
-        $receiver     = $this->entityManager->getReference(User::class, $message->getReceiverId());
         $conversation = $this->entityManager->getReference(Conversation::class, $message->getConversationId());
 
         $item = new Message();
         $item->setCode($message->getCode());
         $item->setSender($sender);
-        $item->setReceiver($receiver);
+        if ($message->getReceiverId()) {
+            $receiver = $this->entityManager->getReference(User::class, $message->getReceiverId());
+            $item->setReceiver($receiver);
+        }
         $item->setConversation($conversation);
         $item->setContent($message->getContent());
         $item->setImages($message->getImages());

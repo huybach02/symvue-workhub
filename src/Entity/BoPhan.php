@@ -35,6 +35,9 @@ class BoPhan
     #[ORM\ManyToOne(inversedBy: 'boPhans')]
     private ?User $quanLyBoPhan = null;
 
+    #[ORM\OneToOne(mappedBy: 'boPhan', cascade: ['persist', 'remove'])]
+    private ?Conversation $conversation = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -113,5 +116,27 @@ class BoPhan
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];
+    }
+
+    public function getConversation(): ?Conversation
+    {
+        return $this->conversation;
+    }
+
+    public function setConversation(?Conversation $conversation): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($conversation === null && $this->conversation !== null) {
+            $this->conversation->setBoPhan(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($conversation !== null && $conversation->getBoPhan() !== $this) {
+            $conversation->setBoPhan($this);
+        }
+
+        $this->conversation = $conversation;
+
+        return $this;
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Class\Constanst;
 use App\Class\FilterWithPagination;
 use App\DTO\ConversationDTO;
 use App\Entity\Conversation;
@@ -62,7 +63,7 @@ class ConversationService
             ->andWhere('u.id NOT IN (' . $subDql . ')')
             ->setParameter('currentUser', $currentUser->getId())
             ->setParameter('keyword', '%' . mb_strtolower($keyword) . '%')
-            ->setParameter('type', 'private')
+            ->setParameter('type', Constanst::TYPE_CONVERSATION['private'])
             ->orderBy('u.name', 'ASC');
 
         $users = $qb->getQuery()->getResult();
@@ -107,9 +108,15 @@ class ConversationService
 
             // Với conversation private: lấy tên/avatar/id từ user đối diện
             $partner = $partnerEntry?->getMember();
-            $data['receiverId']  = $partner?->getId();
-            $data['nameUser']   = $partner?->getName() ?? $conv->getName();
-            $data['avatarUser'] = $partner?->getImage() ?? $conv->getAvatar();
+            if ($conv->getType() === Constanst::TYPE_CONVERSATION['private']) {
+                $data['receiverId']  = $partner?->getId();
+                $data['nameUser']   = $partner?->getName() ?? $conv->getName();
+                $data['avatarUser'] = $partner?->getImage() ?? $conv->getAvatar();
+            } else {
+                $data['receiverId']  = null;
+                $data['nameUser']   = $conv->getName();
+                $data['avatarUser'] = $conv->getAvatar();
+            }
 
             // Format thời gian tin nhắn cuối cho FE
             $data['time'] = $conv->getLastMessageAt()?->format('Y-m-d H:i:s');

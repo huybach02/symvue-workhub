@@ -277,10 +277,12 @@ export default {
             if (hasImages || hasFiles) {
                 const formData = new FormData();
                 formData.append("conversationId", this.activeConversation.id);
-                formData.append(
-                    "receiverId",
-                    this.activeConversation.receiverId,
-                );
+                if (this.activeConversation.receiverId) {
+                    formData.append(
+                        "receiverId",
+                        this.activeConversation.receiverId,
+                    );
+                }
                 if (content) {
                     formData.append("content", content);
                 }
@@ -295,11 +297,14 @@ export default {
 
                 await postDataWithFile(API_ROUTES_CONFIG.message, formData);
             } else {
-                await postData(API_ROUTES_CONFIG.message, {
+                const payload = {
                     conversationId: this.activeConversation.id,
-                    receiverId: this.activeConversation.receiverId,
                     content: content,
-                });
+                };
+                if (this.activeConversation.receiverId) {
+                    payload.receiverId = this.activeConversation.receiverId;
+                }
+                await postData(API_ROUTES_CONFIG.message, payload);
             }
 
             const conv = this.conversations.find(

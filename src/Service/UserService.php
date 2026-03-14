@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Class\FilterWithPagination;
 use App\DTO\UserDTO;
 use App\Entity\BoPhan;
+use App\Entity\ConversationUser;
 use App\Entity\User;
 use App\Entity\UserPermission;
 use App\Repository\ImageRepository;
@@ -321,6 +322,12 @@ class UserService
         }
 
         $this->boPhanService->mergeUserPermissions($userId);
+
+        $conversationUser = new ConversationUser();
+        $conversationUser->setConversation($boPhan->getConversation());
+        $conversationUser->setMember($user);
+        $this->entityManager->persist($conversationUser);
+        $this->entityManager->flush();
     }
 
     public function resetOrDeletePermission(int $userId, int $permissionId, string $action): void

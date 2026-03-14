@@ -2,21 +2,20 @@
 
 namespace App\Service;
 
+use App\Class\Constanst;
 use App\Class\FilterWithPagination;
 use App\DTO\MessageDTO;
+use App\Entity\ConversationUser;
 use App\Entity\Message;
 use App\Entity\User;
-use App\Message\ChatMessage;
 use App\Repository\ConversationRepository;
 use App\Repository\ConversationUserRepository;
 use App\Repository\MessageRepository;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class MessageService
 {
@@ -24,10 +23,8 @@ class MessageService
 
     public function __construct(
         private HubInterface $hub,
-        private MessageBusInterface $messageBus,
         private readonly MessageRepository $messageRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly UserRepository $userRepository,
         private readonly ConversationRepository $conversationRepository,
         private readonly ConversationUserRepository $conversationUserRepository,
         #[Autowire('%kernel.project_dir%')] private readonly string $projectDir,
@@ -41,7 +38,6 @@ class MessageService
 
         $result = FilterWithPagination::findWithPagination($qb, $params, 'e');
 
-        // Map collection to JSON
         $result['collection'] = array_map(
             fn(Message $item) => $item->jsonSerialize(),
             $result['collection']
@@ -70,11 +66,24 @@ class MessageService
 
     public function create(Request $request, MessageDTO $dto, User $currentUser): array
     {
+        $conversation = $this->conversationRepository->find($dto->conversationId);
+        if (!$conversation) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $currentConversationUser = $this->conversationUserRepository->findOneBy([
+            'conversation' => $conversation,
+            'member' => $currentUser,
+        ]);
+        if (!$currentConversationUser || !$currentConversationUser->isActive()) {
+            throw new \Exception(t('error.not_found'));
+        }
+
         $code = uniqid();
         $time = new \DateTimeImmutable();
         $baseUrl = $request->getSchemeAndHttpHost();
-
         $topicTemplate = $this->mercureConfig['topics']['message'];
+        $conversationType = $conversation->getType();
 
         $images = [];
         $files  = [];
@@ -98,45 +107,32 @@ class MessageService
             }, $dto->files);
         }
 
-        $data = [
-            'type'           => 'message',
-            'code'           => $code,
-            'conversationId' => $dto->conversationId,
-            'senderId'       => $currentUser->getId(),
-            'senderName'     => $currentUser->getName(),
-            'receiverId'     => $dto->receiverId,
-            'content'        => $dto->content,
-            'images'         => $images,
-            'files'          => $files,
-            'isSeen'         => false,
-            'seenAt'         => null,
-            'isDeleted'      => false,
-            'deletedAt'      => null,
-            'time'           => $time->format('Y-m-d H:i:s'),
-        ];
+        $memberEntries = array_values(array_filter(
+            $conversation->getConversationUsers()->toArray(),
+            fn(ConversationUser $conversationUser) => $conversationUser->isActive()
+        ));
 
-        $payload = json_encode($data);
+        $recipientEntries = array_values(array_filter(
+            $memberEntries,
+            fn(ConversationUser $conversationUser) => $conversationUser->getMember()?->getId() !== $currentUser->getId()
+        ));
 
-        // Tăng unread count của người nhận trong DB
-        $conversation = $this->conversationRepository->find($dto->conversationId);
-        if ($conversation) {
-            $receiverConvUser = $this->conversationUserRepository->findOneBy([
-                'conversation' => $conversation,
-                'member'       => $this->userRepository->find($dto->receiverId),
-            ]);
-            if ($receiverConvUser) {
-                $receiverConvUser->incrementUnread();
-                $this->entityManager->flush();
+        $resolvedReceiverId = null;
+        if ($conversationType === Constanst::TYPE_CONVERSATION['private']) {
+            $resolvedReceiverId = $dto->receiverId;
+            if (!$resolvedReceiverId && count($recipientEntries) === 1) {
+                $resolvedReceiverId = $recipientEntries[0]->getMember()?->getId();
+            }
+
+            $recipientEntries = array_values(array_filter(
+                $recipientEntries,
+                fn(ConversationUser $conversationUser) => $conversationUser->getMember()?->getId() === $resolvedReceiverId
+            ));
+
+            if (!$resolvedReceiverId || count($recipientEntries) === 0) {
+                throw new \Exception(t('error.not_found'));
             }
         }
-
-        // Publish đến receiver để receiver nhận được tin nhắn mới
-        $topicReceiver = str_replace(':userId', (string) $dto->receiverId, $topicTemplate);
-        $this->hub->publish(new Update($topicReceiver, $payload, false));
-
-        // Publish đến sender để sender cũng thấy tin nhắn mình vừa gửi
-        $topicSender = str_replace(':userId', (string) $currentUser->getId(), $topicTemplate);
-        $this->hub->publish(new Update($topicSender, $payload, false));
 
         $lastMessage = '';
         if (!$dto->content && count($images) > 0) {
@@ -147,19 +143,65 @@ class MessageService
             $lastMessage = $dto->content;
         }
 
-        $this->messageBus->dispatch(
-            new ChatMessage(
-                $code,
-                $currentUser->getId(),
-                $dto->receiverId,
-                $dto->conversationId,
-                $dto->content,
-                $images,
-                $files,
-                $lastMessage,
-                $time->format('Y-m-d H:i:s')
-            )
-        );
+        $message = new Message();
+        $message->setCode($code);
+        $message->setConversation($conversation);
+        $message->setSender($currentUser);
+        if ($resolvedReceiverId) {
+            $receiverEntry = $recipientEntries[0] ?? null;
+            $receiver = $receiverEntry?->getMember();
+            if ($receiver) {
+                $message->setReceiver($receiver);
+            }
+        }
+        $message->setContent($dto->content);
+        $message->setImages($images);
+        $message->setFiles($files);
+        $message->setTime($time);
+
+        $conversation->setLastMessage($lastMessage);
+        $conversation->setLastMessageAt($time);
+
+        $this->entityManager->persist($message);
+
+        $data = [
+            'type' => 'message',
+            'code' => $code,
+            'conversationId' => $dto->conversationId,
+            'conversationType' => $conversationType,
+            'senderId' => $currentUser->getId(),
+            'senderName' => $currentUser->getName(),
+            'receiverId' => $resolvedReceiverId,
+            'content' => $dto->content,
+            'images' => $images,
+            'files' => $files,
+            'isSeen' => false,
+            'seenAt' => null,
+            'isDeleted' => false,
+            'deletedAt' => null,
+            'time' => $time->format('Y-m-d H:i:s'),
+        ];
+
+        foreach ($recipientEntries as $recipientEntry) {
+            $recipientEntry->incrementUnread();
+        }
+
+        $this->entityManager->flush();
+
+        $payload = json_encode($data);
+
+        foreach ($recipientEntries as $recipientEntry) {
+            $recipientId = $recipientEntry->getMember()?->getId();
+            if (!$recipientId) {
+                continue;
+            }
+
+            $topicReceiver = str_replace(':userId', (string) $recipientId, $topicTemplate);
+            $this->hub->publish(new Update($topicReceiver, $payload, false));
+        }
+
+        $topicSender = str_replace(':userId', (string) $currentUser->getId(), $topicTemplate);
+        $this->hub->publish(new Update($topicSender, $payload, false));
 
         return $data;
     }
@@ -171,9 +213,6 @@ class MessageService
         if (!$item) {
             throw new \Exception(t('error.not_found'));
         }
-
-        // TODO: Map DTO properties to entity
-        // Example: $item->setName($dto->name);
 
         $this->entityManager->flush();
 

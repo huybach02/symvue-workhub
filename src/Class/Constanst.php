@@ -94,4 +94,8 @@ final class Constanst
         'PATCH'  => 'edit',
         'DELETE' => 'delete',
     ];
+    const TYPE_CONVERSATION = [
+        'private' => 'private',
+        'department' => 'department',
+    ];
 }
