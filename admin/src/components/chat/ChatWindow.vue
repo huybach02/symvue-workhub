@@ -55,20 +55,22 @@
                         class="text-caption text-grey d-flex align-center ga-1"
                     >
                         <v-icon
-                            size="10"
+                            size="14"
                             :color="
-                                isUserOnline(conversation.receiverId)
-                                    ? 'success'
-                                    : 'grey'
+                                conversation.type === 'department'
+                                    ? 'primary'
+                                    : isUserOnline(conversation.receiverId)
+                                      ? 'success'
+                                      : 'grey'
                             "
                         >
-                            mdi-circle
+                            {{
+                                conversation.type === "department"
+                                    ? "mdi-account-group"
+                                    : "mdi-circle"
+                            }}
                         </v-icon>
-                        {{
-                            isUserOnline(conversation.receiverId)
-                                ? "Đang hoạt động"
-                                : "Offline"
-                        }}
+                        {{ memberLabel }}
                     </div>
                 </div>
 
@@ -205,7 +207,10 @@
                                 {{ formatTime(msg.time) }}
                             </p>
                             <v-icon
-                                v-if="msg.isMine && conversation.type === 'private'"
+                                v-if="
+                                    msg.isMine &&
+                                    conversation.type === 'private'
+                                "
                                 size="12"
                                 color="rgba(255, 255, 255, 0.5)"
                             >
@@ -525,7 +530,19 @@ export default {
             }));
         },
         conversationTitle() {
-            return this.conversation?.nameUser || this.conversation?.name || "";
+            return this.conversation.type === "department"
+                ? "[" + this.$t("chat.group") + "] " + this.conversation.name
+                : this.conversation?.nameUser || this.conversation?.name || "";
+        },
+        memberLabel() {
+            if (this.conversation?.type === "department") {
+                const count = Number(this.conversation?.memberCount ?? 0);
+                return `${count} thành viên`;
+            }
+
+            return this.isUserOnline(this.conversation?.receiverId)
+                ? "Đang hoạt động"
+                : "Offline";
         },
     },
 

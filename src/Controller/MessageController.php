@@ -67,7 +67,7 @@ final class MessageController extends AbstractController
 
         try {
             $data = $this->messageService->create($request, $messageDTO, $currentUser);
-            return CustomResponse::success($data, t('success.created'));
+            return $this->json($data);
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }

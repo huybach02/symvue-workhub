@@ -105,6 +105,10 @@ class ConversationService
 
             $data['unread']     = $myEntry?->getUnreadCount() ?? 0;
             $data['online']     = false;
+            $data['memberCount'] = count(array_filter(
+                $conv->getConversationUsers()->toArray(),
+                fn(ConversationUser $conversationUser) => $conversationUser->isActive()
+            ));
 
             // Với conversation private: lấy tên/avatar/id từ user đối diện
             $partner = $partnerEntry?->getMember();
