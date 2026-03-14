@@ -81,8 +81,9 @@ final class ConversationController extends AbstractController
         $currentUser = $this->getUser();
 
         try {
-            $this->conversationService->markAsRead($id, $currentUser);
-            return CustomResponse::success(['type' => 'message'], t('success.updated'));
+            $data = $this->conversationService->markAsRead($id, $currentUser);
+            // return CustomResponse::success($data, t('success.updated'));
+            return $this->json($data);
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }

@@ -226,8 +226,8 @@ export default {
             this.isLoadingMessages = true;
             this.$store.commit("chat/SET_ACTIVE_CONVERSATION", conv.id);
             this.$store.commit("chat/RESET_UNREAD", conv.id);
-            postData(`${API_ROUTES_CONFIG.conversation}/${conv.id}/read`);
             await this.loadMessageOfConversation(conv.id);
+            await postData(`${API_ROUTES_CONFIG.conversation}/${conv.id}/read`);
             this.isLoadingMessages = false;
         },
 

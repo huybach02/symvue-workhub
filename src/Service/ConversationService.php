@@ -14,16 +14,25 @@ use App\Repository\ConversationUserRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
 
 class ConversationService
 {
+    private array $mercureConfig;
+
     public function __construct(
         private readonly ConversationRepository $conversationRepository,
         private readonly ConversationUserRepository $conversationUserRepository,
         private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly MessageRepository $messageRepository,
-    ) {}
+        private readonly HubInterface $hub,
+        #[Autowire('%kernel.project_dir%')] private readonly string $projectDir,
+    ) {
+        $this->mercureConfig = require $this->projectDir . '/config/mercure.php';
+    }
 
     public function search(array $params, User $currentUser): array
     {
@@ -181,7 +190,7 @@ class ConversationService
         $this->entityManager->flush();
     }
 
-    public function markAsRead(int $conversationId, User $currentUser): void
+    public function markAsRead(int $conversationId, User $currentUser): array
     {
         $conversation = $this->conversationRepository->find($conversationId);
 
@@ -206,13 +215,45 @@ class ConversationService
             'isSeen'         => false,
         ]);
 
+        $seenAt = new \DateTimeImmutable();
+        $messageCodes = [];
+        $senderIds = [];
+
         foreach ($messages as $msg) {
             $msg->setIsSeen(true);
-            $msg->setSeenAt(new \DateTimeImmutable());
+            $msg->setSeenAt($seenAt);
+            $messageCodes[] = $msg->getCode();
+            $senderId = $msg->getSender()?->getId();
+            if ($senderId) {
+                $senderIds[$senderId] = true;
+            }
         }
 
         if (count($messages) > 0) {
             $this->entityManager->flush();
+
+            $payload = json_encode([
+                'type' => 'message_seen',
+                'conversationId' => $conversationId,
+                'readerId' => $currentUser->getId(),
+                'messageCodes' => array_values(array_filter($messageCodes)),
+                'seenAt' => $seenAt->format('Y-m-d H:i:s'),
+            ]);
+
+            $topicTemplate = $this->mercureConfig['topics']['message'];
+            foreach (array_keys($senderIds) as $senderId) {
+                $topic = str_replace(':userId', (string) $senderId, $topicTemplate);
+                $this->hub->publish(new Update($topic, $payload, false));
+            }
         }
+
+        return [
+            'type' => 'message_seen',
+            'conversationId' => $conversationId,
+            'readerId' => $currentUser->getId(),
+            'markedCount' => count($messages),
+            'messageCodes' => array_values(array_filter($messageCodes)),
+            'seenAt' => count($messages) > 0 ? $seenAt->format('Y-m-d H:i:s') : null,
+        ];
     }
 }

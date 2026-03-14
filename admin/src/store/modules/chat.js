@@ -41,6 +41,27 @@ const mutations = {
         };
     },
 
+    MARK_MESSAGES_SEEN(state, { conversationId, messageCodes, seenAt }) {
+        const existing = state.messagesMap[conversationId] ?? [];
+        if (existing.length === 0 || !Array.isArray(messageCodes) || messageCodes.length === 0) {
+            return;
+        }
+
+        const codeSet = new Set(messageCodes);
+        state.messagesMap = {
+            ...state.messagesMap,
+            [conversationId]: existing.map((message) =>
+                codeSet.has(message.code)
+                    ? {
+                          ...message,
+                          isSeen: true,
+                          seenAt: seenAt ?? message.seenAt ?? null,
+                      }
+                    : message,
+            ),
+        };
+    },
+
     SET_ONLINE_STATUSES(state, statuses) {
         state.onlineUsers = { ...state.onlineUsers, ...statuses };
     },

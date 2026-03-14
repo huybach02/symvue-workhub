@@ -48,6 +48,8 @@ export default {
         return {
             eventSource: null,
             connectionStatus: "connecting",
+            pendingReadTimers: {},
+            readRequestInFlight: {},
         };
     },
     computed: {
@@ -72,9 +74,59 @@ export default {
         if (this.eventSource) {
             this.eventSource.close();
         }
+        this.clearAllReadTimers();
         presenceService.stopPresence();
     },
     methods: {
+        clearReadTimers(conversationId) {
+            const timers = this.pendingReadTimers[conversationId] ?? [];
+            timers.forEach((timerId) => window.clearTimeout(timerId));
+            delete this.pendingReadTimers[conversationId];
+            delete this.readRequestInFlight[conversationId];
+        },
+
+        clearAllReadTimers() {
+            Object.keys(this.pendingReadTimers).forEach((conversationId) => {
+                this.clearReadTimers(conversationId);
+            });
+        },
+
+        scheduleMarkConversationRead(conversationId) {
+            if (!conversationId) return;
+            if ((this.pendingReadTimers[conversationId] ?? []).length > 0) return;
+
+            const delays = [0, 300, 1000];
+            this.pendingReadTimers[conversationId] = delays.map((delay) =>
+                window.setTimeout(async () => {
+                    if (this.readRequestInFlight[conversationId]) {
+                        return;
+                    }
+
+                    this.readRequestInFlight[conversationId] = true;
+
+                    try {
+                        const response = await axiosInstance.post(
+                            `/conversation/${conversationId}/read`,
+                        );
+                        const payload = response?.data ?? response;
+                        const responseData = payload?.data ?? payload;
+                        const markedCount = Number(
+                            responseData?.markedCount ?? 0,
+                        );
+
+                        if (markedCount > 0) {
+                            this.clearReadTimers(conversationId);
+                            return;
+                        }
+                    } finally {
+                        if (this.pendingReadTimers[conversationId]) {
+                            this.readRequestInFlight[conversationId] = false;
+                        }
+                    }
+                }, delay),
+            );
+        },
+
         async connectMercure() {
             try {
                 const mercureToken = localStorage.getItem("mercure_token");
@@ -116,6 +168,16 @@ export default {
                                 conversationId: data.conversationId,
                                 message: data,
                             });
+                            if (
+                                this.$store.state.chat.activeConversationId ===
+                                    data.conversationId &&
+                                Number(data.receiverId) ===
+                                    Number(this.currentUser?.id)
+                            ) {
+                                this.scheduleMarkConversationRead(
+                                    data.conversationId,
+                                );
+                            }
                             // Chỉ xử lý khi conversation đó không đang được mở
                             if (
                                 this.$store.state.chat.activeConversationId !==
@@ -141,6 +203,14 @@ export default {
                                     },
                                 );
                             }
+                            break;
+                        case "message_seen":
+                            this.clearReadTimers(data.conversationId);
+                            this.$store.commit("chat/MARK_MESSAGES_SEEN", {
+                                conversationId: data.conversationId,
+                                messageCodes: data.messageCodes,
+                                seenAt: data.seenAt,
+                            });
                             break;
                         default:
                             this.$store.commit(
