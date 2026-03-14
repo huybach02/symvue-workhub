@@ -27,6 +27,11 @@ class Schedule implements ScheduleProviderInterface
                 '0 0 * * *',
                 new RunCommandMessage('app:rebuild-user-permissions-cache')
             ))
+            // Keep alive database vào 23h mỗi ngày
+            ->add(RecurringMessage::cron(
+                '0 23 * * *',
+                new RunCommandMessage('app:keep-alive-db')
+            ))
             // ->add(RecurringMessage::cron(
             //     '* * * * *',
             //     new RunCommandMessage('app:rebuild-user-permissions-cache')

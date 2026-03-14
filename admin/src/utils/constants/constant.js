@@ -1,4 +1,16 @@
+import i18n from "@/plugins/i18n";
+
 export const constant = {
+    ACTIONS: [
+        { key: "index", label: i18n.global.t("bo_phan.actions.index") },
+        { key: "create", label: i18n.global.t("bo_phan.actions.create") },
+        { key: "show", label: i18n.global.t("bo_phan.actions.show") },
+        { key: "edit", label: i18n.global.t("bo_phan.actions.edit") },
+        { key: "delete", label: i18n.global.t("bo_phan.actions.delete") },
+        { key: "export", label: i18n.global.t("bo_phan.actions.export") },
+        { key: "import", label: i18n.global.t("bo_phan.actions.import") },
+        { key: "showMenu", label: i18n.global.t("bo_phan.actions.showMenu") },
+    ],
     GENDER: [
         { value: "male", key: "gender.male" },
         { value: "female", key: "gender.female" },

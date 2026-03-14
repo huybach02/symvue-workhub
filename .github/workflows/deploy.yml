@@ -29,30 +29,33 @@ jobs:
 
                       cd "${{ secrets.EC2_APP_DIR }}"
 
-                      echo "[1/8] Update source code"
+                      echo "[1/9] Update source code"
                       git fetch origin main
                       git pull --ff-only origin main
 
-                      echo "[2/8] Export frontend build variables"
+                      echo "[2/9] Export frontend build variables"
                       export VITE_API_BASE_URL="${{ secrets.VITE_API_BASE_URL }}"
                       export VITE_MERCURE_URL="${{ secrets.VITE_MERCURE_URL }}"
 
-                      echo "[3/8] Build Docker images"
+                      echo "[3/9] Build Docker images"
                       docker compose build --no-cache
 
-                      echo "[4/8] Start or refresh containers"
+                      echo "[4/9] Start or refresh containers"
                       docker compose up -d
 
-                      echo "[5/8] Run database migrations"
+                      echo "[5/9] Run database migrations"
                       docker compose exec -T be-php php bin/console doctrine:migrations:migrate --no-interaction --env=prod
 
-                      echo "[6/8] Clear Symfony cache"
+                      echo "[6/9] Clear Symfony cache"
                       docker compose exec -T be-php php bin/console cache:clear --env=prod --no-debug
 
-                      echo "[7/8] Show service status"
+                      echo "[7/9] Show service status"
                       docker compose ps
 
-                      echo "[8/8] Clean unused Docker resources"
+                      echo "[8/9] Verify scheduler service"
+                      docker compose logs scheduler --tail=50
+
+                      echo "[9/9] Clean unused Docker resources"
                       docker image prune -af
                       docker builder prune -af
 

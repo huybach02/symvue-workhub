@@ -113,10 +113,9 @@
                                 <span class="text-red"> * </span>
                             </div>
 
-                            <!-- Bảng phân quyền -->
-                            <div
-                                class="permission-table-wrapper"
-                                style="position: relative"
+                            <v-card
+                                variant="outlined"
+                                class="position-relative overflow-hidden"
                             >
                                 <v-overlay
                                     :model-value="permissionLoading"
@@ -130,167 +129,326 @@
                                         size="48"
                                     />
                                 </v-overlay>
-                                <v-table
-                                    class="permission-table"
-                                    fixed-header
-                                    height="400px"
-                                >
-                                    <thead>
-                                        <tr>
-                                            <th class="text-left">Module</th>
-                                            <th class="text-left">
-                                                {{
-                                                    $t("bo_phan.vai_tro.title")
-                                                }}
-                                            </th>
-                                            <th
-                                                v-for="action in availableActions"
-                                                :key="action.key"
-                                                class="text-center"
-                                            >
-                                                {{ action.label }}
-                                            </th>
-                                            <th class="text-center">
-                                                {{ $t("bo_phan.actions.all") }}
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <template
-                                            v-for="(
-                                                permission, index
-                                            ) in permissions"
-                                            :key="permission.name"
+
+                                <v-row no-gutters>
+                                    <v-col cols="12" md="4" lg="3">
+                                        <v-card
+                                            flat
+                                            rounded="0"
+                                            class="h-100 border-e"
                                         >
-                                            <!-- Row Quản lý -->
-                                            <tr>
-                                                <td
-                                                    :rowspan="2"
-                                                    class="module-name-cell"
-                                                >
-                                                    {{
-                                                        formatModuleName(
-                                                            permission.name,
+                                            <v-card-item>
+                                                <v-card-title>
+                                                    Module
+                                                </v-card-title>
+                                                <v-card-subtitle>
+                                                    {{ permissions.length }}
+                                                    module
+                                                </v-card-subtitle>
+                                            </v-card-item>
+
+                                            <v-divider />
+
+                                            <v-list
+                                                class="permission-module-list"
+                                                nav
+                                                density="comfortable"
+                                            >
+                                                <v-list-item
+                                                    v-for="(
+                                                        permission, index
+                                                    ) in permissions"
+                                                    :key="permission.name"
+                                                    :active="
+                                                        index ===
+                                                        activePermissionIndex
+                                                    "
+                                                    color="primary"
+                                                    rounded="lg"
+                                                    @click="
+                                                        setActivePermissionIndex(
+                                                            index,
                                                         )
-                                                    }}
-                                                </td>
-                                                <td>
-                                                    {{
-                                                        $t(
-                                                            "bo_phan.vai_tro.manager",
-                                                        )
-                                                    }}
-                                                </td>
-                                                <td
-                                                    v-for="action in availableActions"
-                                                    :key="action.key"
-                                                    class="text-center"
+                                                    "
                                                 >
-                                                    <v-checkbox
-                                                        v-if="
-                                                            permission.actions[
-                                                                action.key
-                                                            ] !== undefined
-                                                        "
-                                                        v-model="
-                                                            permissionStates[
-                                                                index
-                                                            ].manager[
-                                                                action.key
-                                                            ]
-                                                        "
-                                                        color="primary"
-                                                        hide-details
-                                                        density="compact"
-                                                        class="d-inline-flex justify-center"
-                                                    />
-                                                </td>
-                                                <td class="text-center">
-                                                    <v-checkbox
-                                                        :model-value="
-                                                            isAllChecked(
-                                                                index,
-                                                                'manager',
+                                                    <v-list-item-title>
+                                                        {{
+                                                            formatModuleName(
+                                                                permission.name,
                                                             )
-                                                        "
-                                                        color="primary"
-                                                        hide-details
-                                                        density="compact"
-                                                        class="d-inline-flex justify-center"
-                                                        @update:model-value="
-                                                            toggleAll(
-                                                                index,
-                                                                'manager',
-                                                                $event,
-                                                            )
-                                                        "
-                                                    />
-                                                </td>
-                                            </tr>
-                                            <!-- Row Nhân viên -->
-                                            <tr>
-                                                <td>
-                                                    {{
-                                                        $t(
-                                                            "bo_phan.vai_tro.employee",
-                                                        )
-                                                    }}
-                                                </td>
-                                                <td
-                                                    v-for="action in availableActions"
-                                                    :key="action.key"
-                                                    class="text-center"
-                                                >
-                                                    <v-checkbox
-                                                        v-if="
-                                                            permission.actions[
-                                                                action.key
-                                                            ] !== undefined
-                                                        "
-                                                        v-model="
-                                                            permissionStates[
-                                                                index
-                                                            ].employee[
-                                                                action.key
-                                                            ]
-                                                        "
-                                                        color="primary"
-                                                        hide-details
-                                                        density="compact"
-                                                        class="d-inline-flex justify-center"
-                                                    />
-                                                </td>
-                                                <td class="text-center">
-                                                    <v-checkbox
-                                                        :model-value="
-                                                            isAllChecked(
-                                                                index,
-                                                                'employee',
-                                                            )
-                                                        "
-                                                        color="primary"
-                                                        hide-details
-                                                        density="compact"
-                                                        class="d-inline-flex justify-center"
-                                                        @update:model-value="
-                                                            toggleAll(
-                                                                index,
-                                                                'employee',
-                                                                $event,
-                                                            )
-                                                        "
-                                                    />
-                                                </td>
-                                            </tr>
+                                                        }}
+                                                    </v-list-item-title>
+
+                                                    <template #append>
+                                                        <v-chip
+                                                            size="small"
+                                                            variant="tonal"
+                                                            color="primary"
+                                                        >
+                                                            {{
+                                                                getPermissionActionList(
+                                                                    permission,
+                                                                ).length
+                                                            }}
+                                                        </v-chip>
+                                                    </template>
+                                                </v-list-item>
+                                            </v-list>
+                                        </v-card>
+                                    </v-col>
+
+                                    <v-col cols="12" md="8" lg="9">
+                                        <template v-if="activePermission">
+                                            <v-card flat rounded="0">
+                                                <v-card-item class="pb-2">
+                                                    <div
+                                                        class="d-flex flex-column flex-md-row align-start align-md-center justify-space-between ga-4"
+                                                    >
+                                                        <div>
+                                                            <v-card-title
+                                                                class="px-0"
+                                                            >
+                                                                {{
+                                                                    formatModuleName(
+                                                                        activePermission.name,
+                                                                    )
+                                                                }}
+                                                            </v-card-title>
+                                                        </div>
+
+                                                        <div
+                                                            class="d-flex flex-wrap ga-3"
+                                                        >
+                                                            <v-card
+                                                                variant="tonal"
+                                                                color="primary"
+                                                            >
+                                                                <v-card-text
+                                                                    class="d-flex align-center justify-space-between ga-4 py-3"
+                                                                >
+                                                                    <div
+                                                                        class="d-flex align-center ga-2"
+                                                                    >
+                                                                        <span
+                                                                            class="font-weight-medium"
+                                                                        >
+                                                                            {{
+                                                                                $t(
+                                                                                    "bo_phan.vai_tro.manager",
+                                                                                )
+                                                                            }}
+                                                                        </span>
+                                                                        <v-chip
+                                                                            size="small"
+                                                                            variant="flat"
+                                                                            color="warning"
+                                                                        >
+                                                                            {{
+                                                                                countSelectedPermissions(
+                                                                                    activePermissionIndex,
+                                                                                    "manager",
+                                                                                )
+                                                                            }}
+                                                                        </v-chip>
+                                                                    </div>
+                                                                    <v-checkbox
+                                                                        :model-value="
+                                                                            isAllChecked(
+                                                                                activePermissionIndex,
+                                                                                'manager',
+                                                                            )
+                                                                        "
+                                                                        color="primary"
+                                                                        hide-details
+                                                                        density="compact"
+                                                                        @update:model-value="
+                                                                            toggleAll(
+                                                                                activePermissionIndex,
+                                                                                'manager',
+                                                                                $event,
+                                                                            )
+                                                                        "
+                                                                    />
+                                                                </v-card-text>
+                                                            </v-card>
+
+                                                            <v-card
+                                                                variant="tonal"
+                                                                color="primary"
+                                                            >
+                                                                <v-card-text
+                                                                    class="d-flex align-center justify-space-between ga-4 py-3"
+                                                                >
+                                                                    <div
+                                                                        class="d-flex align-center ga-2"
+                                                                    >
+                                                                        <span
+                                                                            class="font-weight-medium"
+                                                                        >
+                                                                            {{
+                                                                                $t(
+                                                                                    "bo_phan.vai_tro.employee",
+                                                                                )
+                                                                            }}
+                                                                        </span>
+                                                                        <v-chip
+                                                                            size="small"
+                                                                            variant="flat"
+                                                                            color="warning"
+                                                                        >
+                                                                            {{
+                                                                                countSelectedPermissions(
+                                                                                    activePermissionIndex,
+                                                                                    "employee",
+                                                                                )
+                                                                            }}
+                                                                        </v-chip>
+                                                                    </div>
+                                                                    <v-checkbox
+                                                                        :model-value="
+                                                                            isAllChecked(
+                                                                                activePermissionIndex,
+                                                                                'employee',
+                                                                            )
+                                                                        "
+                                                                        color="primary"
+                                                                        hide-details
+                                                                        density="compact"
+                                                                        @update:model-value="
+                                                                            toggleAll(
+                                                                                activePermissionIndex,
+                                                                                'employee',
+                                                                                $event,
+                                                                            )
+                                                                        "
+                                                                    />
+                                                                </v-card-text>
+                                                            </v-card>
+                                                        </div>
+                                                    </div>
+                                                </v-card-item>
+
+                                                <v-divider />
+
+                                                <v-card-text class="pa-4">
+                                                    <v-row>
+                                                        <v-col
+                                                            v-for="action in getPermissionActionList(
+                                                                activePermission,
+                                                            )"
+                                                            :key="action.key"
+                                                            cols="12"
+                                                            sm="6"
+                                                            xl="4"
+                                                        >
+                                                            <v-card
+                                                                variant="outlined"
+                                                                class="h-100"
+                                                            >
+                                                                <v-card-item>
+                                                                    <div
+                                                                        class="d-flex align-center justify-space-between ga-3"
+                                                                    >
+                                                                        <div
+                                                                            class="font-weight-medium"
+                                                                        >
+                                                                            {{
+                                                                                action.label
+                                                                            }}
+                                                                        </div>
+                                                                        <v-chip
+                                                                            size="x-small"
+                                                                            variant="tonal"
+                                                                        >
+                                                                            {{
+                                                                                action.key
+                                                                            }}
+                                                                        </v-chip>
+                                                                    </div>
+                                                                </v-card-item>
+
+                                                                <v-divider />
+
+                                                                <v-list
+                                                                    density="compact"
+                                                                >
+                                                                    <v-list-item>
+                                                                        <template
+                                                                            #title
+                                                                        >
+                                                                            <div
+                                                                                class="permission-checkbox-row"
+                                                                            >
+                                                                                <span>
+                                                                                    {{
+                                                                                        $t(
+                                                                                            "bo_phan.vai_tro.manager",
+                                                                                        )
+                                                                                    }}
+                                                                                </span>
+                                                                                <v-checkbox
+                                                                                    v-model="
+                                                                                        permissionStates[
+                                                                                            activePermissionIndex
+                                                                                        ]
+                                                                                            .manager[
+                                                                                            action
+                                                                                                .key
+                                                                                        ]
+                                                                                    "
+                                                                                    color="primary"
+                                                                                    hide-details
+                                                                                    density="compact"
+                                                                                />
+                                                                            </div>
+                                                                        </template>
+                                                                    </v-list-item>
+
+                                                                    <v-list-item>
+                                                                        <template
+                                                                            #title
+                                                                        >
+                                                                            <div
+                                                                                class="permission-checkbox-row"
+                                                                            >
+                                                                                <span>
+                                                                                    {{
+                                                                                        $t(
+                                                                                            "bo_phan.vai_tro.employee",
+                                                                                        )
+                                                                                    }}
+                                                                                </span>
+                                                                                <v-checkbox
+                                                                                    v-model="
+                                                                                        permissionStates[
+                                                                                            activePermissionIndex
+                                                                                        ]
+                                                                                            .employee[
+                                                                                            action
+                                                                                                .key
+                                                                                        ]
+                                                                                    "
+                                                                                    color="primary"
+                                                                                    hide-details
+                                                                                    density="compact"
+                                                                                />
+                                                                            </div>
+                                                                        </template>
+                                                                    </v-list-item>
+                                                                </v-list>
+                                                            </v-card>
+                                                        </v-col>
+                                                    </v-row>
+                                                </v-card-text>
+                                            </v-card>
                                         </template>
-                                    </tbody>
-                                </v-table>
-                            </div>
+                                    </v-col>
+                                </v-row>
+                            </v-card>
                         </v-col>
                     </v-row>
                 </v-col>
 
-                <!-- Nút cancel và create/update -->
                 <v-col cols="12">
                     <div class="d-flex justify-end ga-2">
                         <v-btn color="grey" @click="handleCancel">
@@ -358,6 +516,7 @@ export default {
             permissionStates: [],
             permissionLoading: false,
             selectedQuanLyBoPhan: null,
+            activePermissionIndex: 0,
         };
     },
     computed: {
@@ -368,16 +527,10 @@ export default {
             }));
         },
         availableActions() {
-            return [
-                { key: "index", label: this.$t("bo_phan.actions.index") },
-                { key: "create", label: this.$t("bo_phan.actions.create") },
-                { key: "show", label: this.$t("bo_phan.actions.show") },
-                { key: "edit", label: this.$t("bo_phan.actions.edit") },
-                { key: "delete", label: this.$t("bo_phan.actions.delete") },
-                { key: "export", label: this.$t("bo_phan.actions.export") },
-                { key: "import", label: this.$t("bo_phan.actions.import") },
-                { key: "showMenu", label: this.$t("bo_phan.actions.showMenu") },
-            ];
+            return constant.ACTIONS;
+        },
+        activePermission() {
+            return this.permissions[this.activePermissionIndex] || null;
         },
     },
     watch: {
@@ -389,7 +542,6 @@ export default {
                         if (this.$refs.formRef) {
                             this.$refs.formRef.setValues(value);
                         }
-                        // Fill permission data vào checkboxes
                         if (value.phanQuyen && value.phanQuyen.length > 0) {
                             this.fillPermissionStates(value.phanQuyen);
                         }
@@ -415,7 +567,6 @@ export default {
             }
         },
         handleSubmit(values) {
-            // Map permissionStates vào format cần thiết cho API
             const permissionsData = this.permissions.map(
                 (permission, index) => ({
                     name: permission.name,
@@ -424,7 +575,6 @@ export default {
                 }),
             );
 
-            // Thêm permissions vào values
             const submitData = {
                 ...values,
                 permissions: permissionsData,
@@ -448,6 +598,7 @@ export default {
             try {
                 const response = await getListPhanQuyenMacDinh();
                 this.permissions = response;
+                this.activePermissionIndex = 0;
 
                 this.initializePermissionStates();
 
@@ -489,12 +640,11 @@ export default {
         fillPermissionStates(phanQuyenData) {
             phanQuyenData.forEach((phanQuyen) => {
                 const moduleIndex = this.permissions.findIndex(
-                    (p) => p.name === phanQuyen.name,
+                    (permission) => permission.name === phanQuyen.name,
                 );
 
                 if (moduleIndex !== -1) {
-                    const roles = ["manager", "employee"];
-                    roles.forEach((role) => {
+                    ["manager", "employee"].forEach((role) => {
                         if (phanQuyen[role]) {
                             Object.keys(phanQuyen[role]).forEach(
                                 (actionKey) => {
@@ -515,14 +665,24 @@ export default {
                 }
             });
         },
-        // Format tên module từ dạng "cau-hinh-chung" thành "Cau Hinh Chung"
+        setActivePermissionIndex(index) {
+            this.activePermissionIndex = index;
+        },
+        getPermissionActionList(permission) {
+            if (!permission?.actions) {
+                return [];
+            }
+
+            return this.availableActions.filter(
+                (action) => permission.actions[action.key] !== undefined,
+            );
+        },
         formatModuleName(name) {
             return name
                 .split("-")
                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                 .join(" ");
         },
-        // Kiểm tra xem tất cả các switch trong row có được check không
         isAllChecked(index, role) {
             const state = this.permissionStates[index]?.[role];
             if (!state) return false;
@@ -532,7 +692,13 @@ export default {
 
             return availableKeys.every((key) => state[key] === true);
         },
-        // Toggle tất cả các switch trong row
+        countSelectedPermissions(index, role) {
+            const state = this.permissionStates[index]?.[role];
+            if (!state) return 0;
+
+            return Object.values(state).filter((value) => value === true)
+                .length;
+        },
         toggleAll(index, role, value) {
             const permission = this.permissions[index];
             const availableKeys = Object.keys(permission.actions);
@@ -546,40 +712,24 @@ export default {
 </script>
 
 <style scoped>
-.permission-table-wrapper {
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    overflow: hidden;
+.permission-module-list {
+    max-height: 520px;
+    overflow: auto;
 }
 
-.permission-table {
-    border: none !important;
+.permission-checkbox-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
 }
 
-.permission-table :deep(thead) {
-    position: sticky;
-    top: 0;
-    z-index: 10;
+.permission-checkbox-row :deep(.v-selection-control) {
+    min-height: auto;
 }
 
-.permission-table :deep(th) {
-    background-color: #f5f5f5 !important;
-    font-weight: 600;
-    padding: 12px 8px;
-    border-bottom: 2px solid #e0e0e0 !important;
-}
-
-.permission-table :deep(td) {
-    padding: 8px;
-}
-
-.permission-table :deep(tbody tr:hover) {
-    background-color: #fafafa;
-}
-
-.module-name-cell {
-    vertical-align: middle;
-    font-weight: 500;
-    border-right: 1px solid #e0e0e0;
+.permission-checkbox-row :deep(.v-selection-control__wrapper) {
+    margin-inline-start: 0;
 }
 </style>

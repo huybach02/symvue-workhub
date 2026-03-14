@@ -28,7 +28,6 @@
                 />
 
                 <v-card-text>
-                    <!-- Select và button submit Cho phép assign người dùng vào 1 bộ phận với vai trò employee -->
                     <v-row align="end" class="mb-2">
                         <v-col cols="12" md="10">
                             <div class="mb-2">
@@ -90,7 +89,7 @@
                         />
                     </div>
 
-                    <!-- Không có dữ liệu -->
+                    <!-- KhÃƒÂ´ng cÃƒÂ³ dÃ¡Â»Â¯ liÃ¡Â»â€¡u -->
                     <v-alert
                         v-else-if="departments.length === 0 && boPhanLoaded"
                         type="warning"
@@ -100,7 +99,7 @@
                         {{ $t("bo_phan.text.notBelongsToAnyDepartment") }}
                     </v-alert>
 
-                    <!-- Expansion panels cho từng bộ phận -->
+                    <!-- Expansion panels cho tÃ¡Â»Â«ng bÃ¡Â»â„¢ phÃ¡ÂºÂ­n -->
                     <v-expansion-panels v-else class="mb-2">
                         <v-expansion-panel
                             v-for="(dept, deptIndex) in departments"
@@ -138,142 +137,320 @@
                             </v-expansion-panel-title>
 
                             <v-expansion-panel-text>
-                                <!-- Bảng phân quyền -->
-                                <div
-                                    class="permission-table-wrapper"
-                                    style="position: relative"
+                                <v-card
+                                    variant="outlined"
+                                    class="position-relative overflow-hidden"
                                 >
-                                    <v-table
-                                        class="permission-table"
-                                        fixed-header
-                                        height="400px"
-                                    >
-                                        <thead>
-                                            <tr>
-                                                <th class="text-left">
-                                                    Module
-                                                </th>
-                                                <th class="text-left">
-                                                    {{
-                                                        $t(
-                                                            "bo_phan.vai_tro.title",
-                                                        )
-                                                    }}
-                                                </th>
-                                                <th
-                                                    v-for="action in availableActions"
-                                                    :key="action.key"
-                                                    class="text-center"
-                                                >
-                                                    {{ action.label }}
-                                                </th>
-                                                <th class="text-center">
-                                                    {{
-                                                        $t(
-                                                            "bo_phan.actions.all",
-                                                        )
-                                                    }}
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <template
-                                                v-for="(
-                                                    permission, permIndex
-                                                ) in dept.phan_quyen"
-                                                :key="permission.name"
+                                    <v-row no-gutters>
+                                        <v-col cols="12" md="4" lg="3">
+                                            <v-card
+                                                flat
+                                                rounded="0"
+                                                class="h-100 border-e"
                                             >
-                                                <tr>
-                                                    <td
-                                                        class="module-name-cell"
-                                                    >
+                                                <v-card-item>
+                                                    <v-card-title>
+                                                        Module
+                                                    </v-card-title>
+                                                    <v-card-subtitle>
                                                         {{
-                                                            formatModuleName(
-                                                                permission.name,
+                                                            dept.phan_quyen
+                                                                ?.length || 0
+                                                        }}
+                                                        module
+                                                    </v-card-subtitle>
+                                                </v-card-item>
+
+                                                <v-divider />
+
+                                                <v-list
+                                                    class="permission-module-list"
+                                                    nav
+                                                    density="comfortable"
+                                                >
+                                                    <v-list-item
+                                                        v-for="(
+                                                            permission,
+                                                            permIndex
+                                                        ) in dept.phan_quyen"
+                                                        :key="permission.name"
+                                                        :active="
+                                                            permIndex ===
+                                                            activePermissionIndices[
+                                                                deptIndex
+                                                            ]
+                                                        "
+                                                        color="primary"
+                                                        rounded="lg"
+                                                        @click="
+                                                            setActivePermissionIndex(
+                                                                deptIndex,
+                                                                permIndex,
                                                             )
-                                                        }}
-                                                    </td>
-                                                    <td>
-                                                        {{
-                                                            dept.is_manager
-                                                                ? $t(
-                                                                      "bo_phan.vai_tro.manager",
-                                                                  )
-                                                                : $t(
-                                                                      "bo_phan.vai_tro.employee",
-                                                                  )
-                                                        }}
-                                                    </td>
-                                                    <td
-                                                        v-for="action in availableActions"
-                                                        :key="action.key"
-                                                        class="text-center"
+                                                        "
                                                     >
-                                                        <v-checkbox
-                                                            v-if="
-                                                                permissionStates[
-                                                                    deptIndex
-                                                                ] &&
-                                                                permissionStates[
-                                                                    deptIndex
-                                                                ][permIndex] &&
-                                                                permissionStates[
-                                                                    deptIndex
-                                                                ][permIndex][
-                                                                    dept.is_manager
-                                                                        ? 'manager'
-                                                                        : 'employee'
-                                                                ][
+                                                        <v-list-item-title>
+                                                            {{
+                                                                formatModuleName(
+                                                                    permission.name,
+                                                                )
+                                                            }}
+                                                        </v-list-item-title>
+
+                                                        <template #append>
+                                                            <v-chip
+                                                                size="small"
+                                                                variant="tonal"
+                                                                color="primary"
+                                                            >
+                                                                {{
+                                                                    getPermissionActionList(
+                                                                        permission,
+                                                                    ).length
+                                                                }}
+                                                            </v-chip>
+                                                        </template>
+                                                    </v-list-item>
+                                                </v-list>
+                                            </v-card>
+                                        </v-col>
+
+                                        <v-col cols="12" md="8" lg="9">
+                                            <template
+                                                v-if="
+                                                    getActivePermission(
+                                                        deptIndex,
+                                                    )
+                                                "
+                                            >
+                                                <v-card flat rounded="0">
+                                                    <v-card-item class="pb-2">
+                                                        <div
+                                                            class="d-flex flex-column flex-md-row align-start align-md-center justify-space-between ga-4"
+                                                        >
+                                                            <div>
+                                                                <v-card-title
+                                                                    class="px-0"
+                                                                >
+                                                                    {{
+                                                                        formatModuleName(
+                                                                            getActivePermission(
+                                                                                deptIndex,
+                                                                            )
+                                                                                .name,
+                                                                        )
+                                                                    }}
+                                                                </v-card-title>
+                                                            </div>
+
+                                                            <v-card
+                                                                variant="tonal"
+                                                                color="primary"
+                                                            >
+                                                                <v-card-text
+                                                                    class="d-flex align-center justify-space-between ga-4 py-3"
+                                                                >
+                                                                    <div
+                                                                        class="d-flex align-center ga-2"
+                                                                    >
+                                                                        <span
+                                                                            class="font-weight-medium"
+                                                                        >
+                                                                            {{
+                                                                                dept.is_manager
+                                                                                    ? $t(
+                                                                                          "bo_phan.vai_tro.manager",
+                                                                                      )
+                                                                                    : $t(
+                                                                                          "bo_phan.vai_tro.employee",
+                                                                                      )
+                                                                            }}
+                                                                        </span>
+                                                                        <v-chip
+                                                                            size="small"
+                                                                            variant="flat"
+                                                                            color="warning"
+                                                                        >
+                                                                            {{
+                                                                                countSelectedPermissions(
+                                                                                    deptIndex,
+                                                                                    activePermissionIndices[
+                                                                                        deptIndex
+                                                                                    ],
+                                                                                    getRoleKey(
+                                                                                        dept,
+                                                                                    ),
+                                                                                )
+                                                                            }}
+                                                                        </v-chip>
+                                                                    </div>
+                                                                    <v-checkbox
+                                                                        :model-value="
+                                                                            isAllChecked(
+                                                                                deptIndex,
+                                                                                activePermissionIndices[
+                                                                                    deptIndex
+                                                                                ],
+                                                                                getRoleKey(
+                                                                                    dept,
+                                                                                ),
+                                                                            )
+                                                                        "
+                                                                        color="primary"
+                                                                        hide-details
+                                                                        density="compact"
+                                                                        @update:model-value="
+                                                                            toggleAll(
+                                                                                deptIndex,
+                                                                                activePermissionIndices[
+                                                                                    deptIndex
+                                                                                ],
+                                                                                getRoleKey(
+                                                                                    dept,
+                                                                                ),
+                                                                                $event,
+                                                                            )
+                                                                        "
+                                                                    />
+                                                                </v-card-text>
+                                                            </v-card>
+                                                        </div>
+                                                    </v-card-item>
+
+                                                    <v-divider />
+
+                                                    <v-card-text class="pa-4">
+                                                        <v-row>
+                                                            <v-col
+                                                                v-for="action in getPermissionActionList(
+                                                                    getActivePermission(
+                                                                        deptIndex,
+                                                                    ),
+                                                                )"
+                                                                :key="
                                                                     action.key
-                                                                ] !== undefined
-                                                            "
-                                                            v-model="
-                                                                permissionStates[
-                                                                    deptIndex
-                                                                ][permIndex][
-                                                                    dept.is_manager
-                                                                        ? 'manager'
-                                                                        : 'employee'
-                                                                ][action.key]
-                                                            "
-                                                            color="primary"
-                                                            hide-details
-                                                            density="compact"
-                                                            class="d-inline-flex justify-center"
-                                                        />
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <v-checkbox
-                                                            :model-value="
-                                                                isAllChecked(
-                                                                    deptIndex,
-                                                                    permIndex,
-                                                                    dept.is_manager
-                                                                        ? 'manager'
-                                                                        : 'employee',
-                                                                )
-                                                            "
-                                                            color="primary"
-                                                            hide-details
-                                                            density="compact"
-                                                            class="d-inline-flex justify-center"
-                                                            @update:model-value="
-                                                                toggleAll(
-                                                                    deptIndex,
-                                                                    permIndex,
-                                                                    dept.is_manager
-                                                                        ? 'manager'
-                                                                        : 'employee',
-                                                                    $event,
-                                                                )
-                                                            "
-                                                        />
-                                                    </td>
-                                                </tr>
+                                                                "
+                                                                cols="12"
+                                                                sm="6"
+                                                                xl="4"
+                                                            >
+                                                                <v-card
+                                                                    variant="outlined"
+                                                                    class="h-100"
+                                                                >
+                                                                    <v-card-item>
+                                                                        <div
+                                                                            class="d-flex align-center justify-space-between ga-3"
+                                                                        >
+                                                                            <div
+                                                                                class="font-weight-medium"
+                                                                            >
+                                                                                {{
+                                                                                    action.label
+                                                                                }}
+                                                                            </div>
+                                                                            <v-chip
+                                                                                size="x-small"
+                                                                                variant="tonal"
+                                                                            >
+                                                                                {{
+                                                                                    action.key
+                                                                                }}
+                                                                            </v-chip>
+                                                                        </div>
+                                                                    </v-card-item>
+
+                                                                    <v-divider />
+
+                                                                    <v-list
+                                                                        density="compact"
+                                                                    >
+                                                                        <v-list-item>
+                                                                            <template
+                                                                                #title
+                                                                            >
+                                                                                <div
+                                                                                    class="permission-checkbox-row"
+                                                                                >
+                                                                                    <span>
+                                                                                        {{
+                                                                                            dept.is_manager
+                                                                                                ? $t(
+                                                                                                      "bo_phan.vai_tro.manager",
+                                                                                                  )
+                                                                                                : $t(
+                                                                                                      "bo_phan.vai_tro.employee",
+                                                                                                  )
+                                                                                        }}
+                                                                                    </span>
+                                                                                    <v-checkbox
+                                                                                        v-if="
+                                                                                            permissionStates[
+                                                                                                deptIndex
+                                                                                            ] &&
+                                                                                            permissionStates[
+                                                                                                deptIndex
+                                                                                            ][
+                                                                                                activePermissionIndices[
+                                                                                                    deptIndex
+                                                                                                ]
+                                                                                            ] &&
+                                                                                            permissionStates[
+                                                                                                deptIndex
+                                                                                            ][
+                                                                                                activePermissionIndices[
+                                                                                                    deptIndex
+                                                                                                ]
+                                                                                            ][
+                                                                                                getRoleKey(
+                                                                                                    dept,
+                                                                                                )
+                                                                                            ][
+                                                                                                action
+                                                                                                    .key
+                                                                                            ] !==
+                                                                                                undefined
+                                                                                        "
+                                                                                        v-model="
+                                                                                            permissionStates[
+                                                                                                deptIndex
+                                                                                            ][
+                                                                                                activePermissionIndices[
+                                                                                                    deptIndex
+                                                                                                ]
+                                                                                            ][
+                                                                                                getRoleKey(
+                                                                                                    dept,
+                                                                                                )
+                                                                                            ][
+                                                                                                action
+                                                                                                    .key
+                                                                                            ]
+                                                                                        "
+                                                                                        color="primary"
+                                                                                        hide-details
+                                                                                        density="compact"
+                                                                                    />
+                                                                                </div>
+                                                                            </template>
+                                                                        </v-list-item>
+                                                                    </v-list>
+                                                                </v-card>
+                                                            </v-col>
+                                                        </v-row>
+                                                    </v-card-text>
+                                                </v-card>
                                             </template>
-                                        </tbody>
-                                    </v-table>
-                                </div>
+
+                                            <v-empty-state
+                                                v-else
+                                                icon="mdi-shield-account"
+                                                title="Chua co module phan quyen"
+                                                text="Danh sach module phan quyen hien dang trong."
+                                            />
+                                        </v-col>
+                                    </v-row>
+                                </v-card>
 
                                 <div
                                     class="d-flex flex-column flex-sm-row justify-sm-space-between ga-2 mt-3 mb-1"
@@ -367,6 +544,7 @@ export default {
             loading: false,
             departments: [],
             permissionStates: [],
+            activePermissionIndices: [],
             savingIndex: null,
             boPhanData: [],
             boPhanSelected: null,
@@ -407,7 +585,6 @@ export default {
     watch: {
         async dialog(isOpen) {
             if (isOpen) {
-                // Chỉ load danh sách bộ phận 1 lần duy nhất
                 if (!this.boPhanLoaded) {
                     await this.getBoPhan();
                     this.boPhanLoaded = true;
@@ -416,6 +593,7 @@ export default {
             } else {
                 this.departments = [];
                 this.permissionStates = [];
+                this.activePermissionIndices = [];
                 this.savingIndex = null;
             }
         },
@@ -438,6 +616,7 @@ export default {
             }
         },
         buildPermissionStates() {
+            this.activePermissionIndices = this.departments.map(() => 0);
             this.permissionStates = this.departments.map((dept) => {
                 const phanQuyen = dept.phan_quyen ?? [];
                 const isManager = dept.is_manager ?? false;
@@ -459,11 +638,39 @@ export default {
                 });
             });
         },
+        getRoleKey(dept) {
+            return dept.is_manager ? "manager" : "employee";
+        },
+        getActivePermission(deptIndex) {
+            const permIndex = this.activePermissionIndices[deptIndex] ?? 0;
+            return (
+                this.departments?.[deptIndex]?.phan_quyen?.[permIndex] || null
+            );
+        },
+        getPermissionActionList(permission) {
+            if (!permission?.actions) {
+                return [];
+            }
+
+            return this.availableActions.filter(
+                (action) => permission.actions[action.key] !== undefined,
+            );
+        },
+        setActivePermissionIndex(deptIndex, permIndex) {
+            this.activePermissionIndices[deptIndex] = permIndex;
+        },
         isAllChecked(deptIndex, permIndex, role) {
             const state =
                 this.permissionStates?.[deptIndex]?.[permIndex]?.[role];
             if (!state) return false;
-            return Object.values(state).every((v) => v === true);
+            return Object.values(state).every((value) => value === true);
+        },
+        countSelectedPermissions(deptIndex, permIndex, role) {
+            const state =
+                this.permissionStates?.[deptIndex]?.[permIndex]?.[role];
+            if (!state) return 0;
+            return Object.values(state).filter((value) => value === true)
+                .length;
         },
         toggleAll(deptIndex, permIndex, role, value) {
             const state =
@@ -476,8 +683,7 @@ export default {
         async savePermission(deptIndex) {
             const dept = this.departments[deptIndex];
             const states = this.permissionStates[deptIndex];
-            const isManager = dept.is_manager ?? false;
-            const role = isManager ? "manager" : "employee";
+            const role = this.getRoleKey(dept);
 
             const phanQuyen = (dept.phan_quyen ?? []).map(
                 (permission, permIndex) => {
@@ -512,7 +718,7 @@ export default {
         },
         async addBoPhan() {
             if (!this.boPhanSelected) {
-                toast.error("Vui lòng chọn bộ phận");
+                toast.error("Vui long chon bo phan");
                 return;
             }
 
@@ -542,43 +748,26 @@ export default {
     },
 };
 </script>
-
 <style scoped>
-.permission-table-wrapper {
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    overflow: hidden;
+.permission-module-list {
+    max-height: 420px;
+    overflow: auto;
 }
 
-.permission-table {
-    border: none !important;
+.permission-checkbox-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
 }
 
-.permission-table :deep(thead) {
-    position: sticky;
-    top: 0;
-    z-index: 10;
+.permission-checkbox-row :deep(.v-selection-control) {
+    min-height: auto;
 }
 
-.permission-table :deep(th) {
-    background-color: #f5f5f5 !important;
-    font-weight: 600;
-    padding: 12px 8px;
-    border-bottom: 2px solid #e0e0e0 !important;
-}
-
-.permission-table :deep(td) {
-    padding: 8px;
-}
-
-.permission-table :deep(tbody tr:hover) {
-    background-color: #fafafa;
-}
-
-.module-name-cell {
-    vertical-align: middle;
-    font-weight: 500;
-    border-right: 1px solid #e0e0e0;
+.permission-checkbox-row :deep(.v-selection-control__wrapper) {
+    margin-inline-start: 0;
 }
 
 .close-btn {

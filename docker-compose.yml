@@ -58,6 +58,23 @@ services:
         depends_on:
             - be-php
 
+    scheduler:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: symfony_scheduler
+        restart: unless-stopped
+        command: php bin/console messenger:consume scheduler_default -vv --time-limit=3600 --memory-limit=128M
+        environment:
+            APP_ENV: prod
+            MERCURE_URL: http://mercure/.well-known/mercure
+            MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-https://mercure-erp.huybach02.io.vn/.well-known/mercure}
+        volumes:
+            - symfony_var:/var/www/html/var
+            - ./config/jwt:/var/www/html/config/jwt
+        depends_on:
+            - be-php
+
     mercure:
         image: dunglas/mercure
         container_name: mercure_hub
