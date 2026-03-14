@@ -201,9 +201,9 @@ if (!function_exists('convertMethod')) {
 }
 
 if (!function_exists('uploadFile')) {
-    function uploadFile(UploadedFile $file, string $folder, string $baseUrl = '')
+    function uploadFile(UploadedFile $file, string $folder, string $baseUrl = '', string $prefix = 'media')
     {
-        $fileName = 'media_' . uniqid() . '.' . $file->guessExtension();
+        $fileName = $prefix . '_' . uniqid() . '.' . $file->guessExtension();
 
         $targetDirectory = dirname(__DIR__) . "/public/uploads/$folder";
         $file->move($targetDirectory, $fileName);

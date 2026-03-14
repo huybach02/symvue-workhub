@@ -88,7 +88,7 @@ class MessageService
                 $originalName = $file->getClientOriginalName();
                 $size         = $file->getSize();
                 $mime         = $file->getMimeType();
-                $url          = uploadFile($file, 'chats/files', $baseUrl);
+                $url          = uploadFile($file, 'chats/files', $baseUrl, 'file');
                 return [
                     'name' => $originalName,
                     'url'  => $url,

@@ -146,11 +146,15 @@
                                 <v-img
                                     v-for="(image, index) in msg.images"
                                     :key="index"
-                                    :src="image"
+                                    :src="resolveMediaUrl(image)"
                                     width="100"
                                     height="100"
                                     rounded="lg"
-                                    class="mb-1"
+                                    class="mb-1 message-image-preview"
+                                    cover
+                                    @click="
+                                        openImagePreview(resolveMediaUrl(image))
+                                    "
                                 />
                             </div>
                         </template>
@@ -183,9 +187,7 @@
                                     variant="text"
                                     size="x-small"
                                     class="ms-auto"
-                                    :href="file.url"
-                                    target="_blank"
-                                    download
+                                    @click="downloadFile(file)"
                                 >
                                     <v-icon size="16">mdi-download</v-icon>
                                 </v-btn>
@@ -441,6 +443,10 @@
                 Nhấn Enter để gửi · Shift+Enter xuống dòng
             </div>
         </div>
+        <ImagePreviewDialog
+            v-model="imagePreviewDialog"
+            :image-url="imagePreviewUrl"
+        />
     </div>
 </template>
 
@@ -450,8 +456,10 @@ import data from "emoji-mart-vue-fast/data/all.json";
 import "emoji-mart-vue-fast/css/emoji-mart.css";
 import { Picker, EmojiIndex } from "emoji-mart-vue-fast/src";
 import { functionHelper } from "@/helpers/functionHelper";
-import { toast } from "@/main";
 import { constant } from "@/utils/constants/constant";
+import axiosInstance from "@/configs/axios";
+import { toast } from "@/main";
+import ImagePreviewDialog from "../ImagePreviewDialog.vue";
 
 let emojiIndex = new EmojiIndex(data);
 
@@ -459,6 +467,7 @@ export default {
     name: "ChatWindow",
     components: {
         Picker,
+        ImagePreviewDialog,
     },
     props: {
         conversation: {
@@ -497,6 +506,8 @@ export default {
             emojisOutput: "",
             selectedImages: [], // Mảng chứa objects { file, preview }
             selectedFiles: [], // Mảng chứa File objects đã chọn
+            imagePreviewDialog: false,
+            imagePreviewUrl: "",
         };
     },
 
@@ -541,6 +552,11 @@ export default {
             this.showScrollBtn = false;
             this.$nextTick(() => this.scrollToBottom());
         },
+        imagePreviewDialog(isOpen) {
+            if (!isOpen) {
+                this.imagePreviewUrl = "";
+            }
+        },
     },
 
     mounted() {
@@ -556,6 +572,77 @@ export default {
         formatTime(timeString) {
             return functionHelper.formatMessageTime(timeString);
         },
+
+        getApiOrigin() {
+            const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
+            if (!apiBaseUrl) {
+                return window.location.origin;
+            }
+
+            try {
+                return new URL(apiBaseUrl, window.location.origin).origin;
+            } catch (error) {
+                return window.location.origin;
+            }
+        },
+
+        resolveMediaUrl(url) {
+            if (!url) return "";
+
+            const apiOrigin = this.getApiOrigin();
+
+            if (url.startsWith("/")) {
+                return `${apiOrigin}${url}`;
+            }
+
+            try {
+                const parsedUrl = new URL(url, window.location.origin);
+
+                if (parsedUrl.pathname.startsWith("/uploads/")) {
+                    return `${apiOrigin}${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`;
+                }
+
+                return parsedUrl.toString();
+            } catch (error) {
+                return url;
+            }
+        },
+
+        async downloadFile(file) {
+            const fileUrl = this.resolveMediaUrl(file?.url);
+
+            if (!fileUrl) {
+                toast("Khong tim thay duong dan tep", "error");
+                return;
+            }
+
+            try {
+                const response = await axiosInstance.get(fileUrl, {
+                    responseType: "blob",
+                    timeout: 30000,
+                });
+
+                const blobUrl = window.URL.createObjectURL(response.data);
+                const link = document.createElement("a");
+                link.href = blobUrl;
+                link.download = file?.name || "download";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(blobUrl);
+            } catch (error) {
+                window.open(fileUrl, "_blank", "noopener,noreferrer");
+            }
+        },
+
+        openImagePreview(imageUrl) {
+            if (!imageUrl) return;
+
+            this.imagePreviewUrl = imageUrl;
+            this.imagePreviewDialog = true;
+        },
+
         showAvatar(index) {
             if (index === 0) return true;
             return (
@@ -804,6 +891,10 @@ export default {
 
 .message-meta {
     justify-content: flex-end;
+}
+
+.message-image-preview {
+    cursor: zoom-in;
 }
 
 .file-bubble {
