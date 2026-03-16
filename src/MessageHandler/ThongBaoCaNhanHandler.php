@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\ThongBao;
+use App\Entity\Notification;
 use App\Message\ThongBaoCaNhanMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -19,7 +19,7 @@ final class ThongBaoCaNhanHandler
 
     public function __invoke(ThongBaoCaNhanMessage $message): void
     {
-        $thongBao = new ThongBao();
+        $thongBao = new Notification();
         $thongBao->setCode($message->getCode());
         $thongBao->setFromId($message->getFromUserId());
         $thongBao->setToId($message->getToUserId());

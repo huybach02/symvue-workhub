@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\ThongBao;
+use App\Entity\Notification;
 use App\Message\ThongBaoHeThongMessage;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,7 +31,7 @@ final class ThongBaoHeThongHandler
             ->toIterable();
 
         foreach ($users as $user) {
-            $thongBao = new ThongBao();
+            $thongBao = new Notification();
             $thongBao->setCode($message->getCode());
             $thongBao->setFromId($message->getFromUserId());
             $thongBao->setToId($user['id']);

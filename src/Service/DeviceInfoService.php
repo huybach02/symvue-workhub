@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\User;
-use App\Repository\ThietBiDangNhapRepository;
+use App\Repository\LoginDeviceRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Service để lấy thông tin về thiết bị, browser, OS và IP từ request
+ * Service để lấy thông tin v� thiết bị, browser, OS và IP từ request
  */
 class DeviceInfoService
 {
     public function __construct(
-        private readonly ThietBiDangNhapRepository $thietBiDangNhapRepository,
+        private readonly LoginDeviceRepository $thietBiDangNhapRepository,
     ) {}
 
     public function verifyDeviceId(?Request $request, User $user, array $metadata): bool

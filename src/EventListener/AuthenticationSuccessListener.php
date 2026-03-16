@@ -4,7 +4,7 @@ namespace App\EventListener;
 
 use App\Class\Constanst;
 use App\Entity\User;
-use App\Repository\CauHinhChungRepository;
+use App\Repository\GeneralSettingRepository;
 use App\Repository\UserRepository;
 use App\Service\AuthService;
 use App\Service\DeviceInfoService;
@@ -24,7 +24,7 @@ class AuthenticationSuccessListener
 {
     public function __construct(
         private readonly UserRepository $userRepository,
-        private CauHinhChungRepository $cauHinhChungRepository,
+        private GeneralSettingRepository $cauHinhChungRepository,
         private readonly RequestStack $requestStack,
         private readonly RefreshTokenManagerInterface $refreshTokenManager,
         private readonly DeviceInfoService $deviceInfoService,

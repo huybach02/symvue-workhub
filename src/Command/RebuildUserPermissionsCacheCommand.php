@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Entity\UserPermission;
-use App\Service\BoPhanService;
+use App\Service\DepartmentService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -21,7 +21,7 @@ class RebuildUserPermissionsCacheCommand extends Command
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly BoPhanService $boPhanService,
+        private readonly DepartmentService $boPhanService,
     ) {
         parent::__construct();
     }

@@ -125,9 +125,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
     private Collection $media;
 
     /**
-     * @var Collection<int, BoPhan>
+     * @var Collection<int, Department>
      */
-    #[ORM\OneToMany(targetEntity: BoPhan::class, mappedBy: 'quanLyBoPhan')]
+    #[ORM\OneToMany(targetEntity: Department::class, mappedBy: 'quanLyBoPhan')]
     private Collection $boPhans;
 
     /**
@@ -583,14 +583,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
     }
 
     /**
-     * @return Collection<int, BoPhan>
+     * @return Collection<int, Department>
      */
     public function getBoPhans(): Collection
     {
         return $this->boPhans;
     }
 
-    public function addBoPhan(BoPhan $boPhan): static
+    public function addBoPhan(Department $boPhan): static
     {
         if (!$this->boPhans->contains($boPhan)) {
             $this->boPhans->add($boPhan);
@@ -600,7 +600,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
         return $this;
     }
 
-    public function removeBoPhan(BoPhan $boPhan): static
+    public function removeBoPhan(Department $boPhan): static
     {
         if ($this->boPhans->removeElement($boPhan)) {
             // set the owning side to null (unless already changed)

@@ -6,7 +6,7 @@ use App\DTO\UserDTO;
 use App\Entity\ImportLog;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Service\BoPhanService;
+use App\Service\DepartmentService;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -19,7 +19,7 @@ class UserImportService
         private UserRepository $userRepository,
         private ValidatorInterface $validator,
         private DenormalizerInterface $serializer,
-        private readonly BoPhanService $boPhanService,
+        private readonly DepartmentService $boPhanService,
     ) {}
 
     public function import($filePath, $originalFileName, $user)

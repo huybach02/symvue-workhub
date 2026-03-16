@@ -4,7 +4,7 @@ namespace App\Service;
 
 use App\Class\FilterWithPagination;
 use App\DTO\UserDTO;
-use App\Entity\BoPhan;
+use App\Entity\Department;
 use App\Entity\ConversationUser;
 use App\Entity\User;
 use App\Entity\UserPermission;
@@ -14,7 +14,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use App\Service\BoPhanService;
+use App\Service\DepartmentService;
 
 class UserService
 {
@@ -24,7 +24,7 @@ class UserService
         private UserPasswordHasherInterface $passwordHasher,
         private readonly ParameterBagInterface $parameterBag,
         private readonly ImageRepository $imageRepository,
-        private readonly BoPhanService $boPhanService,
+        private readonly DepartmentService $boPhanService,
     ) {}
 
     public function findAll(array $params): array
@@ -161,7 +161,7 @@ class UserService
         }
 
         // Nếu user này là quản lý của 1 bộ phận thì báo lỗi không cho xóa
-        $checkIsManager = $this->entityManager->getRepository(BoPhan::class)->findOneBy([
+        $checkIsManager = $this->entityManager->getRepository(Department::class)->findOneBy([
             'quanLyBoPhan' => $item,
         ]);
 
@@ -254,7 +254,7 @@ class UserService
         $sql = '
             SELECT up.*, bp.ten_bo_phan, bp.ma_bo_phan, u.name
             FROM user_permission up
-            LEFT JOIN bo_phan bp ON bp.id = up.bo_phan_id
+            LEFT JOIN department bp ON bp.id = up.bo_phan_id
             LEFT JOIN "user" u ON u.id = up.user_id
             WHERE up.user_id = :userId
             ORDER BY up.id DESC
@@ -295,7 +295,7 @@ class UserService
             throw new \Exception(t('error.user_already_in_department'));
         }
 
-        $boPhan =  $this->entityManager->getRepository(BoPhan::class)->find($boPhanId);
+        $boPhan =  $this->entityManager->getRepository(Department::class)->find($boPhanId);
         $user = $this->entityManager->getRepository(User::class)->find($userId);
 
         $employeePermissions = [];
@@ -346,7 +346,7 @@ class UserService
             $this->entityManager->remove($userPermission);
             $this->entityManager->flush();
         } else {
-            $boPhan =  $this->entityManager->getRepository(BoPhan::class)->find($userPermission->getBoPhanId());
+            $boPhan =  $this->entityManager->getRepository(Department::class)->find($userPermission->getBoPhanId());
 
             $employeePermissions = [];
             foreach ($boPhan->getPhanQuyen() as $permission) {

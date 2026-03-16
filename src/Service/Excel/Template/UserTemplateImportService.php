@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\Excel\Template;
 
-use App\Repository\BoPhanRepository;
+use App\Repository\DepartmentRepository;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
@@ -14,7 +14,7 @@ use App\Repository\UserRepository;
 
 class UserTemplateImportService extends BaseExcelTemplateHelper
 {
-    public function __construct(private UserRepository $userRepository, private BoPhanRepository $boPhanRepository) {}
+    public function __construct(private UserRepository $userRepository, private DepartmentRepository $boPhanRepository) {}
 
     public function generateUserTemplate(): StreamedResponse
     {

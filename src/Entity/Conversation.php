@@ -49,7 +49,7 @@ class Conversation
     private Collection $messages;
 
     #[ORM\OneToOne(inversedBy: 'conversation', cascade: ['persist', 'remove'])]
-    private ?BoPhan $boPhan = null;
+    private ?Department $boPhan = null;
 
     public function __construct()
     {
@@ -196,12 +196,12 @@ class Conversation
         return $this;
     }
 
-    public function getBoPhan(): ?BoPhan
+    public function getBoPhan(): ?Department
     {
         return $this->boPhan;
     }
 
-    public function setBoPhan(?BoPhan $boPhan): static
+    public function setBoPhan(?Department $boPhan): static
     {
         $this->boPhan = $boPhan;
 

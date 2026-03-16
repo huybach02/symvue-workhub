@@ -3,10 +3,10 @@
 namespace App\Service;
 
 use App\Class\Constanst;
-use App\Entity\ThietBiDangNhap;
-use App\Repository\CauHinhChungRepository;
-use App\Repository\ThietBiDangNhapRepository;
-use App\Repository\ThoiGianLamViecRepository;
+use App\Entity\LoginDevice;
+use App\Repository\GeneralSettingRepository;
+use App\Repository\LoginDeviceRepository;
+use App\Repository\WorkingTimeRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -17,12 +17,12 @@ class AuthService
 {
     public function __construct(
         private CacheItemPoolInterface $cache,
-        private CauHinhChungRepository $cauHinhChungRepository,
-        private ThoiGianLamViecRepository $thoiGianLamViecRepository,
+        private GeneralSettingRepository $cauHinhChungRepository,
+        private WorkingTimeRepository $thoiGianLamViecRepository,
         private UserRepository $userRepository,
         private MailService $mailService,
         private EntityManagerInterface $entityManager,
-        private ThietBiDangNhapRepository $thietBiDangNhapRepository,
+        private LoginDeviceRepository $thietBiDangNhapRepository,
         private UserPasswordHasherInterface $passwordHasher
     ) {}
 
@@ -112,7 +112,7 @@ class AuthService
                 $deviceId = Uuid::uuid4()->toString();
 
                 // Tạo record vào database
-                $device = new ThietBiDangNhap();
+                $device = new LoginDevice();
                 $device->setDeviceKey($deviceId);
                 $device->setUserId($user->getId());
                 $device->setMetadata($metadata);

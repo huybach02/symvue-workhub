@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\ThongBao;
+use App\Entity\Notification;
 use App\Entity\UserPermission;
 use App\Message\ThongBaoBoPhanMessage;
 use Doctrine\ORM\EntityManagerInterface;
@@ -36,7 +36,7 @@ final class ThongBaoBoPhanHandler
         $i = 0;
 
         foreach ($userIds as $userId) {
-            $thongBao = new ThongBao();
+            $thongBao = new Notification();
             $thongBao->setCode($message->getCode());
             $thongBao->setFromId($message->getFromUserId());
             $thongBao->setToId($userId);

@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Class\CustomResponse;
 use App\Entity\User;
-use App\Repository\BoPhanRepository;
+use App\Repository\DepartmentRepository;
 use App\Service\AuthService;
 use App\Service\DeviceInfoService;
 use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
@@ -20,7 +20,7 @@ final class AuthController extends AbstractController
         private readonly AuthService $authService,
         private readonly DeviceInfoService $deviceInfoService,
         private readonly CacheItemPoolInterface $cache,
-        private readonly BoPhanRepository $boPhanRepository,
+        private readonly DepartmentRepository $boPhanRepository,
     ) {}
 
     #[Route("/auth/me", methods: ["GET"])]

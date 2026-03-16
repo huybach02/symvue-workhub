@@ -3,14 +3,14 @@
 namespace App\Service;
 
 use App\Class\FilterWithPagination;
-use App\Entity\BoPhan;
-use App\Entity\ThongBao;
+use App\Entity\Department;
+use App\Entity\Notification;
 use App\Entity\User;
 use App\Entity\UserPermission;
 use App\Message\ThongBaoBoPhanMessage;
 use App\Message\ThongBaoCaNhanMessage;
 use App\Message\ThongBaoHeThongMessage;
-use App\Repository\ThongBaoRepository;
+use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mercure\HubInterface;
@@ -25,7 +25,7 @@ class MercureService
         private HubInterface $hub,
         private MessageBusInterface $messageBus,
         private EntityManagerInterface $entityManager,
-        private ThongBaoRepository $thongBaoRepository,
+        private NotificationRepository $thongBaoRepository,
         #[Autowire('%kernel.project_dir%')] private readonly string $projectDir,
     ) {
         $this->mercureConfig = require $this->projectDir . '/config/mercure.php';
@@ -58,7 +58,7 @@ class MercureService
         $result = FilterWithPagination::findWithPagination($qb, $params, 'tb');
 
         $result['collection'] = array_map(
-            function (ThongBao $thongBao) {
+            function (Notification $thongBao) {
                 $data = $thongBao->jsonSerialize();
                 $fromUser = $thongBao->getFromId() ? $this->entityManager->getRepository(User::class)->find($thongBao->getFromId()) : null;
                 $data['fromUser'] = $fromUser?->jsonSerialize()['name'] ?? 'Không xác định';
@@ -74,7 +74,7 @@ class MercureService
     /**
      * Xác định giá trị hiển thị của trường sendTo dựa theo typeNotification và toId.
      */
-    private function resolveSendTo(ThongBao $thongBao): string
+    private function resolveSendTo(Notification $thongBao): string
     {
         $type  = $thongBao->getTypeNotification();
         $toId  = $thongBao->getToId();
@@ -84,8 +84,8 @@ class MercureService
         }
 
         if ($type === 'department') {
-            // Join qua entity BoPhan để lấy tên bộ phận
-            $boPhan = $this->entityManager->getRepository(BoPhan::class)->find($toId);
+            // Join qua entity Department để lấy tên bộ phận
+            $boPhan = $this->entityManager->getRepository(Department::class)->find($toId);
             $tenBoPhan = $boPhan?->getTenBoPhan() ?? 'Không xác định';
             return t('thong_bao.type.department') . ': ' . $tenBoPhan;
         }
@@ -102,14 +102,14 @@ class MercureService
 
     public function danhSachThongBao($userId)
     {
-        $thongBao = $this->entityManager->getRepository(ThongBao::class)->findBy(['toId' => $userId, 'isCreated' => false], ['id' => 'DESC']);
+        $thongBao = $this->entityManager->getRepository(Notification::class)->findBy(['toId' => $userId, 'isCreated' => false], ['id' => 'DESC']);
 
-        return array_map(fn(ThongBao $tb) => $tb->jsonSerialize(), $thongBao);
+        return array_map(fn(Notification $tb) => $tb->jsonSerialize(), $thongBao);
     }
 
     public function markAllRead($userId)
     {
-        $thongBao = $this->entityManager->getRepository(ThongBao::class)->findBy(['toId' => $userId]);
+        $thongBao = $this->entityManager->getRepository(Notification::class)->findBy(['toId' => $userId]);
 
         foreach ($thongBao as $tb) {
             $tb->setSeen(true);
@@ -123,7 +123,7 @@ class MercureService
 
     public function markOneRead($userId, $code)
     {
-        $thongBao = $this->entityManager->getRepository(ThongBao::class)->findOneBy(['toId' => $userId, 'code' => $code]);
+        $thongBao = $this->entityManager->getRepository(Notification::class)->findOneBy(['toId' => $userId, 'code' => $code]);
 
         if ($thongBao) {
             $thongBao->setSeen(true);
@@ -134,9 +134,9 @@ class MercureService
         return true;
     }
 
-    public function thongBao($data): ThongBao
+    public function thongBao($data): Notification
     {
-        $thongBao = new ThongBao();
+        $thongBao = new Notification();
         $thongBao->setCode(uniqid());
         $thongBao->setFromId($data['fromId']);
 

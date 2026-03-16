@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Repository\CauHinhChungRepository;
+use App\Repository\GeneralSettingRepository;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -11,7 +11,7 @@ class MailService
 {
     public function __construct(
         private MailerInterface $mailer,
-        private  CauHinhChungRepository $cauHinhChungRepository
+        private  GeneralSettingRepository $cauHinhChungRepository
     ) {}
 
     public function sendOtpEmail(string $toEmail, string $otp): void
