@@ -71,7 +71,7 @@
                             location="top"
                         >
                             <template #activator="{ props: tooltipProps }">
-                                <ThemSua{{MODULE_NAME}}
+                                <CreateEdit{{MODULE_NAME}}
                                     v-bind="tooltipProps"
                                     :path="path"
                                     mode="update"
@@ -159,15 +159,15 @@ import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import ThemSua{{MODULE_NAME}} from "./ThemSua{{MODULE_NAME}}.vue";
+import CreateEdit{{MODULE_NAME}} from "./CreateEdit{{MODULE_NAME}}.vue";
 import { deleteData } from "@/services/bases/deleteData";
 
 export default {
-    name: "DanhSach{{MODULE_NAME}}",
+    name: "{{MODULE_NAME}}List",
     components: {
         FilterPagination,
         ConfirmDialog,
-        ThemSua{{MODULE_NAME}},
+        CreateEdit{{MODULE_NAME}},
     },
     props: {
         path: {

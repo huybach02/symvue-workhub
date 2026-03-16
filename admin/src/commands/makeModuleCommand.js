@@ -21,7 +21,7 @@ class MakeModuleCommand {
 
         if (!pascalCaseRegex.test(moduleName)) {
             console.error(
-                "❌ Lỗi: Tên module phải là PascalCase (ví dụ: NguoiDung, SanPham)",
+                "❌ Lỗi: Tên module phải là PascalCase (ví dụ: User, Product)",
             );
             return false;
         }

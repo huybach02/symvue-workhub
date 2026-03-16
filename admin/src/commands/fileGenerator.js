@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 class FileGenerator {
     /**
      * Đọc nội dung từ template file
-     * @param {string} templateName - Tên template (DanhSach, Form, Module, ThemSua)
+     * @param {string} templateName - Tên template (List, Form, Module, CreateEdit)
      * @returns {string} - Nội dung template
      */
     static readTemplate(templateName) {
@@ -114,10 +114,10 @@ class FileGenerator {
 
         // Danh sách các file cần tạo
         const files = [
-            { template: "DanhSach", filename: `DanhSach${moduleName}.vue` },
+            { template: "List", filename: `${moduleName}List.vue` },
             { template: "Form", filename: `Form${moduleName}.vue` },
             { template: "Module", filename: `${moduleName}.vue` },
-            { template: "ThemSua", filename: `ThemSua${moduleName}.vue` },
+            { template: "CreateEdit", filename: `CreateEdit${moduleName}.vue` },
         ];
 
         // Tạo từng file
