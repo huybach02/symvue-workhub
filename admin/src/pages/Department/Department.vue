@@ -1,19 +1,8 @@
 <template>
     <div>
         <v-row>
-            <v-col cols="12" md="5">
-                <div class="d-flex ga-2">
-                    <ExportDataExcel v-if="permission?.export" :path="path" />
-                    <ImportDataExcel
-                        v-if="permission?.import"
-                        :path="path"
-                        :note="`Mật khẩu mặc định của tất cả người dùng sau khi import là 'password'`"
-                        @reload="getDanhSach"
-                    />
-                </div>
-            </v-col>
-            <v-col cols="12" md="7">
-                <ThemSuaNguoiDung
+            <v-col cols="12">
+                <CreateEditDepartment
                     v-if="permission?.create"
                     :path="path"
                     mode="create"
@@ -23,10 +12,10 @@
         </v-row>
         <v-row>
             <v-col cols="12">
-                <DanhSachNguoiDung
+                <DepartmentList
                     v-if="permission?.index"
                     :path="path"
-                    :users="users"
+                    :items="items"
                     :total-items="totalItems"
                     :loading="loading"
                     :permission="permission"
@@ -39,25 +28,21 @@
 
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import DanhSachNguoiDung from "./DanhSachNguoiDung.vue";
+import DepartmentList from "./DepartmentList.vue";
 import { getListData } from "@/services/bases/getData";
-import ThemSuaNguoiDung from "./ThemSuaNguoiDung.vue";
-import ExportDataExcel from "@/components/ExportDataExcel.vue";
-import ImportDataExcel from "@/components/ImportDataExcel.vue";
+import CreateEditDepartment from "./CreateEditDepartment.vue";
 import { usePermission } from "@/hooks/usePermission";
 
 export default {
-    name: "NguoiDung",
+    name: "Department",
     components: {
-        DanhSachNguoiDung,
-        ThemSuaNguoiDung,
-        ExportDataExcel,
-        ImportDataExcel,
+        DepartmentList,
+        CreateEditDepartment,
     },
     data() {
         return {
-            path: API_ROUTES_CONFIG.user,
-            users: [],
+            path: API_ROUTES_CONFIG.boPhan,
+            items: [],
             totalItems: 0,
             loading: false,
         };
@@ -72,10 +57,10 @@ export default {
             try {
                 this.loading = true;
                 const response = await getListData(this.path, params);
-                this.users = response.data || [];
+                this.items = response.data || [];
                 this.totalItems = response.total || 0;
             } catch (error) {
-                console.error("Lỗi khi lấy danh sách người dùng:", error);
+                console.error("Lỗi khi lấy danh sách:", error);
             } finally {
                 this.loading = false;
             }

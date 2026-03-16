@@ -176,7 +176,7 @@ import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 
 export default {
-    name: "DanhSachLichSuImport",
+    name: "ImportHistoryList",
     components: {
         FilterPagination,
     },

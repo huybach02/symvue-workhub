@@ -73,7 +73,7 @@
                             location="top"
                         >
                             <template #activator="{ props: tooltipProps }">
-                                <BoPhanCuaNguoiDung
+                                <UserDepartment
                                     v-bind="tooltipProps"
                                     :path="path"
                                     :item="item"
@@ -87,7 +87,7 @@
                             location="top"
                         >
                             <template #activator="{ props: tooltipProps }">
-                                <ThemSuaNguoiDung
+                                <CreateEditUser
                                     v-bind="tooltipProps"
                                     :path="path"
                                     mode="update"
@@ -188,17 +188,17 @@ import FilterPagination from "@/components/filters/FilterPagination.vue";
 import FilterPlaceholder from "@/components/filters/FilterPlaceholder.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import ThemSuaNguoiDung from "./ThemSuaNguoiDung.vue";
+import CreateEditUser from "./CreateEditUser.vue";
 import { deleteData } from "@/services/bases/deleteData";
-import BoPhanCuaNguoiDung from "./BoPhanCuaNguoiDung.vue";
+import UserDepartment from "./UserDepartment.vue";
 
 export default {
     name: "DataTable",
     components: {
         FilterPagination,
         ConfirmDialog,
-        ThemSuaNguoiDung,
-        BoPhanCuaNguoiDung,
+        CreateEditUser,
+        UserDepartment,
     },
     props: {
         path: {

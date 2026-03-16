@@ -1,12 +1,25 @@
 <template>
     <div>
         <v-row>
+            <v-col cols="12" md="5"></v-col>
+            <v-col cols="12" md="7">
+                <CreateEditNotification
+                    v-if="permission?.create"
+                    :path="path"
+                    mode="create"
+                    @reload="getDanhSach"
+                />
+            </v-col>
+        </v-row>
+        <v-row>
             <v-col cols="12">
-                <DanhSachLichSuImport
+                <NotificationList
+                    v-if="permission?.index"
                     :path="path"
                     :items="items"
                     :total-items="totalItems"
                     :loading="loading"
+                    :permission="permission"
                     @reload="getDanhSach"
                 />
             </v-col>
@@ -16,24 +29,29 @@
 
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import DanhSachLichSuImport from "./DanhSachLichSuImport.vue";
+import NotificationList from "./NotificationList.vue";
 import { getListData } from "@/services/bases/getData";
+import CreateEditNotification from "./CreateEditNotification.vue";
+import { usePermission } from "@/hooks/usePermission";
 
 export default {
-    name: "LichSuImport",
+    name: "Notification",
     components: {
-        DanhSachLichSuImport,
+        NotificationList,
+        CreateEditNotification,
     },
     data() {
         return {
-            path: API_ROUTES_CONFIG.lichSuImport,
+            path: API_ROUTES_CONFIG.thongBao,
             items: [],
             totalItems: 0,
             loading: false,
         };
     },
-    created() {
-        this.getDanhSach();
+    computed: {
+        permission() {
+            return usePermission(this.path);
+        },
     },
     methods: {
         getDanhSach: async function (params) {

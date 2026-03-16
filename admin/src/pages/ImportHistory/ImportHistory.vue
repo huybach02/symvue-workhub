@@ -2,23 +2,11 @@
     <div>
         <v-row>
             <v-col cols="12">
-                <ThemSuaBoPhan
-                    v-if="permission?.create"
-                    :path="path"
-                    mode="create"
-                    @reload="getDanhSach"
-                />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="12">
-                <DanhSachBoPhan
-                    v-if="permission?.index"
+                <ImportHistoryList
                     :path="path"
                     :items="items"
                     :total-items="totalItems"
                     :loading="loading"
-                    :permission="permission"
                     @reload="getDanhSach"
                 />
             </v-col>
@@ -28,29 +16,24 @@
 
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import DanhSachBoPhan from "./DanhSachBoPhan.vue";
+import ImportHistoryList from "./ImportHistoryList.vue";
 import { getListData } from "@/services/bases/getData";
-import ThemSuaBoPhan from "./ThemSuaBoPhan.vue";
-import { usePermission } from "@/hooks/usePermission";
 
 export default {
-    name: "BoPhan",
+    name: "ImportHistory",
     components: {
-        DanhSachBoPhan,
-        ThemSuaBoPhan,
+        ImportHistoryList,
     },
     data() {
         return {
-            path: API_ROUTES_CONFIG.boPhan,
+            path: API_ROUTES_CONFIG.lichSuImport,
             items: [],
             totalItems: 0,
             loading: false,
         };
     },
-    computed: {
-        permission() {
-            return usePermission(this.path);
-        },
+    created() {
+        this.getDanhSach();
     },
     methods: {
         getDanhSach: async function (params) {

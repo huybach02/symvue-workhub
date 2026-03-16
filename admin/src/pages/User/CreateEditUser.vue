@@ -39,7 +39,7 @@
                 />
 
                 <v-card-text>
-                    <FormNguoiDung
+                    <FormUser
                         :submit-button-text="
                             mode === 'create'
                                 ? $t('button.create')
@@ -58,13 +58,13 @@
 
 <script>
 import { postData } from "@/services/bases/postData";
-import FormNguoiDung from "./FormNguoiDung.vue";
+import FormUser from "./FormUser.vue";
 import { putData } from "@/services/bases/updateData";
 import { getDataById } from "@/services/bases/getData";
 
 export default {
     components: {
-        FormNguoiDung,
+        FormUser,
     },
     props: {
         mode: {

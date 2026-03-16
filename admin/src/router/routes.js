@@ -68,7 +68,7 @@ export const routes = [
                 path: "cau-hinh-chung",
                 name: NAME_ROUTES_CONFIG.systemConfigGeneral,
                 component: () =>
-                    import("../pages/CauHinhChung/CauHinhChung.vue"),
+                    import("../pages/GeneralSettings/GeneralSettings.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
@@ -84,7 +84,7 @@ export const routes = [
                 path: "thoi-gian-lam-viec",
                 name: NAME_ROUTES_CONFIG.systemConfigWorkingTime,
                 component: () =>
-                    import("../pages/ThoiGianLamViec/ThoiGianLamViec.vue"),
+                    import("../pages/WorkingTime/WorkingTime.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
@@ -99,7 +99,7 @@ export const routes = [
             {
                 path: "nguoi-dung",
                 name: NAME_ROUTES_CONFIG.userManagementUser,
-                component: () => import("../pages/NguoiDung/NguoiDung.vue"),
+                component: () => import("../pages/User/User.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
@@ -115,7 +115,7 @@ export const routes = [
                 path: "lich-su-import",
                 name: NAME_ROUTES_CONFIG.lichSuImport,
                 component: () =>
-                    import("../pages/LichSuImport/LichSuImport.vue"),
+                    import("../pages/ImportHistory/ImportHistory.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
@@ -130,7 +130,7 @@ export const routes = [
             {
                 path: "bo-phan",
                 name: NAME_ROUTES_CONFIG.boPhan,
-                component: () => import("../pages/BoPhan/BoPhan.vue"),
+                component: () => import("../pages/Department/Department.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
@@ -145,7 +145,7 @@ export const routes = [
                     {
                 path: "thong-bao",
                 name: NAME_ROUTES_CONFIG.thongBao,
-                component: () => import("../pages/ThongBao/ThongBao.vue"),
+                component: () => import("../pages/Notification/Notification.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(

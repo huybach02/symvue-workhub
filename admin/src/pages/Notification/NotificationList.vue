@@ -74,7 +74,7 @@
                             location="top"
                         >
                             <template #activator="{ props: tooltipProps }">
-                                <ThemSuaThongBao
+                                <CreateEditNotification
                                     v-bind="tooltipProps"
                                     :path="path"
                                     mode="update"
@@ -155,17 +155,17 @@ import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import ThemSuaThongBao from "./ThemSuaThongBao.vue";
+import CreateEditNotification from "./CreateEditNotification.vue";
 import { deleteData } from "@/services/bases/deleteData";
 import FilterAutoComplete from "@/components/filters/FilterAutoComplete.vue";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 
 export default {
-    name: "DanhSachThongBao",
+    name: "NotificationList",
     components: {
         FilterPagination,
         ConfirmDialog,
-        ThemSuaThongBao,
+        CreateEditNotification,
     },
     props: {
         path: {

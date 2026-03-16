@@ -1,9 +1,19 @@
 <template>
     <div>
         <v-row>
-            <v-col cols="12" md="5"></v-col>
+            <v-col cols="12" md="5">
+                <div class="d-flex ga-2">
+                    <ExportDataExcel v-if="permission?.export" :path="path" />
+                    <ImportDataExcel
+                        v-if="permission?.import"
+                        :path="path"
+                        :note="`Mật khẩu mặc định của tất cả người dùng sau khi import là 'password'`"
+                        @reload="getDanhSach"
+                    />
+                </div>
+            </v-col>
             <v-col cols="12" md="7">
-                <ThemSuaThongBao
+                <CreateEditUser
                     v-if="permission?.create"
                     :path="path"
                     mode="create"
@@ -13,10 +23,10 @@
         </v-row>
         <v-row>
             <v-col cols="12">
-                <DanhSachThongBao
+                <UserList
                     v-if="permission?.index"
                     :path="path"
-                    :items="items"
+                    :users="users"
                     :total-items="totalItems"
                     :loading="loading"
                     :permission="permission"
@@ -29,21 +39,25 @@
 
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import DanhSachThongBao from "./DanhSachThongBao.vue";
+import UserList from "./UserList.vue";
 import { getListData } from "@/services/bases/getData";
-import ThemSuaThongBao from "./ThemSuaThongBao.vue";
+import CreateEditUser from "./CreateEditUser.vue";
+import ExportDataExcel from "@/components/ExportDataExcel.vue";
+import ImportDataExcel from "@/components/ImportDataExcel.vue";
 import { usePermission } from "@/hooks/usePermission";
 
 export default {
-    name: "ThongBao",
+    name: "User",
     components: {
-        DanhSachThongBao,
-        ThemSuaThongBao,
+        UserList,
+        CreateEditUser,
+        ExportDataExcel,
+        ImportDataExcel,
     },
     data() {
         return {
-            path: API_ROUTES_CONFIG.thongBao,
-            items: [],
+            path: API_ROUTES_CONFIG.user,
+            users: [],
             totalItems: 0,
             loading: false,
         };
@@ -58,10 +72,10 @@ export default {
             try {
                 this.loading = true;
                 const response = await getListData(this.path, params);
-                this.items = response.data || [];
+                this.users = response.data || [];
                 this.totalItems = response.total || 0;
             } catch (error) {
-                console.error("Lỗi khi lấy danh sách:", error);
+                console.error("Lỗi khi lấy danh sách người dùng:", error);
             } finally {
                 this.loading = false;
             }

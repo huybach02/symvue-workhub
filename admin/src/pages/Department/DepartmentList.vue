@@ -74,7 +74,7 @@
                             location="top"
                         >
                             <template #activator="{ props: tooltipProps }">
-                                <DanhSachThanhVien
+                                <MemberList
                                     v-bind="tooltipProps"
                                     :path="path"
                                     :item="item"
@@ -89,7 +89,7 @@
                             location="top"
                         >
                             <template #activator="{ props: tooltipProps }">
-                                <ThemSuaBoPhan
+                                <CreateEditDepartment
                                     v-bind="tooltipProps"
                                     :path="path"
                                     mode="update"
@@ -176,20 +176,20 @@ import FilterSelect from "@/components/filters/FilterSelect.vue";
 import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import ThemSuaBoPhan from "./ThemSuaBoPhan.vue";
+import CreateEditDepartment from "./CreateEditDepartment.vue";
 import { deleteData } from "@/services/bases/deleteData";
 import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterAutoComplete from "@/components/filters/FilterAutoComplete.vue";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import DanhSachThanhVien from "./DanhSachThanhVien.vue";
+import MemberList from "./MemberList.vue";
 
 export default {
-    name: "DanhSachBoPhan",
+    name: "DepartmentList",
     components: {
         FilterPagination,
         ConfirmDialog,
-        ThemSuaBoPhan,
-        DanhSachThanhVien,
+        CreateEditDepartment,
+        MemberList,
     },
     props: {
         path: {

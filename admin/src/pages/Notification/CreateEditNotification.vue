@@ -37,7 +37,7 @@
                 />
 
                 <v-card-text>
-                    <FormThongBao
+                    <FormNotification
                         :submit-button-text="
                             mode === 'create'
                                 ? $t('button.create')
@@ -56,13 +56,13 @@
 
 <script>
 import { postData } from "@/services/bases/postData";
-import FormThongBao from "./FormThongBao.vue";
+import FormNotification from "./FormNotification.vue";
 import { putData } from "@/services/bases/updateData";
 import { getDataById } from "@/services/bases/getData";
 
 export default {
     components: {
-        FormThongBao,
+        FormNotification,
     },
     props: {
         mode: {

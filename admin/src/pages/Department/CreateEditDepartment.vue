@@ -39,7 +39,7 @@
                 />
 
                 <v-card-text>
-                    <FormBoPhan
+                    <FormDepartment
                         :submit-button-text="
                             mode === 'create'
                                 ? $t('button.create')
@@ -58,13 +58,13 @@
 
 <script>
 import { postData } from "@/services/bases/postData";
-import FormBoPhan from "./FormBoPhan.vue";
+import FormDepartment from "./FormDepartment.vue";
 import { putData } from "@/services/bases/updateData";
 import { getDataById } from "@/services/bases/getData";
 
 export default {
     components: {
-        FormBoPhan,
+        FormDepartment,
     },
     props: {
         mode: {
