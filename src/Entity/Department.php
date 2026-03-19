@@ -6,6 +6,8 @@ use App\Repository\DepartmentRepository;
 use App\Traits\ModifierTrait;
 use App\Traits\SoftDeleteableTrait;
 use App\Traits\TimestampableTrait;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DepartmentRepository::class)]
@@ -38,6 +40,17 @@ class Department
 
     #[ORM\OneToOne(mappedBy: 'boPhan', cascade: ['persist', 'remove'])]
     private ?Conversation $conversation = null;
+
+    /**
+     * @var Collection<int, Position>
+     */
+    #[ORM\OneToMany(targetEntity: Position::class, mappedBy: 'department')]
+    private Collection $positions;
+
+    public function __construct()
+    {
+        $this->positions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -137,6 +150,36 @@ class Department
         }
 
         $this->conversation = $conversation;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Position>
+     */
+    public function getPositions(): Collection
+    {
+        return $this->positions;
+    }
+
+    public function addPosition(Position $position): static
+    {
+        if (!$this->positions->contains($position)) {
+            $this->positions->add($position);
+            $position->setDepartment($this);
+        }
+
+        return $this;
+    }
+
+    public function removePosition(Position $position): static
+    {
+        if ($this->positions->removeElement($position)) {
+            // set the owning side to null (unless already changed)
+            if ($position->getDepartment() === $this) {
+                $position->setDepartment(null);
+            }
+        }
 
         return $this;
     }

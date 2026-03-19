@@ -7,7 +7,7 @@ use App\Service\AuthService;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTDecodedEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Events;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
-use Symfony\Contracts\Cache\CacheInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use function Symfony\Component\Clock\now;
 
@@ -15,7 +15,7 @@ use function Symfony\Component\Clock\now;
 class JWTBlacklistListener
 {
     public function __construct(
-        private readonly CacheInterface $cache,
+        private readonly CacheItemPoolInterface $cache,
         private readonly RequestStack $requestStack,
         private readonly AuthService $authService
     ) {}
@@ -36,7 +36,8 @@ class JWTBlacklistListener
         $accessToken = str_replace('Bearer ', '', $authorizationHeader);
         $tokenKey = 'blacklist_' . md5($accessToken);
 
-        $isBlacklisted = $this->cache->get($tokenKey, fn() => false);
+        $item = $this->cache->getItem($tokenKey);
+        $isBlacklisted = $item->isHit() ? $item->get() : false;
 
         if ($isBlacklisted === true) {
             $event->markAsInvalid();

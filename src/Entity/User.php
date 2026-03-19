@@ -82,7 +82,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
     #[ORM\Column(type: 'integer', options: ['default' => 1, 'comment' => '1: active, 0: inactive'])]
     private int $status = 1;
 
-    #[ORM\Column(type: 'integer', options: ['default' => 0, 'comment' => '0: cho phép ngoại giờ, 1: không cho phép ngoại giờ'])]
+    #[ORM\Column(type: 'integer', options: ['default' => 0, 'comment' => '0: cho phép ngoài giờ, 1: không cho phép ngoài giờ'])]
     private int $isNgoaiGio = 0;
 
     #[ORM\Column(type: 'integer', options: ['default' => 1, 'comment' => '1: full time, 2: part time'])]
