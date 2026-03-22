@@ -31,7 +31,8 @@ jobs:
 
                       echo "[1/9] Update source code"
                       git fetch origin main
-                      git pull --ff-only origin main
+                      git checkout main
+                      git reset --hard origin/main
 
                       echo "[2/9] Export frontend build variables"
                       export VITE_API_BASE_URL="${{ secrets.VITE_API_BASE_URL }}"
