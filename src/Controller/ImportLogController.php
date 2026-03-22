@@ -22,9 +22,10 @@ final class ImportLogController extends AbstractController
     {
         $params = $request->query->all();
         $params = validateFilterParams($params);
+        $currentUser = $this->getUser();
 
         try {
-            $result = $this->importLogService->findAll($params);
+            $result = $this->importLogService->findAll($params, $currentUser);
             return CustomResponse::success([
                 'collection' => $result['collection'],
                 'total' => $result['total'],

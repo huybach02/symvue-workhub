@@ -97,7 +97,7 @@
                             </template>
                         </v-tooltip>
                         <v-tooltip
-                            v-if="permission?.delete"
+                            v-if="permission?.delete && item.id !== authUser.id"
                             :text="$t('button.delete')"
                             location="top"
                         >
@@ -338,6 +338,9 @@ export default {
             return this.headers.reduce((total, col) => {
                 return total + (col.width || col.minWidth || 0);
             }, 0);
+        },
+        authUser() {
+            return this.$store.state.auth.user;
         },
     },
     methods: {

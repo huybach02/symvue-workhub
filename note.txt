@@ -24,21 +24,17 @@ Chạy worker để xử lý message (ví dụ: gửi email)
 php bin/console messenger:consume async --memory-limit=128M -vv
 
 
-
-Tạo controller
-php bin/console make:controller Api\CauHinhChungController
-
-
-        $value = $appCache->get('demo_key', function (ItemInterface $item) {
-            $item->expiresAfter(3600); // Cache tồn tại 1 giờ
-
-            // Giả lập xử lý nặng
-            return 'Dữ liệu này được lấy từ Redis Cloud lúc ' . date('H:i:s');
-        });
-
-
 Command cronjob 
 php bin/console messenger:consume scheduler_default -vv
 
 Chạy ngay lập tức
 php bin/console app:rebuild-user-permissions-cache
+
+
+Reset database
+
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO public;

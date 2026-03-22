@@ -28,6 +28,7 @@ class UserFixture extends Fixture implements FixtureGroupInterface
     public function load(ObjectManager $manager): void
     {
         $faker = Factory::create('vi_VN'); // Sử dụng locale Tiếng Việt
+        $usedNames = [];
 
         $images = [
             "https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg",
@@ -66,7 +67,7 @@ class UserFixture extends Fixture implements FixtureGroupInterface
             // Thông tin cơ bản
             $user->setMaNhanVien('NV' . str_pad((string) $maNhanVien++, 5, '0', STR_PAD_LEFT));
             $user->setEmail($faker->unique()->safeEmail());
-            $user->setName($faker->name());
+            $user->setName($this->generateVietnameseUniqueName($usedNames));
             $user->setPassword($this->passwordHasher->hashPassword($user, 'password'));
 
             // Vai trò
@@ -89,24 +90,171 @@ class UserFixture extends Fixture implements FixtureGroupInterface
             $user->setImage($faker->randomElement($images));
 
             // Trạng thái
-            $user->setStatus($faker->randomElement([0, 1])); // 0: inactive, 1: active
+            $user->setStatus($faker->randomElement([1])); // 0: inactive, 1: active
             $user->setIsNgoaiGio($faker->randomElement([0, 1])); // 0: cho phép, 1: không cho phép
             $user->setHinhThucLamViec($faker->randomElement([1, 2])); // 1: full time, 2: part time
             $user->setIsFirstLogin($faker->randomElement([0, 1])); // 0: đã đổi pass, 1: lần đầu
-
-            // Email verification (70% đã verify)
-            // if ($faker->boolean(70)) {
-            //     $user->setEmailVerifiedAt($faker->dateTimeBetween('-1 year', 'now'));
-            // }
-
-            // Remember token (30% có token)
-            // if ($faker->boolean(30)) {
-            //     $user->setRememberToken($faker->sha256());
-            // }
 
             $manager->persist($user);
         }
 
         $manager->flush();
+    }
+
+    private function generateVietnameseUniqueName(array &$usedNames): string
+    {
+        static $allNames = null;
+
+        if ($allNames === null) {
+            $lastNames = [
+                'Nguyễn',
+                'Trần',
+                'Lê',
+                'Phạm',
+                'Hoàng',
+                'Huỳnh',
+                'Phan',
+                'Vũ',
+                'Võ',
+                'Đặng',
+                'Bùi',
+                'Đỗ',
+                'Hồ',
+                'Ngô',
+                'Dương',
+                'Lý'
+            ];
+
+            $middleNamesMale = [
+                'Văn',
+                'Hữu',
+                'Đình',
+                'Công',
+                'Quang',
+                'Minh',
+                'Gia',
+                'Thanh',
+                'Xuân',
+                'Hoài',
+                'Thế',
+                'Anh',
+                'Trọng',
+                'Đức'
+            ];
+
+            $middleNamesFemale = [
+                'Thị',
+                'Ngọc',
+                'Thu',
+                'Phương',
+                'Thanh',
+                'Bích',
+                'Kim',
+                'Diễm',
+                'Mai',
+                'Hoài',
+                'Quỳnh',
+                'Như',
+                'Mỹ',
+                'Tường'
+            ];
+
+            $firstNamesMale = [
+                'An',
+                'Bảo',
+                'Cường',
+                'Dũng',
+                'Đạt',
+                'Đức',
+                'Hải',
+                'Hiếu',
+                'Hoàng',
+                'Hưng',
+                'Khang',
+                'Khánh',
+                'Kiên',
+                'Long',
+                'Minh',
+                'Nam',
+                'Nghĩa',
+                'Nguyên',
+                'Phong',
+                'Phúc',
+                'Quân',
+                'Sơn',
+                'Thành',
+                'Thắng',
+                'Thiện',
+                'Trung',
+                'Tuấn',
+                'Tùng',
+                'Việt',
+                'Vinh'
+            ];
+
+            $firstNamesFemale = [
+                'An',
+                'Anh',
+                'Chi',
+                'Diễm',
+                'Dung',
+                'Giang',
+                'Hà',
+                'Hạnh',
+                'Hiền',
+                'Hoa',
+                'Hương',
+                'Khánh',
+                'Lan',
+                'Linh',
+                'Mai',
+                'My',
+                'Ngân',
+                'Ngọc',
+                'Nhung',
+                'Nhi',
+                'Oanh',
+                'Phương',
+                'Quỳnh',
+                'Thảo',
+                'Thư',
+                'Trang',
+                'Trâm',
+                'Uyên',
+                'Vy',
+                'Yến'
+            ];
+
+            $uniqueNames = [];
+
+            foreach ($lastNames as $lastName) {
+                foreach ($middleNamesMale as $middleName) {
+                    foreach ($firstNamesMale as $firstName) {
+                        $uniqueNames["$lastName $middleName $firstName"] = true;
+                    }
+                }
+
+                foreach ($middleNamesFemale as $middleName) {
+                    foreach ($firstNamesFemale as $firstName) {
+                        $uniqueNames["$lastName $middleName $firstName"] = true;
+                    }
+                }
+            }
+
+            $allNames = array_keys($uniqueNames);
+            shuffle($allNames);
+        }
+
+        if (count($usedNames) >= count($allNames)) {
+            throw new \RuntimeException('Đã hết tên duy nhất để tạo.');
+        }
+
+        do {
+            $name = array_pop($allNames);
+        } while (isset($usedNames[$name]));
+
+        $usedNames[$name] = true;
+
+        return $name;
     }
 }
