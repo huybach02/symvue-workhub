@@ -66,9 +66,9 @@ export const functionHelper = {
         if (diffMonth < 12) return `${diffMonth} tháng trước`;
         return `${diffYear} năm trước`;
     },
-    generateMa(tenBoPhan) {
+    generateMa(string) {
         // Bỏ dấu tiếng Việt
-        const withoutAccents = tenBoPhan
+        const withoutAccents = string
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "")
             .replace(/đ/g, "d")
@@ -99,5 +99,9 @@ export const functionHelper = {
         } else {
             return date.format("DD/MM/YYYY HH:mm");
         }
+    },
+    formatNumber(value) {
+        const digits = String(value ?? "").replace(/[^\d]/g, "");
+        return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".") || "--";
     },
 };

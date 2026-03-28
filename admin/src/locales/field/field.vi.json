@@ -48,6 +48,24 @@
         "noi_cap_cmnd": "Nơi cấp CMND/CCCD",
         "ngay_vao_lam": "Ngày vào làm",
         "trang_thai_lam_viec": "Trạng thái làm việc",
-        "thanh_vien_moi": "Thành viên mới"
+        "thanh_vien_moi": "Thành viên mới",
+        "chuc_vu": "Chức vụ",
+        "ten_chuc_vu": "Tên chức vụ",
+        "ma_chuc_vu": "Mã chức vụ",
+        "mo_ta": "Mô tả",
+        "hinh_thuc_lam_viec": "Hình thức làm việc",
+        "luong_toi_thieu": "Lương tối thiểu",
+        "luong_toi_da": "Lương tối đa",
+        "range_luong": "Khoảng lương",
+        "tien_te": "Loại tiền tệ nhận lương",
+        "so_thang_thu_viec": "Số tháng làm việc",
+        "ty_le_luong_thu_viec": "Tỷ lệ lương làm việc (%)",
+        "so_ngay_nghi_phep_nam": "Số ngày nghỉ phép năm",
+        "chu_ky_danh_gia_thang": "Thời gian đánh giá lại lương (tháng)",
+        "so_ngay_bao_truoc": "Số ngày báo trước trước khi nghỉ việc",
+        "phu_cap": "Phụ cấp",
+        "ten_phu_cap": "Tên phụ cấp",
+        "so_tien_phu_cap": "Số tiền phụ cấp",
+        "position_is_manager": "Chức vụ này sẽ quản lý Phòng ban/Bộ phận này"
     }
 }

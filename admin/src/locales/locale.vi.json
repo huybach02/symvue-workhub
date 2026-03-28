@@ -189,7 +189,10 @@
             "resetPermissionDefault": "Khôi phục phân quyền mặc định của bộ phận",
             "delete": "Xóa bộ phận",
             "viewDepartment": "Xem Phòng ban/Bộ phận của người dùng",
-            "userList": "Danh sách thành viên"
+            "userList": "Danh sách thành viên",
+            "addPosition": "Thêm chức vụ",
+            "savePermissionByPosition": "Lưu phân quyền theo chức vụ",
+            "addPositionAllowance": "Thêm phụ cấp"
         },
         "text": {
             "departmentOfUser": "Phòng ban/Bộ phận của người dùng",
@@ -203,7 +206,25 @@
             "noMembers": "Bộ phận chưa có thành viên nào",
             "manager": "Quản lý",
             "totalMembers": "Tổng số: {count} thành viên",
-            "removeMemberConfirm": "Bạn có chắc muốn loại {name} khỏi bộ phận '{tenBoPhan}' không?"
+            "removeMemberConfirm": "Bạn có chắc muốn loại {name} khỏi bộ phận '{tenBoPhan}' không?",
+            "positionPermissionDialogTitle": "Chức vụ và phân quyền của bộ phận {tenBoPhan}",
+            "positionList": "Danh sách chức vụ",
+            "totalPositions": "Tổng số: {count} chức vụ",
+            "noPositions": "Bộ phận chưa có chức vụ nào.",
+            "permissionByPosition": "Chức vụ và phân quyền cho chức vụ",
+            "permissionRequiresPosition": "Hãy tạo ít nhất 1 chức vụ để có thể cấu hình phân quyền.",
+            "deletePositionConfirm": "Bạn có chắc muốn xóa chức vụ {name} không?",
+            "positionManagerDescription": "Bật tùy chọn này nếu chức vụ này có quyền quản lý phòng ban/bộ phận.",
+            "allowancesHint": "Nhập các phụ cấp, ngăn cách bằng dấu phẩy",
+            "permission": "Phân quyền",
+            "notHasPositionManager": "Phòng ban/Bộ phận này chưa có chức vụ nào chịu trách nhiệm quản lý. Vui lòng tạo/chọn một chức vụ chịu trách nhiệm quản lý Phòng ban/Bộ phận này",
+            "hasPositionManager": "Phòng ban/Bộ phận này đang được quản lý bởi Chức vụ {positionManager} (Mã: {positionManagerCode})"
+        },
+        "employmentType": {
+            "fullTime": "Toàn thời gian",
+            "partTime": "Bán thời gian",
+            "intern": "Thực tập",
+            "contractor": "Hợp đồng"
         }
     },
     "thong_bao": {

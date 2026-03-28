@@ -8,6 +8,7 @@ use App\Traits\SoftDeleteableTrait;
 use App\Traits\TimestampableTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DepartmentRepository::class)]
@@ -32,11 +33,14 @@ class Department
     #[ORM\Column(options: ["default" => 1])]
     private ?int $status = 1;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $ghiChu = null;
+
     #[ORM\Column(nullable: true)]
     private ?array $phanQuyen = null;
 
-    #[ORM\ManyToOne(inversedBy: 'boPhans')]
-    private ?User $quanLyBoPhan = null;
+    #[ORM\Column(nullable: true)]
+    private ?array $quanLyBoPhan = null;
 
     #[ORM\OneToOne(mappedBy: 'boPhan', cascade: ['persist', 'remove'])]
     private ?Conversation $conversation = null;
@@ -93,6 +97,18 @@ class Department
         return $this;
     }
 
+    public function getGhiChu(): ?string
+    {
+        return $this->ghiChu;
+    }
+
+    public function setGhiChu(?string $ghiChu): static
+    {
+        $this->ghiChu = $ghiChu;
+
+        return $this;
+    }
+
     public function getPhanQuyen(): ?array
     {
         return $this->phanQuyen;
@@ -123,10 +139,13 @@ class Department
             'id' => $this->id,
             'maBoPhan' => $this->maBoPhan,
             'tenBoPhan' => $this->tenBoPhan,
+            'positionCount' => $this->positions->count(),
             'status' => $this->status,
+            'ghiChu' => $this->ghiChu,
             'phanQuyen' => $this->phanQuyen,
             'quanLyBoPhanId' => $this->quanLyBoPhan?->getId(),
             'quanLyBoPhan' => $this->quanLyBoPhan?->getName(),
+            "positionManager" => $this->getPositionManager()?->jsonSerialize(),
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];
@@ -182,5 +201,15 @@ class Department
         }
 
         return $this;
+    }
+
+    public function getPositionManager(): ?Position
+    {
+        foreach ($this->positions as $position) {
+            if ($position->getIsManager()) {
+                return $position;
+            }
+        }
+        return null;
     }
 }

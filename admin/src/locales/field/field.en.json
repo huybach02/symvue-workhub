@@ -48,6 +48,24 @@
         "noi_cap_cmnd": "ID Card Issue Place",
         "ngay_vao_lam": "Start Date",
         "trang_thai_lam_viec": "Work Status",
-        "thanh_vien_moi": "New Member"
+        "thanh_vien_moi": "New Member",
+        "chuc_vu": "Position",
+        "ten_chuc_vu": "Position Name",
+        "ma_chuc_vu": "Position Code",
+        "mo_ta": "Description",
+        "hinh_thuc_lam_viec": "Employment Type",
+        "luong_toi_thieu": "Minimum Salary",
+        "luong_toi_da": "Maximum Salary",
+        "range_luong": "Salary Range",
+        "tien_te": "Currency",
+        "so_thang_thu_viec": "Probation Months",
+        "ty_le_luong_thu_viec": "Probation Salary Rate (%)",
+        "so_ngay_nghi_phep_nam": "Annual Leave Days",
+        "chu_ky_danh_gia_thang": "Review Cycle (Months)",
+        "so_ngay_bao_truoc": "Notice Period Days",
+        "phu_cap": "Allowances",
+        "ten_phu_cap": "Allowance Name",
+        "so_tien_phu_cap": "Allowance Amount",
+        "position_is_manager": "Position is manager of department"
     }
 }

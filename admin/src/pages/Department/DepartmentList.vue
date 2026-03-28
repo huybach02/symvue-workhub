@@ -70,11 +70,11 @@
                     <div class="d-flex align-center justify-space-between ga-1">
                         <v-tooltip
                             v-if="permission?.show"
-                            :text="$t('bo_phan.button.userList')"
+                            :text="$t('bo_phan.text.permissionByPosition')"
                             location="top"
                         >
                             <template #activator="{ props: tooltipProps }">
-                                <MemberList
+                                <PositionAndPermissionOfDepartment
                                     v-bind="tooltipProps"
                                     :path="path"
                                     :item="item"
@@ -132,6 +132,27 @@
                     </v-chip>
                 </template>
 
+                <template #[`item.maBoPhan`]="{ item }">
+                    <div class="d-flex align-center ga-2">
+                        <v-tooltip
+                            v-if="Number(item.positionCount || 0) === 0"
+                            :text="$t('bo_phan.text.noPositions')"
+                            location="top"
+                        >
+                            <template #activator="{ props: tooltipProps }">
+                                <v-icon
+                                    v-bind="tooltipProps"
+                                    icon="mdi-alert-circle-outline"
+                                    color="warning"
+                                    size="default"
+                                    class="warning-blink"
+                                />
+                            </template>
+                        </v-tooltip>
+                        <span>{{ item.maBoPhan }}</span>
+                    </div>
+                </template>
+
                 <template #no-data>
                     <div class="pa-8 text-center">
                         <v-icon
@@ -181,7 +202,7 @@ import { deleteData } from "@/services/bases/deleteData";
 import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterAutoComplete from "@/components/filters/FilterAutoComplete.vue";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import MemberList from "./MemberList.vue";
+import PositionAndPermissionOfDepartment from "./PositionAndPermissionOfDepartment.vue";
 
 export default {
     name: "DepartmentList",
@@ -189,7 +210,7 @@ export default {
         FilterPagination,
         ConfirmDialog,
         CreateEditDepartment,
-        MemberList,
+        PositionAndPermissionOfDepartment,
     },
     props: {
         path: {
@@ -343,5 +364,22 @@ export default {
 .table-scroll-container :deep(.v-data-table),
 .table-scroll-container :deep(table) {
     min-width: var(--table-min-width, 600px);
+}
+
+.warning-blink {
+    animation: warning-blink 1.4s ease-in-out infinite;
+}
+
+@keyframes warning-blink {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.45;
+        transform: scale(1.08);
+    }
 }
 </style>

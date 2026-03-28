@@ -106,8 +106,6 @@ class UserService
             $this->imageRepository->addOneImage($item, $dto->avatar, "avatar");
         }
 
-        $this->boPhanService->handleAddUserPermission($item->getId(), $dto->boPhanId, true);
-
         return $item->jsonSerialize();
     }
 
@@ -146,8 +144,6 @@ class UserService
             $this->imageRepository->removeImages($item);
             $this->imageRepository->addOneImage($item, $dto->avatar, "avatar");
         }
-
-        $this->boPhanService->handleAddUserPermission($item->getId(), $dto->boPhanId, true);
 
         return $item->jsonSerialize();
     }

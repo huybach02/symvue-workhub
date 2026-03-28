@@ -137,10 +137,6 @@ class UserImportService
                 $this->em->persist($user);
                 $this->em->flush();
 
-                if ($dto->boPhanId) {
-                    $this->boPhanService->handleAddUserPermission($user->getId(), $dto->boPhanId, true);
-                }
-
                 $successCount++;
             }
         }

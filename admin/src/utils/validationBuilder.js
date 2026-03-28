@@ -565,3 +565,34 @@ export const buildConditionalRule = (label, dependsOn, when) => {
             });
         });
 };
+
+export const buildGreaterThanFieldNumberRule = (
+    label,
+    comparedField,
+    comparedLabel,
+    options = {},
+) => {
+    const rule = buildNumberRule(label, options);
+
+    return rule.test(
+        `${comparedField}-${label}-greater-than-field`,
+        t("validation.number.greater_than_field", {
+            field: label,
+            otherField: comparedLabel,
+        }),
+        function (value) {
+            const comparedValue = this.parent?.[comparedField];
+
+            if (
+                value === null ||
+                value === undefined ||
+                comparedValue === null ||
+                comparedValue === undefined
+            ) {
+                return true;
+            }
+
+            return value > comparedValue;
+        },
+    );
+};

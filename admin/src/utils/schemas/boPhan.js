@@ -5,10 +5,6 @@ import { i18n } from "@/plugins/i18n";
 const t = (key) => i18n.global.t(key);
 
 export const boPhanSchema = yup.object({
-    quanLyBoPhanId: buildStringRule(t("field.quan_ly_bo_phan"), {
-        required: true,
-    }),
-
     tenBoPhan: buildStringRule(t("field.ten_bo_phan"), {
         required: true,
         min: 2,
@@ -21,5 +17,9 @@ export const boPhanSchema = yup.object({
 
     status: buildStringRule(t("field.trang_thai"), {
         required: true,
+    }),
+
+    ghiChu: buildStringRule(t("field.ghi_chu"), {
+        required: false,
     }),
 });

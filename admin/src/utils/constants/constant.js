@@ -33,4 +33,9 @@ export const constant = {
     ],
     MAX_IMAGE_UPLOAD: 10,
     MAX_FILE_UPLOAD: 10,
+    CURRENCY_OPTIONS: [
+        { value: "VND", title: "VND" },
+        { value: "USD", title: "USD" },
+        { value: "EUR", title: "EUR" },
+    ],
 };

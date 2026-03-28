@@ -15,7 +15,8 @@
             "min": "{field} phải lớn hơn hoặc bằng {min}.",
             "max": "{field} phải nhỏ hơn hoặc bằng {max}.",
             "integer": "{field} phải là số nguyên.",
-            "type_error": "{field} phải là một số hợp lệ."
+            "type_error": "{field} phải là một số hợp lệ.",
+            "greater_than_field": "{field} phải lớn hơn {otherField}."
         },
         "date": {
             "min": "{field} phải từ ngày {min} trở đi.",

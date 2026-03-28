@@ -66,6 +66,9 @@ class Position
     #[ORM\Column(nullable: true, options: ['comment' => '1: active, 0: inactive', 'default' => 1])]
     private int $status = 1;
 
+    #[ORM\Column(nullable: true, options: ['comment' => '1: yes, 0: no', 'default' => 0])]
+    private int $isManager = 0;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -251,6 +254,18 @@ class Position
         return $this;
     }
 
+    public function getIsManager(): ?int
+    {
+        return $this->isManager;
+    }
+
+    public function setIsManager(?int $isManager): static
+    {
+        $this->isManager = $isManager ?? 0;
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
         return [
@@ -261,8 +276,8 @@ class Position
             'name' => $this->name,
             'description' => $this->description,
             'employmentType' => $this->employmentType,
-            'minSalary' => $this->minSalary,
-            'maxSalary' => $this->maxSalary,
+            'minSalary' => (int)$this->minSalary,
+            'maxSalary' => (int)$this->maxSalary,
             'currency' => $this->currency,
             'probationMonths' => $this->probationMonths,
             'probationSalaryRate' => $this->probationSalaryRate,
@@ -271,6 +286,7 @@ class Position
             'noticePeriodDays' => $this->noticePeriodDays,
             'allowances' => $this->allowances,
             'status' => $this->status,
+            'isManager' => $this->isManager,
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];

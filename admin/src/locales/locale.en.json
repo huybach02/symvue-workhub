@@ -188,7 +188,10 @@
             "resetPermissionDefault": "Reset permission default",
             "delete": "Delete department",
             "viewDepartment": "View Department of user",
-            "userList": "User list"
+            "userList": "User list",
+            "addPosition": "Add position",
+            "savePermissionByPosition": "Save permissions by position",
+            "addPositionAllowance": "Add allowance"
         },
         "text": {
             "departmentOfUser": "Department of user",
@@ -202,7 +205,25 @@
             "noMembers": "This department has no members yet",
             "manager": "Manager",
             "totalMembers": "Total: {count} members",
-            "removeMemberConfirm": "Are you sure you want to remove '{name}' from department '{tenBoPhan}'?"
+            "removeMemberConfirm": "Are you sure you want to remove '{name}' from department '{tenBoPhan}'?",
+            "positionPermissionDialogTitle": "Positions and permissions of department {tenBoPhan}",
+            "positionList": "Position list",
+            "totalPositions": "Total: {count} positions",
+            "noPositions": "This department does not have any positions yet.",
+            "permissionByPosition": "Positions and permissions of position",
+            "permissionRequiresPosition": "Create at least one position before configuring permissions.",
+            "deletePositionConfirm": "Are you sure you want to delete position {name}?",
+            "positionManagerDescription": "Enable this option if this position should manage the department.",
+            "allowancesHint": "Enter allowances separated by commas",
+            "permission": "Permission",
+            "notHasPositionManager": "This department does not have any position manager. Please create at least one position manager for this department.",
+            "hasPositionManager": "This department is managed by position {positionManager} (Code: {positionManagerCode})"
+        },
+        "employmentType": {
+            "fullTime": "Full time",
+            "partTime": "Part time",
+            "intern": "Intern",
+            "contractor": "Contractor"
         }
     },
     "thong_bao": {

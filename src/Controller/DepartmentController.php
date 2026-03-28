@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Class\CustomResponse;
 use App\DTO\DepartmentDTO;
+use App\DTO\PositionDTO;
 use App\Service\DepartmentService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -37,46 +38,6 @@ final class DepartmentController extends AbstractController
                     'total_current' => $result['total_current'],
                 ]
             ]);
-        } catch (\Throwable $th) {
-            return CustomResponse::error($th->getMessage());
-        }
-    }
-
-    #[Route('/bo-phan/{id}/thanh-vien', methods: ['GET'])]
-    public function getMembers(int $id): JsonResponse
-    {
-        try {
-            $data = $this->boPhanService->getMembers($id);
-            return CustomResponse::success($data);
-        } catch (\Throwable $th) {
-            return CustomResponse::error($th->getMessage());
-        }
-    }
-
-    #[Route('/bo-phan/{id}/thanh-vien', methods: ['POST'])]
-    public function addMember(int $id, Request $request): JsonResponse
-    {
-        try {
-            $body = json_decode($request->getContent(), true);
-            $userId = $body['user_id'] ?? null;
-
-            if (!$userId) {
-                return CustomResponse::error(t('error.invalid_request'));
-            }
-
-            $this->boPhanService->addMemberToBoPhan((int) $userId, $id);
-            return CustomResponse::success([], t('success.created'));
-        } catch (\Throwable $th) {
-            return CustomResponse::error($th->getMessage());
-        }
-    }
-
-    #[Route('/bo-phan/{id}/thanh-vien/{userId}', methods: ['DELETE'])]
-    public function removeMember(int $id, int $userId): JsonResponse
-    {
-        try {
-            $this->boPhanService->removeMember($id, $userId);
-            return CustomResponse::success([], t('success.deleted'));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
@@ -149,6 +110,69 @@ final class DepartmentController extends AbstractController
         try {
             $data = require __DIR__ . '/../../config/permission.php';
             return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/bo-phan/{id}/chuc-vu', methods: ['GET'])]
+    public function getPositions(int $id): JsonResponse
+    {
+        try {
+            $data = $this->boPhanService->getPositions($id);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/bo-phan/{id}/chuc-vu', methods: ['POST'])]
+    public function createPosition(
+        int $id,
+        #[MapRequestPayload(validationGroups: ['create'])] PositionDTO $positionDTO
+    ): JsonResponse
+    {
+        try {
+            $data = $this->boPhanService->createPosition($id, $positionDTO);
+            return CustomResponse::success($data, t('success.created'));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/bo-phan/{id}/chuc-vu/{positionId}', methods: ['PUT'])]
+    public function updatePosition(
+        int $id,
+        int $positionId,
+        #[MapRequestPayload(validationGroups: ['update'])] PositionDTO $positionDTO
+    ): JsonResponse
+    {
+        try {
+            $data = $this->boPhanService->updatePosition($id, $positionId, $positionDTO);
+            return CustomResponse::success($data, t('success.updated'));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/bo-phan/{id}/chuc-vu/{positionId}', methods: ['DELETE'])]
+    public function deletePosition(int $id, int $positionId): JsonResponse
+    {
+        try {
+            $this->boPhanService->deletePosition($id, $positionId);
+            return CustomResponse::success([], t('success.deleted'));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/bo-phan/{id}/phan-quyen', methods: ['PUT'])]
+    public function updatePositionPermission(int $id, Request $request): JsonResponse
+    {
+        try {
+            $body = $request->toArray();
+            $data = $this->boPhanService->updatePositionPermissions($id, $body['phanQuyen'] ?? []);
+            return CustomResponse::success($data, t('success.updated'));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
