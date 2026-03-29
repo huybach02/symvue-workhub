@@ -136,12 +136,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'senderId')]
     private Collection $messages;
 
+    /**
+     * @var Collection<int, UserPosition>
+     */
+    #[ORM\OneToMany(targetEntity: UserPosition::class, mappedBy: 'member')]
+    private Collection $userPositions;
+
     public function __construct()
     {
         $this->folders = new ArrayCollection();
         $this->media = new ArrayCollection();
         $this->boPhans = new ArrayCollection();
         $this->messages = new ArrayCollection();
+        $this->userPositions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -618,5 +625,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
     public function getMessages(): Collection
     {
         return $this->messages;
+    }
+
+    /**
+     * @return Collection<int, UserPosition>
+     */
+    public function getUserPositions(): Collection
+    {
+        return $this->userPositions;
+    }
+
+    public function addUserPosition(UserPosition $userPosition): static
+    {
+        if (!$this->userPositions->contains($userPosition)) {
+            $this->userPositions->add($userPosition);
+            $userPosition->setMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserPosition(UserPosition $userPosition): static
+    {
+        if ($this->userPositions->removeElement($userPosition)) {
+            // set the owning side to null (unless already changed)
+            if ($userPosition->getMember() === $this) {
+                $userPosition->setMember(null);
+            }
+        }
+
+        return $this;
     }
 }

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Class\CustomResponse;
 use App\DTO\UserDTO;
+use App\DTO\UserPositionDTO;
 use App\Repository\UserRepository;
 use App\Service\Excel\Export\UserExportService;
 use App\Service\Excel\Import\UserImportService;
@@ -222,6 +223,41 @@ final class UserController extends AbstractController
             $action = $body['action'] ?? 'reset';
             $this->userService->resetOrDeletePermission($id, $permissionId, $action);
             return CustomResponse::success([],  t('success.updated'));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/nguoi-dung/{id}/vi-tri-cong-viec', methods: ['GET'])]
+    public function getUserPosition(int $id): JsonResponse
+    {
+        try {
+            $data = $this->userService->getUserPosition($id);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/nguoi-dung/{id}/vi-tri-cong-viec', methods: ['PUT'])]
+    public function saveUserPosition(
+        int $id,
+        #[MapRequestPayload(validationGroups: ['update'])] UserPositionDTO $userPositionDTO
+    ): JsonResponse {
+        try {
+            $data = $this->userService->saveUserPosition($id, $userPositionDTO);
+            return CustomResponse::success($data, t('success.updated'));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/nguoi-dung/{id}/hop-dong', methods: ['POST'])]
+    public function uploadUserContracts(int $id, Request $request): JsonResponse
+    {
+        try {
+            $data = $this->userService->uploadUserContracts($id, $request);
+            return CustomResponse::success($data, t('success.updated'));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }

@@ -206,6 +206,9 @@ if (!function_exists('uploadFile')) {
         $fileName = $prefix . '_' . uniqid() . '.' . $file->guessExtension();
 
         $targetDirectory = dirname(__DIR__) . "/public/uploads/$folder";
+        if (!is_dir($targetDirectory)) {
+            mkdir($targetDirectory, 0777, true);
+        }
         $file->move($targetDirectory, $fileName);
 
         if ($baseUrl) {

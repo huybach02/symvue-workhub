@@ -124,7 +124,7 @@
         }
     },
     "user": {
-        "title": "Người dùng",
+        "title": "Nhân sự",
         "columns": {
             "id": "ID",
             "avatar": "Ảnh đại diện",
@@ -188,18 +188,18 @@
             "update": "Cập nhật phân quyền",
             "resetPermissionDefault": "Khôi phục phân quyền mặc định của bộ phận",
             "delete": "Xóa bộ phận",
-            "viewDepartment": "Xem Phòng ban/Bộ phận của người dùng",
+            "viewPosition": "Vị trí công việc và Hợp đồng",
             "userList": "Danh sách thành viên",
             "addPosition": "Thêm chức vụ",
             "savePermissionByPosition": "Lưu phân quyền theo chức vụ",
             "addPositionAllowance": "Thêm phụ cấp"
         },
         "text": {
-            "departmentOfUser": "Phòng ban/Bộ phận của người dùng",
+            "departmentOfUser": "Phòng ban/Bộ phận của nhân sự",
             "isMemberOf": "Là thành viên của",
             "isManagerOf": "Là quản lý của",
             "department": "Phòng ban/Bộ phận",
-            "notBelongsToAnyDepartment": " Người dùng chưa thuộc phòng ban nào",
+            "notBelongsToAnyDepartment": "Nhân sự chưa thuộc phòng ban nào",
             "default": "Mặc định",
             "userList": "Danh sách thành viên của bộ phận {tenBoPhan}",
             "viewMembers": "Xem danh sách thành viên",
@@ -242,7 +242,7 @@
             "sendTo": {
                 "all": "Toàn hệ thống",
                 "department": "Phòng ban/Bộ phận",
-                "user": "Người dùng"
+                "user": "Nhân sự"
             },
             "type": {
                 "primary": "Thông báo mặc định",
@@ -257,5 +257,34 @@
         "has_sent_file": "Đã gửi {count} file",
         "has_sent_images_and_files": "Đã gửi {imageCount} ảnh và {fileCount} file",
         "group": "Nhóm"
+    },
+    "position": {
+        "text": "Chức vụ",
+        "position_and_contract": "Vị trí công việc và Hợp đồng của {name}",
+        "position": "Chức vụ",
+        "contract": "Hợp đồng",
+        "choose_position_to_view": " Chọn chức vụ để xem thông tin chi tiết",
+        "position_detail": "Thông tin chi tiết công việc",
+        "salary": "Lương thoả thuận",
+        "insurance_salary": "Lương đóng BHXH",
+        "insurance_code": "Mã số BHXH",
+        "probation_from": "Ngày bắt đầu thử việc",
+        "probation_to": "Ngày kết thúc thử việc",
+        "effective_from": "Ngày bắt đầu công việc chính thức (100% lương)",
+        "effective_to": "Ngày kết thúc công việc chính thức (100% lương)",
+        "allowances_optional": "Phụ cấp bổ sung (Nếu có)"
+    },
+    "contract": {
+        "text": "Hợp đồng",
+        "please_update_position": "Vui lòng cập nhật vị trí công việc trước khi tải hợp đồng lên hệ thống",
+        "upload_contract": "Tải lên hợp đồng",
+        "format_contract": "File hợp đồng phải có định dạng doc, docx, pdf",
+        "contract_list": "Danh sách hợp đồng",
+        "total_contracts": "Tổng số hợp đồng: {count}",
+        "no_contract": "Chưa có hợp đồng",
+        "file_name": "Tên file",
+        "file_format": "Định dạng",
+        "file_size": "Dung lượng",
+        "uploaded_at": "Ngày tải lên"
     }
 }

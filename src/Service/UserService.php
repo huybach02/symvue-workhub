@@ -4,15 +4,19 @@ namespace App\Service;
 
 use App\Class\FilterWithPagination;
 use App\DTO\UserDTO;
+use App\DTO\UserPositionDTO;
 use App\Entity\Department;
 use App\Entity\ConversationUser;
+use App\Entity\Position;
 use App\Entity\User;
 use App\Entity\UserPermission;
+use App\Entity\UserPosition;
 use App\Repository\ImageRepository;
 use App\Repository\UserPermissionRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Service\DepartmentService;
 
@@ -358,5 +362,135 @@ class UserService
         }
 
         $this->boPhanService->mergeUserPermissions($userId);
+    }
+
+    public function getUserPosition(int $userId): ?array
+    {
+        $user = $this->userRepository->find($userId);
+
+        if (!$user) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $userPosition = $this->entityManager->getRepository(UserPosition::class)->findOneBy(
+            ['member' => $user],
+            ['id' => 'DESC']
+        );
+
+        return $userPosition?->jsonSerialize();
+    }
+
+    public function saveUserPosition(int $userId, UserPositionDTO $dto): array
+    {
+        $user = $this->userRepository->find($userId);
+
+        if (!$user) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $department = $this->entityManager->getRepository(Department::class)->find($dto->departmentId);
+        if (!$department) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $position = $this->entityManager->getRepository(Position::class)->find($dto->positionId);
+        if (!$position) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        if ($position->getDepartment()?->getId() !== $department->getId()) {
+            throw new \Exception('Chức vụ không thuộc phòng ban/bộ phận đã chọn.');
+        }
+
+        $userPosition = $this->entityManager->getRepository(UserPosition::class)->findOneBy(
+            ['member' => $user],
+            ['id' => 'DESC']
+        );
+
+        if (!$userPosition) {
+            $userPosition = new UserPosition();
+            $userPosition->setMember($user);
+            $this->entityManager->persist($userPosition);
+        }
+
+        $userPosition->setDepartment($department);
+        $userPosition->setPosition($position);
+        $userPosition->setSalary($dto->salary);
+        $userPosition->setAllowances($dto->allowances);
+        $userPosition->setAllowancesTotal(array_merge($position->getAllowances() ?? [], $dto->allowances ?? []));
+        $userPosition->setEffectiveFrom(new \DateTime($dto->effectiveFrom));
+        $userPosition->setEffectiveTo(new \DateTime($dto->effectiveTo));
+        $userPosition->setProbationFrom(new \DateTime($dto->probationFrom));
+        $userPosition->setProbationTo(new \DateTime($dto->probationTo));
+        $userPosition->setSalaryNet($dto->salary);
+        $userPosition->setInsuranceSalary($dto->insuranceSalary);
+        $userPosition->setInsuranceCode($dto->insuranceCode);
+        $userPosition->setNote($dto->note);
+        $userPosition->setIsPrimary(true);
+        $userPosition->setPositionSnapshot($position->jsonSerialize());
+
+        $this->entityManager->flush();
+
+        return $userPosition->jsonSerialize();
+    }
+
+    public function uploadUserContracts(int $userId, Request $request): array
+    {
+        $user = $this->userRepository->find($userId);
+
+        if (!$user) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $userPosition = $this->entityManager->getRepository(UserPosition::class)->findOneBy(
+            ['member' => $user],
+            ['id' => 'DESC']
+        );
+
+        if (!$userPosition) {
+            throw new \Exception('Vui lòng cập nhật vị trí công việc trước khi tải hợp đồng.');
+        }
+
+        $files = $request->files->get('files', []);
+        if ($files && !is_array($files)) {
+            $files = [$files];
+        }
+
+        if (!$files || count($files) === 0) {
+            throw new \Exception('Vui lòng chọn file hợp đồng.');
+        }
+
+        $allowedExtensions = ['pdf', 'doc', 'docx'];
+        $baseUrl = $request->getSchemeAndHttpHost();
+        $contracts = $userPosition->getContracts() ?? [];
+
+        foreach ($files as $file) {
+            if (!$file) {
+                continue;
+            }
+
+            $extension = strtolower($file->getClientOriginalExtension());
+            if (!in_array($extension, $allowedExtensions, true)) {
+                throw new \Exception('Chỉ hỗ trợ file .doc, .docx, .pdf.');
+            }
+
+            $originalName = $file->getClientOriginalName();
+            $size = $file->getSize();
+            $mime = $file->getMimeType();
+            $url = uploadFile($file, 'contracts', $baseUrl, 'contract');
+            $contracts[] = [
+                'name' => $originalName,
+                'url' => $url,
+                'size' => $size,
+                'mime' => $mime,
+                'extension' => $extension,
+                'uploadedAt' => (new \DateTime())->format('Y-m-d H:i:s'),
+            ];
+        }
+
+        $userPosition->setContracts($contracts);
+        $this->entityManager->flush();
+
+        return $userPosition->jsonSerialize();
     }
 }

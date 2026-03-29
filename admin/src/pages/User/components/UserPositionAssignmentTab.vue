@@ -1,0 +1,264 @@
+<template>
+    <div class="d-flex flex-column ga-4">
+        <div v-if="loading" class="d-flex justify-center py-8">
+            <v-progress-circular indeterminate color="primary" size="48" />
+        </div>
+
+        <template v-else>
+            <UserPositionInfoCard
+                v-if="displayPosition"
+                :position="displayPosition"
+            />
+
+            <v-alert v-else type="info" variant="tonal">
+                {{ $t("position.choose_position_to_view") }}
+            </v-alert>
+
+            <v-card variant="outlined">
+                <v-card-item>
+                    <v-card-title>
+                        {{ $t("position.position_detail") }}
+                    </v-card-title>
+                </v-card-item>
+
+                <v-divider />
+
+                <v-card-text>
+                    <UserPositionForm
+                        :item="form"
+                        :loading="saving"
+                        :currency="displayPosition?.currency || 'VND'"
+                        :department-options="departmentOptions"
+                        :position-options="positionOptions"
+                        :submit-button-text="$t('button.update')"
+                        @department-change="handleDepartmentChange"
+                        @position-change="handlePositionChange"
+                        @submit="submitForm"
+                    />
+                </v-card-text>
+            </v-card>
+        </template>
+    </div>
+</template>
+
+<script>
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
+import { getDataById, getDataSelect } from "@/services/bases/getData";
+import { putData } from "@/services/bases/updateData";
+import UserPositionForm from "./UserPositionForm.vue";
+import UserPositionInfoCard from "./UserPositionInfoCard.vue";
+
+export default {
+    components: {
+        UserPositionForm,
+        UserPositionInfoCard,
+    },
+    props: {
+        item: {
+            type: Object,
+            default: null,
+        },
+        path: {
+            type: String,
+            default: "",
+        },
+        active: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    emits: ["reload"],
+    data() {
+        return {
+            loading: false,
+            saving: false,
+            departmentOptions: [],
+            positionOptions: [],
+            selectedPosition: null,
+            form: this.createDefaultForm(),
+        };
+    },
+    computed: {
+        displayPosition() {
+            return this.selectedPosition || this.form.positionSnapshot || null;
+        },
+    },
+    watch: {
+        active: {
+            async handler(isActive) {
+                if (isActive) {
+                    await this.loadData();
+                }
+            },
+            immediate: true,
+        },
+    },
+    methods: {
+        createDefaultForm() {
+            return {
+                departmentId: null,
+                positionId: null,
+                salary: null,
+                salaryGross: null,
+                salaryNet: null,
+                insuranceSalary: null,
+                insuranceCode: "",
+                effectiveFrom: "",
+                effectiveTo: "",
+                probationFrom: "",
+                probationTo: "",
+                note: "",
+                positionSnapshot: null,
+                allowances: [{ name: "", amount: null }],
+            };
+        },
+        async loadData() {
+            this.loading = true;
+
+            try {
+                const [departments, userPosition] = await Promise.all([
+                    getDataSelect(API_ROUTES_CONFIG.boPhan),
+                    getDataById(this.path, this.item.id, "vi-tri-cong-viec"),
+                ]);
+
+                this.departmentOptions = departments ?? [];
+
+                if (!userPosition) {
+                    this.form = this.createDefaultForm();
+                    this.positionOptions = [];
+                    this.selectedPosition = null;
+                    return;
+                }
+
+                this.form = {
+                    ...this.createDefaultForm(),
+                    ...userPosition,
+                    allowances:
+                        Array.isArray(userPosition.allowances) &&
+                        userPosition.allowances.length
+                            ? userPosition.allowances
+                            : [{ name: "", amount: null }],
+                };
+
+                if (this.form.departmentId) {
+                    await this.loadPositions(this.form.departmentId, false);
+                    this.selectedPosition =
+                        this.positionOptions.find(
+                            (position) => position.id === this.form.positionId,
+                        ) || null;
+                }
+            } finally {
+                this.loading = false;
+            }
+        },
+        async loadPositions(departmentId, resetPosition = true) {
+            if (!departmentId) {
+                this.positionOptions = [];
+                this.selectedPosition = null;
+
+                if (resetPosition) {
+                    this.form = {
+                        ...this.form,
+                        positionId: null,
+                        positionSnapshot: null,
+                    };
+                }
+
+                return;
+            }
+
+            this.positionOptions =
+                (await getDataById(
+                    API_ROUTES_CONFIG.boPhan,
+                    departmentId,
+                    "chuc-vu",
+                )) ?? [];
+
+            if (resetPosition) {
+                this.form = {
+                    ...this.form,
+                    departmentId,
+                    positionId: null,
+                    positionSnapshot: null,
+                };
+                this.selectedPosition = null;
+                return;
+            }
+
+            this.selectedPosition =
+                this.positionOptions.find(
+                    (position) => position.id === this.form.positionId,
+                ) || null;
+        },
+        async handleDepartmentChange(value) {
+            this.form = {
+                ...this.form,
+                departmentId: value,
+                positionId: null,
+                positionSnapshot: null,
+            };
+
+            await this.loadPositions(value);
+        },
+        handlePositionChange(value) {
+            const selectedPosition =
+                this.positionOptions.find(
+                    (position) => position.id === value,
+                ) || null;
+
+            this.form = {
+                ...this.form,
+                positionId: value,
+                positionSnapshot: selectedPosition,
+            };
+            this.selectedPosition = selectedPosition;
+        },
+        async submitForm(values) {
+            this.saving = true;
+
+            try {
+                const response = await putData(
+                    `${this.path}/${this.item.id}/vi-tri-cong-viec`,
+                    null,
+                    {
+                        departmentId: values.departmentId,
+                        positionId: values.positionId,
+                        salary: values.salary,
+                        allowances: values.allowances,
+                        effectiveFrom: values.effectiveFrom || null,
+                        effectiveTo: values.effectiveTo || null,
+                        probationFrom: values.probationFrom,
+                        probationTo: values.probationTo || null,
+                        salaryNet: values.salaryNet,
+                        salaryGross: values.salaryGross,
+                        insuranceSalary: values.insuranceSalary,
+                        insuranceCode: values.insuranceCode || null,
+                        note: values.note || null,
+                    },
+                );
+
+                if (response) {
+                    this.form = {
+                        ...this.createDefaultForm(),
+                        ...response,
+                        allowances:
+                            Array.isArray(response.allowances) &&
+                            response.allowances.length
+                                ? response.allowances
+                                : [{ name: "", amount: null }],
+                    };
+
+                    this.selectedPosition =
+                        this.positionOptions.find(
+                            (position) => position.id === response.positionId,
+                        ) || null;
+
+                    this.$emit("reload");
+                }
+            } finally {
+                this.saving = false;
+            }
+        },
+    },
+};
+</script>

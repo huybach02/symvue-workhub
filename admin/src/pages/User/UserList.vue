@@ -69,11 +69,11 @@
                     <div class="d-flex align-center justify-start ga-1">
                         <v-tooltip
                             v-if="permission?.show"
-                            :text="$t('bo_phan.button.viewDepartment')"
+                            :text="$t('bo_phan.button.viewPosition')"
                             location="top"
                         >
                             <template #activator="{ props: tooltipProps }">
-                                <UserDepartment
+                                <UserPosition
                                     v-bind="tooltipProps"
                                     :path="path"
                                     :item="item"
@@ -190,7 +190,7 @@ import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import CreateEditUser from "./CreateEditUser.vue";
 import { deleteData } from "@/services/bases/deleteData";
-import UserDepartment from "./UserDepartment.vue";
+import UserPosition from "./UserPosition.vue";
 
 export default {
     name: "DataTable",
@@ -198,7 +198,7 @@ export default {
         FilterPagination,
         ConfirmDialog,
         CreateEditUser,
-        UserDepartment,
+        UserPosition,
     },
     props: {
         path: {

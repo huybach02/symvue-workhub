@@ -131,7 +131,8 @@
             "name": "Full name",
             "email": "Email",
             "phone": "Phone",
-            "role": "Role"
+            "role": "Role",
+            "ma_nhan_vien": "Employee code"
         },
         "roles": {
             "admin": "Admin",
@@ -187,7 +188,7 @@
             "update": "Update permission",
             "resetPermissionDefault": "Reset permission default",
             "delete": "Delete department",
-            "viewDepartment": "View Department of user",
+            "viewPosition": "View position and contract",
             "userList": "User list",
             "addPosition": "Add position",
             "savePermissionByPosition": "Save permissions by position",
@@ -256,5 +257,34 @@
         "has_sent_file": "Sent {count} files",
         "has_sent_images_and_files": "Sent {imageCount} images and {fileCount} files",
         "group": "Group"
+    },
+    "position": {
+        "text": "Position",
+        "position_and_contract": "Position and contract of {name}",
+        "position": "Position",
+        "contract": "Contract",
+        "choose_position_to_view": "Choose position to view detail",
+        "position_detail": "Position detail",
+        "salary": "Salary",
+        "insurance_salary": "Insurance salary",
+        "insurance_code": "Insurance code",
+        "probation_from": "Probation from",
+        "probation_to": "Probation to",
+        "effective_from": "Effective from",
+        "effective_to": "Effective to",
+        "allowances_optional": "Allowances optional"
+    },
+    "contract": {
+        "text": "Contract",
+        "please_update_position": "Please update position before uploading contract to system",
+        "upload_contract": "Upload contract",
+        "format_contract": "Contract file format must be doc, docx, pdf",
+        "contract_list": "Contract list",
+        "total_contracts": "Total contracts: {count}",
+        "no_contract": "No contract yet",
+        "file_name": "File name",
+        "file_format": "File format",
+        "file_size": "File size",
+        "uploaded_at": "Uploaded at"
     }
 }

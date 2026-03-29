@@ -38,4 +38,22 @@ export const constant = {
         { value: "USD", title: "USD" },
         { value: "EUR", title: "EUR" },
     ],
+    EMPLOYMENT_TYPE_OPTIONS: [
+        {
+            value: "FULL_TIME",
+            text: i18n.global.t("bo_phan.employmentType.fullTime"),
+        },
+        {
+            value: "PART_TIME",
+            text: i18n.global.t("bo_phan.employmentType.partTime"),
+        },
+        {
+            value: "INTERN",
+            text: i18n.global.t("bo_phan.employmentType.intern"),
+        },
+        {
+            value: "CONTRACTOR",
+            text: i18n.global.t("bo_phan.employmentType.contractor"),
+        },
+    ],
 };

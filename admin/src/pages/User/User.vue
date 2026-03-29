@@ -7,7 +7,7 @@
                     <ImportDataExcel
                         v-if="permission?.import"
                         :path="path"
-                        :note="`Mật khẩu mặc định của tất cả người dùng sau khi import là 'password'`"
+                        :note="`Mật khẩu mặc định của tất cả nhân sự sau khi import là 'password'`"
                         @reload="getDanhSach"
                     />
                 </div>

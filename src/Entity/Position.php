@@ -6,6 +6,8 @@ use App\Repository\PositionRepository;
 use App\Traits\ModifierTrait;
 use App\Traits\SoftDeleteableTrait;
 use App\Traits\TimestampableTrait;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -68,6 +70,17 @@ class Position
 
     #[ORM\Column(nullable: true, options: ['comment' => '1: yes, 0: no', 'default' => 0])]
     private int $isManager = 0;
+
+    /**
+     * @var Collection<int, UserPosition>
+     */
+    #[ORM\OneToMany(targetEntity: UserPosition::class, mappedBy: 'position')]
+    private Collection $userPositions;
+
+    public function __construct()
+    {
+        $this->userPositions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -290,5 +303,35 @@ class Position
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];
+    }
+
+    /**
+     * @return Collection<int, UserPosition>
+     */
+    public function getUserPositions(): Collection
+    {
+        return $this->userPositions;
+    }
+
+    public function addUserPosition(UserPosition $userPosition): static
+    {
+        if (!$this->userPositions->contains($userPosition)) {
+            $this->userPositions->add($userPosition);
+            $userPosition->setPosition($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserPosition(UserPosition $userPosition): static
+    {
+        if ($this->userPositions->removeElement($userPosition)) {
+            // set the owning side to null (unless already changed)
+            if ($userPosition->getPosition() === $this) {
+                $userPosition->setPosition(null);
+            }
+        }
+
+        return $this;
     }
 }

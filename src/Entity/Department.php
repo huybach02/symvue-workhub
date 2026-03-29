@@ -51,9 +51,16 @@ class Department
     #[ORM\OneToMany(targetEntity: Position::class, mappedBy: 'department')]
     private Collection $positions;
 
+    /**
+     * @var Collection<int, UserPosition>
+     */
+    #[ORM\OneToMany(targetEntity: UserPosition::class, mappedBy: 'department')]
+    private Collection $userPositions;
+
     public function __construct()
     {
         $this->positions = new ArrayCollection();
+        $this->userPositions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -211,5 +218,35 @@ class Department
             }
         }
         return null;
+    }
+
+    /**
+     * @return Collection<int, UserPosition>
+     */
+    public function getUserPositions(): Collection
+    {
+        return $this->userPositions;
+    }
+
+    public function addUserPosition(UserPosition $userPosition): static
+    {
+        if (!$this->userPositions->contains($userPosition)) {
+            $this->userPositions->add($userPosition);
+            $userPosition->setDepartment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserPosition(UserPosition $userPosition): static
+    {
+        if ($this->userPositions->removeElement($userPosition)) {
+            // set the owning side to null (unless already changed)
+            if ($userPosition->getDepartment() === $this) {
+                $userPosition->setDepartment(null);
+            }
+        }
+
+        return $this;
     }
 }
