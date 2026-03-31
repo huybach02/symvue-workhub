@@ -4,7 +4,7 @@
             <div class="d-flex align-center justify-space-between">
                 <span class="text-subtitle-1 font-weight-bold">
                     <v-icon size="20" class="me-1">mdi-chat-outline</v-icon>
-                    Tin nhắn
+                    {{ $t("chat.text") }}
                 </span>
                 <v-btn
                     v-if="mobileMode"
@@ -20,11 +20,11 @@
             <div class="d-flex align-center ga-2 mt-2 mb-1">
                 <v-chip size="x-small" variant="tonal" color="primary">
                     <v-icon start size="12">mdi-chat-outline</v-icon>
-                    Tổng: {{ conversations.length }}
+                    {{ $t("chat.total") }}: {{ conversations.length }}
                 </v-chip>
                 <v-chip size="x-small" variant="tonal" color="error">
                     <v-icon start size="12">mdi-message-badge</v-icon>
-                    Chưa đọc: {{ totalUnread }}
+                    {{ $t("chat.unseen") }}: {{ totalUnread }}
                 </v-chip>
             </div>
 
@@ -32,7 +32,7 @@
                 v-model="searchQuery"
                 density="compact"
                 variant="outlined"
-                placeholder="Tìm kiếm hội thoại..."
+                :placeholder="$t('chat.search_conversation')"
                 prepend-inner-icon="mdi-magnify"
                 hide-details
                 class="mt-2"
@@ -51,7 +51,8 @@
                     </v-icon>
                     <span
                         class="text-caption text-grey-darken-1 font-weight-medium"
-                        >Hội thoại
+                    >
+                        {{ $t("chat.conversation") }}
                     </span>
                 </div>
 
@@ -195,7 +196,9 @@
                 <v-icon size="40" color="grey-lighten-1">
                     mdi-chat-sleep-outline
                 </v-icon>
-                <span class="text-body-2 mt-3">Không có hội thoại nào</span>
+                <span class="text-body-2 mt-3">{{
+                    $t("chat.not_conversation")
+                }}</span>
             </div>
 
             <template v-if="searchQuery.trim()">
@@ -210,7 +213,7 @@
                     </v-icon>
                     <span
                         class="text-caption text-grey-darken-1 font-weight-medium"
-                        >Nhắn tin mới
+                        >{{ $t("chat.new_chat") }}
                     </span>
                     >
                 </div>
@@ -292,7 +295,7 @@
                         mdi-account-search-outline
                     </v-icon>
                     <span class="text-caption mt-2 text-center">
-                        Không tìm thấy người dùng nào
+                        {{ $t("chat.not_found_user") }}
                     </span>
                 </div>
             </template>

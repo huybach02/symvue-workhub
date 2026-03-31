@@ -1,290 +1,304 @@
 {
-    "loading": "Loading...",
-    "system_management": "System Management",
-    "status_values": {
-        "active": "Active",
-        "inactive": "Inactive",
-        "blocked": "Blocked"
+  "loading": "Loading...",
+  "system_management": "System Management",
+  "status_values": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "blocked": "Blocked"
+  },
+  "auth": {
+    "login": "Login",
+    "remember_me": "Remember me",
+    "sign_in": "Sign in",
+    "forgot_password": "Forgot password",
+    "profile": "Profile",
+    "logout": "Logout",
+    "verify_otp": "Verify OTP",
+    "verify_otp_description": "Enter the 6-digit OTP code sent to your email",
+    "otp_code": "OTP Code",
+    "resend_otp": "Resend OTP",
+    "back_to_login": "Back to login",
+    "change_password": "Change new password"
+  },
+  "language": {
+    "en": "English",
+    "vi": "Vietnamese"
+  },
+  "system_config": {
+    "login_fail_setting": "Login fail setting",
+    "max_login_fail": "Max login fail",
+    "lock_account_time": "Lock account time (minutes)",
+    "two_factor_setting": "Two factor setting",
+    "enable_two_factor": "Enable/Disable two factor",
+    "otp_expire_time": "OTP expire time (minutes)",
+    "device_verify_time": "Device verify time (days)",
+    "working_time_setting": "Working time setting",
+    "enable_working_time_check": "Enable/Disable working time check",
+    "max_device_login": "Max device login",
+    "edit_button": "Edit",
+    "save_button": "Save configuration",
+    "cancel_button": "Cancel"
+  },
+  "thoi_gian_lam_viec": {
+    "fulltime": "Fixed time",
+    "parttime": "Shift time",
+    "action": "Action",
+    "thoi_gian_cap_nhat": "Updated time",
+    "edit_button": "Edit",
+    "save_button": "Save configuration",
+    "cancel_button": "Cancel",
+    "edit": "Edit working time",
+    "thu": "Day",
+    "gio_bat_dau": "Start Time",
+    "gio_ket_thuc": "End Time",
+    "ghi_chu": "Note"
+  },
+  "ca_lam_viec": {
+    "ten_ca": "Shift name",
+    "edit": "Edit shift",
+    "create": "Create shift",
+    "cancel_button": "Cancel",
+    "save_button": "Save shift"
+  },
+  "media_library": {
+    "title": "Media Library",
+    "select_from_library": "Select from library",
+    "selected_images": "Selected images",
+    "upload_images": "Upload images",
+    "no_images": "No images yet. Please upload new images.",
+    "no_images_in_trash": "No images in trash.",
+    "delete_button": "Delete ({count} images)",
+    "confirm_select_button": "Confirm selection ({count} images)",
+    "delete_confirm_message": "Are you sure you want to delete {count} records?",
+    "select_all": "Select all",
+    "deselect_all": "Deselect all",
+    "restore_button": "Restore ({count} images)",
+    "delete_permanently_button": "Delete permanently ({count} images)",
+    "restore_confirm_title": "Confirm restore",
+    "restore_confirm_message": "Are you sure you want to restore {count} images?",
+    "delete_permanently_confirm_title": "Confirm permanent deletion",
+    "delete_permanently_confirm_message": "Are you sure you want to permanently delete {count} images? This action cannot be undone!",
+    "restore_action": "Restore",
+    "delete_permanently_action": "Delete permanently",
+    "tab_library": "Media Library",
+    "tab_trash": "Trash"
+  },
+  "confirm_dialog": {
+    "default_title": "Confirm",
+    "default_message": "Are you sure you want to perform this action?",
+    "confirm_button": "Confirm",
+    "cancel_button": "Cancel"
+  },
+  "filter": {
+    "date_range": {
+      "title": "Date range",
+      "select_type": "Select date type",
+      "from_date": "From date",
+      "to_date": "To date",
+      "date": "Date",
+      "types": {
+        "equal_to": "Date",
+        "less_than": "Less than date",
+        "greater_than": "Greater than date",
+        "less_than_or_equal_to": "Less than or equal to date",
+        "greater_than_or_equal_to": "Greater than or equal to date",
+        "between": "From date to date"
+      },
+      "display": {
+        "from": "From",
+        "to": "To"
+      },
+      "error": {
+        "invalid_range": "Start date must be less than or equal to end date"
+      }
     },
-    "auth": {
-        "login": "Login",
-        "remember_me": "Remember me",
-        "sign_in": "Sign in",
-        "forgot_password": "Forgot password",
-        "profile": "Profile",
-        "logout": "Logout",
-        "verify_otp": "Verify OTP",
-        "verify_otp_description": "Enter the 6-digit OTP code sent to your email",
-        "otp_code": "OTP Code",
-        "resend_otp": "Resend OTP",
-        "back_to_login": "Back to login",
-        "change_password": "Change new password"
-    },
-    "language": {
-        "en": "English",
-        "vi": "Vietnamese"
-    },
-    "system_config": {
-        "login_fail_setting": "Login fail setting",
-        "max_login_fail": "Max login fail",
-        "lock_account_time": "Lock account time (minutes)",
-        "two_factor_setting": "Two factor setting",
-        "enable_two_factor": "Enable/Disable two factor",
-        "otp_expire_time": "OTP expire time (minutes)",
-        "device_verify_time": "Device verify time (days)",
-        "working_time_setting": "Working time setting",
-        "enable_working_time_check": "Enable/Disable working time check",
-        "max_device_login": "Max device login",
-        "edit_button": "Edit",
-        "save_button": "Save configuration",
-        "cancel_button": "Cancel"
-    },
-    "thoi_gian_lam_viec": {
-        "fulltime": "Fixed time",
-        "parttime": "Shift time",
-        "action": "Action",
-        "thoi_gian_cap_nhat": "Updated time",
-        "edit_button": "Edit",
-        "save_button": "Save configuration",
-        "cancel_button": "Cancel",
-        "edit": "Edit working time",
-        "thu": "Day",
-        "gio_bat_dau": "Start Time",
-        "gio_ket_thuc": "End Time",
-        "ghi_chu": "Note"
-    },
-    "ca_lam_viec": {
-        "ten_ca": "Shift name",
-        "edit": "Edit shift",
-        "create": "Create shift",
-        "cancel_button": "Cancel",
-        "save_button": "Save shift"
-    },
-    "media_library": {
-        "title": "Media Library",
-        "select_from_library": "Select from library",
-        "selected_images": "Selected images",
-        "upload_images": "Upload images",
-        "no_images": "No images yet. Please upload new images.",
-        "no_images_in_trash": "No images in trash.",
-        "delete_button": "Delete ({count} images)",
-        "confirm_select_button": "Confirm selection ({count} images)",
-        "delete_confirm_message": "Are you sure you want to delete {count} records?",
-        "select_all": "Select all",
-        "deselect_all": "Deselect all",
-        "restore_button": "Restore ({count} images)",
-        "delete_permanently_button": "Delete permanently ({count} images)",
-        "restore_confirm_title": "Confirm restore",
-        "restore_confirm_message": "Are you sure you want to restore {count} images?",
-        "delete_permanently_confirm_title": "Confirm permanent deletion",
-        "delete_permanently_confirm_message": "Are you sure you want to permanently delete {count} images? This action cannot be undone!",
-        "restore_action": "Restore",
-        "delete_permanently_action": "Delete permanently",
-        "tab_library": "Media Library",
-        "tab_trash": "Trash"
-    },
-    "confirm_dialog": {
-        "default_title": "Confirm",
-        "default_message": "Are you sure you want to perform this action?",
-        "confirm_button": "Confirm",
-        "cancel_button": "Cancel"
-    },
-    "filter": {
-        "date_range": {
-            "title": "Date range",
-            "select_type": "Select date type",
-            "from_date": "From date",
-            "to_date": "To date",
-            "date": "Date",
-            "types": {
-                "equal_to": "Date",
-                "less_than": "Less than date",
-                "greater_than": "Greater than date",
-                "less_than_or_equal_to": "Less than or equal to date",
-                "greater_than_or_equal_to": "Greater than or equal to date",
-                "between": "From date to date"
-            },
-            "display": {
-                "from": "From",
-                "to": "To"
-            },
-            "error": {
-                "invalid_range": "Start date must be less than or equal to end date"
-            }
-        },
-        "pagination": {
-            "showing": "Showing",
-            "to": "to",
-            "of": "of",
-            "records": "records",
-            "no_data": "No data",
-            "items_per_page": "Show:",
-            "first": "First",
-            "last": "Last"
-        }
-    },
-    "user": {
-        "title": "User",
-        "columns": {
-            "id": "ID",
-            "avatar": "Avatar",
-            "name": "Full name",
-            "email": "Email",
-            "phone": "Phone",
-            "role": "Role",
-            "ma_nhan_vien": "Employee code"
-        },
-        "roles": {
-            "admin": "Admin",
-            "user": "User",
-            "manager": "Manager",
-            "staff": "Staff"
-        }
-    },
-    "lich_su_import": {
-        "title": "Import history",
-        "columns": {
-            "id": "ID",
-            "fileName": "File name",
-            "entityType": "Entity type",
-            "status": "Status",
-            "totalRows": "Total rows",
-            "successRows": "Success rows",
-            "errorRows": "Error rows",
-            "errorDetails": "Error details",
-            "createdAt": "Created at",
-            "row": "Row",
-            "rawData": "Raw data",
-            "errors": "Errors"
-        }
-    },
-    "bo_phan": {
-        "title": "Departments",
-        "columns": {
-            "id": "ID",
-            "maBoPhan": "Department code",
-            "tenBoPhan": "Department name",
-            "status": "Status",
-            "quanLyBoPhan": "Manager",
-            "phanQuyen": "Permissions"
-        },
-        "vai_tro": {
-            "title": "Role",
-            "manager": "Manager",
-            "employee": "Member"
-        },
-        "actions": {
-            "index": "View list",
-            "create": "Add new",
-            "show": "View detail",
-            "edit": "Edit",
-            "delete": "Delete",
-            "export": "Export file",
-            "import": "Import file",
-            "showMenu": "Show menu",
-            "all": "All"
-        },
-        "button": {
-            "update": "Update permission",
-            "resetPermissionDefault": "Reset permission default",
-            "delete": "Delete department",
-            "viewPosition": "View position and contract",
-            "userList": "User list",
-            "addPosition": "Add position",
-            "savePermissionByPosition": "Save permissions by position",
-            "addPositionAllowance": "Add allowance"
-        },
-        "text": {
-            "departmentOfUser": "Department of user",
-            "isMemberOf": "Is member of",
-            "isManagerOf": "Is manager of",
-            "department": "Department",
-            "notBelongsToAnyDepartment": "Not belongs to any department",
-            "default": "Default",
-            "userList": "User list of department {tenBoPhan}",
-            "viewMembers": "View member list",
-            "noMembers": "This department has no members yet",
-            "manager": "Manager",
-            "totalMembers": "Total: {count} members",
-            "removeMemberConfirm": "Are you sure you want to remove '{name}' from department '{tenBoPhan}'?",
-            "positionPermissionDialogTitle": "Positions and permissions of department {tenBoPhan}",
-            "positionList": "Position list",
-            "totalPositions": "Total: {count} positions",
-            "noPositions": "This department does not have any positions yet.",
-            "permissionByPosition": "Positions and permissions of position",
-            "permissionRequiresPosition": "Create at least one position before configuring permissions.",
-            "deletePositionConfirm": "Are you sure you want to delete position {name}?",
-            "positionManagerDescription": "Enable this option if this position should manage the department.",
-            "allowancesHint": "Enter allowances separated by commas",
-            "permission": "Permission",
-            "notHasPositionManager": "This department does not have any position manager. Please create at least one position manager for this department.",
-            "hasPositionManager": "This department is managed by position {positionManager} (Code: {positionManagerCode})"
-        },
-        "employmentType": {
-            "fullTime": "Full time",
-            "partTime": "Part time",
-            "intern": "Intern",
-            "contractor": "Contractor"
-        }
-    },
-    "thong_bao": {
-        "title": "Notification",
-        "columns": {
-            "id": "ID",
-            "title": "Title",
-            "body": "Content",
-            "type": "Type notification",
-            "fromUser": "From user",
-            "sendTo": "Send to",
-            "createdAt": "Created at"
-        },
-        "options": {
-            "sendTo": {
-                "all": "All",
-                "department": "Department",
-                "user": "User"
-            },
-            "type": {
-                "primary": "Default notification",
-                "info": "Information",
-                "warning": "Warning",
-                "error": "Emergency"
-            }
-        }
-    },
-    "chat": {
-        "has_sent_image": "Sent {count} images",
-        "has_sent_file": "Sent {count} files",
-        "has_sent_images_and_files": "Sent {imageCount} images and {fileCount} files",
-        "group": "Group"
-    },
-    "position": {
-        "text": "Position",
-        "position_and_contract": "Position and contract of {name}",
-        "position": "Position",
-        "contract": "Contract",
-        "choose_position_to_view": "Choose position to view detail",
-        "position_detail": "Position detail",
-        "salary": "Salary",
-        "insurance_salary": "Insurance salary",
-        "insurance_code": "Insurance code",
-        "probation_from": "Probation from",
-        "probation_to": "Probation to",
-        "effective_from": "Effective from",
-        "effective_to": "Effective to",
-        "allowances_optional": "Allowances optional"
-    },
-    "contract": {
-        "text": "Contract",
-        "please_update_position": "Please update position before uploading contract to system",
-        "upload_contract": "Upload contract",
-        "format_contract": "Contract file format must be doc, docx, pdf",
-        "contract_list": "Contract list",
-        "total_contracts": "Total contracts: {count}",
-        "no_contract": "No contract yet",
-        "file_name": "File name",
-        "file_format": "File format",
-        "file_size": "File size",
-        "uploaded_at": "Uploaded at"
+    "pagination": {
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "records": "records",
+      "no_data": "No data",
+      "items_per_page": "Show:",
+      "first": "First",
+      "last": "Last"
     }
+  },
+  "user": {
+    "title": "User",
+    "columns": {
+      "id": "ID",
+      "avatar": "Avatar",
+      "name": "Full name",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role",
+      "ma_nhan_vien": "Employee code"
+    },
+    "roles": {
+      "admin": "Admin",
+      "user": "User",
+      "manager": "Manager",
+      "staff": "Staff"
+    }
+  },
+  "lich_su_import": {
+    "title": "Import history",
+    "columns": {
+      "id": "ID",
+      "fileName": "File name",
+      "entityType": "Entity type",
+      "status": "Status",
+      "totalRows": "Total rows",
+      "successRows": "Success rows",
+      "errorRows": "Error rows",
+      "errorDetails": "Error details",
+      "createdAt": "Created at",
+      "row": "Row",
+      "rawData": "Raw data",
+      "errors": "Errors"
+    }
+  },
+  "bo_phan": {
+    "title": "Departments",
+    "columns": {
+      "id": "ID",
+      "maBoPhan": "Department code",
+      "tenBoPhan": "Department name",
+      "status": "Status",
+      "quanLyBoPhan": "Manager",
+      "phanQuyen": "Permissions"
+    },
+    "vai_tro": {
+      "title": "Role",
+      "manager": "Manager",
+      "employee": "Member"
+    },
+    "actions": {
+      "index": "View list",
+      "create": "Add new",
+      "show": "View detail",
+      "edit": "Edit",
+      "delete": "Delete",
+      "export": "Export file",
+      "import": "Import file",
+      "showMenu": "Show menu",
+      "all": "All"
+    },
+    "button": {
+      "update": "Update permission",
+      "resetPermissionDefault": "Reset permission default",
+      "delete": "Delete department",
+      "viewPosition": "View position and contract",
+      "userList": "User list",
+      "addPosition": "Add position",
+      "savePermissionByPosition": "Save permissions by position",
+      "addPositionAllowance": "Add allowance"
+    },
+    "text": {
+      "departmentOfUser": "Department of user",
+      "isMemberOf": "Is member of",
+      "isManagerOf": "Is manager of",
+      "department": "Department",
+      "notBelongsToAnyDepartment": "Not belongs to any department",
+      "default": "Default",
+      "userList": "User list of department {tenBoPhan}",
+      "viewMembers": "View member list",
+      "noMembers": "This department has no members yet",
+      "manager": "Manager",
+      "totalMembers": "Total: {count} members",
+      "removeMemberConfirm": "Are you sure you want to remove '{name}' from department '{tenBoPhan}'?",
+      "positionPermissionDialogTitle": "Positions and permissions of department {tenBoPhan}",
+      "positionList": "Position list",
+      "totalPositions": "Total: {count} positions",
+      "noPositions": "This department does not have any positions yet.",
+      "permissionByPosition": "Positions and permissions of position",
+      "permissionRequiresPosition": "Create at least one position before configuring permissions.",
+      "deletePositionConfirm": "Are you sure you want to delete position {name}?",
+      "positionManagerDescription": "Enable this option if this position should manage the department.",
+      "allowancesHint": "Enter allowances separated by commas",
+      "permission": "Permission",
+      "notHasPositionManager": "This department does not have any position manager. Please create at least one position manager for this department.",
+      "hasPositionManager": "This department is managed by position {positionManager} (Code: {positionManagerCode})"
+    },
+    "employmentType": {
+      "fullTime": "Full time",
+      "partTime": "Part time",
+      "intern": "Intern",
+      "contractor": "Contractor"
+    }
+  },
+  "thong_bao": {
+    "title": "Notification",
+    "columns": {
+      "id": "ID",
+      "title": "Title",
+      "body": "Content",
+      "type": "Type notification",
+      "fromUser": "From user",
+      "sendTo": "Send to",
+      "createdAt": "Created at"
+    },
+    "options": {
+      "sendTo": {
+        "all": "All",
+        "department": "Department",
+        "user": "User"
+      },
+      "type": {
+        "primary": "Default notification",
+        "info": "Information",
+        "warning": "Warning",
+        "error": "Emergency"
+      }
+    }
+  },
+  "chat": {
+    "text": "Chat",
+    "total": "Total",
+    "unseen": "Unseen",
+    "search_conversation": "Search conversation",
+    "conversation": "Conversation",
+    "not_conversation": "No conversation found",
+    "new_chat": "Start new chat",
+    "not_found_user": "User not found",
+    "has_sent_image": "Sent {count} images",
+    "has_sent_file": "Sent {count} files",
+    "has_sent_images_and_files": "Sent {imageCount} images and {fileCount} files",
+    "group": "Group",
+    "choose_conversation": "Choose conversation",
+    "to_start_chat": "to start chat",
+    "attach_file": "Attach file (max 10 files)",
+    "send_image": "Send image (max 10 images)",
+    "enter_message": "Enter message...",
+    "enter_to_send_shift_to_wrap": "Press Enter to send message, or Shift + Enter to wrap"
+  },
+  "position": {
+    "text": "Position",
+    "position_and_contract": "Position and contract of {name}",
+    "position": "Position",
+    "contract": "Contract",
+    "choose_position_to_view": "Choose position to view detail",
+    "position_detail": "Position detail",
+    "salary": "Salary",
+    "insurance_salary": "Insurance salary",
+    "insurance_code": "Insurance code",
+    "probation_from": "Probation from",
+    "probation_to": "Probation to",
+    "effective_from": "Effective from",
+    "effective_to": "Effective to",
+    "allowances_optional": "Allowances optional"
+  },
+  "contract": {
+    "text": "Contract",
+    "please_update_position": "Please update position before uploading contract to system",
+    "upload_contract": "Upload contract",
+    "format_contract": "Contract file format must be doc, docx, pdf",
+    "contract_list": "Contract list",
+    "total_contracts": "Total contracts: {count}",
+    "no_contract": "No contract yet",
+    "file_name": "File name",
+    "file_format": "File format",
+    "file_size": "File size",
+    "uploaded_at": "Uploaded at"
+  }
 }

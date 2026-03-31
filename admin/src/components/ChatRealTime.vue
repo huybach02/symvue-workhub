@@ -74,10 +74,10 @@
                         <div
                             class="text-h6 font-weight-medium mt-4 text-grey-lighten-1"
                         >
-                            Chọn một hội thoại
+                            {{ $t("chat.choose_conversation") }}
                         </div>
                         <div class="text-body-2 text-grey-lighten-1 mt-1">
-                            để bắt đầu trò chuyện
+                            {{ $t("chat.to_start_chat") }}
                         </div>
                     </div>
                 </div>

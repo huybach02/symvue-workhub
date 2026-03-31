@@ -75,12 +75,12 @@
                 </div>
 
                 <div class="d-flex align-center ga-1">
-                    <v-btn icon variant="text" size="small">
+                    <!-- <v-btn icon variant="text" size="small">
                         <v-icon size="18">mdi-dots-vertical</v-icon>
                         <v-tooltip activator="parent" location="top">
                             Thêm
                         </v-tooltip>
-                    </v-btn>
+                    </v-btn> -->
                     <v-btn
                         icon
                         variant="text"
@@ -88,9 +88,6 @@
                         @click="$emit('close')"
                     >
                         <v-icon size="20">mdi-close</v-icon>
-                        <v-tooltip activator="parent" location="top">
-                            Đóng
-                        </v-tooltip>
                     </v-btn>
                 </div>
             </div>
@@ -306,7 +303,7 @@
                 >
                     <v-icon size="18">mdi-paperclip</v-icon>
                     <v-tooltip activator="parent" location="top">
-                        Đính kèm file (tối đa 10 file)
+                        {{ $t("chat.attach_file") }}
                     </v-tooltip>
                 </v-btn>
                 <v-btn
@@ -318,7 +315,7 @@
                 >
                     <v-icon size="18">mdi-image-outline</v-icon>
                     <v-tooltip activator="parent" location="top">
-                        Gửi ảnh (tối đa 10 ảnh)
+                        {{ $t("chat.send_image") }}
                     </v-tooltip>
                 </v-btn>
                 <input
@@ -421,7 +418,7 @@
                     v-model="newMessage"
                     variant="outlined"
                     density="compact"
-                    placeholder="Nhập tin nhắn..."
+                    :placeholder="$t('chat.enter_message')"
                     rows="1"
                     auto-grow
                     max-rows="4"
@@ -446,7 +443,7 @@
                 </v-btn>
             </div>
             <div class="text-caption text-grey mt-1" style="font-size: 10px">
-                Nhấn Enter để gửi · Shift+Enter xuống dòng
+                {{ $t("chat.enter_to_send_shift_to_wrap") }}
             </div>
         </div>
         <ImagePreviewDialog
