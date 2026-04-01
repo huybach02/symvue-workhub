@@ -178,56 +178,6 @@ final class UserController extends AbstractController
         }
     }
 
-    #[Route('/nguoi-dung/{id}/department', methods: ['GET'])]
-    public function getUserDepartment(int $id): JsonResponse
-    {
-        try {
-            $data = $this->userService->getUserDepartment($id);
-            return CustomResponse::success($data);
-        } catch (\Throwable $th) {
-            return CustomResponse::error($th->getMessage());
-        }
-    }
-
-    #[Route('/nguoi-dung/{id}/department', methods: ['POST'])]
-    public function addUserDepartment(int $id, Request $request): JsonResponse
-    {
-        try {
-            $body = json_decode($request->getContent(), true);
-            $boPhanId = $body['bo_phan_id'] ?? [];
-            $this->userService->addUserDepartment($id, $boPhanId);
-            return CustomResponse::success([], t('success.created'));
-        } catch (\Throwable $th) {
-            return CustomResponse::error($th->getMessage());
-        }
-    }
-
-    #[Route('/nguoi-dung/{id}/department/{permissionId}', methods: ['PATCH'])]
-    public function updateUserDepartment(int $id, int $permissionId, Request $request): JsonResponse
-    {
-        try {
-            $body = json_decode($request->getContent(), true);
-            $phanQuyen = $body['phan_quyen'] ?? [];
-            $this->userService->updatePhanQuyen($permissionId, $phanQuyen);
-            return CustomResponse::success([], t('success.updated'));
-        } catch (\Throwable $th) {
-            return CustomResponse::error($th->getMessage());
-        }
-    }
-
-    #[Route('/nguoi-dung/{id}/department/{permissionId}', methods: ['POST'])]
-    public function resetOrDeletePermission(int $id, int $permissionId, Request $request): JsonResponse
-    {
-        try {
-            $body = json_decode($request->getContent(), true);
-            $action = $body['action'] ?? 'reset';
-            $this->userService->resetOrDeletePermission($id, $permissionId, $action);
-            return CustomResponse::success([],  t('success.updated'));
-        } catch (\Throwable $th) {
-            return CustomResponse::error($th->getMessage());
-        }
-    }
-
     #[Route('/nguoi-dung/{id}/vi-tri-cong-viec', methods: ['GET'])]
     public function getUserPosition(int $id): JsonResponse
     {

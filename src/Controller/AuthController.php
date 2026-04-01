@@ -37,11 +37,6 @@ final class AuthController extends AbstractController
         $userData = $user->jsonSerialize();
         $userData['permissions'] = $userPermission;
 
-        if ($user->getBoPhanId()) {
-            $boPhan = $this->boPhanRepository->find($user->getBoPhanId());
-            $userData['boPhan'] = $boPhan->jsonSerialize();
-        }
-
         return CustomResponse::success($userData);
     }
 

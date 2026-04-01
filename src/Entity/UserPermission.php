@@ -20,19 +20,13 @@ class UserPermission
     private ?int $userId = null;
 
     #[ORM\Column]
-    private ?int $boPhanId = null;
+    private ?int $departmentId = null;
+
+    #[ORM\Column]
+    private ?int $positionId = null;
 
     #[ORM\Column(nullable: true)]
     private ?array $phanQuyen = null;
-
-    #[ORM\Column(nullable: true, options: ["default" => false])]
-    private ?bool $isDefault = false;
-
-    #[ORM\Column(nullable: true, options: ["default" => false])]
-    private ?bool $isManager = false;
-
-    #[ORM\Column(nullable: true, options: ["default" => false])]
-    private ?bool $isCustom = false;
 
     public function getId(): ?int
     {
@@ -51,14 +45,26 @@ class UserPermission
         return $this;
     }
 
-    public function getBoPhanId(): ?int
+    public function getDepartmentId(): ?int
     {
-        return $this->boPhanId;
+        return $this->departmentId;
     }
 
-    public function setBoPhanId(int $boPhanId): static
+    public function setDepartmentId(int $departmentId): static
     {
-        $this->boPhanId = $boPhanId;
+        $this->departmentId = $departmentId;
+
+        return $this;
+    }
+
+    public function getPositionId(): ?int
+    {
+        return $this->positionId;
+    }
+
+    public function setPositionId(int $positionId): static
+    {
+        $this->positionId = $positionId;
 
         return $this;
     }
@@ -75,39 +81,14 @@ class UserPermission
         return $this;
     }
 
-    public function isDefault(): ?bool
+    public function jsonSerialize(): array
     {
-        return $this->isDefault;
-    }
-
-    public function setIsDefault(?bool $isDefault): static
-    {
-        $this->isDefault = $isDefault;
-
-        return $this;
-    }
-
-    public function isManager(): ?bool
-    {
-        return $this->isManager;
-    }
-
-    public function setIsManager(?bool $isManager): static
-    {
-        $this->isManager = $isManager;
-
-        return $this;
-    }
-
-    public function isCustom(): ?bool
-    {
-        return $this->isCustom;
-    }
-
-    public function setIsCustom(?bool $isCustom): static
-    {
-        $this->isCustom = $isCustom;
-
-        return $this;
+        return [
+            'id' => $this->id,
+            'userId' => $this->userId,
+            'departmentId' => $this->departmentId,
+            'positionId' => $this->positionId,
+            'phanQuyen' => $this->phanQuyen,
+        ];
     }
 }

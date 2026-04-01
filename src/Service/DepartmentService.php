@@ -11,6 +11,7 @@ use App\Entity\Conversation;
 use App\Entity\ConversationUser;
 use App\Entity\Position;
 use App\Entity\User;
+use App\Entity\UserHasCustomPermission;
 use App\Entity\UserPermission;
 use App\Repository\DepartmentRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -83,48 +84,13 @@ class DepartmentService
             throw new \Exception(t('error.bo_phan_exist', ['%name%' => $dto->tenBoPhan, '%ma_bo_phan%' => $dto->maBoPhan]));
         }
 
-        // $item->setQuanLyBoPhan($user);
         $item->setTenBoPhan($dto->tenBoPhan);
         $item->setMaBoPhan($dto->maBoPhan);
         $item->setStatus($dto->status);
         $item->setGhiChu($dto->ghiChu);
-        // $item->setPhanQuyen($dto->permissions);
 
         $this->entityManager->persist($item);
         $this->entityManager->flush();
-
-        // $permissions = [];
-        // foreach ($dto->permissions as $permission) {
-        //     $permissions[] = [
-        //         "name" => $permission['name'],
-        //         "actions" => $permission['manager'],
-        //     ];
-        // }
-
-        // $userPermission = new UserPermission();
-        // $userPermission->setUserId($user->getId());
-        // $userPermission->setBoPhanId($item->getId());
-        // $userPermission->setPhanQuyen($permissions);
-        // $userPermission->setIsManager(true);
-        // $this->entityManager->persist($userPermission);
-        // $this->entityManager->flush();
-
-        // $conversation = new Conversation();
-        // $conversation->setType(Constanst::TYPE_CONVERSATION['department']);
-        // $conversation->setName($item->getTenBoPhan());
-        // $this->entityManager->persist($conversation);
-        // $this->entityManager->flush();
-
-        // $item->setConversation($conversation);
-        // $this->entityManager->flush();
-
-        // $conversationUser = new ConversationUser();
-        // $conversationUser->setConversation($conversation);
-        // $conversationUser->setMember($user);
-        // $this->entityManager->persist($conversationUser);
-        // $this->entityManager->flush();
-
-        // $this->mergeUserPermissions($user->getId());
 
         return $item->jsonSerialize();
     }
@@ -288,34 +254,67 @@ class DepartmentService
 
     public function updatePositionPermissions(int $boPhanId, array $permissions): array
     {
-        $boPhan = $this->boPhanRepository->find($boPhanId);
+        $department = $this->boPhanRepository->find($boPhanId);
 
-        if (!$boPhan) {
+        if (!$department) {
             throw new \Exception(t('error.not_found'));
         }
 
-        $boPhan->setPhanQuyen($permissions);
+        $positions = $department->getPositions();
+
+        $department->setPhanQuyen($permissions);
+
+        $affectedUserIds = [];
+
+        foreach ($positions as $position) {
+            $userPermissions = $this->entityManager->getRepository(UserPermission::class)->findBy([
+                'departmentId' => $department->getId(),
+                'positionId' => $position->getId()
+            ]);
+
+            foreach ($userPermissions as $userPermission) {
+                $userPermission->setPhanQuyen($permissions[$position->getCode()] ?? []);
+                $affectedUserIds[$userPermission->getUserId()] = true;
+            }
+        }
+
         $this->entityManager->flush();
 
-        return $boPhan->jsonSerialize();
+        foreach (array_keys($affectedUserIds) as $userId) {
+            $this->mergeUserPermissions($userId);
+        }
+
+        return $department->jsonSerialize();
     }
 
     public function mergeUserPermissions(int $userId): void
     {
+        $user = $this->entityManager->getRepository(User::class)->find($userId);
+
+        if (!$user) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $checkUserHasCustomPermission = $this->entityManager->getRepository(UserHasCustomPermission::class)->findOneBy(['user' => $user]);
+        if ($checkUserHasCustomPermission) {
+            return;
+        }
+
+        $cacheKey = "user_permissions_" . $userId;
         $userPermissions = $this->entityManager
             ->getRepository(UserPermission::class)
             ->findBy(['userId' => $userId]);
-        if (empty($userPermissions)) {
-            return;
-        }
         $merged = [];
         foreach ($userPermissions as $up) {
             foreach ($up->getPhanQuyen() ?? [] as $perm) {
+                if (!isset($perm['name']) || !is_array($perm['actions'] ?? null)) {
+                    continue;
+                }
+
                 $name = $perm['name'];
                 if (!isset($merged[$name])) {
                     $merged[$name] = $perm['actions'];
                 } else {
-                    // OR merge: náº¿u báº¥t ká»³ true â†’ true
                     foreach ($perm['actions'] as $action => $value) {
                         $merged[$name][$action] =
                             ($merged[$name][$action] ?? false) || $value;
@@ -329,7 +328,6 @@ class DepartmentService
         }
 
         // Lưu result vào cache redis.
-        $cacheKey = "user_permissions_" . $userId;
         $item = $this->cache->getItem($cacheKey);
         $item->set($result);
         $item->expiresAfter(3600 * 24 * 90); // 90 ngày

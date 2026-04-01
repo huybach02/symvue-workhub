@@ -248,122 +248,6 @@ class UserService
         return $items ?? [];
     }
 
-    public function getUserDepartment(int $userId): array
-    {
-        $conn = $this->entityManager->getConnection();
-        $sql = '
-            SELECT up.*, bp.ten_bo_phan, bp.ma_bo_phan, u.name
-            FROM user_permission up
-            LEFT JOIN department bp ON bp.id = up.bo_phan_id
-            LEFT JOIN "user" u ON u.id = up.user_id
-            WHERE up.user_id = :userId
-            ORDER BY up.id DESC
-        ';
-        $items = $conn->executeQuery($sql, ['userId' => $userId])->fetchAllAssociative();
-
-        foreach ($items as $key => $item) {
-            $items[$key]['phan_quyen'] = json_decode($item['phan_quyen'], true);
-        }
-
-        return $items;
-    }
-
-    public function updatePhanQuyen(int $permissionId, array $phanQuyen): void
-    {
-        $userPermission = $this->entityManager->getRepository(\App\Entity\UserPermission::class)->find($permissionId);
-
-        if (!$userPermission) {
-            throw new \Exception(t('error.permission_not_found', ['%id%' => $permissionId]));
-        }
-
-        $userPermission->setPhanQuyen($phanQuyen);
-        $userPermission->setIsCustom(true);
-
-        $this->entityManager->flush();
-
-        $this->boPhanService->mergeUserPermissions($userPermission->getUserId());
-    }
-
-    public function addUserDepartment(int $userId, int $boPhanId): void
-    {
-        $checkExist = $this->entityManager->getRepository(UserPermission::class)->findOneBy([
-            'userId' => $userId,
-            'boPhanId' => $boPhanId,
-        ]);
-
-        if ($checkExist) {
-            throw new \Exception(t('error.user_already_in_department'));
-        }
-
-        $boPhan =  $this->entityManager->getRepository(Department::class)->find($boPhanId);
-        $user = $this->entityManager->getRepository(User::class)->find($userId);
-
-        $employeePermissions = [];
-        foreach ($boPhan->getPhanQuyen() as $permission) {
-            $employeePermissions[] = [
-                "name" => $permission['name'],
-                "actions" => $permission['employee'],
-            ];
-        }
-
-        $userPermission = new UserPermission();
-        $userPermission->setUserId($userId);
-        $userPermission->setBoPhanId($boPhanId);
-        $userPermission->setPhanQuyen($employeePermissions);
-        if (!$user->getBoPhanId()) {
-            $userPermission->setIsDefault(true);
-        }
-        $this->entityManager->persist($userPermission);
-        $this->entityManager->flush();
-
-        if (!$user->getBoPhanId()) {
-            $user->setBoPhanId($boPhanId);
-            $this->entityManager->flush();
-        }
-
-        $this->boPhanService->mergeUserPermissions($userId);
-
-        $conversationUser = new ConversationUser();
-        $conversationUser->setConversation($boPhan->getConversation());
-        $conversationUser->setMember($user);
-        $this->entityManager->persist($conversationUser);
-        $this->entityManager->flush();
-    }
-
-    public function resetOrDeletePermission(int $userId, int $permissionId, string $action): void
-    {
-        $userPermission = $this->entityManager->getRepository(UserPermission::class)->find($permissionId);
-
-        if (!$userPermission) {
-            throw new \Exception(t('error.permission_not_found', ['%id%' => $permissionId]));
-        }
-
-        if ($action === 'delete') {
-            if ($userPermission->isManager()) {
-                throw new \Exception(t('error.cannot_delete_manager_department'));
-            }
-
-            $this->entityManager->remove($userPermission);
-            $this->entityManager->flush();
-        } else {
-            $boPhan =  $this->entityManager->getRepository(Department::class)->find($userPermission->getBoPhanId());
-
-            $employeePermissions = [];
-            foreach ($boPhan->getPhanQuyen() as $permission) {
-                $employeePermissions[] = [
-                    "name" => $permission['name'],
-                    "actions" => $userPermission->isManager() ? $permission['manager'] : $permission['employee'],
-                ];
-            }
-
-            $userPermission->setPhanQuyen($employeePermissions);
-            $userPermission->setIsCustom(false);
-            $this->entityManager->flush();
-        }
-
-        $this->boPhanService->mergeUserPermissions($userId);
-    }
-
     public function getUserPosition(int $userId): ?array
     {
         $user = $this->userRepository->find($userId);
@@ -431,6 +315,8 @@ class UserService
 
         $this->entityManager->flush();
 
+        $this->createUserPermission($user, $position);
+
         return $userPosition->jsonSerialize();
     }
 
@@ -492,5 +378,51 @@ class UserService
         $this->entityManager->flush();
 
         return $userPosition->jsonSerialize();
+    }
+
+    public function createUserPermission(User $user, Position $position)
+    {
+        $department = $position->getDepartment();
+        if (!$department) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $userPermission = $this->entityManager->getRepository(UserPermission::class)->findOneBy(
+            ['userId' => $user->getId(), 'departmentId' => $department->getId(), 'positionId' => $position->getId()]
+        );
+
+        if (!$userPermission) {
+            $userPermission = new UserPermission();
+        }
+
+        $departmentPermissions = $department->getPhanQuyen() ?? [];
+        $permissions = $departmentPermissions[$position->getCode()] ?? [];
+
+        $userPermission->setUserId($user->getId());
+        $userPermission->setDepartmentId($department->getId());
+        $userPermission->setPositionId($position->getId());
+        $userPermission->setPhanQuyen($permissions);
+        $this->entityManager->persist($userPermission);
+        $this->entityManager->flush();
+
+        $this->boPhanService->mergeUserPermissions($user->getId());
+    }
+
+    public function createConversationByDepartment()
+    {
+        // $conversation = new Conversation();
+        // $conversation->setType(Constanst::TYPE_CONVERSATION['department']);
+        // $conversation->setName($item->getTenBoPhan());
+        // $this->entityManager->persist($conversation);
+        // $this->entityManager->flush();
+
+        // $item->setConversation($conversation);
+        // $this->entityManager->flush();
+
+        // $conversationUser = new ConversationUser();
+        // $conversationUser->setConversation($conversation);
+        // $conversationUser->setMember($user);
+        // $this->entityManager->persist($conversationUser);
+        // $this->entityManager->flush();
     }
 }

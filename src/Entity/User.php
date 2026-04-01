@@ -88,9 +88,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
     #[ORM\Column(type: 'integer', options: ['default' => 1, 'comment' => '1: full time, 2: part time'])]
     private int $hinhThucLamViec = 1;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $boPhanId = null;
-
     #[ORM\Column(length: 50, nullable: true, unique: true)]
     private ?string $maNhanVien = null;
 
@@ -141,6 +138,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
      */
     #[ORM\OneToMany(targetEntity: UserPosition::class, mappedBy: 'member')]
     private Collection $userPositions;
+
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?UserHasCustomPermission $userHasCustomPermission = null;
 
     public function __construct()
     {
@@ -394,18 +394,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
         return $this;
     }
 
-    public function getBoPhanId(): ?int
-    {
-        return $this->boPhanId;
-    }
-
-    public function setBoPhanId(?int $boPhanId): static
-    {
-        $this->boPhanId = $boPhanId;
-
-        return $this;
-    }
-
     public function getMaNhanVien(): ?string
     {
         return $this->maNhanVien;
@@ -517,7 +505,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
             'image' => $this->image,
             'description' => $this->description,
             'status' => $this->status,
-            'boPhanId' => $this->boPhanId,
             'maNhanVien' => $this->maNhanVien,
             'cmnd' => $this->cmnd,
             'ngayCapCmnd' => $this->ngayCapCmnd,
@@ -653,6 +640,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
                 $userPosition->setMember(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUserHasCustomPermission(): ?UserHasCustomPermission
+    {
+        return $this->userHasCustomPermission;
+    }
+
+    public function setUserHasCustomPermission(?UserHasCustomPermission $userHasCustomPermission): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($userHasCustomPermission === null && $this->userHasCustomPermission !== null) {
+            $this->userHasCustomPermission->setUser(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($userHasCustomPermission !== null && $userHasCustomPermission->getUser() !== $this) {
+            $userHasCustomPermission->setUser($this);
+        }
+
+        $this->userHasCustomPermission = $userHasCustomPermission;
 
         return $this;
     }
