@@ -208,104 +208,6 @@
                     </div>
                 </v-col>
 
-                <!-- ===== THÔNG TIN CÔNG VIỆC ===== -->
-                <v-col cols="12">
-                    <div class="form-section">
-                        <div class="form-section__title">
-                            Thông tin công việc
-                        </div>
-                        <v-row>
-                            <!-- Phòng ban/Bộ phận mặc định -->
-                            <v-col cols="12" md="4">
-                                <VeeField
-                                    v-slot="{
-                                        field,
-                                        errorMessage,
-                                        handleChange,
-                                    }"
-                                    name="boPhanId"
-                                >
-                                    <div class="mb-2">
-                                        {{ $t("field.bo_phan_mac_dinh") }}
-                                        <span class="text-red"> * </span>
-                                    </div>
-                                    <v-autocomplete
-                                        :model-value="field.value"
-                                        name="boPhanId"
-                                        :items="boPhanData"
-                                        item-title="label"
-                                        item-value="value"
-                                        :error-messages="errorMessage"
-                                        variant="outlined"
-                                        clearable
-                                        :placeholder="`${$t('base.enter')} ${$t('field.bo_phan_mac_dinh')}`"
-                                        @update:model-value="handleChange"
-                                        @blur="field.onBlur"
-                                    />
-                                </VeeField>
-                            </v-col>
-
-                            <!-- Ngày vào làm -->
-                            <v-col cols="12" md="4">
-                                <VeeField
-                                    v-slot="{
-                                        field,
-                                        errorMessage,
-                                        handleChange,
-                                        handleBlur,
-                                    }"
-                                    name="ngayVaoLam"
-                                >
-                                    <div class="mb-2">
-                                        {{ $t("field.ngay_vao_lam") }}
-                                    </div>
-                                    <DatePicker
-                                        :model-value="field.value"
-                                        :error-messages="errorMessage"
-                                        :placeholder="`${$t('base.enter')} ${$t('field.ngay_vao_lam')}`"
-                                        @update:model-value="
-                                            (value) => {
-                                                handleChange(value);
-                                                handleBlur();
-                                            }
-                                        "
-                                        @blur="handleBlur"
-                                    />
-                                </VeeField>
-                            </v-col>
-
-                            <!-- Trạng thái làm việc -->
-                            <v-col cols="12" md="4">
-                                <VeeField
-                                    v-slot="{
-                                        field,
-                                        errorMessage,
-                                        handleChange,
-                                        handleBlur,
-                                    }"
-                                    name="status"
-                                >
-                                    <div class="mb-2">
-                                        {{ $t("field.trang_thai_lam_viec") }}
-                                        <span class="text-red"> * </span>
-                                    </div>
-                                    <v-select
-                                        :model-value="field.value"
-                                        :items="statusOptions"
-                                        item-title="text"
-                                        item-value="value"
-                                        :error-messages="errorMessage"
-                                        variant="outlined"
-                                        :placeholder="`${$t('base.enter')} ${$t('field.trang_thai_lam_viec')}`"
-                                        @update:model-value="handleChange"
-                                        @blur="handleBlur"
-                                    />
-                                </VeeField>
-                            </v-col>
-                        </v-row>
-                    </div>
-                </v-col>
-
                 <!-- ===== THÔNG TIN LIÊN HỆ ===== -->
                 <v-col cols="12">
                     <div class="form-section">
@@ -441,6 +343,39 @@
                     </div>
                 </v-col>
 
+                <v-col cols="12">
+                    <v-row>
+                        <!-- Trạng thái làm việc -->
+                        <v-col cols="12" md="4">
+                            <VeeField
+                                v-slot="{
+                                    field,
+                                    errorMessage,
+                                    handleChange,
+                                    handleBlur,
+                                }"
+                                name="status"
+                            >
+                                <div class="mb-2">
+                                    {{ $t("field.trang_thai") }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-select
+                                    :model-value="field.value"
+                                    :items="statusOptions"
+                                    item-title="text"
+                                    item-value="value"
+                                    :error-messages="errorMessage"
+                                    variant="outlined"
+                                    :placeholder="`${$t('base.enter')} ${$t('field.trang_thai_lam_viec')}`"
+                                    @update:model-value="handleChange"
+                                    @blur="handleBlur"
+                                />
+                            </VeeField>
+                        </v-col>
+                    </v-row>
+                </v-col>
+
                 <!-- Nút cancel và create/update -->
                 <v-col cols="12">
                     <div class="d-flex justify-end ga-2">
@@ -469,7 +404,7 @@ import { functionHelper } from "@/helpers/functionHelper";
 import { addressHelper } from "@/helpers/addressHelper";
 import { userSchema } from "@/utils/schemas/user";
 import { constant } from "@/utils/constants/constant";
-import { getAllData, getDataSelect } from "@/services/bases/getData";
+import { getAllData } from "@/services/bases/getData";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import ImageSelector from "@/components/ImageSelector.vue";
 import LoadingForm from "@/components/LoadingForm.vue";
@@ -509,8 +444,6 @@ export default {
                 cmnd: "",
                 ngayCapCmnd: "",
                 noiCapCmnd: "",
-                boPhanId: "",
-                ngayVaoLam: "",
                 status: 1,
                 email: "",
                 phone: "",
@@ -520,7 +453,6 @@ export default {
             },
             provinceData: {},
             wardData: {},
-            boPhanData: [],
             selectedProvince: "",
             selectedBoPhan: null,
         };
@@ -580,11 +512,7 @@ export default {
         },
     },
     async mounted() {
-        await Promise.all([
-            this.getProvince(),
-            this.getBoPhan(),
-            this.getMaNhanVien(),
-        ]);
+        await Promise.all([this.getProvince(), this.getMaNhanVien()]);
     },
     methods: {
         handleSubmit(values) {
@@ -618,10 +546,6 @@ export default {
                 API_ROUTES_CONFIG.user + "/ward/" + provinceId,
             );
             this.wardData = res;
-        },
-        async getBoPhan() {
-            const res = await getDataSelect(API_ROUTES_CONFIG.boPhan);
-            this.boPhanData = res;
         },
         async getMaNhanVien() {
             if (this.mode !== "create") return;

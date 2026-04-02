@@ -49,16 +49,7 @@ export const userSchema = yup.object({
         max: 255,
     }),
 
-    // Thông tin công việc
-    boPhanId: buildStringRule(t("field.bo_phan_mac_dinh"), {
-        required: true,
-    }),
-
-    ngayVaoLam: buildDateRule(t("field.ngay_vao_lam"), {
-        required: true,
-    }),
-
-    status: buildStringRule(t("field.trang_thai_lam_viec"), {
+    status: buildStringRule(t("field.trang_thai"), {
         required: true,
     }),
 

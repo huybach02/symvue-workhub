@@ -2,9 +2,11 @@
 
 namespace App\Service;
 
+use App\Class\Constanst;
 use App\Class\FilterWithPagination;
 use App\DTO\UserDTO;
 use App\DTO\UserPositionDTO;
+use App\Entity\Conversation;
 use App\Entity\Department;
 use App\Entity\ConversationUser;
 use App\Entity\Position;
@@ -33,19 +35,16 @@ class UserService
 
     public function findAll(array $params): array
     {
-        $qb = $this->userRepository->createQueryBuilder('u');
+        $qb = $this->userRepository->createQueryBuilder("u");
 
-        $result = FilterWithPagination::findWithPagination($qb, $params, 'u');
+        $result = FilterWithPagination::findWithPagination($qb, $params, "u");
 
         // Map collection to JSON
-        $result['collection'] = array_map(
-            function (User $user) {
-                $data = $user->jsonSerialize();
-                $data['image'] = $this->imageRepository->getImages($user, 'avatar');
-                return $data;
-            },
-            $result['collection']
-        );
+        $result["collection"] = array_map(function (User $user) {
+            $data = $user->jsonSerialize();
+            $data["image"] = $this->imageRepository->getImages($user, "avatar");
+            return $data;
+        }, $result["collection"]);
 
         return $result;
     }
@@ -55,11 +54,11 @@ class UserService
         $item = $this->userRepository->find($id);
 
         if (!$item) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         $data = $item->jsonSerialize();
-        $data['image'] = $this->imageRepository->getImages($item, 'avatar');
+        $data["image"] = $this->imageRepository->getImages($item, "avatar");
 
         return $data;
     }
@@ -71,13 +70,15 @@ class UserService
         $password = generateRandomString(10);
 
         $checkMaNhanVien = $this->userRepository->findOneBy([
-            'maNhanVien' => $dto->maNhanVien,
+            "maNhanVien" => $dto->maNhanVien,
         ]);
 
         if ($checkMaNhanVien) {
-            throw new \Exception(t('error.ma_nhan_vien_exists', [
-                '%ma_nhan_vien%' => $dto->maNhanVien,
-            ]));
+            throw new \Exception(
+                t("error.ma_nhan_vien_exists", [
+                    "%ma_nhan_vien%" => $dto->maNhanVien,
+                ]),
+            );
         }
 
         // Thông tin cá nhân
@@ -89,11 +90,6 @@ class UserService
         $item->setNgayCapCmnd($dto->ngayCapCmnd);
         $item->setNoiCapCmnd($dto->noiCapCmnd);
 
-        // Thông tin công việc
-        $item->setBoPhanId($dto->boPhanId);
-        $item->setNgayVaoLam($dto->ngayVaoLam);
-        $item->setStatus($dto->status);
-
         // Thông tin liên hệ
         $item->setEmail($dto->email);
         $item->setPhone($dto->phone);
@@ -101,7 +97,11 @@ class UserService
         $item->setWard($dto->ward);
         $item->setAddress($dto->address);
 
-        $item->setPassword($this->passwordHasher->hashPassword($item, $password));
+        $item->setStatus($dto->status);
+
+        $item->setPassword(
+            $this->passwordHasher->hashPassword($item, $password),
+        );
 
         $this->entityManager->persist($item);
         $this->entityManager->flush();
@@ -118,7 +118,7 @@ class UserService
         $item = $this->userRepository->find($id);
 
         if (!$item) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         // Thông tin cá nhân
@@ -130,17 +130,14 @@ class UserService
         $item->setNgayCapCmnd($dto->ngayCapCmnd);
         $item->setNoiCapCmnd($dto->noiCapCmnd);
 
-        // Thông tin công việc
-        $item->setBoPhanId($dto->boPhanId);
-        $item->setNgayVaoLam($dto->ngayVaoLam);
-        $item->setStatus($dto->status);
-
         // Thông tin liên hệ
         $item->setEmail($dto->email);
         $item->setPhone($dto->phone);
         $item->setProvince($dto->province);
         $item->setWard($dto->ward);
         $item->setAddress($dto->address);
+
+        $item->setStatus($dto->status);
 
         $this->entityManager->flush();
 
@@ -157,19 +154,23 @@ class UserService
         $item = $this->userRepository->find($id);
 
         if (!$item) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         // Nếu user này là quản lý của 1 bộ phận thì báo lỗi không cho xóa
-        $checkIsManager = $this->entityManager->getRepository(Department::class)->findOneBy([
-            'quanLyBoPhan' => $item,
-        ]);
+        $checkIsManager = $this->entityManager
+            ->getRepository(Department::class)
+            ->findOneBy([
+                "quanLyBoPhan" => $item,
+            ]);
 
         if ($checkIsManager) {
-            throw new \Exception(t('error.user_is_manager', [
-                '%name%' => $item->getName(),
-                '%bo_phan%' => $checkIsManager->getTenBoPhan(),
-            ]));
+            throw new \Exception(
+                t("error.user_is_manager", [
+                    "%name%" => $item->getName(),
+                    "%bo_phan%" => $checkIsManager->getTenBoPhan(),
+                ]),
+            );
         }
 
         $this->entityManager->remove($item);
@@ -178,50 +179,48 @@ class UserService
 
     public function getDataSelect(array $params): array
     {
-        $qb = $this->userRepository->createQueryBuilder('u');
+        $qb = $this->userRepository->createQueryBuilder("u");
 
-        $result = FilterWithPagination::findWithPagination($qb, $params, 'u');
+        $result = FilterWithPagination::findWithPagination($qb, $params, "u");
 
         // Map collection to JSON
-        $result['collection'] = array_map(
-            function (User $user) {
-                $data = $user->jsonSerialize();
-                return [
-                    'label' => $data['name'],
-                    'value' => $data['id'],
-                ];
-            },
-            $result['collection']
-        );
+        $result["collection"] = array_map(function (User $user) {
+            $data = $user->jsonSerialize();
+            return [
+                "label" => $data["name"],
+                "value" => $data["id"],
+            ];
+        }, $result["collection"]);
 
-        return $result['collection'];
+        return $result["collection"];
     }
 
     public function getMaNhanVien(): string
     {
         $conn = $this->entityManager->getConnection();
-        $sql = "SELECT MAX(CAST(SUBSTRING(ma_nhan_vien FROM 3) AS INTEGER)) FROM \"user\" WHERE ma_nhan_vien ~ '^NV[0-9]+$'";
+        $sql =
+            "SELECT MAX(CAST(SUBSTRING(ma_nhan_vien FROM 3) AS INTEGER)) FROM \"user\" WHERE ma_nhan_vien ~ '^NV[0-9]+$'";
         $maxSoThuTu = (int) $conn->executeQuery($sql)->fetchOne();
 
         $newSoThuTu = $maxSoThuTu + 1;
 
-        return "NV" . str_pad((string) $newSoThuTu, 5, '0', STR_PAD_LEFT);
+        return "NV" . str_pad((string) $newSoThuTu, 5, "0", STR_PAD_LEFT);
     }
 
     public function getProvince(): array
     {
-        $projectDir = $this->parameterBag->get('kernel.project_dir');
-        $filePath = $projectDir . '/public/province.json';
+        $projectDir = $this->parameterBag->get("kernel.project_dir");
+        $filePath = $projectDir . "/public/province.json";
 
         if (!file_exists($filePath)) {
-            throw new \Exception(t('error.province_file_not_found'));
+            throw new \Exception(t("error.province_file_not_found"));
         }
 
         $content = file_get_contents($filePath);
         $items = json_decode($content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception(t('error.province_file_invalid_json'));
+            throw new \Exception(t("error.province_file_invalid_json"));
         }
 
         return $items ?? [];
@@ -229,21 +228,24 @@ class UserService
 
     public function getWard(string $provinceCode): array
     {
-        $projectDir = $this->parameterBag->get('kernel.project_dir');
-        $filePath = $projectDir . '/public/ward.json';
+        $projectDir = $this->parameterBag->get("kernel.project_dir");
+        $filePath = $projectDir . "/public/ward.json";
 
         if (!file_exists($filePath)) {
-            throw new \Exception(t('error.ward_file_not_found'));
+            throw new \Exception(t("error.ward_file_not_found"));
         }
 
         $content = file_get_contents($filePath);
         $items = json_decode($content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception(t('error.ward_file_invalid_json'));
+            throw new \Exception(t("error.ward_file_invalid_json"));
         }
 
-        $items = array_filter($items, fn($item) => $item['parent_code'] === $provinceCode);
+        $items = array_filter(
+            $items,
+            fn($item) => $item["parent_code"] === $provinceCode,
+        );
 
         return $items ?? [];
     }
@@ -253,13 +255,12 @@ class UserService
         $user = $this->userRepository->find($userId);
 
         if (!$user) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
-        $userPosition = $this->entityManager->getRepository(UserPosition::class)->findOneBy(
-            ['member' => $user],
-            ['id' => 'DESC']
-        );
+        $userPosition = $this->entityManager
+            ->getRepository(UserPosition::class)
+            ->findOneBy(["member" => $user], ["id" => "DESC"]);
 
         return $userPosition?->jsonSerialize();
     }
@@ -267,29 +268,36 @@ class UserService
     public function saveUserPosition(int $userId, UserPositionDTO $dto): array
     {
         $user = $this->userRepository->find($userId);
-
         if (!$user) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
-        $department = $this->entityManager->getRepository(Department::class)->find($dto->departmentId);
+        $department = $this->entityManager
+            ->getRepository(Department::class)
+            ->find($dto->departmentId);
         if (!$department) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
-        $position = $this->entityManager->getRepository(Position::class)->find($dto->positionId);
+        $position = $this->entityManager
+            ->getRepository(Position::class)
+            ->find($dto->positionId);
         if (!$position) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         if ($position->getDepartment()?->getId() !== $department->getId()) {
-            throw new \Exception('Chức vụ không thuộc phòng ban/bộ phận đã chọn.');
+            throw new \Exception(
+                "Chức vụ không thuộc phòng ban/bộ phận đã chọn.",
+            );
         }
 
-        $userPosition = $this->entityManager->getRepository(UserPosition::class)->findOneBy(
-            ['member' => $user],
-            ['id' => 'DESC']
-        );
+        $userPosition = $this->entityManager
+            ->getRepository(UserPosition::class)
+            ->findOneBy(["member" => $user], ["id" => "DESC"]);
+
+        $oldDepartment = $userPosition?->getDepartment();
+        $oldPosition = $userPosition?->getPosition();
 
         if (!$userPosition) {
             $userPosition = new UserPosition();
@@ -301,7 +309,12 @@ class UserService
         $userPosition->setPosition($position);
         $userPosition->setSalary($dto->salary);
         $userPosition->setAllowances($dto->allowances);
-        $userPosition->setAllowancesTotal(array_merge($position->getAllowances() ?? [], $dto->allowances ?? []));
+        $userPosition->setAllowancesTotal(
+            array_merge(
+                $position->getAllowances() ?? [],
+                $dto->allowances ?? [],
+            ),
+        );
         $userPosition->setEffectiveFrom(new \DateTime($dto->effectiveFrom));
         $userPosition->setEffectiveTo(new \DateTime($dto->effectiveTo));
         $userPosition->setProbationFrom(new \DateTime($dto->probationFrom));
@@ -316,6 +329,15 @@ class UserService
         $this->entityManager->flush();
 
         $this->createUserPermission($user, $position);
+        $this->createConversationByDepartment($department, $user);
+
+        $this->removeOldUserPermission(
+            $user,
+            $oldDepartment,
+            $oldPosition,
+            $department,
+            $position,
+        );
 
         return $userPosition->jsonSerialize();
     }
@@ -325,28 +347,29 @@ class UserService
         $user = $this->userRepository->find($userId);
 
         if (!$user) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
-        $userPosition = $this->entityManager->getRepository(UserPosition::class)->findOneBy(
-            ['member' => $user],
-            ['id' => 'DESC']
-        );
+        $userPosition = $this->entityManager
+            ->getRepository(UserPosition::class)
+            ->findOneBy(["member" => $user], ["id" => "DESC"]);
 
         if (!$userPosition) {
-            throw new \Exception('Vui lòng cập nhật vị trí công việc trước khi tải hợp đồng.');
+            throw new \Exception(
+                "Vui lòng cập nhật vị trí công việc trước khi tải hợp đồng.",
+            );
         }
 
-        $files = $request->files->get('files', []);
+        $files = $request->files->get("files", []);
         if ($files && !is_array($files)) {
             $files = [$files];
         }
 
         if (!$files || count($files) === 0) {
-            throw new \Exception('Vui lòng chọn file hợp đồng.');
+            throw new \Exception("Vui lòng chọn file hợp đồng.");
         }
 
-        $allowedExtensions = ['pdf', 'doc', 'docx'];
+        $allowedExtensions = ["pdf", "doc", "docx"];
         $baseUrl = $request->getSchemeAndHttpHost();
         $contracts = $userPosition->getContracts() ?? [];
 
@@ -357,20 +380,20 @@ class UserService
 
             $extension = strtolower($file->getClientOriginalExtension());
             if (!in_array($extension, $allowedExtensions, true)) {
-                throw new \Exception('Chỉ hỗ trợ file .doc, .docx, .pdf.');
+                throw new \Exception("Chỉ hỗ trợ file .doc, .docx, .pdf.");
             }
 
             $originalName = $file->getClientOriginalName();
             $size = $file->getSize();
             $mime = $file->getMimeType();
-            $url = uploadFile($file, 'contracts', $baseUrl, 'contract');
+            $url = uploadFile($file, "contracts", $baseUrl, "contract");
             $contracts[] = [
-                'name' => $originalName,
-                'url' => $url,
-                'size' => $size,
-                'mime' => $mime,
-                'extension' => $extension,
-                'uploadedAt' => (new \DateTime())->format('Y-m-d H:i:s'),
+                "name" => $originalName,
+                "url" => $url,
+                "size" => $size,
+                "mime" => $mime,
+                "extension" => $extension,
+                "uploadedAt" => new \DateTime()->format("Y-m-d H:i:s"),
             ];
         }
 
@@ -384,12 +407,16 @@ class UserService
     {
         $department = $position->getDepartment();
         if (!$department) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
-        $userPermission = $this->entityManager->getRepository(UserPermission::class)->findOneBy(
-            ['userId' => $user->getId(), 'departmentId' => $department->getId(), 'positionId' => $position->getId()]
-        );
+        $userPermission = $this->entityManager
+            ->getRepository(UserPermission::class)
+            ->findOneBy([
+                "userId" => $user->getId(),
+                "departmentId" => $department->getId(),
+                "positionId" => $position->getId(),
+            ]);
 
         if (!$userPermission) {
             $userPermission = new UserPermission();
@@ -408,21 +435,65 @@ class UserService
         $this->boPhanService->mergeUserPermissions($user->getId());
     }
 
-    public function createConversationByDepartment()
+    private function removeOldUserPermission(
+        User $user,
+        ?Department $oldDepartment,
+        ?Position $oldPosition,
+        Department $newDepartment,
+        Position $newPosition,
+    ): void {
+        if (
+            !$oldPosition ||
+            !$oldDepartment ||
+            ($oldPosition->getId() === $newPosition->getId() &&
+                $oldDepartment->getId() === $newDepartment->getId())
+        ) {
+            return;
+        }
+
+        $oldUserPermission = $this->entityManager
+            ->getRepository(UserPermission::class)
+            ->findOneBy([
+                "userId" => $user->getId(),
+                "departmentId" => $oldDepartment->getId(),
+                "positionId" => $oldPosition->getId(),
+            ]);
+
+        if (!$oldUserPermission) {
+            return;
+        }
+
+        $this->entityManager->remove($oldUserPermission);
+        $this->entityManager->flush();
+        $this->boPhanService->mergeUserPermissions($user->getId());
+    }
+
+    public function createConversationByDepartment($department, $user)
     {
-        // $conversation = new Conversation();
-        // $conversation->setType(Constanst::TYPE_CONVERSATION['department']);
-        // $conversation->setName($item->getTenBoPhan());
-        // $this->entityManager->persist($conversation);
-        // $this->entityManager->flush();
+        $conversation = $this->entityManager
+            ->getRepository(Conversation::class)
+            ->findOneBy(["boPhan" => $department]);
+        if (!$conversation) {
+            $conversation = new Conversation();
+            $conversation->setType(Constanst::TYPE_CONVERSATION["department"]);
+            $conversation->setName($department->getTenBoPhan());
+            $conversation->setBoPhan($department);
+            $this->entityManager->persist($conversation);
+            $this->entityManager->flush();
+        }
 
-        // $item->setConversation($conversation);
-        // $this->entityManager->flush();
-
-        // $conversationUser = new ConversationUser();
-        // $conversationUser->setConversation($conversation);
-        // $conversationUser->setMember($user);
-        // $this->entityManager->persist($conversationUser);
-        // $this->entityManager->flush();
+        $checkConversationUser = $this->entityManager
+            ->getRepository(ConversationUser::class)
+            ->findOneBy([
+                "conversation" => $conversation,
+                "member" => $user,
+            ]);
+        if (!$checkConversationUser) {
+            $conversationUser = new ConversationUser();
+            $conversationUser->setConversation($conversation);
+            $conversationUser->setMember($user);
+            $this->entityManager->persist($conversationUser);
+            $this->entityManager->flush();
+        }
     }
 }
