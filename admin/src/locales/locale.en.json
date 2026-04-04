@@ -192,7 +192,8 @@
       "userList": "User list",
       "addPosition": "Add position",
       "savePermissionByPosition": "Save permissions by position",
-      "addPositionAllowance": "Add allowance"
+      "addPositionAllowance": "Add allowance",
+      "positionAndPermission": "Position and Permission"
     },
     "text": {
       "departmentOfUser": "Department of user",
@@ -277,6 +278,7 @@
     "position_and_contract": "Position and contract of {name}",
     "position": "Position",
     "contract": "Contract",
+    "user_permission": "User permission",
     "choose_position_to_view": "Choose position to view detail",
     "position_detail": "Position detail",
     "salary": "Salary",
@@ -286,7 +288,17 @@
     "probation_to": "Probation to",
     "effective_from": "Effective from",
     "effective_to": "Effective to",
-    "allowances_optional": "Allowances optional"
+    "allowances_optional": "Allowances optional",
+    "position_and_permission": "Position and permission of user {name}",
+    "add_temp_position": "Add temporary position",
+    "please_update_position": "Please update position before",
+    "primary": "Primary position",
+    "temporary": "Temporary position",
+    "startTemp": "Start temporary position",
+    "endTemp": "End temporary position",
+    "view_permission": "View permission",
+    "permission_of_position": "Permission of position {name}",
+    "delete_temporary_position": "Delete temporary position"
   },
   "contract": {
     "text": "Contract",

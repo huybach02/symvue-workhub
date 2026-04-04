@@ -120,6 +120,8 @@
                                                 color="primary"
                                                 hide-details
                                                 density="compact"
+                                                :readonly="readonly"
+                                                :disabled="readonly"
                                                 @update:model-value="
                                                     toggleAll(
                                                         activePermissionIndex,
@@ -193,6 +195,8 @@
                                                             color="primary"
                                                             hide-details
                                                             density="compact"
+                                                            :readonly="readonly"
+                                                            :disabled="readonly"
                                                         />
                                                     </div>
                                                 </template>
@@ -222,6 +226,10 @@ export default {
         positions: {
             type: Array,
             default: () => [],
+        },
+        readonly: {
+            type: Boolean,
+            default: false,
         },
     },
     emits: ["update:modelValue"],
@@ -296,9 +304,9 @@ export default {
 
                 this.positions.forEach((position) => {
                     const positionKey = this.getPositionPermissionKey(position);
-                    const currentModule = this.modelValue?.[
-                        positionKey
-                    ]?.find((item) => item.name === permission.name);
+                    const currentModule = this.modelValue?.[positionKey]?.find(
+                        (item) => item.name === permission.name,
+                    );
                     const actionState = {};
 
                     Object.keys(permission.actions || {}).forEach(
@@ -372,6 +380,8 @@ export default {
                 .length;
         },
         toggleAll(index, positionKey, value) {
+            if (this.readonly) return;
+
             const state = this.permissionStates[index]?.[positionKey];
             if (!state) return;
 

@@ -6,6 +6,7 @@ use App\Class\Constanst;
 use App\Class\FilterWithPagination;
 use App\DTO\UserDTO;
 use App\DTO\UserPositionDTO;
+use App\DTO\UserPositionTempDTO;
 use App\Entity\Conversation;
 use App\Entity\Department;
 use App\Entity\ConversationUser;
@@ -260,9 +261,27 @@ class UserService
 
         $userPosition = $this->entityManager
             ->getRepository(UserPosition::class)
-            ->findOneBy(["member" => $user], ["id" => "DESC"]);
+            ->findOneBy(["member" => $user, "isPrimary" => true], ["id" => "DESC"]);
 
         return $userPosition?->jsonSerialize();
+    }
+
+    public function getListUserPosition(int $userId): ?array
+    {
+        $user = $this->userRepository->find($userId);
+
+        if (!$user) {
+            throw new \Exception(t("error.not_found"));
+        }
+
+        $userPositions = $this->entityManager
+            ->getRepository(UserPosition::class)
+            ->findBy(["member" => $user], ["id" => "DESC"]);
+
+        return array_map(
+            fn(UserPosition $position) => $position->jsonSerialize(),
+            $userPositions,
+        );
     }
 
     public function saveUserPosition(int $userId, UserPositionDTO $dto): array
@@ -294,7 +313,7 @@ class UserService
 
         $userPosition = $this->entityManager
             ->getRepository(UserPosition::class)
-            ->findOneBy(["member" => $user], ["id" => "DESC"]);
+            ->findOneBy(["member" => $user, "isPrimary" => true], ["id" => "DESC"]);
 
         $oldDepartment = $userPosition?->getDepartment();
         $oldPosition = $userPosition?->getPosition();
@@ -338,6 +357,88 @@ class UserService
             $department,
             $position,
         );
+
+        return $userPosition->jsonSerialize();
+    }
+
+    public function saveUserPositionTemp(int $userId, UserPositionTempDTO $dto): array
+    {
+        $user = $this->userRepository->find($userId);
+        if (!$user) {
+            throw new \Exception(t("error.not_found"));
+        }
+
+        $department = $this->entityManager
+            ->getRepository(Department::class)
+            ->find($dto->departmentId);
+        if (!$department) {
+            throw new \Exception(t("error.not_found"));
+        }
+
+        $position = $this->entityManager
+            ->getRepository(Position::class)
+            ->find($dto->positionId);
+        if (!$position) {
+            throw new \Exception(t("error.not_found"));
+        }
+
+        if ($position->getDepartment()?->getId() !== $department->getId()) {
+            throw new \Exception(
+                "Chức vụ không thuộc phòng ban/bộ phận đã chọn.",
+            );
+        }
+
+        $userPosition = $this->entityManager
+            ->getRepository(UserPosition::class)
+            ->findOneBy(["member" => $user, "department" => $department, "position" => $position, "isPrimary" => false], ["id" => "DESC"]);
+
+        if (!$userPosition) {
+            $userPosition = new UserPosition();
+            $userPosition->setMember($user);
+            $this->entityManager->persist($userPosition);
+        }
+        $userPosition->setDepartment($department);
+        $userPosition->setPosition($position);
+        $userPosition->setIsPrimary(false);
+
+        $startTemp = new \DateTime($dto->startTempDate . " " . $dto->startTempTime)->getTimestamp();
+        $endTemp = new \DateTime($dto->endTempDate . " " . $dto->endTempTime)->getTimestamp();
+
+        $userPosition->setStartTemp($startTemp);
+        $userPosition->setEndTemp($endTemp);
+
+        $this->entityManager->flush();
+
+        $this->createUserPermission($user, $position, $startTemp, $endTemp);
+
+        return $userPosition->jsonSerialize();
+    }
+
+    public function deleteUserPositionTemp(int $id): array
+    {
+        $userPosition = $this->entityManager
+            ->getRepository(UserPosition::class)
+            ->find($id);
+        if (!$userPosition) {
+            throw new \Exception(t("error.not_found"));
+        }
+
+        $this->entityManager->remove($userPosition);
+        $this->entityManager->flush();
+
+        $userPermission = $this->entityManager
+            ->getRepository(UserPermission::class)
+            ->findOneBy([
+                "userId" => $userPosition->getMember()->getId(),
+                "departmentId" => $userPosition->getDepartment()->getId(),
+                "positionId" => $userPosition->getPosition()->getId(),
+                "isPrimary" => false,
+            ]);
+
+        if ($userPermission) {
+            $this->entityManager->remove($userPermission);
+            $this->entityManager->flush();
+        }
 
         return $userPosition->jsonSerialize();
     }
@@ -403,7 +504,7 @@ class UserService
         return $userPosition->jsonSerialize();
     }
 
-    public function createUserPermission(User $user, Position $position)
+    public function createUserPermission(User $user, Position $position, int $startTemp = 0, int $endTemp = 0)
     {
         $department = $position->getDepartment();
         if (!$department) {
@@ -429,6 +530,12 @@ class UserService
         $userPermission->setDepartmentId($department->getId());
         $userPermission->setPositionId($position->getId());
         $userPermission->setPhanQuyen($permissions);
+
+        if ($startTemp > 0 && $endTemp > 0) {
+            $userPermission->setStartTemp($startTemp);
+            $userPermission->setEndTemp($endTemp);
+        }
+
         $this->entityManager->persist($userPermission);
         $this->entityManager->flush();
 

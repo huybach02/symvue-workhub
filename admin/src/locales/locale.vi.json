@@ -192,7 +192,8 @@
       "userList": "Danh sách thành viên",
       "addPosition": "Thêm chức vụ",
       "savePermissionByPosition": "Lưu phân quyền theo chức vụ",
-      "addPositionAllowance": "Thêm phụ cấp"
+      "addPositionAllowance": "Thêm phụ cấp",
+      "positionAndPermission": "Chức vụ và Phân quyền"
     },
     "text": {
       "departmentOfUser": "Phòng ban/Bộ phận của nhân sự",
@@ -277,6 +278,7 @@
     "position_and_contract": "Vị trí công việc và Hợp đồng của {name}",
     "position": "Chức vụ",
     "contract": "Hợp đồng",
+    "user_permission": "Phân quyền của người dùng",
     "choose_position_to_view": " Chọn chức vụ để xem thông tin chi tiết",
     "position_detail": "Thông tin chi tiết công việc",
     "salary": "Lương thoả thuận",
@@ -286,7 +288,17 @@
     "probation_to": "Ngày kết thúc thử việc",
     "effective_from": "Ngày bắt đầu công việc chính thức (100% lương)",
     "effective_to": "Ngày kết thúc công việc chính thức (100% lương)",
-    "allowances_optional": "Phụ cấp bổ sung (Nếu có)"
+    "allowances_optional": "Phụ cấp bổ sung (Nếu có)",
+    "position_and_permission": "Chức vụ và phân quyền của người dùng {name}",
+    "add_temp_position": "Thêm chức vụ tạm thời",
+    "please_update_position": "Vui lòng cập nhật vị trí công việc trước",
+    "primary": "Chính thức",
+    "temporary": "Tạm thời",
+    "startTemp": "Thời gian bắt đầu tạm thời",
+    "endTemp": "Thời gian kết thúc tạm thời",
+    "view_permission": "Xem phân quyền",
+    "permission_of_position": "Phân quyền của chức vụ {name}",
+    "delete_temporary_position": "Xóa chức vụ tạm thời"
   },
   "contract": {
     "text": "Hợp đồng",

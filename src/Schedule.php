@@ -32,6 +32,12 @@ class Schedule implements ScheduleProviderInterface
                 '0 23 * * *',
                 new RunCommandMessage('app:keep-alive-db')
             ))
+            // Clear cache persist mỗi ngày lúc 00:00
+            ->add(RecurringMessage::cron(
+                '0 0 * * *',
+                new RunCommandMessage('app:clear-cache-persist-in-database')
+            ))
+            // Rebuild cache user permissions mỗi phút
             // ->add(RecurringMessage::cron(
             //     '* * * * *',
             //     new RunCommandMessage('app:rebuild-user-permissions-cache')

@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
-use App\Class\Constanst;
 use App\Class\CustomResponse;
 use App\Entity\User;
-use Psr\Cache\CacheItemPoolInterface;
+use App\Service\CacheService;
+use App\Service\DepartmentService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -25,7 +24,8 @@ class PermissionListener
 {
     public function __construct(
         private readonly Security $security,
-        private readonly CacheItemPoolInterface $cache,
+        private readonly DepartmentService $departmentService,
+        private readonly CacheService $cacheService,
     ) {}
 
     protected $excludedRoutes = [
@@ -35,6 +35,9 @@ class PermissionListener
         'api/auth/forgot-password',
         'api/mercure/danh-sach-thong-bao',
     ];
+
+    // Các từ khóa trong path sẽ được bỏ qua kiểm tra quyền
+    protected array $excludedKeywords = ['select', 'import', 'export', 'template-import', 'media', 'conversation', 'message', 'presence'];
 
     public function onKernelRequest(RequestEvent $event): void
     {
@@ -69,8 +72,7 @@ class PermissionListener
         }
 
         $key = "user_permissions_" . $user->getId();
-
-        $userPermission = $this->cache->getItem($key)->get();
+        $userPermission = $this->getUserPermissions($key, $user->getId());
 
         $path = str_replace("/api/", "", $path);
 
@@ -93,8 +95,17 @@ class PermissionListener
         }
     }
 
-    // Các từ khóa trong path sẽ được bỏ qua kiểm tra quyền
-    protected array $excludedKeywords = ['select', 'import', 'export', 'template-import', 'media', 'conversation', 'message', 'presence'];
+    protected function getUserPermissions(string $cacheKey, int $userId): array
+    {
+        $userPermissions = $this->cacheService->get($cacheKey);
+
+        if ($userPermissions === null) {
+            $this->departmentService->mergeUserPermissions($userId);
+            $userPermissions = $this->cacheService->get($cacheKey, []);
+        }
+
+        return $userPermissions ?? [];
+    }
 
     protected function shouldExcludeRoute(string $path): bool
     {

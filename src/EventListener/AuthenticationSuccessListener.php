@@ -7,11 +7,11 @@ use App\Entity\User;
 use App\Repository\GeneralSettingRepository;
 use App\Repository\UserRepository;
 use App\Service\AuthService;
+use App\Service\CacheService;
 use App\Service\DeviceInfoService;
 use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Events;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -29,7 +29,7 @@ class AuthenticationSuccessListener
         private readonly RefreshTokenManagerInterface $refreshTokenManager,
         private readonly DeviceInfoService $deviceInfoService,
         private readonly AuthService $authService,
-        private CacheItemPoolInterface $cache,
+        private readonly CacheService $cacheService,
         #[Autowire('%kernel.project_dir%')] private readonly string $projectDir,
 
         #[Target('defaultTokenFactory')]
@@ -121,13 +121,11 @@ class AuthenticationSuccessListener
                 $key = 'otp_' . $userEntity->getId();
 
                 // Lưu OTP vào cache
-                $otpItem = $this->cache->getItem($key);
-                if ($otpItem->isHit()) {
-                    $this->cache->deleteItem($key);
-                }
-                $otpItem->set($otp);
-                $otpItem->expiresAfter((int) $this->cauHinhChungRepository->getAllConfig()['THOI_GIAN_HET_HAN_OTP'] * 60);
-                $this->cache->save($otpItem);
+                $this->cacheService->set(
+                    $key,
+                    $otp,
+                    (int) $this->cauHinhChungRepository->getAllConfig()['THOI_GIAN_HET_HAN_OTP'] * 60
+                );
 
                 // Gửi OTP qua email
                 $this->authService->sendOtpEmail($userEntity->getEmail(), $otp);

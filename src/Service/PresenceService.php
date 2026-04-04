@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
@@ -18,7 +17,7 @@ class PresenceService
     private array $mercureConfig;
 
     public function __construct(
-        private readonly CacheItemPoolInterface $cache,
+        private readonly CacheService $cacheService,
         private readonly HubInterface $hub,
         #[Autowire('%kernel.project_dir%')] private readonly string $projectDir,
     ) {
@@ -28,13 +27,8 @@ class PresenceService
     public function setOnline(int $userId): void
     {
         $cacheKey = self::KEY_PREFIX . $userId;
-        $item = $this->cache->getItem($cacheKey);
-
-        $isNewOnline = !$item->isHit();
-
-        $item->set(1);
-        $item->expiresAfter(self::ONLINE_TTL);
-        $this->cache->save($item);
+        $isNewOnline = !$this->cacheService->has($cacheKey);
+        $this->cacheService->set($cacheKey, 1, self::ONLINE_TTL);
 
         if ($isNewOnline) {
             $this->publishPresence($userId, true);
@@ -44,7 +38,7 @@ class PresenceService
     public function setOffline(int $userId): void
     {
         $cacheKey = self::KEY_PREFIX . $userId;
-        $this->cache->deleteItem($cacheKey);
+        $this->cacheService->delete($cacheKey);
 
         $this->publishPresence($userId, false);
     }
@@ -56,8 +50,7 @@ class PresenceService
         foreach ($userIds as $userId) {
             $userId = (int) $userId;
             $cacheKey = self::KEY_PREFIX . $userId;
-            $item = $this->cache->getItem($cacheKey);
-            $result[$userId] = $item->isHit();
+            $result[$userId] = $this->cacheService->get($cacheKey) !== null;
         }
 
         return $result;

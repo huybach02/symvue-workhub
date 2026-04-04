@@ -48,7 +48,7 @@
                         </v-tabs-window-item>
 
                         <v-tabs-window-item value="contract">
-                            <UserPositionContract
+                            <UserPositionContractTab
                                 :item="item"
                                 :path="path"
                                 :active="dialog && tab === 'contract'"
@@ -63,12 +63,12 @@
 </template>
 
 <script>
-import UserPositionContract from "./components/UserPositionContract.vue";
+import UserPositionContractTab from "./components/UserPositionContractTab.vue";
 import UserPositionAssignmentTab from "./components/UserPositionAssignmentTab.vue";
 
 export default {
     components: {
-        UserPositionContract,
+        UserPositionContractTab,
         UserPositionAssignmentTab,
     },
     props: {

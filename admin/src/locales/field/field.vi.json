@@ -66,6 +66,10 @@
         "phu_cap": "Phụ cấp",
         "ten_phu_cap": "Tên phụ cấp",
         "so_tien_phu_cap": "Số tiền phụ cấp",
-        "position_is_manager": "Chức vụ này sẽ quản lý Phòng ban/Bộ phận này"
+        "position_is_manager": "Chức vụ này sẽ quản lý Phòng ban/Bộ phận này",
+        "start_temp_date": "Ngày bắt đầu hiệu lực",
+        "start_temp_time": "Giờ bắt đầu hiệu lực",
+        "end_temp_date": "Ngày kết thúc hiệu lực",
+        "end_temp_time": "Giờ kết thúc hiệu lực"
     }
 }

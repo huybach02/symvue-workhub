@@ -36,62 +36,50 @@
                         </v-col>
                         <v-col cols="12" md="6">
                             <VeeField
-                                v-slot="{ field, errorMessage }"
+                                v-slot="{
+                                    field,
+                                    errorMessage,
+                                    handleChange,
+                                    handleBlur,
+                                }"
                                 name="gioBatDau"
                             >
-                                <v-text-field
-                                    v-bind="field"
+                                <TimePicker
+                                    :model-value="field.value"
                                     :error-messages="errorMessage"
-                                    variant="outlined"
-                                    persistent-placeholder
-                                >
-                                    <template #label>
-                                        {{ $t("field.gio_bat_dau") }}
-                                    </template>
-                                    <v-menu
-                                        v-model="showMenuGioBatDau"
-                                        :close-on-content-click="false"
-                                        activator="parent"
-                                        min-width="0"
-                                    >
-                                        <v-time-picker
-                                            :model-value="field.value"
-                                            @update:model-value="
-                                                (val) => updateTime(field, val)
-                                            "
-                                        />
-                                    </v-menu>
-                                </v-text-field>
+                                    :placeholder="`${$t('base.enter')} ${$t('field.gio_bat_dau')}`"
+                                    @update:model-value="
+                                        (value) => {
+                                            handleChange(value);
+                                            handleBlur();
+                                        }
+                                    "
+                                    @blur="handleBlur"
+                                />
                             </VeeField>
                         </v-col>
                         <v-col cols="12" md="6">
                             <VeeField
-                                v-slot="{ field, errorMessage }"
+                                v-slot="{
+                                    field,
+                                    errorMessage,
+                                    handleChange,
+                                    handleBlur,
+                                }"
                                 name="gioKetThuc"
                             >
-                                <v-text-field
-                                    v-bind="field"
+                                <TimePicker
+                                    :model-value="field.value"
                                     :error-messages="errorMessage"
-                                    variant="outlined"
-                                    persistent-placeholder
-                                >
-                                    <template #label>
-                                        {{ $t("field.gio_ket_thuc") }}
-                                    </template>
-                                    <v-menu
-                                        v-model="showMenuGioKetThuc"
-                                        :close-on-content-click="false"
-                                        activator="parent"
-                                        min-width="0"
-                                    >
-                                        <v-time-picker
-                                            :model-value="field.value"
-                                            @update:model-value="
-                                                (val) => updateTime(field, val)
-                                            "
-                                        />
-                                    </v-menu>
-                                </v-text-field>
+                                    :placeholder="`${$t('base.enter')} ${$t('field.gio_ket_thuc')}`"
+                                    @update:model-value="
+                                        (value) => {
+                                            handleChange(value);
+                                            handleBlur();
+                                        }
+                                    "
+                                    @blur="handleBlur"
+                                />
                             </VeeField>
                         </v-col>
                         <v-col cols="12">
@@ -137,13 +125,14 @@
 
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import { functionHelper } from "@/helpers/functionHelper";
 import { getAllData } from "@/services/bases/getData";
 import { putData } from "@/services/bases/updateData";
+import TimePicker from "@/components/TimePicker.vue";
 import { Form as VeeForm, Field as VeeField } from "vee-validate";
 
 export default {
     components: {
+        TimePicker,
         VeeForm,
         VeeField,
     },
@@ -167,9 +156,6 @@ export default {
                 ghiChu: "",
             },
             dataLoaded: false,
-            showMenuGioBatDau: false,
-            showMenuGioKetThuc: false,
-            time: null,
         };
     },
     computed: {
@@ -225,9 +211,6 @@ export default {
                 this.dialog = false;
                 this.$emit("update");
             }
-        },
-        updateTime(field, value) {
-            functionHelper.updateTime(field, value);
         },
     },
 };

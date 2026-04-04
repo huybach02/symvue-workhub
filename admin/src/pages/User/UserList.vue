@@ -83,6 +83,20 @@
                         </v-tooltip>
                         <v-tooltip
                             v-if="permission?.show"
+                            :text="$t('bo_phan.button.positionAndPermission')"
+                            location="top"
+                        >
+                            <template #activator="{ props: tooltipProps }">
+                                <UserPositionAndPermission
+                                    v-bind="tooltipProps"
+                                    :path="path"
+                                    :item="item"
+                                    @reload="$emit('reload')"
+                                />
+                            </template>
+                        </v-tooltip>
+                        <v-tooltip
+                            v-if="permission?.show"
                             :text="$t('button.update')"
                             location="top"
                         >
@@ -191,6 +205,7 @@ import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import CreateEditUser from "./CreateEditUser.vue";
 import { deleteData } from "@/services/bases/deleteData";
 import UserPosition from "./UserPosition.vue";
+import UserPositionAndPermission from "./UserPositionAndPermission.vue";
 
 export default {
     name: "DataTable",
@@ -199,6 +214,7 @@ export default {
         ConfirmDialog,
         CreateEditUser,
         UserPosition,
+        UserPositionAndPermission,
     },
     props: {
         path: {
@@ -253,9 +269,9 @@ export default {
             headers: [
                 {
                     key: "action",
-                    width: 140,
-                    minWidth: 140,
-                    maxWidth: 140,
+                    width: 200,
+                    minWidth: 200,
+                    maxWidth: 200,
                     sortable: false,
                 },
                 {

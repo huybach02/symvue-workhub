@@ -6,20 +6,20 @@ use App\Class\CustomResponse;
 use App\Entity\User;
 use App\Repository\DepartmentRepository;
 use App\Service\AuthService;
+use App\Service\CacheService;
 use App\Service\DeviceInfoService;
 use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
-use Psr\Cache\CacheItemPoolInterface;
 
 final class AuthController extends AbstractController
 {
     public function __construct(
         private readonly AuthService $authService,
         private readonly DeviceInfoService $deviceInfoService,
-        private readonly CacheItemPoolInterface $cache,
+        private readonly CacheService $cacheService,
         private readonly DepartmentRepository $boPhanRepository,
     ) {}
 
@@ -32,7 +32,7 @@ final class AuthController extends AbstractController
 
         $key = "user_permissions_" . $user->getId();
 
-        $userPermission = $this->cache->getItem($key)->get();
+        $userPermission = $this->cacheService->get($key, []);
 
         $userData = $user->jsonSerialize();
         $userData['permissions'] = $userPermission;
@@ -44,7 +44,6 @@ final class AuthController extends AbstractController
     public function logout(
         Request $request,
         RefreshTokenManagerInterface $refreshTokenManager,
-        CacheItemPoolInterface $cache,
     ) {
         // 1. Xử lý Refresh Token
         $payload = $request->toArray();
@@ -63,14 +62,11 @@ final class AuthController extends AbstractController
         if ($authorizationHeader) {
             $accessToken = str_replace("Bearer ", "", $authorizationHeader);
 
-            // Tạo một key unique cho token này
+            // Tạo một key unique
             $tokenKey = "blacklist_" . md5($accessToken);
 
             // Lưu vào cache với TTL = 1 ngày (Redis native TTL)
-            $item = $cache->getItem($tokenKey);
-            $item->set(true);
-            $item->expiresAfter(3600 * 24); // Token sẽ bị chặn trong 1 ngày
-            $cache->save($item);
+            $this->cacheService->set($tokenKey, true, 3600 * 24);
         }
 
         return CustomResponse::success([], t("auth.logout.success"));

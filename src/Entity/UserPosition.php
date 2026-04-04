@@ -6,6 +6,7 @@ use App\Repository\UserPositionRepository;
 use App\Traits\ModifierTrait;
 use App\Traits\SoftDeleteableTrait;
 use App\Traits\TimestampableTrait;
+use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -21,13 +22,13 @@ class UserPosition
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'userPositions')]
+    #[ORM\ManyToOne(inversedBy: "userPositions")]
     private ?Department $department = null;
 
-    #[ORM\ManyToOne(inversedBy: 'userPositions')]
+    #[ORM\ManyToOne(inversedBy: "userPositions")]
     private ?Position $position = null;
 
-    #[ORM\ManyToOne(inversedBy: 'userPositions')]
+    #[ORM\ManyToOne(inversedBy: "userPositions")]
     private ?User $member = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
@@ -45,7 +46,7 @@ class UserPosition
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $effective_to = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $probation_from = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
@@ -69,14 +70,30 @@ class UserPosition
     #[ORM\Column(nullable: true)]
     private ?array $positionSnapshot = null;
 
-    #[ORM\Column(nullable: true, options: ['comment' => '1: active, 0: inactive', 'default' => 1])]
+    #[
+        ORM\Column(
+            nullable: true,
+            options: ["comment" => "1: active, 0: inactive", "default" => 1],
+        ),
+    ]
     private int $status = 1;
 
-    #[ORM\Column(nullable: true, options: ['comment' => '1: yes, 0: no', 'default' => 0])]
+    #[
+        ORM\Column(
+            nullable: true,
+            options: ["comment" => "1: yes, 0: no", "default" => 0],
+        ),
+    ]
     private int $isPrimary = 0;
 
     #[ORM\Column(nullable: true)]
     private ?array $contracts = null;
+
+    #[ORM\Column(type: "integer", nullable: true)]
+    private ?int $startTemp = null;
+
+    #[ORM\Column(type: "integer", nullable: true)]
+    private ?int $endTemp = null;
 
     public function getId(): ?int
     {
@@ -311,33 +328,64 @@ class UserPosition
         return $this;
     }
 
+    public function getStartTemp(): ?int
+    {
+        return $this->startTemp;
+    }
+
+    public function setStartTemp(?int $startTemp): static
+    {
+        $this->startTemp = $startTemp;
+
+        return $this;
+    }
+
+    public function getEndTemp(): ?int
+    {
+        return $this->endTemp;
+    }
+
+    public function setEndTemp(?int $endTemp): static
+    {
+        $this->endTemp = $endTemp;
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
         return [
-            'id' => $this->id,
-            'departmentId' => $this->department?->getId(),
-            'department' => $this->department?->getTenBoPhan(),
-            'positionId' => $this->position?->getId(),
-            'position' => $this->position?->getName(),
-            'memberId' => $this->member?->getId(),
-            'salary' => $this->salary === null ? null : (float) $this->salary,
-            'allowances' => $this->allowances,
-            'allowancesTotal' => $this->allowancesTotal,
-            'effectiveFrom' => $this->effective_from?->format('Y-m-d'),
-            'effectiveTo' => $this->effective_to?->format('Y-m-d'),
-            'probationFrom' => $this->probation_from?->format('Y-m-d'),
-            'probationTo' => $this->probation_to?->format('Y-m-d'),
-            'salaryNet' => $this->salary_net === null ? null : (float) $this->salary_net,
-            'salaryGross' => $this->salaryGross === null ? null : (float) $this->salaryGross,
-            'insuranceSalary' => $this->insurance_salary === null ? null : (float) $this->insurance_salary,
-            'insuranceCode' => $this->insurance_code,
-            'note' => $this->note,
-            'status' => $this->status,
-            'isPrimary' => $this->isPrimary,
-            'positionSnapshot' => $this->positionSnapshot,
-            'contracts' => $this->contracts,
-            'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
-            'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
+            "id" => $this->id,
+            "departmentId" => $this->department?->getId(),
+            "department" => $this->department?->jsonSerialize(),
+            "positionId" => $this->position?->getId(),
+            "position" => $this->position?->jsonSerialize(),
+            "memberId" => $this->member?->getId(),
+            "salary" => $this->salary === null ? null : (float) $this->salary,
+            "allowances" => $this->allowances,
+            "allowancesTotal" => $this->allowancesTotal,
+            "effectiveFrom" => $this->effective_from?->format("Y-m-d"),
+            "effectiveTo" => $this->effective_to?->format("Y-m-d"),
+            "probationFrom" => $this->probation_from?->format("Y-m-d"),
+            "probationTo" => $this->probation_to?->format("Y-m-d"),
+            "salaryNet" =>
+            $this->salary_net === null ? null : (float) $this->salary_net,
+            "salaryGross" =>
+            $this->salaryGross === null ? null : (float) $this->salaryGross,
+            "insuranceSalary" =>
+            $this->insurance_salary === null
+                ? null
+                : (float) $this->insurance_salary,
+            "insuranceCode" => $this->insurance_code,
+            "note" => $this->note,
+            "status" => $this->status,
+            "isPrimary" => $this->isPrimary,
+            "positionSnapshot" => $this->positionSnapshot,
+            "contracts" => $this->contracts,
+            "startTemp" =>  $this->startTemp === null ? null : (new DateTime())->setTimestamp($this->startTemp)->format("Y-m-d H:i:s"),
+            "endTemp" =>  $this->endTemp === null ? null : (new DateTime())->setTimestamp($this->endTemp)->format("Y-m-d H:i:s"),
+            "createdAt" => $this->createdAt?->format("Y-m-d H:i:s"),
+            "updatedAt" => $this->updatedAt?->format("Y-m-d H:i:s"),
         ];
     }
 }

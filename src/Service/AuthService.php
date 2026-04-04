@@ -9,14 +9,13 @@ use App\Repository\LoginDeviceRepository;
 use App\Repository\WorkingTimeRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Cache\CacheItemPoolInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AuthService
 {
     public function __construct(
-        private CacheItemPoolInterface $cache,
+        private CacheService $cacheService,
         private GeneralSettingRepository $cauHinhChungRepository,
         private WorkingTimeRepository $thoiGianLamViecRepository,
         private UserRepository $userRepository,
@@ -29,33 +28,27 @@ class AuthService
     public function handleLoginAttempts($attemptsKey, $lockoutKey)
     {
         // Lấy số lần đăng nhập sai từ cache
-        $attemptsItem = $this->cache->getItem($attemptsKey);
-        $attempts = $attemptsItem->isHit() ? (int) $attemptsItem->get() : 0;
+        $attempts = (int) $this->cacheService->get($attemptsKey, 0);
         $attempts++; // Tăng số lần thất bại
 
         $maxAttempts = (int) $this->cauHinhChungRepository->getAllConfig()['SO_LAN_DANG_NHAP_SAI_TOI_DA'];
         $lockoutMinutes = (int) $this->cauHinhChungRepository->getAllConfig()['THOI_GIAN_KHOA_TAI_KHOAN'];
 
         // Lưu số lần đăng nhập sai vào cache
-        $attemptsItem->set($attempts);
-        $attemptsItem->expiresAfter($lockoutMinutes * 60); // Tính bằng giây
-        $this->cache->save($attemptsItem);
+        $this->cacheService->set($attemptsKey, $attempts, $lockoutMinutes * 60);
 
         // Nếu vượt quá số lần cho phép, khóa tài khoản
         if ($attempts >= $maxAttempts) {
-            $lockoutItem = $this->cache->getItem($lockoutKey);
             $lockoutExpires = time() + ($lockoutMinutes * 60);
-            $lockoutItem->set($lockoutExpires);
-            $lockoutItem->expiresAfter($lockoutMinutes * 60);
-            $this->cache->save($lockoutItem);
+            $this->cacheService->set($lockoutKey, $lockoutExpires, $lockoutMinutes * 60);
         }
     }
 
     public function getLockoutTime($lockoutKey): string
     {
-        $lockoutItem = $this->cache->getItem($lockoutKey);
-        if ($lockoutItem->isHit()) {
-            $lockoutExpires = (int) $lockoutItem->get();
+        $lockoutExpires = $this->cacheService->get($lockoutKey);
+        if ($lockoutExpires !== null) {
+            $lockoutExpires = (int) $lockoutExpires;
             ray(formatSeconds($lockoutExpires - time()));
             return formatSeconds($lockoutExpires - time());
         }
@@ -101,9 +94,8 @@ class AuthService
         $keyOtp = "otp_" . $user->getId();
 
         // Lấy opt từ cache ra và verify
-        $otpItem = $this->cache->getItem($keyOtp);
-        if ($otpItem->isHit()) {
-            $otpCache = $otpItem->get();
+        $otpCache = $this->cacheService->get($keyOtp);
+        if ($otpCache !== null) {
             if ($otpCache == $otp) {
 
                 $this->handleLimitDeviceLogin($user);
@@ -130,10 +122,8 @@ class AuthService
 
         // Gửi lại OTP
         $newOtp = $this->generateOtp();
-        $otpItem->set($newOtp);
         $thoiGianHieuLucOtp = (int) $this->cauHinhChungRepository->getAllConfig()['THOI_GIAN_HET_HAN_OTP'];
-        $otpItem->expiresAfter($thoiGianHieuLucOtp * 60);
-        $this->cache->save($otpItem);
+        $this->cacheService->set($keyOtp, $newOtp, $thoiGianHieuLucOtp * 60);
 
         $this->sendOtpEmail($email, $newOtp);
 

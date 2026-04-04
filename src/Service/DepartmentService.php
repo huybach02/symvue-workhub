@@ -15,14 +15,13 @@ use App\Entity\UserHasCustomPermission;
 use App\Entity\UserPermission;
 use App\Repository\DepartmentRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Cache\CacheItemPoolInterface;
 
 class DepartmentService
 {
     public function __construct(
         private readonly DepartmentRepository $boPhanRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly CacheItemPoolInterface $cache,
+        private readonly CacheService $cacheService,
     ) {}
 
     public function findAll(array $params): array
@@ -295,42 +294,94 @@ class DepartmentService
             throw new \Exception(t('error.not_found'));
         }
 
-        $checkUserHasCustomPermission = $this->entityManager->getRepository(UserHasCustomPermission::class)->findOneBy(['user' => $user]);
-        if ($checkUserHasCustomPermission) {
-            return;
-        }
+        $currentTimeStamp = time();
+        $cacheKey = 'user_permissions_' . $userId;
 
-        $cacheKey = "user_permissions_" . $userId;
-        $userPermissions = $this->entityManager
-            ->getRepository(UserPermission::class)
-            ->findBy(['userId' => $userId]);
+        $repository = $this->entityManager->getRepository(UserPermission::class);
+
+        // Lấy các permission đang có hiệu lực tại thời điểm hiện tại
+        $activeQb = $repository
+            ->createQueryBuilder('up')
+            ->andWhere('up.userId = :userId')
+            ->andWhere('(up.startTemp <= :currentTimeStamp OR up.startTemp IS NULL)')
+            ->andWhere('(up.endTemp > :currentTimeStamp OR up.endTemp IS NULL)')
+            ->setParameter('userId', $userId)
+            ->setParameter('currentTimeStamp', $currentTimeStamp);
+
+        $userPermissions = (clone $activeQb)
+            ->getQuery()
+            ->getResult();
+
+        // Tìm mốc start gần nhất trong tương lai
+        $minFutureStart = $repository
+            ->createQueryBuilder('up')
+            ->select('MIN(up.startTemp)')
+            ->andWhere('up.userId = :userId')
+            ->andWhere('up.startTemp > :currentTimeStamp')
+            ->setParameter('userId', $userId)
+            ->setParameter('currentTimeStamp', $currentTimeStamp)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Tìm mốc end gần nhất trong tương lai
+        $minFutureEnd = $repository
+            ->createQueryBuilder('up')
+            ->select('MIN(up.endTemp)')
+            ->andWhere('up.userId = :userId')
+            ->andWhere('up.endTemp > :currentTimeStamp')
+            ->setParameter('userId', $userId)
+            ->setParameter('currentTimeStamp', $currentTimeStamp)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $boundaries = array_filter([
+            $minFutureStart !== null ? (int) $minFutureStart : null,
+            $minFutureEnd !== null ? (int) $minFutureEnd : null,
+        ]);
+
+        $nextBoundary = !empty($boundaries) ? min($boundaries) : null;
+
+        // Merge quyền: true + false = true
         $merged = [];
+
         foreach ($userPermissions as $up) {
-            foreach ($up->getPhanQuyen() ?? [] as $perm) {
+            $permissions = $up->getPhanQuyen() ?? [];
+
+            foreach ($permissions as $perm) {
                 if (!isset($perm['name']) || !is_array($perm['actions'] ?? null)) {
                     continue;
                 }
 
-                $name = $perm['name'];
-                if (!isset($merged[$name])) {
-                    $merged[$name] = $perm['actions'];
-                } else {
-                    foreach ($perm['actions'] as $action => $value) {
-                        $merged[$name][$action] =
-                            ($merged[$name][$action] ?? false) || $value;
-                    }
+                $permissionName = $perm['name'];
+                $actions = $perm['actions'];
+
+                if (!isset($merged[$permissionName])) {
+                    $merged[$permissionName] = [];
+                }
+
+                foreach ($actions as $action => $value) {
+                    $merged[$permissionName][$action] =
+                        ($merged[$permissionName][$action] ?? false) || (bool) $value;
                 }
             }
         }
+
         $result = [];
         foreach ($merged as $name => $actions) {
-            $result[] = ['name' => $name, 'actions' => $actions];
+            $result[] = [
+                'name' => $name,
+                'actions' => $actions,
+            ];
         }
 
-        // Lưu result vào cache redis.
-        $item = $this->cache->getItem($cacheKey);
-        $item->set($result);
-        $item->expiresAfter(3600 * 24 * 90); // 90 ngày
-        $this->cache->save($item);
+        // TTL mặc định dài
+        $cacheTtl = 3600 * 24 * 90;
+
+        // Nếu có mốc thay đổi sắp tới thì cache chỉ sống tới mốc đó
+        if ($nextBoundary !== null) {
+            $cacheTtl = max(1, min($cacheTtl, $nextBoundary - $currentTimeStamp));
+        }
+
+        $this->cacheService->set($cacheKey, $result, $cacheTtl);
     }
 }
