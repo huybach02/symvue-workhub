@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Class\CacheKey;
 use App\Class\CustomResponse;
 use App\Entity\User;
 use App\Repository\DepartmentRepository;
@@ -30,7 +31,7 @@ final class AuthController extends AbstractController
             return CustomResponse::error(t("auth.me.not_found"), 401);
         }
 
-        $key = "user_permissions_" . $user->getId();
+        $key = CacheKey::USER_PERMISSION . $user->getId();
 
         $userPermission = $this->cacheService->get($key, []);
 

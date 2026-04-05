@@ -17,6 +17,9 @@ class UserHasCustomPermission
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', unique: true, nullable: true)]
     private ?User $user = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?array $module = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -30,6 +33,18 @@ class UserHasCustomPermission
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getModule(): ?array
+    {
+        return $this->module;
+    }
+
+    public function setModule(?array $module): static
+    {
+        $this->module = $module;
 
         return $this;
     }

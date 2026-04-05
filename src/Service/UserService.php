@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Class\CacheKey;
 use App\Class\Constanst;
 use App\Class\FilterWithPagination;
 use App\DTO\UserDTO;
@@ -12,6 +13,7 @@ use App\Entity\Department;
 use App\Entity\ConversationUser;
 use App\Entity\Position;
 use App\Entity\User;
+use App\Entity\UserHasCustomPermission;
 use App\Entity\UserPermission;
 use App\Entity\UserPosition;
 use App\Repository\ImageRepository;
@@ -32,6 +34,7 @@ class UserService
         private readonly ParameterBagInterface $parameterBag,
         private readonly ImageRepository $imageRepository,
         private readonly DepartmentService $boPhanService,
+        private readonly CacheService $cacheService,
     ) {}
 
     public function findAll(array $params): array
@@ -602,5 +605,86 @@ class UserService
             $this->entityManager->persist($conversationUser);
             $this->entityManager->flush();
         }
+    }
+
+    public function getUserPermission(int $id)
+    {
+        $cacheKey = CacheKey::USER_PERMISSION . $id;
+        $userPermissions = $this->cacheService->get($cacheKey);
+
+        if ($userPermissions === null) {
+            $this->boPhanService->mergeUserPermissions($id);
+            $userPermissions = $this->cacheService->get($cacheKey, []);
+        }
+
+        return $userPermissions ?? [];
+    }
+
+    public function checkUserHasCustomPermission(int $id)
+    {
+        $user = $this->entityManager->find(User::class, $id);
+        $userHasCustomPermission = $this->entityManager
+            ->getRepository(UserHasCustomPermission::class)
+            ->findOneBy(["user" => $user]);
+
+        $moduleName = [];
+
+        foreach ($userHasCustomPermission->getModule() ?? [] as $item) {
+            $moduleName[] = convertSlugToNameWithUpperWords($item["name"]);
+        }
+
+
+        return $userHasCustomPermission !== null ? $moduleName : null;
+    }
+
+    public function updateUserPermission(int $id, array $permissions)
+    {
+        $currentPermissions = $this->getUserPermission($id);
+        $user = $this->entityManager->find(User::class, $id);
+
+        $module = [];
+
+        foreach ($permissions as $index => $permission) {
+
+            foreach ($currentPermissions as $currentPermission) {
+                if ($currentPermission["name"] === $permission["name"]) {
+                    foreach ($currentPermission["actions"] as $key => $value) {
+                        if ($value !== ($permission["actions"][$key] ?? null)) {
+                            $module[] = $permission;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        $userHasCustomPermission = $this->entityManager
+            ->getRepository(UserHasCustomPermission::class)
+            ->findOneBy(["user" => $user]);
+        if (!$userHasCustomPermission) {
+            $userHasCustomPermission = new UserHasCustomPermission();
+            $userHasCustomPermission->setUser($user);
+        }
+        $userHasCustomPermission->setModule($module);
+        $this->entityManager->persist($userHasCustomPermission);
+        $this->entityManager->flush();
+
+        $this->boPhanService->mergeUserPermissions($user->getId());
+    }
+
+    public function restoreDefaultPermission(int $id)
+    {
+        $user = $this->entityManager->find(User::class, $id);
+        $userHasCustomPermission = $this->entityManager
+            ->getRepository(UserHasCustomPermission::class)
+            ->findOneBy(["user" => $user]);
+        if (!$userHasCustomPermission) {
+            return;
+        }
+        $userHasCustomPermission->setModule([]);
+        $this->entityManager->persist($userHasCustomPermission);
+        $this->entityManager->flush();
+        $this->boPhanService->mergeUserPermissions($user->getId());
     }
 }

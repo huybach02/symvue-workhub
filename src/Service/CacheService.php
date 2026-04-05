@@ -112,6 +112,17 @@ class CacheService
         }
     }
 
+    public function getTTLByKey(string $key): int
+    {
+        $cachePersist = $this->cachePersistRepository->findOneBy(['key' => $key]);
+
+        if (!$cachePersist) {
+            return 0;
+        }
+
+        return $cachePersist->getExpireAt() - time();
+    }
+
     private function encodeValue(mixed $value): string
     {
         $encoded = json_encode($value, JSON_UNESCAPED_UNICODE);

@@ -217,3 +217,10 @@ if (!function_exists('uploadFile')) {
         return '/uploads/' . $folder . '/' . $fileName;
     }
 }
+
+if (!function_exists('convertSlugToNameWithUpperWords')) {
+    function convertSlugToNameWithUpperWords(string $slug): string
+    {
+        return ucwords(str_replace('-', ' ', $slug));
+    }
+}

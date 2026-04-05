@@ -72,9 +72,12 @@
                                     </v-card-title>
                                 </div>
 
-                                <div class="d-flex flex-wrap ga-3">
+                                <div
+                                    v-if="showPositionList"
+                                    class="d-flex flex-wrap ga-3"
+                                >
                                     <v-card
-                                        v-for="position in positions"
+                                        v-for="position in renderPositions"
                                         :key="
                                             getPositionPermissionKey(position)
                                         "
@@ -172,16 +175,20 @@
 
                                         <v-list density="compact">
                                             <v-list-item
-                                                v-for="position in positions"
+                                                v-for="position in renderPositions"
                                                 :key="`${action.key}-${getPositionPermissionKey(position)}`"
                                             >
                                                 <template #title>
                                                     <div
                                                         class="permission-checkbox-row"
                                                     >
-                                                        <span>{{
-                                                            position.name
-                                                        }}</span>
+                                                        <span
+                                                            v-if="
+                                                                showPositionList
+                                                            "
+                                                        >
+                                                            {{ position.name }}
+                                                        </span>
                                                         <v-checkbox
                                                             v-model="
                                                                 permissionStates[
@@ -227,6 +234,10 @@ export default {
             type: Array,
             default: () => [],
         },
+        showPositionList: {
+            type: Boolean,
+            default: true,
+        },
         readonly: {
             type: Boolean,
             default: false,
@@ -248,6 +259,11 @@ export default {
         },
         activePermission() {
             return this.permissions[this.activePermissionIndex] || null;
+        },
+        renderPositions() {
+            return this.showPositionList
+                ? this.positions
+                : [{ code: "fake_position" }];
         },
     },
     watch: {
@@ -302,11 +318,15 @@ export default {
             this.permissionStates = this.permissions.map((permission) => {
                 const stateByPosition = {};
 
-                this.positions.forEach((position) => {
+                this.renderPositions.forEach((position) => {
                     const positionKey = this.getPositionPermissionKey(position);
-                    const currentModule = this.modelValue?.[positionKey]?.find(
-                        (item) => item.name === permission.name,
-                    );
+                    const currentModule = this.showPositionList
+                        ? this.modelValue?.[positionKey]?.find(
+                              (item) => item.name === permission.name,
+                          )
+                        : this.modelValue?.find(
+                              (item) => item.name === permission.name,
+                          );
                     const actionState = {};
 
                     Object.keys(permission.actions || {}).forEach(
@@ -329,9 +349,25 @@ export default {
             });
         },
         emitPermissionsData() {
+            if (!this.showPositionList) {
+                const positionKey = this.getPositionPermissionKey(
+                    this.renderPositions[0],
+                );
+
+                this.$emit(
+                    "update:modelValue",
+                    this.permissions.map((permission, index) => ({
+                        name: permission.name,
+                        actions:
+                            this.permissionStates[index]?.[positionKey] || {},
+                    })),
+                );
+                return;
+            }
+
             const result = {};
 
-            this.positions.forEach((position) => {
+            this.renderPositions.forEach((position) => {
                 const positionKey = this.getPositionPermissionKey(position);
 
                 result[positionKey] = this.permissions.map(

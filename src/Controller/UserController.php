@@ -261,4 +261,54 @@ final class UserController extends AbstractController
             return CustomResponse::error($th->getMessage());
         }
     }
+
+    #[Route("/nguoi-dung/{id}/permission", methods: ["GET"])]
+    public function userPermission(
+        int $id,
+    ): JsonResponse {
+        try {
+            $data = $this->userService->getUserPermission($id);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route("/nguoi-dung/{id}/has-custom-permission", methods: ["GET"])]
+    public function checkUserHasCustomPermission(
+        int $id,
+    ): JsonResponse {
+        try {
+            $data = $this->userService->checkUserHasCustomPermission($id);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route("/nguoi-dung/{id}/permission", methods: ["PUT"])]
+    public function updateUserPermission(
+        int $id,
+        Request $request,
+    ): JsonResponse {
+        try {
+            $body = $request->toArray();
+            $data = $this->userService->updateUserPermission($id, $body["permissions"]);
+            return CustomResponse::success($data, t("success.updated"));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route("/nguoi-dung/{id}/restore-default-permission", methods: ["GET"])]
+    public function restoreDefaultPermission(
+        int $id,
+    ): JsonResponse {
+        try {
+            $data = $this->userService->restoreDefaultPermission($id);
+            return CustomResponse::success($data, t("success.updated"));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
 }

@@ -55,7 +55,10 @@
                         </v-tabs-window-item>
 
                         <v-tabs-window-item value="permission">
-                            <UserPositionAndPermissionPermissionTab />
+                            <UserPositionAndPermissionPermissionTab
+                                :item="item"
+                                :user-id="item?.id"
+                            />
                         </v-tabs-window-item>
                     </v-tabs-window>
                 </v-card-text>

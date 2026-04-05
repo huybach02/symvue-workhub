@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
+use App\Class\CacheKey;
 use App\Class\CustomResponse;
 use App\Entity\User;
 use App\Service\CacheService;
@@ -71,7 +72,7 @@ class PermissionListener
             return;
         }
 
-        $key = "user_permissions_" . $user->getId();
+        $key = CacheKey::USER_PERMISSION . $user->getId();
         $userPermission = $this->getUserPermissions($key, $user->getId());
 
         $path = str_replace("/api/", "", $path);

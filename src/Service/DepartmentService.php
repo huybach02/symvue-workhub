@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Class\Constanst;
+use App\Class\CacheKey;
 use App\Class\FilterWithPagination;
 use App\DTO\DepartmentDTO;
 use App\DTO\PositionDTO;
@@ -295,7 +295,7 @@ class DepartmentService
         }
 
         $currentTimeStamp = time();
-        $cacheKey = 'user_permissions_' . $userId;
+        $cacheKey = CacheKey::USER_PERMISSION . $userId;
 
         $repository = $this->entityManager->getRepository(UserPermission::class);
 
@@ -334,6 +334,20 @@ class DepartmentService
             ->getQuery()
             ->getSingleScalarResult();
 
+        $userHasCustomPermission = $this->entityManager
+            ->getRepository(UserHasCustomPermission::class)
+            ->findOneBy(["user" => $user]);
+        $customModules = $userHasCustomPermission?->getModule() ?? [];
+        $customModulesByName = [];
+
+        foreach ($customModules as $customModule) {
+            if (!isset($customModule["name"])) {
+                continue;
+            }
+
+            $customModulesByName[$customModule["name"]] = $customModule;
+        }
+
         $boundaries = array_filter([
             $minFutureStart !== null ? (int) $minFutureStart : null,
             $minFutureEnd !== null ? (int) $minFutureEnd : null,
@@ -353,6 +367,16 @@ class DepartmentService
                 }
 
                 $permissionName = $perm['name'];
+
+                if (isset($customModulesByName[$permissionName])) {
+                    if (!isset($merged[$permissionName])) {
+                        $merged[$permissionName] =
+                            $customModulesByName[$permissionName]['actions'] ??
+                            [];
+                    }
+                    continue;
+                }
+
                 $actions = $perm['actions'];
 
                 if (!isset($merged[$permissionName])) {
