@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
-use App\Class\CacheKey;
 use App\Class\CustomResponse;
 use App\Entity\User;
-use App\Service\CacheService;
 use App\Service\DepartmentService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -26,7 +24,6 @@ class PermissionListener
     public function __construct(
         private readonly Security $security,
         private readonly DepartmentService $departmentService,
-        private readonly CacheService $cacheService,
     ) {}
 
     protected $excludedRoutes = [
@@ -72,8 +69,7 @@ class PermissionListener
             return;
         }
 
-        $key = CacheKey::USER_PERMISSION . $user->getId();
-        $userPermission = $this->getUserPermissions($key, $user->getId());
+        $userPermission = $this->departmentService->getCachedUserPermissions($user->getId());
 
         $path = str_replace("/api/", "", $path);
 
@@ -94,18 +90,6 @@ class PermissionListener
             ));
             return;
         }
-    }
-
-    protected function getUserPermissions(string $cacheKey, int $userId): array
-    {
-        $userPermissions = $this->cacheService->get($cacheKey);
-
-        if ($userPermissions === null) {
-            $this->departmentService->mergeUserPermissions($userId);
-            $userPermissions = $this->cacheService->get($cacheKey, []);
-        }
-
-        return $userPermissions ?? [];
     }
 
     protected function shouldExcludeRoute(string $path): bool

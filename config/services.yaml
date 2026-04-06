@@ -8,6 +8,9 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     media_directory: "%kernel.project_dir%/public/uploads"
+    user_permission_lock_ttl: "%env(int:USER_PERMISSION_LOCK_TTL)%"
+    user_permission_lock_wait_usleep: "%env(int:USER_PERMISSION_LOCK_WAIT_USLEEP)%"
+    user_permission_lock_max_attempts: "%env(int:USER_PERMISSION_LOCK_MAX_ATTEMPTS)%"
 
 services:
     # default configuration for services in *this* file
@@ -17,6 +20,9 @@ services:
         bind:
             $defaultLocale: "vi"
             $projectDir: "%kernel.project_dir%"
+            $userPermissionLockTtl: "%user_permission_lock_ttl%"
+            $userPermissionLockWaitUsleep: "%user_permission_lock_wait_usleep%"
+            $userPermissionLockMaxAttempts: "%user_permission_lock_max_attempts%"
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

@@ -2,12 +2,11 @@
 
 namespace App\Controller;
 
-use App\Class\CacheKey;
 use App\Class\CustomResponse;
 use App\Entity\User;
-use App\Repository\DepartmentRepository;
 use App\Service\AuthService;
 use App\Service\CacheService;
+use App\Service\DepartmentService;
 use App\Service\DeviceInfoService;
 use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,7 +20,7 @@ final class AuthController extends AbstractController
         private readonly AuthService $authService,
         private readonly DeviceInfoService $deviceInfoService,
         private readonly CacheService $cacheService,
-        private readonly DepartmentRepository $boPhanRepository,
+        private readonly DepartmentService $departmentService,
     ) {}
 
     #[Route("/auth/me", methods: ["GET"])]
@@ -31,9 +30,7 @@ final class AuthController extends AbstractController
             return CustomResponse::error(t("auth.me.not_found"), 401);
         }
 
-        $key = CacheKey::USER_PERMISSION . $user->getId();
-
-        $userPermission = $this->cacheService->get($key, []);
+        $userPermission = $this->departmentService->getCachedUserPermissions($user->getId());
 
         $userData = $user->jsonSerialize();
         $userData['permissions'] = $userPermission;

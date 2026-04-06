@@ -22,6 +22,9 @@ class DepartmentService
         private readonly DepartmentRepository $boPhanRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly CacheService $cacheService,
+        private readonly int $userPermissionLockTtl,
+        private readonly int $userPermissionLockWaitUsleep,
+        private readonly int $userPermissionLockMaxAttempts,
     ) {}
 
     public function findAll(array $params): array
@@ -407,5 +410,42 @@ class DepartmentService
         }
 
         $this->cacheService->set($cacheKey, $result, $cacheTtl);
+    }
+
+    public function getCachedUserPermissions(int $userId): array
+    {
+        $cacheKey = CacheKey::USER_PERMISSION . $userId;
+        $lockKey = CacheKey::USER_PERMISSION . 'lock_' . $userId;
+
+        for ($attempt = 0; $attempt < $this->userPermissionLockMaxAttempts; $attempt++) {
+            $userPermissions = $this->cacheService->get($cacheKey);
+
+            if ($userPermissions !== null) {
+                return $userPermissions ?? [];
+            }
+
+            $lockToken = $this->cacheService->acquireLock($lockKey, $this->userPermissionLockTtl);
+
+            if ($lockToken !== null) {
+                try {
+                    $userPermissions = $this->cacheService->get($cacheKey);
+
+                    if ($userPermissions === null) {
+                        $this->mergeUserPermissions($userId);
+                        $userPermissions = $this->cacheService->get($cacheKey, []);
+                    }
+
+                    return $userPermissions ?? [];
+                } finally {
+                    $this->cacheService->removeLock($lockKey, $lockToken);
+                }
+            }
+
+            usleep($this->userPermissionLockWaitUsleep);
+        }
+
+        $this->mergeUserPermissions($userId);
+
+        return $this->cacheService->get($cacheKey, []) ?? [];
     }
 }

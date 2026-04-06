@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Class\CacheKey;
 use App\Class\Constanst;
 use App\Class\FilterWithPagination;
 use App\DTO\UserDTO;
@@ -34,7 +33,6 @@ class UserService
         private readonly ParameterBagInterface $parameterBag,
         private readonly ImageRepository $imageRepository,
         private readonly DepartmentService $boPhanService,
-        private readonly CacheService $cacheService,
     ) {}
 
     public function findAll(array $params): array
@@ -609,15 +607,7 @@ class UserService
 
     public function getUserPermission(int $id)
     {
-        $cacheKey = CacheKey::USER_PERMISSION . $id;
-        $userPermissions = $this->cacheService->get($cacheKey);
-
-        if ($userPermissions === null) {
-            $this->boPhanService->mergeUserPermissions($id);
-            $userPermissions = $this->cacheService->get($cacheKey, []);
-        }
-
-        return $userPermissions ?? [];
+        return $this->boPhanService->getCachedUserPermissions($id);
     }
 
     public function checkUserHasCustomPermission(int $id)
