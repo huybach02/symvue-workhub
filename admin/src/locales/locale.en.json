@@ -166,6 +166,7 @@
       "tenBoPhan": "Department name",
       "status": "Status",
       "quanLyBoPhan": "Manager",
+      "chucVuQuanLy": "Manager position",
       "phanQuyen": "Permissions"
     },
     "vai_tro": {
@@ -298,7 +299,9 @@
     "endTemp": "End temporary position",
     "view_permission": "View permission",
     "permission_of_position": "Permission of position {name}",
-    "delete_temporary_position": "Delete temporary position"
+    "delete_temporary_position": "Delete temporary position",
+    "expired": "Expired",
+    "notification": "You have created {count} custom permissions for {listModuleCustomPermission}. These permissions will be prioritized over the system-generated permissions."
   },
   "contract": {
     "text": "Contract",

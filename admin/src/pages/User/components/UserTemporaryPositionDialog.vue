@@ -113,7 +113,7 @@
                                 <DatePicker
                                     :model-value="field.value"
                                     :error-messages="errorMessage"
-                                    :placeholder="'Nhap ngay bat dau hieu luc'"
+                                    :placeholder="`${$t('base.enter')} ${$t('field.start_temp_date')}`"
                                     @update:model-value="
                                         (value) => {
                                             handleChange(value);
@@ -142,7 +142,7 @@
                                 <TimePicker
                                     :model-value="field.value"
                                     :error-messages="errorMessage"
-                                    :placeholder="'Nhap gio bat dau hieu luc'"
+                                    :placeholder="`${$t('base.enter')} ${$t('field.start_temp_time')}`"
                                     @update:model-value="
                                         (value) => {
                                             handleChange(value);
@@ -171,7 +171,7 @@
                                 <DatePicker
                                     :model-value="field.value"
                                     :error-messages="errorMessage"
-                                    :placeholder="'Nhap ngay het hieu luc'"
+                                    :placeholder="`${$t('base.enter')} ${$t('field.end_temp_date')}`"
                                     @update:model-value="
                                         (value) => {
                                             handleChange(value);
@@ -200,7 +200,7 @@
                                 <TimePicker
                                     :model-value="field.value"
                                     :error-messages="errorMessage"
-                                    :placeholder="'Nhap gio het hieu luc'"
+                                    :placeholder="`${$t('base.enter')} ${$t('field.end_temp_time')}`"
                                     @update:model-value="
                                         (value) => {
                                             handleChange(value);

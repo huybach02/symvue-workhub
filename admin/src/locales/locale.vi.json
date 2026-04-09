@@ -166,6 +166,7 @@
       "tenBoPhan": "Tên bộ phận",
       "status": "Trạng thái",
       "quanLyBoPhan": "Quản lý bộ phận",
+      "chucVuQuanLy": "Chức vụ quản lý",
       "phanQuyen": "Phân quyền"
     },
     "vai_tro": {
@@ -298,7 +299,9 @@
     "endTemp": "Thời gian kết thúc tạm thời",
     "view_permission": "Xem phân quyền",
     "permission_of_position": "Phân quyền của chức vụ {name}",
-    "delete_temporary_position": "Xóa chức vụ tạm thời"
+    "delete_temporary_position": "Xóa chức vụ tạm thời",
+    "expired": "Hết hiệu lực",
+    "notification": "Bạn đã tạo phân quyền tùy chỉnh cho {count} module: {listModuleCustomPermission}. Các mục này sẽ được ưu tiên theo thiết lập riêng thay vì phân quyền tự động của hệ thống."
   },
   "contract": {
     "text": "Hợp đồng",

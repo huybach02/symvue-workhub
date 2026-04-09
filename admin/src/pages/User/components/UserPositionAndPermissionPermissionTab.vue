@@ -10,10 +10,12 @@
             variant="tonal"
             class="mb-3"
         >
-            Bạn đã tạo phân quyền tùy chỉnh cho 2 module:
-            <b>{{ listModuleCustomPermission }}</b
-            >. Các mục này sẽ được ưu tiên theo thiết lập riêng thay vì phân
-            quyền tự động của hệ thống.
+            {{
+                $t("position.notification", {
+                    count: customPermission.length,
+                    listModuleCustomPermission: listModuleCustomPermission,
+                })
+            }}
         </v-alert>
 
         <v-alert v-if="!userId" type="info" variant="tonal">
@@ -38,11 +40,11 @@
                     :loading="saving"
                     @click="showConfirmRestore = true"
                 >
-                    Khôi phục permission mặc định
+                    {{ $t("button.restore_default") }}
                 </v-btn>
             </div>
             <v-btn color="primary" :loading="saving" @click="savePermissions">
-                Luu permission
+                {{ $t("button.update") }}
             </v-btn>
         </div>
 

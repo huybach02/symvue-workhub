@@ -49,9 +49,18 @@
                                     size="small"
                                     color="success"
                                     variant="tonal"
+                                    prepend-icon="mdi-check"
                                 >
                                     {{ $t("position.primary") }}
-                                    <v-icon>mdi-check</v-icon>
+                                </v-chip>
+                                <v-chip
+                                    v-else
+                                    size="small"
+                                    color="warning"
+                                    variant="tonal"
+                                    prepend-icon="mdi-clock-outline"
+                                >
+                                    {{ $t("position.temporary") }}
                                 </v-chip>
                             </div>
 
@@ -197,7 +206,10 @@
                                                 }}
                                             </v-btn>
                                             <v-btn
-                                                v-if="!positionItem.isPrimary"
+                                                v-if="
+                                                    !positionItem.isPrimary &&
+                                                    !positionItem?.isExpired
+                                                "
                                                 block
                                                 size="small"
                                                 variant="tonal"
@@ -214,6 +226,17 @@
                                                     )
                                                 }}
                                             </v-btn>
+                                            <v-chip
+                                                v-if="positionItem?.isExpired"
+                                                size="medium"
+                                                color="danger"
+                                                variant="tonal"
+                                                prepend-icon="mdi-close"
+                                            >
+                                                <span>
+                                                    {{ $t("position.expired") }}
+                                                </span>
+                                            </v-chip>
                                         </v-col>
                                     </v-row>
                                 </v-list-item>

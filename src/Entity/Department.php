@@ -128,11 +128,6 @@ class Department
         return $this;
     }
 
-    public function getQuanLyBoPhan(): ?User
-    {
-        return $this->quanLyBoPhan;
-    }
-
     public function setQuanLyBoPhan(?User $quanLyBoPhan): static
     {
         $this->quanLyBoPhan = $quanLyBoPhan;
@@ -150,9 +145,11 @@ class Department
             'status' => $this->status,
             'ghiChu' => $this->ghiChu,
             'phanQuyen' => $this->phanQuyen,
-            'quanLyBoPhanId' => $this->quanLyBoPhan?->getId(),
-            'quanLyBoPhan' => $this->quanLyBoPhan?->getName(),
             "positionManager" => $this->getPositionManager()?->jsonSerialize(),
+            'quanLyBoPhan' => array_map(
+                fn(User $user) => $user->getName(),
+                $this->getQuanLyBoPhan()
+            ),
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];
@@ -248,5 +245,32 @@ class Department
         }
 
         return $this;
+    }
+
+    public function getQuanLyBoPhan(): array
+    {
+        $managers = [];
+
+        foreach ($this->positions as $position) {
+            if ((int) $position->getIsManager() !== 1) {
+                continue;
+            }
+
+            foreach ($position->getUserPositions() as $userPosition) {
+                if ((int) $userPosition->getIsPrimary() !== 1) {
+                    continue;
+                }
+
+                $member = $userPosition->getMember();
+
+                if (!$member) {
+                    continue;
+                }
+
+                $managers[$member->getId()] = $member;
+            }
+        }
+
+        return array_values($managers);
     }
 }

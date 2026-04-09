@@ -1,30 +1,33 @@
 import { buildNumberRule, buildStringRule } from "../validationBuilder";
 import * as yup from "yup";
+import { i18n } from "@/plugins/i18n";
+
+const t = (key) => i18n.global.t(key);
 
 export const userTemporaryPositionSchema = yup.object({
-    departmentId: buildNumberRule("Bo phan", {
+    departmentId: buildNumberRule(t("field.department"), {
         required: true,
         min: 1,
         integer: true,
     }),
-    positionId: buildNumberRule("Chuc vu", {
+    positionId: buildNumberRule(t("field.position"), {
         required: true,
         min: 1,
         integer: true,
     }),
-    startTempDate: buildStringRule("Ngay bat dau hieu luc", {
+    startTempDate: buildStringRule(t("field.start_temp_date"), {
         required: true,
         max: 50,
     }),
-    startTempTime: buildStringRule("Gio bat dau hieu luc", {
+    startTempTime: buildStringRule(t("field.start_temp_time"), {
         required: true,
         max: 10,
     }),
-    endTempDate: buildStringRule("Ngay het hieu luc", {
+    endTempDate: buildStringRule(t("field.end_temp_date"), {
         required: true,
         max: 50,
     }),
-    endTempTime: buildStringRule("Gio het hieu luc", {
+    endTempTime: buildStringRule(t("field.end_temp_time"), {
         required: true,
         max: 10,
     }),

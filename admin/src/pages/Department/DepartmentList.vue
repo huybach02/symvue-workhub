@@ -153,6 +153,21 @@
                     </div>
                 </template>
 
+                <template #[`item.quanLyBoPhan`]="{ item }">
+                    <div class="d-flex flex-column ga-2 py-3">
+                        <v-chip
+                            v-for="(name, index) in item.quanLyBoPhan"
+                            :key="index"
+                            color="primary"
+                            size="small"
+                            class="align-center ga-3"
+                        >
+                            <v-icon>mdi-account-outline</v-icon>
+                            {{ name }}
+                        </v-chip>
+                    </div>
+                </template>
+
                 <template #no-data>
                     <div class="pa-8 text-center">
                         <v-icon
@@ -289,11 +304,18 @@ export default {
                     filterComponent: markRaw(FilterText),
                 },
                 {
+                    title: this.$t("bo_phan.columns.chucVuQuanLy"),
+                    key: "positionManager.name",
+                    width: 250,
+                    filterComponent: markRaw(FilterText),
+                },
+                {
                     title: this.$t("bo_phan.columns.quanLyBoPhan"),
                     key: "quanLyBoPhan",
                     width: 250,
                     filterComponent: markRaw(FilterAutoComplete),
                     path: API_ROUTES_CONFIG.user,
+                    sortable: false,
                 },
                 {
                     title: this.$t("base.status"),
@@ -318,13 +340,13 @@ export default {
                 {
                     title: this.$t("base.created_at"),
                     key: "createdAt",
-                    width: 150,
+                    width: 180,
                     filterComponent: markRaw(FilterDateRange),
                 },
                 {
                     title: this.$t("base.updated_at"),
                     key: "updatedAt",
-                    width: 170,
+                    width: 180,
                     filterComponent: markRaw(FilterDateRange),
                 },
             ],

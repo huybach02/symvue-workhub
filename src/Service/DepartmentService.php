@@ -36,11 +36,27 @@ class DepartmentService
             $params,
             'bp',
             [
-                'quanLyBoPhan' => [
+                'positionManager.name' => [
                     'alias' => 'qlbp',
-                    'joinField' => 'bp.quanLyBoPhan',
-                    'targetField' => 'id'
+                    'joinField' => 'bp.positions',
+                    'targetField' => 'name'
                 ]
+            ],
+            [
+                'quanLyBoPhan' => function ($qb, array $filter, int $index): void {
+                    $subQb = $this->entityManager->createQueryBuilder()
+                        ->select('1')
+                        ->from(Position::class, 'mp')
+                        ->innerJoin('mp.userPositions', 'mup')
+                        ->innerJoin('mup.member', 'mu')
+                        ->andWhere('mp.department = bp')
+                        ->andWhere('mp.isManager = 1')
+                        ->andWhere('mup.isPrimary = 1')
+                        ->andWhere('mu.id IN (:managerIds)');
+
+                    $qb->andWhere($qb->expr()->exists($subQb->getDQL()))
+                        ->setParameter('managerIds', $filter['value']);
+                },
             ]
         );
 

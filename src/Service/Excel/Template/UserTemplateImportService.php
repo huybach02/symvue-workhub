@@ -47,7 +47,6 @@ class UserTemplateImportService extends BaseExcelTemplateHelper
             'J' => 'Trạng thái (*)',
             'K' => 'Email (*)',
             'L' => 'Số điện thoại (*)',
-            'M' => 'Bộ phận (*)',
             // 'N' => 'Tỉnh/Thành phố (*)',
             // 'O' => 'Xã/Phường (*)',
             // 'P' => 'Địa chỉ (*)',
@@ -83,13 +82,7 @@ class UserTemplateImportService extends BaseExcelTemplateHelper
         ], null, 'A2');
 
         // --- SETUP DROPDOWN VỚI AUTO-MAPPING ---
-        // Dropdown sẽ hiển thị text thân thiện, cột ẩn lưu code để import
-
-        $boPhanList = $this->boPhanRepository->findAll();
-        $boPhanMappings = [];
-        foreach ($boPhanList as $boPhan) {
-            $boPhanMappings[$boPhan->getId()] = $boPhan->getTenBoPhan();
-        }
+        // Dropdown sẽ hiển thị text, cột ẩn lưu code để import
 
         $dropdownConfigs = [
             [
@@ -115,15 +108,6 @@ class UserTemplateImportService extends BaseExcelTemplateHelper
                 'promptTitle'   => 'Chọn trạng thái',
                 'promptMessage' => 'Chọn Hoạt động hoặc Không hoạt động',
                 'headerName'    => 'status_code',
-            ],
-            [
-                'sourceColumn' => 'M',       // Cột hiển thị dropdown
-                'targetColumn' => 'R',       // Cột ẩn chứa giá trị code
-                'refSheetName' => 'Bộ phận',
-                'mappings' => $boPhanMappings,
-                'promptTitle'   => 'Chọn bộ phận',
-                'promptMessage' => 'Chọn bộ phận',
-                'headerName'    => 'bo_phan_code',
             ],
         ];
 

@@ -33,7 +33,8 @@
         "save": "Lưu",
         "back": "Quay lại",
         "close": "Đóng",
-        "remove": "Xóa"
+        "remove": "Xóa",
+        "restore_default": "Khôi phục mặc định"
     },
     "sidebar": {
         "home": "Trang chủ",

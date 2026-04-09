@@ -25,16 +25,46 @@ class FilterWithPagination
         QueryBuilder $qb,
         array $filters,
         string $alias = 't',
-        array $relationFields = []
+        array $relationFields = [],
+        array $customFilters = []
     ): array {
 
         // Xử lý relation filters trước, và loại bỏ chúng khỏi $filters
+        $filters = self::processCustomFilters($qb, $filters, $alias, $customFilters);
         $filters = self::processRelationFilters($qb, $filters, $alias, $relationFields);
 
         self::processFilters($qb, $filters, $alias);
         self::processSorting($qb, $filters, $alias);
 
         return self::processPagination($qb, $filters);
+    }
+
+    private static function processCustomFilters(
+        QueryBuilder $qb,
+        array $filters,
+        string $alias,
+        array $customFilters
+    ): array {
+        if (empty($customFilters) || !isset($filters['f']) || !is_array($filters['f'])) {
+            return $filters;
+        }
+
+        $filtersToRemove = [];
+
+        foreach ($filters['f'] as $index => $filter) {
+            if (!self::isValidFilter($filter)) continue;
+            if (!isset($customFilters[$filter['field']])) continue;
+            if (!is_callable($customFilters[$filter['field']])) continue;
+
+            $customFilters[$filter['field']]($qb, $filter, $index);
+            $filtersToRemove[] = $index;
+        }
+
+        foreach ($filtersToRemove as $index) {
+            unset($filters['f'][$index]);
+        }
+
+        return $filters;
     }
 
     private static function processRelationFilters(
@@ -46,8 +76,6 @@ class FilterWithPagination
         if (empty($relationFields) || !isset($filters['f']) || !is_array($filters['f'])) {
             return $filters;
         }
-
-        ray($filters, $relationFields);
 
         $processedJoins = [];
         $filtersToRemove = [];

@@ -352,6 +352,16 @@ class UserPosition
         return $this;
     }
 
+    public function getIsExpired(): ?int
+    {
+        $currentTimestamp = time();
+        $isExpired = 0;
+        if ($this->endTemp !== null) {
+            $isExpired = $currentTimestamp > $this->endTemp ? 1 : 0;
+        }
+        return $isExpired;
+    }
+
     public function jsonSerialize(): array
     {
         return [
@@ -384,6 +394,7 @@ class UserPosition
             "contracts" => $this->contracts,
             "startTemp" =>  $this->startTemp === null ? null : (new DateTime())->setTimestamp($this->startTemp)->format("Y-m-d H:i:s"),
             "endTemp" =>  $this->endTemp === null ? null : (new DateTime())->setTimestamp($this->endTemp)->format("Y-m-d H:i:s"),
+            "isExpired" => $this->getIsExpired(),
             "createdAt" => $this->createdAt?->format("Y-m-d H:i:s"),
             "updatedAt" => $this->updatedAt?->format("Y-m-d H:i:s"),
         ];
