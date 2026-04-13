@@ -1,0 +1,73 @@
+<?php
+
+namespace App\Controller;
+
+use App\Class\CustomResponse;
+use App\DTO\WorkScheduleFulltimeDTO;
+use App\Service\WorkScheduleService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+final class WorkScheduleController extends AbstractController
+{
+    public function __construct(
+        private readonly WorkScheduleService $workScheduleService,
+    ) {}
+
+    #[Route("/work-schedule/fulltime/{departmentId}", methods: ["GET"])]
+    public function getFulltime(int $departmentId): JsonResponse
+    {
+        try {
+            $data = $this->workScheduleService->getFulltime($departmentId);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route("/work-schedule/fulltime", methods: ["POST"])]
+    public function createFulltime(
+        #[
+            MapRequestPayload(validationGroups: ["create"]),
+        ]
+        WorkScheduleFulltimeDTO $dto,
+    ): JsonResponse {
+        try {
+            $data = $this->workScheduleService->createFulltime($dto);
+            return CustomResponse::success($data, t("success.created"));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    // #[Route("/work-schedule/{id}", methods: ["PUT"])]
+    // public function update(
+    //     int $id,
+    //     #[
+    //         MapRequestPayload(validationGroups: ["update"]),
+    //     ]
+    //     WorkScheduleDTO $exampleDTO,
+    // ): JsonResponse {
+    //     try {
+    //         $data = $this->exampleService->update($id, $exampleDTO);
+    //         return CustomResponse::success($data, t("success.updated"));
+    //     } catch (\Throwable $th) {
+    //         return CustomResponse::error($th->getMessage());
+    //     }
+    // }
+
+    // #[Route("/work-schedule/{id}", methods: ["DELETE"])]
+    // public function delete(int $id): JsonResponse
+    // {
+    //     try {
+    //         $this->exampleService->delete($id);
+    //         return CustomResponse::success([], t("success.deleted"));
+    //     } catch (\Throwable $th) {
+    //         return CustomResponse::error($th->getMessage());
+    //     }
+    // }
+}

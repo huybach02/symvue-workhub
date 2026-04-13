@@ -1,319 +1,326 @@
 {
-  "loading": "Đang tải...",
-  "system_management": "Hệ thống quản lý",
-  "status_values": {
-    "active": "Hoạt động",
-    "inactive": "Không hoạt động",
-    "blocked": "Bị khóa"
-  },
-  "auth": {
-    "login": "Đăng nhập",
-    "remember_me": "Ghi nhớ tôi",
-    "sign_in": "Đăng nhập",
-    "forgot_password": "Quên mật khẩu",
-    "profile": "Hồ sơ",
-    "logout": "Đăng xuất",
-    "verify_otp": "Xác thực OTP",
-    "verify_otp_description": "Nhập mã OTP gồm 6 chữ số đã được gửi đến email của bạn",
-    "otp_code": "Mã OTP",
-    "resend_otp": "Gửi lại mã OTP",
-    "back_to_login": "Quay lại đăng nhập",
-    "change_password": "Cập nhật mật khẩu mới"
-  },
-  "language": {
-    "en": "English",
-    "vi": "Tiếng Việt"
-  },
-  "system_config": {
-    "login_fail_setting": "Thiết lập khi đăng nhập sai thông tin",
-    "max_login_fail": "Số lần đăng nhập sai tối đa",
-    "lock_account_time": "Thời gian tạm khóa tài khoản (phút)",
-    "two_factor_setting": "Thiết lập xác thực 2 yếu tố",
-    "enable_two_factor": "Bật/Tắt xác thực 2 yếu tố",
-    "otp_expire_time": "Thời gian hết hạn mã OTP (phút)",
-    "device_verify_time": "Thời hạn xác thực lại thiết bị (ngày)",
-    "working_time_setting": "Thiết lập kiểm tra thời gian làm việc",
-    "enable_working_time_check": "Bật/Tắt kiểm tra thời gian làm việc",
-    "max_device_login": "Số thiết bị đăng nhập tối đa",
-    "edit_button": "Chỉnh sửa",
-    "save_button": "Lưu cấu hình",
-    "cancel_button": "Hủy bỏ"
-  },
-  "thoi_gian_lam_viec": {
-    "fulltime": "Thời gian cố định",
-    "parttime": "Thời gian theo ca làm việc",
-    "action": "Hành động",
-    "thoi_gian_cap_nhat": "Thời gian cập nhật",
-    "edit_button": "Chỉnh sửa",
-    "save_button": "Lưu cấu hình",
-    "cancel_button": "Hủy bỏ",
-    "edit": "Chỉnh sửa thời gian làm việc",
-    "thu": "Thứ",
-    "gio_bat_dau": "Giờ bắt đầu",
-    "gio_ket_thuc": "Giờ kết thúc",
-    "ghi_chu": "Ghi chú"
-  },
-  "ca_lam_viec": {
-    "ten_ca": "Tên ca",
-    "create": "Thêm ca làm việc",
-    "edit": "Chỉnh sửa ca làm việc",
-    "cancel_button": "Hủy bỏ",
-    "save_button": "Lưu ca làm việc"
-  },
-  "media_library": {
-    "title": "Thư viện ảnh",
-    "select_from_library": "Chọn ảnh từ thư viện",
-    "selected_images": "Ảnh đã chọn",
-    "upload_images": "Upload ảnh",
-    "no_images": "Chưa có ảnh nào. Vui lòng upload ảnh mới.",
-    "no_images_in_trash": "Chưa có ảnh nào trong thùng rác.",
-    "delete_button": "Xóa ({count} ảnh)",
-    "confirm_select_button": "Xác nhận chọn ({count} ảnh)",
-    "delete_confirm_message": "Bạn có chắc chắn muốn xóa {count} dữ liệu này?",
-    "select_all": "Chọn tất cả",
-    "deselect_all": "Bỏ chọn tất cả",
-    "restore_button": "Khôi phục ({count} ảnh)",
-    "delete_permanently_button": "Xóa vĩnh viễn ({count} ảnh)",
-    "restore_confirm_title": "Xác nhận khôi phục",
-    "restore_confirm_message": "Bạn có chắc chắn muốn khôi phục {count} ảnh này?",
-    "delete_permanently_confirm_title": "Xác nhận xóa vĩnh viễn",
-    "delete_permanently_confirm_message": "Bạn có chắc chắn muốn xóa vĩnh viễn {count} ảnh này? Hành động này không thể hoàn tác!",
-    "restore_action": "Khôi phục",
-    "delete_permanently_action": "Xóa vĩnh viễn",
-    "tab_library": "Thư viện ảnh",
-    "tab_trash": "Thùng rác"
-  },
-  "confirm_dialog": {
-    "default_title": "Xác nhận",
-    "default_message": "Bạn có chắc chắn muốn thực hiện hành động này?",
-    "confirm_button": "Xác nhận",
-    "cancel_button": "Hủy"
-  },
-  "filter": {
-    "date_range": {
-      "title": "Khoảng thời gian",
-      "select_type": "Chọn kiểu ngày",
-      "from_date": "Từ ngày",
-      "to_date": "Đến ngày",
-      "date": "Ngày",
-      "types": {
-        "equal_to": "Ngày",
-        "less_than": "Nhỏ hơn ngày",
-        "greater_than": "Lớn hơn ngày",
-        "less_than_or_equal_to": "Nhỏ hơn hoặc bằng ngày",
-        "greater_than_or_equal_to": "Lớn hơn hoặc bằng ngày",
-        "between": "Từ ngày đến ngày"
-      },
-      "display": {
-        "from": "Từ",
-        "to": "Đến"
-      },
-      "error": {
-        "invalid_range": "Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc"
-      }
+    "loading": "Đang tải...",
+    "system_management": "Hệ thống quản lý",
+    "status_values": {
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động",
+        "blocked": "Bị khóa"
     },
-    "pagination": {
-      "showing": "Hiển thị",
-      "to": "đến",
-      "of": "trong tổng số",
-      "records": "bản ghi",
-      "no_data": "Không có dữ liệu",
-      "items_per_page": "Hiển thị:",
-      "first": "Đầu",
-      "last": "Cuối"
+    "auth": {
+        "login": "Đăng nhập",
+        "remember_me": "Ghi nhớ tôi",
+        "sign_in": "Đăng nhập",
+        "forgot_password": "Quên mật khẩu",
+        "profile": "Hồ sơ",
+        "logout": "Đăng xuất",
+        "verify_otp": "Xác thực OTP",
+        "verify_otp_description": "Nhập mã OTP gồm 6 chữ số đã được gửi đến email của bạn",
+        "otp_code": "Mã OTP",
+        "resend_otp": "Gửi lại mã OTP",
+        "back_to_login": "Quay lại đăng nhập",
+        "change_password": "Cập nhật mật khẩu mới"
+    },
+    "language": {
+        "en": "English",
+        "vi": "Tiếng Việt"
+    },
+    "system_config": {
+        "login_fail_setting": "Thiết lập khi đăng nhập sai thông tin",
+        "max_login_fail": "Số lần đăng nhập sai tối đa",
+        "lock_account_time": "Thời gian tạm khóa tài khoản (phút)",
+        "two_factor_setting": "Thiết lập xác thực 2 yếu tố",
+        "enable_two_factor": "Bật/Tắt xác thực 2 yếu tố",
+        "otp_expire_time": "Thời gian hết hạn mã OTP (phút)",
+        "device_verify_time": "Thời hạn xác thực lại thiết bị (ngày)",
+        "working_time_setting": "Thiết lập kiểm tra thời gian làm việc",
+        "enable_working_time_check": "Bật/Tắt kiểm tra thời gian làm việc",
+        "max_device_login": "Số thiết bị đăng nhập tối đa",
+        "edit_button": "Chỉnh sửa",
+        "save_button": "Lưu cấu hình",
+        "cancel_button": "Hủy bỏ"
+    },
+    "thoi_gian_lam_viec": {
+        "fulltime": "Thời gian cố định",
+        "parttime": "Thời gian theo ca làm việc",
+        "action": "Hành động",
+        "thoi_gian_cap_nhat": "Thời gian cập nhật",
+        "edit_button": "Chỉnh sửa",
+        "save_button": "Lưu cấu hình",
+        "cancel_button": "Hủy bỏ",
+        "edit": "Chỉnh sửa thời gian làm việc",
+        "thu": "Thứ",
+        "gio_bat_dau": "Giờ bắt đầu",
+        "gio_ket_thuc": "Giờ kết thúc",
+        "ghi_chu": "Ghi chú"
+    },
+    "ca_lam_viec": {
+        "ten_ca": "Tên ca",
+        "create": "Thêm ca làm việc",
+        "edit": "Chỉnh sửa ca làm việc",
+        "cancel_button": "Hủy bỏ",
+        "save_button": "Lưu ca làm việc"
+    },
+    "media_library": {
+        "title": "Thư viện ảnh",
+        "select_from_library": "Chọn ảnh từ thư viện",
+        "selected_images": "Ảnh đã chọn",
+        "upload_images": "Upload ảnh",
+        "no_images": "Chưa có ảnh nào. Vui lòng upload ảnh mới.",
+        "no_images_in_trash": "Chưa có ảnh nào trong thùng rác.",
+        "delete_button": "Xóa ({count} ảnh)",
+        "confirm_select_button": "Xác nhận chọn ({count} ảnh)",
+        "delete_confirm_message": "Bạn có chắc chắn muốn xóa {count} dữ liệu này?",
+        "select_all": "Chọn tất cả",
+        "deselect_all": "Bỏ chọn tất cả",
+        "restore_button": "Khôi phục ({count} ảnh)",
+        "delete_permanently_button": "Xóa vĩnh viễn ({count} ảnh)",
+        "restore_confirm_title": "Xác nhận khôi phục",
+        "restore_confirm_message": "Bạn có chắc chắn muốn khôi phục {count} ảnh này?",
+        "delete_permanently_confirm_title": "Xác nhận xóa vĩnh viễn",
+        "delete_permanently_confirm_message": "Bạn có chắc chắn muốn xóa vĩnh viễn {count} ảnh này? Hành động này không thể hoàn tác!",
+        "restore_action": "Khôi phục",
+        "delete_permanently_action": "Xóa vĩnh viễn",
+        "tab_library": "Thư viện ảnh",
+        "tab_trash": "Thùng rác"
+    },
+    "confirm_dialog": {
+        "default_title": "Xác nhận",
+        "default_message": "Bạn có chắc chắn muốn thực hiện hành động này?",
+        "confirm_button": "Xác nhận",
+        "cancel_button": "Hủy"
+    },
+    "filter": {
+        "date_range": {
+            "title": "Khoảng thời gian",
+            "select_type": "Chọn kiểu ngày",
+            "from_date": "Từ ngày",
+            "to_date": "Đến ngày",
+            "date": "Ngày",
+            "types": {
+                "equal_to": "Ngày",
+                "less_than": "Nhỏ hơn ngày",
+                "greater_than": "Lớn hơn ngày",
+                "less_than_or_equal_to": "Nhỏ hơn hoặc bằng ngày",
+                "greater_than_or_equal_to": "Lớn hơn hoặc bằng ngày",
+                "between": "Từ ngày đến ngày"
+            },
+            "display": {
+                "from": "Từ",
+                "to": "Đến"
+            },
+            "error": {
+                "invalid_range": "Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc"
+            }
+        },
+        "pagination": {
+            "showing": "Hiển thị",
+            "to": "đến",
+            "of": "trong tổng số",
+            "records": "bản ghi",
+            "no_data": "Không có dữ liệu",
+            "items_per_page": "Hiển thị:",
+            "first": "Đầu",
+            "last": "Cuối"
+        }
+    },
+    "user": {
+        "title": "Nhân sự",
+        "columns": {
+            "id": "ID",
+            "avatar": "Ảnh đại diện",
+            "name": "Họ tên",
+            "email": "Email",
+            "phone": "Điện thoại",
+            "role": "Vai trò",
+            "ma_nhan_vien": "Mã nhân viên"
+        },
+        "roles": {
+            "admin": "Admin",
+            "user": "User",
+            "manager": "Manager",
+            "staff": "Staff"
+        }
+    },
+    "lich_su_import": {
+        "title": "Lịch sử import",
+        "columns": {
+            "id": "ID",
+            "fileName": "Tên file",
+            "entityType": "Loại dữ liệu",
+            "status": "Trạng thái",
+            "totalRows": "Tổng số dòng",
+            "successRows": "Số dòng thành công",
+            "errorRows": "Số dòng lỗi",
+            "errorDetails": "Chi tiết lỗi",
+            "createdAt": "Ngày tạo",
+            "row": "Dòng",
+            "rawData": "Dữ liệu gốc",
+            "errors": "Lỗi"
+        }
+    },
+    "bo_phan": {
+        "title": "Bộ phận",
+        "columns": {
+            "id": "ID",
+            "maBoPhan": "Mã bộ phận",
+            "tenBoPhan": "Tên bộ phận",
+            "status": "Trạng thái",
+            "quanLyBoPhan": "Quản lý bộ phận",
+            "chucVuQuanLy": "Chức vụ quản lý",
+            "phanQuyen": "Phân quyền"
+        },
+        "vai_tro": {
+            "title": "Vai trò",
+            "manager": "Quản lý",
+            "employee": "Thành viên"
+        },
+        "actions": {
+            "index": "Xem danh sách",
+            "create": "Thêm mới",
+            "show": "Xem chi tiết",
+            "edit": "Chỉnh sửa",
+            "delete": "Xóa",
+            "export": "Xuất file",
+            "import": "Import file",
+            "showMenu": "Hiển thị menu",
+            "all": "Tất cả"
+        },
+        "button": {
+            "update": "Cập nhật phân quyền",
+            "resetPermissionDefault": "Khôi phục phân quyền mặc định của bộ phận",
+            "delete": "Xóa bộ phận",
+            "viewPosition": "Vị trí công việc và Hợp đồng",
+            "userList": "Danh sách thành viên",
+            "addPosition": "Thêm chức vụ",
+            "savePermissionByPosition": "Lưu phân quyền theo chức vụ",
+            "addPositionAllowance": "Thêm phụ cấp",
+            "positionAndPermission": "Chức vụ và Phân quyền"
+        },
+        "text": {
+            "departmentOfUser": "Phòng ban/Bộ phận của nhân sự",
+            "isMemberOf": "Là thành viên của",
+            "isManagerOf": "Là quản lý của",
+            "department": "Phòng ban/Bộ phận",
+            "notBelongsToAnyDepartment": "Nhân sự chưa thuộc phòng ban nào",
+            "default": "Mặc định",
+            "userList": "Danh sách thành viên của bộ phận {tenBoPhan}",
+            "viewMembers": "Xem danh sách thành viên",
+            "noMembers": "Bộ phận chưa có thành viên nào",
+            "manager": "Quản lý",
+            "totalMembers": "Tổng số: {count} thành viên",
+            "removeMemberConfirm": "Bạn có chắc muốn loại {name} khỏi bộ phận '{tenBoPhan}' không?",
+            "positionPermissionDialogTitle": "Chức vụ và phân quyền của bộ phận {tenBoPhan}",
+            "positionList": "Danh sách chức vụ",
+            "totalPositions": "Tổng số: {count} chức vụ",
+            "noPositions": "Bộ phận chưa có chức vụ nào.",
+            "permissionByPosition": "Chức vụ và phân quyền cho chức vụ",
+            "permissionRequiresPosition": "Hãy tạo ít nhất 1 chức vụ để có thể cấu hình phân quyền.",
+            "deletePositionConfirm": "Bạn có chắc muốn xóa chức vụ {name} không?",
+            "positionManagerDescription": "Bật tùy chọn này nếu chức vụ này có quyền quản lý phòng ban/bộ phận.",
+            "allowancesHint": "Nhập các phụ cấp, ngăn cách bằng dấu phẩy",
+            "permission": "Phân quyền",
+            "notHasPositionManager": "Phòng ban/Bộ phận này chưa có chức vụ nào chịu trách nhiệm quản lý. Vui lòng tạo/chọn một chức vụ chịu trách nhiệm quản lý Phòng ban/Bộ phận này",
+            "hasPositionManager": "Phòng ban/Bộ phận này đang được quản lý bởi Chức vụ {positionManager} (Mã: {positionManagerCode})"
+        },
+        "employmentType": {
+            "fullTime": "Toàn thời gian",
+            "partTime": "Bán thời gian",
+            "intern": "Thực tập",
+            "contractor": "Hợp đồng"
+        }
+    },
+    "thong_bao": {
+        "title": "Thông báo",
+        "columns": {
+            "id": "ID",
+            "title": "Tiêu đề",
+            "body": "Nội dung",
+            "type": "Loại thông báo",
+            "fromUser": "Gửi từ",
+            "sendTo": "Gửi đến",
+            "createdAt": "Ngày tạo"
+        },
+        "options": {
+            "sendTo": {
+                "all": "Toàn hệ thống",
+                "department": "Phòng ban/Bộ phận",
+                "user": "Nhân sự"
+            },
+            "type": {
+                "primary": "Thông báo mặc định",
+                "info": "Thông tin",
+                "warning": "Cảnh báo",
+                "error": "Khẩn cấp"
+            }
+        }
+    },
+    "chat": {
+        "text": "Tin nhắn",
+        "total": "Tổng",
+        "unseen": "Chưa đọc",
+        "search_conversation": "Tìm kiếm hội thoại",
+        "conversation": "Hội thoại",
+        "not_conversation": "Không có hội thoại nào",
+        "new_chat": "Bắt đầu trò chuyện mới",
+        "not_found_user": "Không tìm thấy người dùng",
+        "has_sent_image": "Đã gửi {count} ảnh",
+        "has_sent_file": "Đã gửi {count} file",
+        "has_sent_images_and_files": "Đã gửi {imageCount} ảnh và {fileCount} file",
+        "group": "Nhóm",
+        "choose_conversation": "Chọn một hội thoại",
+        "to_start_chat": "để bắt đầu trò chuyện",
+        "attach_file": "Đính kèm file (tối đa 10 file)",
+        "send_image": "Gửi ảnh (tối đa 10 ảnh)",
+        "enter_message": "Nhập tin nhắn...",
+        "enter_to_send_shift_to_wrap": "Nhấn Enter để gửi tin nhắn, hoặc Shift + Enter để xuống dòng"
+    },
+    "position": {
+        "text": "Chức vụ",
+        "position_and_contract": "Vị trí công việc và Hợp đồng của {name}",
+        "position": "Chức vụ",
+        "contract": "Hợp đồng",
+        "user_permission": "Phân quyền của người dùng",
+        "choose_position_to_view": " Chọn chức vụ để xem thông tin chi tiết",
+        "position_detail": "Thông tin chi tiết công việc",
+        "salary": "Lương thoả thuận",
+        "insurance_salary": "Lương đóng BHXH",
+        "insurance_code": "Mã số BHXH",
+        "probation_from": "Ngày bắt đầu thử việc",
+        "probation_to": "Ngày kết thúc thử việc",
+        "effective_from": "Ngày bắt đầu công việc chính thức (100% lương)",
+        "effective_to": "Ngày kết thúc công việc chính thức (100% lương)",
+        "allowances_optional": "Phụ cấp bổ sung (Nếu có)",
+        "position_and_permission": "Chức vụ và phân quyền của người dùng {name}",
+        "add_temp_position": "Thêm chức vụ tạm thời",
+        "please_update_position": "Vui lòng cập nhật vị trí công việc trước",
+        "primary": "Chính thức",
+        "temporary": "Tạm thời",
+        "startTemp": "Thời gian bắt đầu tạm thời",
+        "endTemp": "Thời gian kết thúc tạm thời",
+        "view_permission": "Xem phân quyền",
+        "permission_of_position": "Phân quyền của chức vụ {name}",
+        "delete_temporary_position": "Xóa chức vụ tạm thời",
+        "expired": "Hết hiệu lực",
+        "notification": "Bạn đã tạo phân quyền tùy chỉnh cho {count} module: {listModuleCustomPermission}. Các mục này sẽ được ưu tiên theo thiết lập riêng thay vì phân quyền tự động của hệ thống."
+    },
+    "contract": {
+        "text": "Hợp đồng",
+        "please_update_position": "Vui lòng cập nhật vị trí công việc trước khi tải hợp đồng lên hệ thống",
+        "upload_contract": "Tải lên hợp đồng",
+        "format_contract": "File hợp đồng phải có định dạng doc, docx, pdf",
+        "contract_list": "Danh sách hợp đồng",
+        "total_contracts": "Tổng số hợp đồng: {count}",
+        "no_contract": "Chưa có hợp đồng",
+        "file_name": "Tên file",
+        "file_format": "Định dạng",
+        "file_size": "Dung lượng",
+        "uploaded_at": "Ngày tải lên"
+    },
+    "work_schedule": {
+        "title": "WorkSchedule",
+        "columns": {
+            "id": "ID",
+            "name": "Tên"
+        }
     }
-  },
-  "user": {
-    "title": "Nhân sự",
-    "columns": {
-      "id": "ID",
-      "avatar": "Ảnh đại diện",
-      "name": "Họ tên",
-      "email": "Email",
-      "phone": "Điện thoại",
-      "role": "Vai trò",
-      "ma_nhan_vien": "Mã nhân viên"
-    },
-    "roles": {
-      "admin": "Admin",
-      "user": "User",
-      "manager": "Manager",
-      "staff": "Staff"
-    }
-  },
-  "lich_su_import": {
-    "title": "Lịch sử import",
-    "columns": {
-      "id": "ID",
-      "fileName": "Tên file",
-      "entityType": "Loại dữ liệu",
-      "status": "Trạng thái",
-      "totalRows": "Tổng số dòng",
-      "successRows": "Số dòng thành công",
-      "errorRows": "Số dòng lỗi",
-      "errorDetails": "Chi tiết lỗi",
-      "createdAt": "Ngày tạo",
-      "row": "Dòng",
-      "rawData": "Dữ liệu gốc",
-      "errors": "Lỗi"
-    }
-  },
-  "bo_phan": {
-    "title": "Bộ phận",
-    "columns": {
-      "id": "ID",
-      "maBoPhan": "Mã bộ phận",
-      "tenBoPhan": "Tên bộ phận",
-      "status": "Trạng thái",
-      "quanLyBoPhan": "Quản lý bộ phận",
-      "chucVuQuanLy": "Chức vụ quản lý",
-      "phanQuyen": "Phân quyền"
-    },
-    "vai_tro": {
-      "title": "Vai trò",
-      "manager": "Quản lý",
-      "employee": "Thành viên"
-    },
-    "actions": {
-      "index": "Xem danh sách",
-      "create": "Thêm mới",
-      "show": "Xem chi tiết",
-      "edit": "Chỉnh sửa",
-      "delete": "Xóa",
-      "export": "Xuất file",
-      "import": "Import file",
-      "showMenu": "Hiển thị menu",
-      "all": "Tất cả"
-    },
-    "button": {
-      "update": "Cập nhật phân quyền",
-      "resetPermissionDefault": "Khôi phục phân quyền mặc định của bộ phận",
-      "delete": "Xóa bộ phận",
-      "viewPosition": "Vị trí công việc và Hợp đồng",
-      "userList": "Danh sách thành viên",
-      "addPosition": "Thêm chức vụ",
-      "savePermissionByPosition": "Lưu phân quyền theo chức vụ",
-      "addPositionAllowance": "Thêm phụ cấp",
-      "positionAndPermission": "Chức vụ và Phân quyền"
-    },
-    "text": {
-      "departmentOfUser": "Phòng ban/Bộ phận của nhân sự",
-      "isMemberOf": "Là thành viên của",
-      "isManagerOf": "Là quản lý của",
-      "department": "Phòng ban/Bộ phận",
-      "notBelongsToAnyDepartment": "Nhân sự chưa thuộc phòng ban nào",
-      "default": "Mặc định",
-      "userList": "Danh sách thành viên của bộ phận {tenBoPhan}",
-      "viewMembers": "Xem danh sách thành viên",
-      "noMembers": "Bộ phận chưa có thành viên nào",
-      "manager": "Quản lý",
-      "totalMembers": "Tổng số: {count} thành viên",
-      "removeMemberConfirm": "Bạn có chắc muốn loại {name} khỏi bộ phận '{tenBoPhan}' không?",
-      "positionPermissionDialogTitle": "Chức vụ và phân quyền của bộ phận {tenBoPhan}",
-      "positionList": "Danh sách chức vụ",
-      "totalPositions": "Tổng số: {count} chức vụ",
-      "noPositions": "Bộ phận chưa có chức vụ nào.",
-      "permissionByPosition": "Chức vụ và phân quyền cho chức vụ",
-      "permissionRequiresPosition": "Hãy tạo ít nhất 1 chức vụ để có thể cấu hình phân quyền.",
-      "deletePositionConfirm": "Bạn có chắc muốn xóa chức vụ {name} không?",
-      "positionManagerDescription": "Bật tùy chọn này nếu chức vụ này có quyền quản lý phòng ban/bộ phận.",
-      "allowancesHint": "Nhập các phụ cấp, ngăn cách bằng dấu phẩy",
-      "permission": "Phân quyền",
-      "notHasPositionManager": "Phòng ban/Bộ phận này chưa có chức vụ nào chịu trách nhiệm quản lý. Vui lòng tạo/chọn một chức vụ chịu trách nhiệm quản lý Phòng ban/Bộ phận này",
-      "hasPositionManager": "Phòng ban/Bộ phận này đang được quản lý bởi Chức vụ {positionManager} (Mã: {positionManagerCode})"
-    },
-    "employmentType": {
-      "fullTime": "Toàn thời gian",
-      "partTime": "Bán thời gian",
-      "intern": "Thực tập",
-      "contractor": "Hợp đồng"
-    }
-  },
-  "thong_bao": {
-    "title": "Thông báo",
-    "columns": {
-      "id": "ID",
-      "title": "Tiêu đề",
-      "body": "Nội dung",
-      "type": "Loại thông báo",
-      "fromUser": "Gửi từ",
-      "sendTo": "Gửi đến",
-      "createdAt": "Ngày tạo"
-    },
-    "options": {
-      "sendTo": {
-        "all": "Toàn hệ thống",
-        "department": "Phòng ban/Bộ phận",
-        "user": "Nhân sự"
-      },
-      "type": {
-        "primary": "Thông báo mặc định",
-        "info": "Thông tin",
-        "warning": "Cảnh báo",
-        "error": "Khẩn cấp"
-      }
-    }
-  },
-  "chat": {
-    "text": "Tin nhắn",
-    "total": "Tổng",
-    "unseen": "Chưa đọc",
-    "search_conversation": "Tìm kiếm hội thoại",
-    "conversation": "Hội thoại",
-    "not_conversation": "Không có hội thoại nào",
-    "new_chat": "Bắt đầu trò chuyện mới",
-    "not_found_user": "Không tìm thấy người dùng",
-    "has_sent_image": "Đã gửi {count} ảnh",
-    "has_sent_file": "Đã gửi {count} file",
-    "has_sent_images_and_files": "Đã gửi {imageCount} ảnh và {fileCount} file",
-    "group": "Nhóm",
-    "choose_conversation": "Chọn một hội thoại",
-    "to_start_chat": "để bắt đầu trò chuyện",
-    "attach_file": "Đính kèm file (tối đa 10 file)",
-    "send_image": "Gửi ảnh (tối đa 10 ảnh)",
-    "enter_message": "Nhập tin nhắn...",
-    "enter_to_send_shift_to_wrap": "Nhấn Enter để gửi tin nhắn, hoặc Shift + Enter để xuống dòng"
-  },
-  "position": {
-    "text": "Chức vụ",
-    "position_and_contract": "Vị trí công việc và Hợp đồng của {name}",
-    "position": "Chức vụ",
-    "contract": "Hợp đồng",
-    "user_permission": "Phân quyền của người dùng",
-    "choose_position_to_view": " Chọn chức vụ để xem thông tin chi tiết",
-    "position_detail": "Thông tin chi tiết công việc",
-    "salary": "Lương thoả thuận",
-    "insurance_salary": "Lương đóng BHXH",
-    "insurance_code": "Mã số BHXH",
-    "probation_from": "Ngày bắt đầu thử việc",
-    "probation_to": "Ngày kết thúc thử việc",
-    "effective_from": "Ngày bắt đầu công việc chính thức (100% lương)",
-    "effective_to": "Ngày kết thúc công việc chính thức (100% lương)",
-    "allowances_optional": "Phụ cấp bổ sung (Nếu có)",
-    "position_and_permission": "Chức vụ và phân quyền của người dùng {name}",
-    "add_temp_position": "Thêm chức vụ tạm thời",
-    "please_update_position": "Vui lòng cập nhật vị trí công việc trước",
-    "primary": "Chính thức",
-    "temporary": "Tạm thời",
-    "startTemp": "Thời gian bắt đầu tạm thời",
-    "endTemp": "Thời gian kết thúc tạm thời",
-    "view_permission": "Xem phân quyền",
-    "permission_of_position": "Phân quyền của chức vụ {name}",
-    "delete_temporary_position": "Xóa chức vụ tạm thời",
-    "expired": "Hết hiệu lực",
-    "notification": "Bạn đã tạo phân quyền tùy chỉnh cho {count} module: {listModuleCustomPermission}. Các mục này sẽ được ưu tiên theo thiết lập riêng thay vì phân quyền tự động của hệ thống."
-  },
-  "contract": {
-    "text": "Hợp đồng",
-    "please_update_position": "Vui lòng cập nhật vị trí công việc trước khi tải hợp đồng lên hệ thống",
-    "upload_contract": "Tải lên hợp đồng",
-    "format_contract": "File hợp đồng phải có định dạng doc, docx, pdf",
-    "contract_list": "Danh sách hợp đồng",
-    "total_contracts": "Tổng số hợp đồng: {count}",
-    "no_contract": "Chưa có hợp đồng",
-    "file_name": "Tên file",
-    "file_format": "Định dạng",
-    "file_size": "Dung lượng",
-    "uploaded_at": "Ngày tải lên"
-  }
 }

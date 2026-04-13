@@ -157,6 +157,21 @@ export const routes = [
                         ).icon || "",
                 },
             },
+            {
+                path: "work-schedule",
+                name: NAME_ROUTES_CONFIG.workSchedule,
+                component: () => import("../pages/WorkSchedule/WorkSchedule.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.workSchedule,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.workSchedule,
+                        ).icon || "",
+                },
+            },
 ],
     },
 ];

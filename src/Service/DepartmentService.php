@@ -29,41 +29,47 @@ class DepartmentService
 
     public function findAll(array $params): array
     {
-        $qb = $this->boPhanRepository->createQueryBuilder('bp');
+        $qb = $this->boPhanRepository->createQueryBuilder("bp");
 
         $result = FilterWithPagination::findWithPagination(
             $qb,
             $params,
-            'bp',
+            "bp",
             [
-                'positionManager.name' => [
-                    'alias' => 'qlbp',
-                    'joinField' => 'bp.positions',
-                    'targetField' => 'name'
-                ]
+                "positionManager.name" => [
+                    "alias" => "qlbp",
+                    "joinField" => "bp.positions",
+                    "targetField" => "name",
+                ],
             ],
             [
-                'quanLyBoPhan' => function ($qb, array $filter, int $index): void {
-                    $subQb = $this->entityManager->createQueryBuilder()
-                        ->select('1')
-                        ->from(Position::class, 'mp')
-                        ->innerJoin('mp.userPositions', 'mup')
-                        ->innerJoin('mup.member', 'mu')
-                        ->andWhere('mp.department = bp')
-                        ->andWhere('mp.isManager = 1')
-                        ->andWhere('mup.isPrimary = 1')
-                        ->andWhere('mu.id IN (:managerIds)');
+                "quanLyBoPhan" => function (
+                    $qb,
+                    array $filter,
+                    int $index,
+                ): void {
+                    $subQb = $this->entityManager
+                        ->createQueryBuilder()
+                        ->select("1")
+                        ->from(Position::class, "mp")
+                        ->innerJoin("mp.userPositions", "mup")
+                        ->innerJoin("mup.member", "mu")
+                        ->andWhere("mp.department = bp")
+                        ->andWhere("mp.isManager = 1")
+                        ->andWhere("mup.isPrimary = 1")
+                        ->andWhere("mu.id IN (:managerIds)");
 
-                    $qb->andWhere($qb->expr()->exists($subQb->getDQL()))
-                        ->setParameter('managerIds', $filter['value']);
+                    $qb->andWhere(
+                        $qb->expr()->exists($subQb->getDQL()),
+                    )->setParameter("managerIds", $filter["value"]);
                 },
-            ]
+            ],
         );
 
         // Map collection to JSON
-        $result['collection'] = array_map(
+        $result["collection"] = array_map(
             fn(Department $item) => $item->jsonSerialize(),
-            $result['collection']
+            $result["collection"],
         );
 
         return $result;
@@ -74,7 +80,7 @@ class DepartmentService
         $item = $this->boPhanRepository->find($id);
 
         if (!$item) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         return $item->jsonSerialize();
@@ -84,22 +90,19 @@ class DepartmentService
     {
         $item = new Department();
 
-        // $user = $this->entityManager->find(User::class, $dto->quanLyBoPhanId);
-
-        // $checkExistQuanLy = $this->entityManager->getRepository(Department::class)->findOneBy([
-        //     'quanLyBoPhan' => $dto->quanLyBoPhanId,
-        // ]);
-
-        // if ($checkExistQuanLy) {
-        //     throw new \Exception(t('error.quan_ly_bo_phan_exist', ['%name%' => $user->getName(), '%bo_phan%' => $checkExistQuanLy->getTenBoPhan()]));
-        // }
-
-        $checkExistMaBoPhan = $this->entityManager->getRepository(Department::class)->findOneBy([
-            'maBoPhan' => $dto->maBoPhan,
-        ]);
+        $checkExistMaBoPhan = $this->entityManager
+            ->getRepository(Department::class)
+            ->findOneBy([
+                "maBoPhan" => $dto->maBoPhan,
+            ]);
 
         if ($checkExistMaBoPhan) {
-            throw new \Exception(t('error.bo_phan_exist', ['%name%' => $dto->tenBoPhan, '%ma_bo_phan%' => $dto->maBoPhan]));
+            throw new \Exception(
+                t("error.bo_phan_exist", [
+                    "%name%" => $dto->tenBoPhan,
+                    "%ma_bo_phan%" => $dto->maBoPhan,
+                ]),
+            );
         }
 
         $item->setTenBoPhan($dto->tenBoPhan);
@@ -118,7 +121,7 @@ class DepartmentService
         $item = $this->boPhanRepository->find($id);
 
         if (!$item) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         $item->setTenBoPhan($dto->tenBoPhan);
@@ -138,13 +141,18 @@ class DepartmentService
         $item = $this->boPhanRepository->find($id);
 
         if (!$item) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         $positions = $item->getPositions();
 
         if ($positions->count() > 0) {
-            throw new \Exception(t('error.bo_phan_has_position', ['%name%' => $item->getTenBoPhan(), '%ma_bo_phan%' => $item->getMaBoPhan()]));
+            throw new \Exception(
+                t("error.bo_phan_has_position", [
+                    "%name%" => $item->getTenBoPhan(),
+                    "%ma_bo_phan%" => $item->getMaBoPhan(),
+                ]),
+            );
         }
 
         $this->entityManager->remove($item);
@@ -153,23 +161,20 @@ class DepartmentService
 
     public function getDataSelect(array $params): array
     {
-        $qb = $this->boPhanRepository->createQueryBuilder('bp');
+        $qb = $this->boPhanRepository->createQueryBuilder("bp");
 
-        $result = FilterWithPagination::findWithPagination($qb, $params, 'bp');
+        $result = FilterWithPagination::findWithPagination($qb, $params, "bp");
 
         // Map collection to JSON
-        $result['collection'] = array_map(
-            function (Department $boPhan) {
-                $data = $boPhan->jsonSerialize();
-                return [
-                    'label' => $data['tenBoPhan'] . ' (' . $data['maBoPhan'] . ')',
-                    'value' => $data['id'],
-                ];
-            },
-            $result['collection']
-        );
+        $result["collection"] = array_map(function (Department $boPhan) {
+            $data = $boPhan->jsonSerialize();
+            return [
+                "label" => $data["tenBoPhan"] . " (" . $data["maBoPhan"] . ")",
+                "value" => $data["id"],
+            ];
+        }, $result["collection"]);
 
-        return $result['collection'];
+        return $result["collection"];
     }
 
     public function getPositions(int $boPhanId): array
@@ -177,12 +182,12 @@ class DepartmentService
         $boPhan = $this->boPhanRepository->find($boPhanId);
 
         if (!$boPhan) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         return array_map(
             fn(Position $position) => $position->jsonSerialize(),
-            $boPhan->getPositions()->toArray()
+            $boPhan->getPositions()->toArray(),
         );
     }
 
@@ -191,7 +196,7 @@ class DepartmentService
         $boPhan = $this->boPhanRepository->find($boPhanId);
 
         if (!$boPhan) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         $position = new Position();
@@ -219,12 +224,17 @@ class DepartmentService
         return $position->jsonSerialize();
     }
 
-    public function updatePosition(int $boPhanId, int $positionId, PositionDTO $dto): array
-    {
-        $position = $this->entityManager->getRepository(Position::class)->find($positionId);
+    public function updatePosition(
+        int $boPhanId,
+        int $positionId,
+        PositionDTO $dto,
+    ): array {
+        $position = $this->entityManager
+            ->getRepository(Position::class)
+            ->find($positionId);
 
         if (!$position || $position->getDepartment()?->getId() !== $boPhanId) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         $position->setCode($dto->code);
@@ -250,10 +260,16 @@ class DepartmentService
     public function deletePosition(int $boPhanId, int $positionId): void
     {
         $boPhan = $this->boPhanRepository->find($boPhanId);
-        $position = $this->entityManager->getRepository(Position::class)->find($positionId);
+        $position = $this->entityManager
+            ->getRepository(Position::class)
+            ->find($positionId);
 
-        if (!$boPhan || !$position || $position->getDepartment()?->getId() !== $boPhanId) {
-            throw new \Exception(t('error.not_found'));
+        if (
+            !$boPhan ||
+            !$position ||
+            $position->getDepartment()?->getId() !== $boPhanId
+        ) {
+            throw new \Exception(t("error.not_found"));
         }
 
         $positionCode = $position->getCode();
@@ -270,12 +286,14 @@ class DepartmentService
         $this->entityManager->flush();
     }
 
-    public function updatePositionPermissions(int $boPhanId, array $permissions): array
-    {
+    public function updatePositionPermissions(
+        int $boPhanId,
+        array $permissions,
+    ): array {
         $department = $this->boPhanRepository->find($boPhanId);
 
         if (!$department) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         $positions = $department->getPositions();
@@ -285,13 +303,17 @@ class DepartmentService
         $affectedUserIds = [];
 
         foreach ($positions as $position) {
-            $userPermissions = $this->entityManager->getRepository(UserPermission::class)->findBy([
-                'departmentId' => $department->getId(),
-                'positionId' => $position->getId()
-            ]);
+            $userPermissions = $this->entityManager
+                ->getRepository(UserPermission::class)
+                ->findBy([
+                    "departmentId" => $department->getId(),
+                    "positionId" => $position->getId(),
+                ]);
 
             foreach ($userPermissions as $userPermission) {
-                $userPermission->setPhanQuyen($permissions[$position->getCode()] ?? []);
+                $userPermission->setPhanQuyen(
+                    $permissions[$position->getCode()] ?? [],
+                );
                 $affectedUserIds[$userPermission->getUserId()] = true;
             }
         }
@@ -310,46 +332,48 @@ class DepartmentService
         $user = $this->entityManager->getRepository(User::class)->find($userId);
 
         if (!$user) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         $currentTimeStamp = time();
         $cacheKey = CacheKey::USER_PERMISSION . $userId;
 
-        $repository = $this->entityManager->getRepository(UserPermission::class);
+        $repository = $this->entityManager->getRepository(
+            UserPermission::class,
+        );
 
         // Lấy các permission đang có hiệu lực tại thời điểm hiện tại
         $activeQb = $repository
-            ->createQueryBuilder('up')
-            ->andWhere('up.userId = :userId')
-            ->andWhere('(up.startTemp <= :currentTimeStamp OR up.startTemp IS NULL)')
-            ->andWhere('(up.endTemp > :currentTimeStamp OR up.endTemp IS NULL)')
-            ->setParameter('userId', $userId)
-            ->setParameter('currentTimeStamp', $currentTimeStamp);
+            ->createQueryBuilder("up")
+            ->andWhere("up.userId = :userId")
+            ->andWhere(
+                "(up.startTemp <= :currentTimeStamp OR up.startTemp IS NULL)",
+            )
+            ->andWhere("(up.endTemp > :currentTimeStamp OR up.endTemp IS NULL)")
+            ->setParameter("userId", $userId)
+            ->setParameter("currentTimeStamp", $currentTimeStamp);
 
-        $userPermissions = (clone $activeQb)
-            ->getQuery()
-            ->getResult();
+        $userPermissions = (clone $activeQb)->getQuery()->getResult();
 
         // Tìm mốc start gần nhất trong tương lai
         $minFutureStart = $repository
-            ->createQueryBuilder('up')
-            ->select('MIN(up.startTemp)')
-            ->andWhere('up.userId = :userId')
-            ->andWhere('up.startTemp > :currentTimeStamp')
-            ->setParameter('userId', $userId)
-            ->setParameter('currentTimeStamp', $currentTimeStamp)
+            ->createQueryBuilder("up")
+            ->select("MIN(up.startTemp)")
+            ->andWhere("up.userId = :userId")
+            ->andWhere("up.startTemp > :currentTimeStamp")
+            ->setParameter("userId", $userId)
+            ->setParameter("currentTimeStamp", $currentTimeStamp)
             ->getQuery()
             ->getSingleScalarResult();
 
         // Tìm mốc end gần nhất trong tương lai
         $minFutureEnd = $repository
-            ->createQueryBuilder('up')
-            ->select('MIN(up.endTemp)')
-            ->andWhere('up.userId = :userId')
-            ->andWhere('up.endTemp > :currentTimeStamp')
-            ->setParameter('userId', $userId)
-            ->setParameter('currentTimeStamp', $currentTimeStamp)
+            ->createQueryBuilder("up")
+            ->select("MIN(up.endTemp)")
+            ->andWhere("up.userId = :userId")
+            ->andWhere("up.endTemp > :currentTimeStamp")
+            ->setParameter("userId", $userId)
+            ->setParameter("currentTimeStamp", $currentTimeStamp)
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -381,22 +405,25 @@ class DepartmentService
             $permissions = $up->getPhanQuyen() ?? [];
 
             foreach ($permissions as $perm) {
-                if (!isset($perm['name']) || !is_array($perm['actions'] ?? null)) {
+                if (
+                    !isset($perm["name"]) ||
+                    !is_array($perm["actions"] ?? null)
+                ) {
                     continue;
                 }
 
-                $permissionName = $perm['name'];
+                $permissionName = $perm["name"];
 
                 if (isset($customModulesByName[$permissionName])) {
                     if (!isset($merged[$permissionName])) {
                         $merged[$permissionName] =
-                            $customModulesByName[$permissionName]['actions'] ??
+                            $customModulesByName[$permissionName]["actions"] ??
                             [];
                     }
                     continue;
                 }
 
-                $actions = $perm['actions'];
+                $actions = $perm["actions"];
 
                 if (!isset($merged[$permissionName])) {
                     $merged[$permissionName] = [];
@@ -404,7 +431,8 @@ class DepartmentService
 
                 foreach ($actions as $action => $value) {
                     $merged[$permissionName][$action] =
-                        ($merged[$permissionName][$action] ?? false) || (bool) $value;
+                        ($merged[$permissionName][$action] ?? false) ||
+                        (bool) $value;
                 }
             }
         }
@@ -412,8 +440,8 @@ class DepartmentService
         $result = [];
         foreach ($merged as $name => $actions) {
             $result[] = [
-                'name' => $name,
-                'actions' => $actions,
+                "name" => $name,
+                "actions" => $actions,
             ];
         }
 
@@ -422,7 +450,10 @@ class DepartmentService
 
         // Nếu có mốc thay đổi sắp tới thì cache chỉ sống tới mốc đó
         if ($nextBoundary !== null) {
-            $cacheTtl = max(1, min($cacheTtl, $nextBoundary - $currentTimeStamp));
+            $cacheTtl = max(
+                1,
+                min($cacheTtl, $nextBoundary - $currentTimeStamp),
+            );
         }
 
         $this->cacheService->set($cacheKey, $result, $cacheTtl);
@@ -431,16 +462,23 @@ class DepartmentService
     public function getCachedUserPermissions(int $userId): array
     {
         $cacheKey = CacheKey::USER_PERMISSION . $userId;
-        $lockKey = CacheKey::USER_PERMISSION . 'lock_' . $userId;
+        $lockKey = CacheKey::USER_PERMISSION . "lock_" . $userId;
 
-        for ($attempt = 0; $attempt < $this->userPermissionLockMaxAttempts; $attempt++) {
+        for (
+            $attempt = 0;
+            $attempt < $this->userPermissionLockMaxAttempts;
+            $attempt++
+        ) {
             $userPermissions = $this->cacheService->get($cacheKey);
 
             if ($userPermissions !== null) {
                 return $userPermissions ?? [];
             }
 
-            $lockToken = $this->cacheService->acquireLock($lockKey, $this->userPermissionLockTtl);
+            $lockToken = $this->cacheService->acquireLock(
+                $lockKey,
+                $this->userPermissionLockTtl,
+            );
 
             if ($lockToken !== null) {
                 try {
@@ -448,7 +486,10 @@ class DepartmentService
 
                     if ($userPermissions === null) {
                         $this->mergeUserPermissions($userId);
-                        $userPermissions = $this->cacheService->get($cacheKey, []);
+                        $userPermissions = $this->cacheService->get(
+                            $cacheKey,
+                            [],
+                        );
                     }
 
                     return $userPermissions ?? [];
@@ -463,5 +504,47 @@ class DepartmentService
         $this->mergeUserPermissions($userId);
 
         return $this->cacheService->get($cacheKey, []) ?? [];
+    }
+
+    public function getMembersByDepartment(int $boPhanId): array
+    {
+        $department = $this->boPhanRepository->find($boPhanId);
+
+        if (!$department) {
+            throw new \Exception(t("error.not_found"));
+        }
+
+        $members = [];
+
+        foreach ($department->getUserPositions() as $userPosition) {
+            $member = $userPosition->getMember();
+
+            if (
+                (int) $userPosition->getStatus() !== 1 ||
+                !$member ||
+                $member->getStatus() !== 1 ||
+                $member->getId() === null
+            ) {
+                continue;
+            }
+
+            $memberId = $member->getId();
+
+            if (!isset($members[$memberId])) {
+                $members[$memberId] = $member->jsonSerialize();
+            }
+        }
+
+        $members = array_values($members);
+
+        usort(
+            $members,
+            fn(array $left, array $right): int => strcasecmp(
+                $left["name"] ?? "",
+                $right["name"] ?? "",
+            ),
+        );
+
+        return $members;
     }
 }

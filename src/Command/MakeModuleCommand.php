@@ -30,7 +30,8 @@ class MakeModuleCommand extends Command
     {
         $this
             ->addArgument('module', InputArgument::REQUIRED, 'Tên module (VD: UserManagement)')
-            ->addOption('entity', null, InputOption::VALUE_REQUIRED, 'Tên Entity (VD: User)');
+            ->addOption('entity', null, InputOption::VALUE_REQUIRED, 'Tên Entity (VD: User)')
+            ->addOption('no-entity', null, InputOption::VALUE_NONE, 'Dùng entity mặc định là Example');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -39,18 +40,26 @@ class MakeModuleCommand extends Command
 
         $moduleName = $input->getArgument('module');
         $entityName = $input->getOption('entity');
+        $useDefaultEntity = (bool) $input->getOption('no-entity');
+
+        if ($useDefaultEntity) {
+            $entityName = 'Example';
+            $io->note('Đang sử dụng option --no-entity, các chỗ liên quan entity sẽ dùng placeholder Example.');
+        }
 
         // Nếu không nhập --entity thì tự động lấy tên module làm tên entity
-        if (!$entityName) {
+        if (!$useDefaultEntity && !$entityName) {
             $entityName = $moduleName;
             $io->note("Không tìm thấy option --entity, tự động sử dụng tên module: {$entityName}");
         }
 
-        // Validate entity exists
-        $entityPath = $this->projectDir . '/src/Entity/' . $entityName . '.php';
-        if (!file_exists($entityPath)) {
-            $io->error("Entity '{$entityName}' không tồn tại tại: {$entityPath}");
-            return Command::FAILURE;
+        // Validate entity exists when using a real entity name
+        if (!$useDefaultEntity) {
+            $entityPath = $this->projectDir . '/src/Entity/' . $entityName . '.php';
+            if (!file_exists($entityPath)) {
+                $io->error("Entity '{$entityName}' không tồn tại tại: {$entityPath}");
+                return Command::FAILURE;
+            }
         }
 
         // Prepare placeholders
@@ -89,6 +98,7 @@ class MakeModuleCommand extends Command
                 'Lưu ý: Cập nhật properties trong DTO (xem TODO comments)',
                 'Và cập nhật logic mapping trong Service (xem TODO comments)',
                 'Permission mặc định đã được thêm vào config/permission.php (kiểm tra và điều chỉnh nếu cần)',
+                'Nếu dùng --no-entity, hãy thay Example và các import/repository liên quan bằng entity thực tế sau đó.',
             ]);
 
             return Command::SUCCESS;

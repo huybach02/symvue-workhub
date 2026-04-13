@@ -47,7 +47,8 @@
         "user_management_user": "Nhân sự",
         "lich_su_import": "Lịch sử import",
         "bo_phan": "Phòng ban/Bộ phận",
-        "thong_bao": "Quản lý thông báo"
+        "thong_bao": "Quản lý thông báo",
+        "work_schedule": "WorkSchedule"
     },
     "gender": {
         "male": "Nam",

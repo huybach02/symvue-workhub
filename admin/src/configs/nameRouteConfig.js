@@ -12,4 +12,5 @@ export const NAME_ROUTES_CONFIG = {
     lichSuImport: "system.lichSuImport",
     boPhan: "system.boPhan",
     thongBao: "system.thongBao",
+    workSchedule: "system.workSchedule",
 };

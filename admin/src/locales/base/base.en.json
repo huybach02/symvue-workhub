@@ -47,7 +47,8 @@
         "user_management_user": "User",
         "lich_su_import": "Import history",
         "bo_phan": "Departments",
-        "thong_bao": "Notification"
+        "thong_bao": "Notification",
+        "work_schedule": "WorkSchedule"
     },
     "gender": {
         "male": "Male",

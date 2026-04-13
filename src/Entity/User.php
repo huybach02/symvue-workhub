@@ -142,6 +142,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?UserHasCustomPermission $userHasCustomPermission = null;
 
+    /**
+     * @var Collection<int, ShiftAssignment>
+     */
+    #[ORM\OneToMany(targetEntity: ShiftAssignment::class, mappedBy: 'member')]
+    private Collection $shiftAssignments;
+
+    /**
+     * @var Collection<int, LeaveSchedule>
+     */
+    #[ORM\OneToMany(targetEntity: LeaveSchedule::class, mappedBy: 'member')]
+    private Collection $leaveSchedules;
+
+    /**
+     * @var Collection<int, FixedScheduleGroup>
+     */
+    #[ORM\OneToMany(targetEntity: FixedScheduleGroup::class, mappedBy: 'member')]
+    private Collection $fixedScheduleGroups;
+
+    /**
+     * @var Collection<int, FixedScheduleOverride>
+     */
+    #[ORM\OneToMany(targetEntity: FixedScheduleOverride::class, mappedBy: 'member')]
+    private Collection $fixedScheduleOverrides;
+
     public function __construct()
     {
         $this->folders = new ArrayCollection();
@@ -149,6 +173,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
         $this->boPhans = new ArrayCollection();
         $this->messages = new ArrayCollection();
         $this->userPositions = new ArrayCollection();
+        $this->shiftAssignments = new ArrayCollection();
+        $this->leaveSchedules = new ArrayCollection();
+        $this->fixedScheduleGroups = new ArrayCollection();
+        $this->fixedScheduleOverrides = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -505,6 +533,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
             'image' => $this->image,
             'description' => $this->description,
             'status' => $this->status,
+            'hinhThucLamViec' => $this->hinhThucLamViec,
             'maNhanVien' => $this->maNhanVien,
             'cmnd' => $this->cmnd,
             'ngayCapCmnd' => $this->ngayCapCmnd,
@@ -662,6 +691,126 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
         }
 
         $this->userHasCustomPermission = $userHasCustomPermission;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ShiftAssignment>
+     */
+    public function getShiftAssignments(): Collection
+    {
+        return $this->shiftAssignments;
+    }
+
+    public function addShiftAssignment(ShiftAssignment $shiftAssignment): static
+    {
+        if (!$this->shiftAssignments->contains($shiftAssignment)) {
+            $this->shiftAssignments->add($shiftAssignment);
+            $shiftAssignment->setMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShiftAssignment(ShiftAssignment $shiftAssignment): static
+    {
+        if ($this->shiftAssignments->removeElement($shiftAssignment)) {
+            // set the owning side to null (unless already changed)
+            if ($shiftAssignment->getMember() === $this) {
+                $shiftAssignment->setMember(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, LeaveSchedule>
+     */
+    public function getLeaveSchedules(): Collection
+    {
+        return $this->leaveSchedules;
+    }
+
+    public function addLeaveSchedule(LeaveSchedule $leaveSchedule): static
+    {
+        if (!$this->leaveSchedules->contains($leaveSchedule)) {
+            $this->leaveSchedules->add($leaveSchedule);
+            $leaveSchedule->setMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLeaveSchedule(LeaveSchedule $leaveSchedule): static
+    {
+        if ($this->leaveSchedules->removeElement($leaveSchedule)) {
+            // set the owning side to null (unless already changed)
+            if ($leaveSchedule->getMember() === $this) {
+                $leaveSchedule->setMember(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FixedScheduleGroup>
+     */
+    public function getFixedScheduleGroups(): Collection
+    {
+        return $this->fixedScheduleGroups;
+    }
+
+    public function addFixedScheduleGroup(FixedScheduleGroup $fixedScheduleGroup): static
+    {
+        if (!$this->fixedScheduleGroups->contains($fixedScheduleGroup)) {
+            $this->fixedScheduleGroups->add($fixedScheduleGroup);
+            $fixedScheduleGroup->setMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFixedScheduleGroup(FixedScheduleGroup $fixedScheduleGroup): static
+    {
+        if ($this->fixedScheduleGroups->removeElement($fixedScheduleGroup)) {
+            // set the owning side to null (unless already changed)
+            if ($fixedScheduleGroup->getMember() === $this) {
+                $fixedScheduleGroup->setMember(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FixedScheduleOverride>
+     */
+    public function getFixedScheduleOverrides(): Collection
+    {
+        return $this->fixedScheduleOverrides;
+    }
+
+    public function addFixedScheduleOverride(FixedScheduleOverride $fixedScheduleOverride): static
+    {
+        if (!$this->fixedScheduleOverrides->contains($fixedScheduleOverride)) {
+            $this->fixedScheduleOverrides->add($fixedScheduleOverride);
+            $fixedScheduleOverride->setMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFixedScheduleOverride(FixedScheduleOverride $fixedScheduleOverride): static
+    {
+        if ($this->fixedScheduleOverrides->removeElement($fixedScheduleOverride)) {
+            // set the owning side to null (unless already changed)
+            if ($fixedScheduleOverride->getMember() === $this) {
+                $fixedScheduleOverride->setMember(null);
+            }
+        }
 
         return $this;
     }

@@ -65,4 +65,10 @@ export const menuSidebar = [
         value: NAME_ROUTES_CONFIG.thongBao,
         to: { name: NAME_ROUTES_CONFIG.thongBao },
     },
+    {
+        title: i18n.global.t("sidebar.work_schedule"),
+        icon: "mdi-view-dashboard",
+        value: NAME_ROUTES_CONFIG.workSchedule,
+        to: { name: NAME_ROUTES_CONFIG.workSchedule },
+    },
 ];

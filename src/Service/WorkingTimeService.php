@@ -21,12 +21,14 @@ class WorkingTimeService
 
     public function findAll(): array
     {
-        // Order by bÃ¡ÂºÂ¯t buÃ¡Â»â„¢c phÃ¡ÂºÂ£i theo thÃ¡Â»Â© tÃ¡Â»Â± ThÃ¡Â»Â© 2 Ã„â€˜Ã¡ÂºÂ¿n ChÃ¡Â»Â§ NhÃ¡ÂºÂ­t
-        $thoiGianLamViecList = $this->thoiGianLamViecRepository->findBy([], ['id' => 'ASC']);
+        $thoiGianLamViecList = $this->thoiGianLamViecRepository->findBy(
+            [],
+            ["id" => "ASC"],
+        );
 
         return array_map(
             fn(WorkingTime $item) => $item->jsonSerialize(),
-            $thoiGianLamViecList
+            $thoiGianLamViecList,
         );
     }
 
@@ -54,16 +56,18 @@ class WorkingTimeService
 
     public function createParttime(WorkShiftDTO $caLamViecDTO)
     {
-        $thoiGianLamViec = $this->thoiGianLamViecRepository->find($caLamViecDTO->thoiGianLamViecId);
+        $thoiGianLamViec = $this->thoiGianLamViecRepository->find(
+            $caLamViecDTO->thoiGianLamViecId,
+        );
         if (!$thoiGianLamViec) {
             throw new \Exception(t("error.not_found"));
         }
 
         // KiÃ¡Â»Æ’m tra ca lÃƒÂ m viÃ¡Â»â€¡c Ã„â€˜ÃƒÂ£ tÃ¡Â»â€œn tÃ¡ÂºÂ¡i hay chÃ†Â°a
         $caLamViec = $this->caLamViecRepository->findOneBy([
-            'thoiGianLamViec' => $thoiGianLamViec,
-            'gioBatDau' => $caLamViecDTO->gioBatDau,
-            'gioKetThuc' => $caLamViecDTO->gioKetThuc
+            "thoiGianLamViec" => $thoiGianLamViec,
+            "gioBatDau" => $caLamViecDTO->gioBatDau,
+            "gioKetThuc" => $caLamViecDTO->gioKetThuc,
         ]);
         if ($caLamViec) {
             throw new \Exception(t("error.exists"));
@@ -81,15 +85,19 @@ class WorkingTimeService
         return $caLamViec->jsonSerialize();
     }
 
-    public function findAllParttimeByThoiGianLamViecId(int $thoiGianLamViecId): array
-    {
-        $caLamViecList = $this->caLamViecRepository->findBy([
-            'thoiGianLamViec' => $thoiGianLamViecId
-        ], ['gioBatDau' => 'ASC', 'gioKetThuc' => 'ASC']);
+    public function findAllParttimeByThoiGianLamViecId(
+        int $thoiGianLamViecId,
+    ): array {
+        $caLamViecList = $this->caLamViecRepository->findBy(
+            [
+                "thoiGianLamViec" => $thoiGianLamViecId,
+            ],
+            ["gioBatDau" => "ASC", "gioKetThuc" => "ASC"],
+        );
 
         return array_map(
             fn(WorkShift $item) => $item->jsonSerialize(),
-            $caLamViecList
+            $caLamViecList,
         );
     }
 }

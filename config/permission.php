@@ -6,8 +6,8 @@ return [
         "actions" => [
             "index" => true,
             "edit" => true,
-            "showMenu" => true
-        ]
+            "showMenu" => true,
+        ],
     ],
     [
         "name" => "thoi-gian-lam-viec",
@@ -17,8 +17,8 @@ return [
             "show" => true,
             "edit" => true,
             "delete" => true,
-            "showMenu" => true
-        ]
+            "showMenu" => true,
+        ],
     ],
     [
         "name" => "nguoi-dung",
@@ -30,8 +30,8 @@ return [
             "delete" => true,
             "export" => true,
             "import" => true,
-            "showMenu" => true
-        ]
+            "showMenu" => true,
+        ],
     ],
     [
         "name" => "vai-tro",
@@ -41,8 +41,8 @@ return [
             "show" => true,
             "edit" => true,
             "delete" => true,
-            "showMenu" => true
-        ]
+            "showMenu" => true,
+        ],
     ],
     [
         "name" => "bo-phan",
@@ -52,8 +52,8 @@ return [
             "show" => true,
             "edit" => true,
             "delete" => true,
-            "showMenu" => true
-        ]
+            "showMenu" => true,
+        ],
     ],
     [
         "name" => "thong-bao",
@@ -61,6 +61,17 @@ return [
             "index" => true,
             "create" => true,
             "showMenu" => true,
-        ]
+        ],
+    ],
+    [
+        "name" => "work-schedule",
+        "actions" => [
+            "index" => true,
+            "create" => true,
+            "show" => true,
+            "edit" => true,
+            "delete" => true,
+            "showMenu" => true,
+        ],
     ],
 ];
