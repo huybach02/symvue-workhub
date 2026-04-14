@@ -18,6 +18,17 @@ final class WorkScheduleController extends AbstractController
         private readonly WorkScheduleService $workScheduleService,
     ) {}
 
+    #[Route("/work-schedule/holiday-schedule", methods: ["GET"])]
+    public function getHolidaySchedule(): JsonResponse
+    {
+        try {
+            $data = $this->workScheduleService->getHolidaySchedule();
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
     #[Route("/work-schedule/fulltime/{departmentId}", methods: ["GET"])]
     public function getFulltime(int $departmentId): JsonResponse
     {

@@ -3,6 +3,7 @@ import auth from "./modules/auth";
 import media from "./modules/media";
 import mercure from "./modules/mercure";
 import chat from "./modules/chat";
+import workSchedule from "./modules/workSchedule";
 
 const store = createStore({
     state() {
@@ -24,6 +25,7 @@ const store = createStore({
         media,
         mercure,
         chat,
+        workSchedule,
     },
 });
 

@@ -98,4 +98,17 @@ final class Constanst
         'private' => 'private',
         'department' => 'department',
     ];
+
+    const HOLIDAY_SCHEDULE = [
+        "Tết dương lịch" => "1/1",
+        "Ngày Chiến thắng" => "30/4",
+        "Quốc tế Lao động" => "1/5",
+        "Quốc khánh" => "2/9"
+    ];
+
+    const LUNAR_HOLIDAY = [
+        "Mùng 1 Tết" => "01/01",
+        "Mùng 2 Tết" => "01/02",
+        "Mùng 3 Tết" => "01/03",
+    ];
 }

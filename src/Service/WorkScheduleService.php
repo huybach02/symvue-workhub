@@ -10,11 +10,13 @@ use App\Entity\Example;
 use App\Entity\FixedSchedule;
 use App\Entity\FixedScheduleGroup;
 use App\Entity\FixedScheduleOverride;
+use App\Entity\HolidaySchedule;
 use App\Entity\LeaveSchedule;
 use App\Entity\User;
 use App\Repository\ExampleRepository;
 use App\Repository\FixedScheduleGroupRepository;
 use App\Repository\FixedScheduleOverrideRepository;
+use App\Repository\HolidayScheduleRepository;
 use App\Repository\LeaveScheduleRepository;
 use App\Repository\UserRepository;
 use App\Repository\WorkingTimeRepository;
@@ -26,11 +28,42 @@ class WorkScheduleService
         private readonly EntityManagerInterface $entityManager,
         private readonly UserRepository $userRepository,
         private readonly WorkingTimeRepository $workingTimeRepository,
+        private readonly HolidayScheduleRepository $holidayScheduleRepository,
         private readonly FixedScheduleGroupRepository $fixedScheduleGroupRepository,
         private readonly FixedScheduleOverrideRepository $fixedScheduleOverrideRepository,
         private readonly LeaveScheduleRepository $leaveScheduleRepository,
         private readonly DepartmentService $departmentService,
     ) {}
+
+    public function getHolidaySchedule(): array
+    {
+        $holidaySchedules = $this->holidayScheduleRepository->findBy(
+            ["status" => true],
+            ["date" => "ASC", "id" => "ASC"],
+        );
+
+        $holidayRanges = [];
+
+        foreach ($holidaySchedules as $holidaySchedule) {
+            $date = $holidaySchedule->getDate();
+            $year = $holidaySchedule->getYear();
+
+            if (!$date instanceof \DateTime || $year === null) {
+                continue;
+            }
+
+            $holidayRanges[$year][] = [
+                "id" => $holidaySchedule->getId(),
+                "code" => $holidaySchedule->getCode() ?? "",
+                "name" => $holidaySchedule->getName() ?? "",
+                "start" => $date->format("Y-m-d"),
+                "end" => $date->format("Y-m-d"),
+                "status" => $holidaySchedule->isStatus(),
+            ];
+        }
+
+        return $holidayRanges;
+    }
 
     public function getFulltime(int $departmentId): array
     {
@@ -103,6 +136,7 @@ class WorkScheduleService
                 $members,
             ),
             "events" => array_values($events),
+            "holidayRanges" => $this->getHolidaySchedule(),
         ];
     }
 

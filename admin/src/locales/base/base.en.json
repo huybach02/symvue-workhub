@@ -19,7 +19,8 @@
         "view": "View",
         "note": "Note:",
         "yesterday": "Yesterday",
-        "today": "Today"
+        "today": "Today",
+        "mobile_alert": "This feature is not available on mobile. Please use on desktop."
     },
     "title": {
         "create": "Create",

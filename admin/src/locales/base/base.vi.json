@@ -19,7 +19,8 @@
         "view": "Xem",
         "note": "Ghi chú: ",
         "yesterday": "Hôm qua",
-        "today": "Hôm nay"
+        "today": "Hôm nay",
+        "mobile_alert": "Chức năng này chưa khả dụng trên mobile. Vui lòng sử dụng trên máy tính."
     },
     "title": {
         "create": "Thêm mới",

@@ -173,44 +173,6 @@ import updateLocale from "dayjs/plugin/updateLocale";
 const DAY_MODE_START_HOUR = 0;
 const DAY_MODE_END_HOUR = 23;
 
-const VIETNAM_HOLIDAY_RANGES = {
-    2025: [
-        { name: "Tết Dương lịch", start: "2025-01-01", end: "2025-01-01" },
-        { name: "Tết Nguyên đán", start: "2025-01-25", end: "2025-02-02" },
-        {
-            name: "Giỗ Tổ Hùng Vương",
-            start: "2025-04-07",
-            end: "2025-04-07",
-        },
-        {
-            name: "Nghỉ lễ 30/4 - 1/5",
-            start: "2025-04-30",
-            end: "2025-05-04",
-        },
-        { name: "Quốc khánh", start: "2025-08-30", end: "2025-09-02" },
-    ],
-    2026: [
-        { name: "Tết Dương lịch", start: "2026-01-01", end: "2026-01-04" },
-        { name: "Tết Nguyên đán", start: "2026-02-16", end: "2026-02-20" },
-        {
-            name: "Giỗ Tổ Hùng Vương",
-            start: "2026-04-26",
-            end: "2026-04-27",
-        },
-        {
-            name: "Ngày Chiến thắng",
-            start: "2026-04-30",
-            end: "2026-04-30",
-        },
-        {
-            name: "Ngày Quốc tế Lao động",
-            start: "2026-05-01",
-            end: "2026-05-01",
-        },
-        { name: "Quốc khánh", start: "2026-08-31", end: "2026-09-02" },
-    ],
-};
-
 // Cấu hình Dayjs để tuần bắt đầu vào Thứ 2
 dayjs.extend(updateLocale);
 dayjs.updateLocale("vi", {
@@ -314,7 +276,8 @@ export default {
         getHolidayInfo(date) {
             const dateValue = date.format("YYYY-MM-DD");
             const year = date.year();
-            const holidayRanges = VIETNAM_HOLIDAY_RANGES[year] ?? [];
+            const holidayRanges =
+                this.$store.getters["workSchedule/holidaySchedule"][year] ?? [];
             const matchedHoliday = holidayRanges.find(
                 (holiday) =>
                     dateValue >= holiday.start && dateValue <= holiday.end,

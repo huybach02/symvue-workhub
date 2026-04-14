@@ -21,7 +21,6 @@ class KeepAliveDatabaseCommand extends Command
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly DepartmentService $boPhanService,
     ) {
         parent::__construct();
     }
