@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\FixedScheduleOverride;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +17,46 @@ class FixedScheduleOverrideRepository extends ServiceEntityRepository
         parent::__construct($registry, FixedScheduleOverride::class);
     }
 
-    //    /**
-    //     * @return FixedScheduleOverride[] Returns an array of FixedScheduleOverride objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('f')
-    //            ->andWhere('f.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('f.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function hasFulltimeOverrideOverlap(User $user, \DateTimeInterface $startDate, \DateTimeInterface $endDate): bool
+    {
+        $count = $this->createQueryBuilder('f')
+            ->select('COUNT(f.id)')
+            ->andWhere('f.member = :member')
+            ->andWhere('f.type = :type')
+            ->andWhere('f.startDate <= :endDate')
+            ->andWhere('f.endDate >= :startDate')
+            ->setParameter('member', $user)
+            ->setParameter('type', 'fulltime')
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->getQuery()
+            ->getSingleScalarResult();
 
-    //    public function findOneBySomeField($value): ?FixedScheduleOverride
-    //    {
-    //        return $this->createQueryBuilder('f')
-    //            ->andWhere('f.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return (int) $count > 0;
+    }
+
+    public function findOverlappingOverrides(User $user, \DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    {
+        return $this->createQueryBuilder('f')
+            ->andWhere('f.member = :member')
+            ->andWhere('f.type = :type')
+            ->andWhere('f.startDate <= :endDate')
+            ->andWhere('f.endDate >= :startDate')
+            ->setParameter('member', $user)
+            ->setParameter('type', 'fulltime')
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function clearOverridesByUser(int $userId): void
+    {
+        $this->createQueryBuilder('f')
+            ->delete()
+            ->andWhere('f.member = :userId')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->execute();
+    }
 }

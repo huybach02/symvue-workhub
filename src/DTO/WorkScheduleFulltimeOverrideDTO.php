@@ -1,0 +1,29 @@
+<?php
+
+namespace App\DTO;
+
+use Symfony\Component\Validator\Constraints as Assert;
+
+class WorkScheduleFulltimeOverrideDTO
+{
+    public function __construct(
+        #[Assert\NotBlank(groups: ["create", "update"])]
+        #[Assert\Type("integer", groups: ["create", "update"])]
+        public readonly int $userId = 0,
+
+        #[Assert\NotBlank(groups: ["create", "update"])]
+        public readonly ?string $startDate = null,
+
+        #[Assert\NotBlank(groups: ["create", "update"])]
+        public readonly ?string $endDate = null,
+
+        #[Assert\NotBlank(groups: ["create", "update"])]
+        public readonly ?string $startTime = null,
+
+        #[Assert\NotBlank(groups: ["create", "update"])]
+        public readonly ?string $endTime = null,
+
+        public readonly ?string $note = null,
+
+    ) {}
+}

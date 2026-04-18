@@ -87,11 +87,41 @@
             <tbody v-if="currentMode !== 'day'">
                 <tr v-for="user in users" :key="user.id">
                     <td class="sticky-col-left user-cell">
-                        <v-list-item
-                            :prepend-avatar="user.image"
-                            :title="user.name"
-                            class="px-0"
-                        />
+                        <div class="d-flex align-center justify-space-between">
+                            <v-list-item
+                                :prepend-avatar="user.image"
+                                :title="user.name"
+                                class="px-0 flex-grow-1"
+                            />
+                            <v-menu
+                                v-if="hasUserFixedSchedule(user)"
+                                :close-on-content-click="true"
+                                location="top"
+                            >
+                                <template #activator="{ props }">
+                                    <v-btn
+                                        v-bind="props"
+                                        icon="mdi-dots-vertical"
+                                        variant="text"
+                                        density="compact"
+                                        @click="selectedUser = user"
+                                    />
+                                </template>
+                                <v-list density="compact">
+                                    <v-list-item
+                                        prepend-icon="mdi-calendar-plus"
+                                        title="Thêm lịch thay thế"
+                                        @click="handleAddOverride(user)"
+                                    />
+                                    <v-list-item
+                                        prepend-icon="mdi-calendar-remove"
+                                        title="Xóa lịch làm việc"
+                                        class="text-error"
+                                        @click="handleClearSchedule(user)"
+                                    />
+                                </v-list>
+                            </v-menu>
+                        </div>
                     </td>
 
                     <td
@@ -135,11 +165,42 @@
             <tbody v-else>
                 <tr v-for="user in users" :key="user.id">
                     <td class="sticky-col-left user-cell">
-                        <v-list-item
-                            :prepend-avatar="user.image"
-                            :title="user.name"
-                            class="px-0"
-                        ></v-list-item>
+                        <div class="d-flex align-center justify-space-between">
+                            <v-list-item
+                                :prepend-avatar="user.image"
+                                :title="user.name"
+                                class="px-0 flex-grow-1"
+                            />
+                            <v-menu
+                                v-if="hasUserFixedSchedule(user)"
+                                :close-on-content-click="true"
+                                location="top"
+                            >
+                                <template #activator="{ props }">
+                                    <v-btn
+                                        v-bind="props"
+                                        icon="mdi-dots-vertical"
+                                        variant="text"
+                                        density="compact"
+                                        @click="selectedUser = user"
+                                    />
+                                </template>
+                                <v-list density="compact">
+                                    <v-list-item
+                                        v-if="hasUserFixedSchedule(user)"
+                                        prepend-icon="mdi-calendar-plus"
+                                        title="Thêm lịch thay thế"
+                                        @click="handleAddOverride(user)"
+                                    />
+                                    <v-list-item
+                                        prepend-icon="mdi-calendar-remove"
+                                        title="Xóa lịch làm việc"
+                                        class="text-error"
+                                        @click="handleClearSchedule(user)"
+                                    />
+                                </v-list>
+                            </v-menu>
+                        </div>
                     </td>
 
                     <td
@@ -187,11 +248,17 @@ export default {
             type: Array,
             default: () => [],
         },
+        type: {
+            type: String,
+            default: "fulltime",
+        },
     },
+    emits: ["addOverride", "clearSchedule", "userSelected"],
     data() {
         return {
             currentMode: "week", // 'day', 'week', 'month'
             baseDate: dayjs(), // Mốc thời gian hiện tại đang xem
+            selectedUser: null, // User đang mở dropdown menu
         };
     },
 
@@ -206,6 +273,7 @@ export default {
 
         // Tiêu đề hiển thị
         currentLabel() {
+            console.log(this.dataCalendar);
             if (this.currentMode === "day")
                 return this.baseDate.format("DD/MM/YYYY");
             if (this.currentMode === "week") {
@@ -273,6 +341,13 @@ export default {
     },
 
     methods: {
+        hasUserFixedSchedule(user) {
+            return this.dataCalendar?.events?.some(
+                (event) =>
+                    event.source === "fixed_schedule" &&
+                    event.user_id === user.id,
+            );
+        },
         getHolidayInfo(date) {
             const dateValue = date.format("YYYY-MM-DD");
             const year = date.year();
@@ -401,6 +476,16 @@ export default {
                     behavior: "smooth",
                 });
             });
+        },
+
+        handleClearSchedule(user) {
+            this.$emit("clearSchedule", user);
+            this.$emit("userSelected", user);
+        },
+
+        handleAddOverride(user) {
+            this.$emit("addOverride", user);
+            this.$emit("userSelected", user);
         },
     },
 };

@@ -52,3 +52,6 @@ chat:
     has_sent_image: "Sent %count% images"
     has_sent_file: "Sent %count% files"
     has_sent_images_and_files: "Sent %imageCount% images and %fileCount% files"
+work_schedule:
+    invalid_date_range: "Invalid date range"
+    has_override_overlap: "There are %count% schedule overrides in the period %startDate% to %endDate%. Creating a new schedule will automatically calculate and update these existing schedules."

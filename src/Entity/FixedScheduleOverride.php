@@ -128,4 +128,22 @@ class FixedScheduleOverride
 
         return $this;
     }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'member' => $this->member?->jsonSerialize(),
+            'startDate' => $this->startDate?->format('Y-m-d'),
+            'endDate' => $this->endDate?->format('Y-m-d'),
+            'startTime' => $this->startTime?->format('H:i:s'),
+            'endTime' => $this->endTime?->format('H:i:s'),
+            'type' => $this->type,
+            'reason' => $this->reason,
+            'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
+            'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
+            'createdBy' => $this->createdBy,
+            'updatedBy' => $this->updatedBy,
+        ];
+    }
 }

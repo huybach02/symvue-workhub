@@ -1,12 +1,51 @@
 <template>
     <div>
-        <FulltimeTabDialogCreate
-            ref="fulltimeTabDialogCreate"
-            :members="members"
-            @create="handleCreate"
-        />
+        <div>
+            <FulltimeTabDialogCreate
+                ref="fulltimeTabDialogCreate"
+                :members="members"
+                @create="handleCreate"
+            />
 
-        <Calendar :data-calendar="dataCalendar" />
+            <Calendar
+                :data-calendar="dataCalendar"
+                :type="tab"
+                @add-override="dialog = true"
+                @clear-schedule="showConfirmDelete = true"
+                @user-selected="userSelected = $event"
+            />
+
+            <v-dialog v-model="dialog" max-width="1000" scrollable persistent>
+                <v-card
+                    :title="`Thêm lịch thay thế`"
+                    :prepend-icon="`mdi-plus`"
+                    class="position-relative"
+                >
+                    <v-btn
+                        icon="mdi-close"
+                        variant="text"
+                        size="small"
+                        class="close-btn"
+                        @click="dialog = false"
+                    />
+
+                    <v-card-text>
+                        <FulltimeOverrideForm
+                            :user-selected="userSelected"
+                            @cancel="handleCancelOverride"
+                        />
+                    </v-card-text>
+                </v-card>
+            </v-dialog>
+        </div>
+
+        <ConfirmDialog
+            v-model="showConfirmDelete"
+            :message="$t('work_schedule.confirm_delete')"
+            :loading="isDeleting"
+            @confirm="handleDelete"
+            @cancel="showConfirmDelete = false"
+        />
     </div>
 </template>
 
@@ -17,11 +56,15 @@ import { toast } from "@/main";
 import { postData } from "@/services/bases/postData";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import { getListData } from "@/services/bases/getData";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import FulltimeOverrideForm from "./FulltimeOverrideForm.vue";
 
 export default {
     components: {
         Calendar,
         FulltimeTabDialogCreate,
+        ConfirmDialog,
+        FulltimeOverrideForm,
     },
     props: {
         tab: {
@@ -36,6 +79,10 @@ export default {
     data() {
         return {
             dataCalendar: [],
+            showConfirmDelete: false,
+            isDeleting: false,
+            userSelected: null,
+            dialog: false,
         };
     },
     computed: {
@@ -95,6 +142,21 @@ export default {
 
             this.$refs.fulltimeTabDialogCreate.isLoading = false;
             this.$refs.fulltimeTabDialogCreate.dialog = false;
+        },
+        async handleDelete() {
+            this.isDeleting = true;
+            await postData(API_ROUTES_CONFIG.workSchedule + "/fulltime/clear", {
+                departmentId: this.departmentId,
+                userId: this.userSelected.id,
+            });
+            this.isDeleting = false;
+            await this.getFulltime();
+            this.showConfirmDelete = false;
+        },
+        handleCancelOverride() {
+            this.dialog = false;
+            this.userSelected = null;
+            this.getFulltime();
         },
     },
 };

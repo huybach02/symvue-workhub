@@ -67,7 +67,7 @@ export const menuSidebar = [
     },
     {
         title: i18n.global.t("sidebar.work_schedule"),
-        icon: "mdi-view-dashboard",
+        icon: "mdi-calendar-clock",
         value: NAME_ROUTES_CONFIG.workSchedule,
         to: { name: NAME_ROUTES_CONFIG.workSchedule },
     },

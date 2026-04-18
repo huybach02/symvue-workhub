@@ -1,72 +1,72 @@
 {
-    "base": {
-        "confirm": "Xác nhận",
-        "cancel": "Hủy bỏ",
-        "save": "Lưu",
-        "back": "Quay lại",
-        "edit": "Chỉnh sửa",
-        "delete": "Xóa",
-        "status": "Trạng thái",
-        "created_at": "Ngày tạo",
-        "updated_at": "Ngày cập nhật",
-        "no_data": "Không tìm thấy dữ liệu phù hợp",
-        "enter": "Nhập",
-        "export_excel": "Xuất excel",
-        "import_excel": "Nhập excel",
-        "dowload_template_import_excel": "Tải file excel mẫu",
-        "upload": "Tải lên",
-        "error_detail": "Chi tiết lỗi import",
-        "view": "Xem",
-        "note": "Ghi chú: ",
-        "yesterday": "Hôm qua",
-        "today": "Hôm nay",
-        "mobile_alert": "Chức năng này chưa khả dụng trên mobile. Vui lòng sử dụng trên máy tính."
-    },
-    "title": {
-        "create": "Thêm mới",
-        "update": "Cập nhật"
-    },
-    "button": {
-        "create": "Thêm mới",
-        "update": "Cập nhật",
-        "delete": "Xóa",
-        "cancel": "Hủy bỏ",
-        "save": "Lưu",
-        "back": "Quay lại",
-        "close": "Đóng",
-        "remove": "Xóa",
-        "restore_default": "Khôi phục mặc định"
-    },
-    "sidebar": {
-        "home": "Trang chủ",
-        "user_management": "Quản lý nhân sự",
-        "role_management": "Quản lý vai trò",
-        "permission_management": "Quản lý quyền",
-        "system_config": "Thiết lập hệ thống",
-        "system_config_general": "Cấu hình chung",
-        "system_config_working_time": "Thời gian làm việc",
-        "user_management_user": "Nhân sự",
-        "lich_su_import": "Lịch sử import",
-        "bo_phan": "Phòng ban/Bộ phận",
-        "thong_bao": "Quản lý thông báo",
-        "work_schedule": "WorkSchedule"
-    },
-    "gender": {
-        "male": "Nam",
-        "female": "Nữ"
-    },
-    "status": {
-        "active": "Hoạt động",
-        "inactive": "Không hoạt động",
-        "success": "Thành công",
-        "error": "Thất bại"
-    },
-    "thong-bao": {
-        "title": "Thông báo",
-        "read_all": "Đọc tất cả",
-        "no_notification": "Không có thông báo nào",
-        "total": "Tổng",
-        "unread": "Chưa đọc",
-        "read": "Đã đọc"
-    }
+  "base": {
+    "confirm": "Xác nhận",
+    "cancel": "Hủy bỏ",
+    "save": "Lưu",
+    "back": "Quay lại",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "status": "Trạng thái",
+    "created_at": "Ngày tạo",
+    "updated_at": "Ngày cập nhật",
+    "no_data": "Không tìm thấy dữ liệu phù hợp",
+    "enter": "Nhập",
+    "export_excel": "Xuất excel",
+    "import_excel": "Nhập excel",
+    "dowload_template_import_excel": "Tải file excel mẫu",
+    "upload": "Tải lên",
+    "error_detail": "Chi tiết lỗi import",
+    "view": "Xem",
+    "note": "Ghi chú: ",
+    "yesterday": "Hôm qua",
+    "today": "Hôm nay",
+    "mobile_alert": "Chức năng này chưa khả dụng trên mobile. Vui lòng sử dụng trên máy tính."
+  },
+  "title": {
+    "create": "Thêm mới",
+    "update": "Cập nhật"
+  },
+  "button": {
+    "create": "Thêm mới",
+    "update": "Cập nhật",
+    "delete": "Xóa",
+    "cancel": "Hủy bỏ",
+    "save": "Lưu",
+    "back": "Quay lại",
+    "close": "Đóng",
+    "remove": "Xóa",
+    "restore_default": "Khôi phục mặc định"
+  },
+  "sidebar": {
+    "home": "Trang chủ",
+    "user_management": "Quản lý nhân sự",
+    "role_management": "Quản lý vai trò",
+    "permission_management": "Quản lý quyền",
+    "system_config": "Thiết lập hệ thống",
+    "system_config_general": "Cấu hình chung",
+    "system_config_working_time": "Thời gian làm việc",
+    "user_management_user": "Nhân sự",
+    "lich_su_import": "Lịch sử import",
+    "bo_phan": "Phòng ban/Bộ phận",
+    "thong_bao": "Quản lý thông báo",
+    "work_schedule": "Lịch làm việc"
+  },
+  "gender": {
+    "male": "Nam",
+    "female": "Nữ"
+  },
+  "status": {
+    "active": "Hoạt động",
+    "inactive": "Không hoạt động",
+    "success": "Thành công",
+    "error": "Thất bại"
+  },
+  "thong-bao": {
+    "title": "Thông báo",
+    "read_all": "Đọc tất cả",
+    "no_notification": "Không có thông báo nào",
+    "total": "Tổng",
+    "unread": "Chưa đọc",
+    "read": "Đã đọc"
+  }
 }

@@ -2,11 +2,18 @@ import axiosInstance from "@/configs/axios";
 import { handleAxiosError } from "@/helpers/axiosHelper";
 import { toast } from "@/main";
 
-export const postData = async (path, data, callback = () => {}) => {
+export const postData = async (
+    path,
+    data,
+    callback = () => {},
+    hideNotification = false,
+) => {
     try {
         const res = await axiosInstance.post(path, data);
         if (res.success) {
-            toast.success(res.message);
+            if (!hideNotification) {
+                toast.success(res.message);
+            }
             callback();
             return res.data;
         } else {

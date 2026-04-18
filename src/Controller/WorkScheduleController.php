@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Class\CustomResponse;
 use App\DTO\WorkScheduleFulltimeDTO;
+use App\DTO\WorkScheduleFulltimeOverrideDTO;
 use App\Service\WorkScheduleService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -29,7 +30,7 @@ final class WorkScheduleController extends AbstractController
         }
     }
 
-    #[Route("/work-schedule/fulltime/{departmentId}", methods: ["GET"])]
+    #[Route("/work-schedule/fulltime/{departmentId}", methods: ["GET"], priority: -1)]
     public function getFulltime(int $departmentId): JsonResponse
     {
         try {
@@ -49,6 +50,48 @@ final class WorkScheduleController extends AbstractController
     ): JsonResponse {
         try {
             $data = $this->workScheduleService->createFulltime($dto);
+            return CustomResponse::success($data, t("success.created"));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route("/work-schedule/fulltime/clear", methods: ["POST"])]
+    public function clearFulltime(
+        Request $request,
+    ): JsonResponse {
+        try {
+            $body = $request->toArray();
+
+            $data = $this->workScheduleService->clearFulltime($body["departmentId"], $body["userId"]);
+            return CustomResponse::success($data, t("success.deleted"));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route("/work-schedule/fulltime/check-override", methods: ["POST"])]
+    public function checkOverrideFulltime(
+        Request $request,
+    ): JsonResponse {
+        try {
+            $body = $request->toArray();
+            $data = $this->workScheduleService->checkOverrideFulltime($body["userId"], $body["startDate"], $body["endDate"]);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route("/work-schedule/fulltime/override", methods: ["POST"])]
+    public function overrideFulltime(
+        #[
+            MapRequestPayload(validationGroups: ["create"]),
+        ]
+        WorkScheduleFulltimeOverrideDTO $dto,
+    ): JsonResponse {
+        try {
+            $data = $this->workScheduleService->overrideFulltime($dto);
             return CustomResponse::success($data, t("success.created"));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());

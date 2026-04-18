@@ -6,6 +6,7 @@ use App\Class\Constanst;
 use App\Class\FilterWithPagination;
 use App\DTO\WorkScheduleDTO;
 use App\DTO\WorkScheduleFulltimeDTO;
+use App\DTO\WorkScheduleFulltimeOverrideDTO;
 use App\Entity\Example;
 use App\Entity\FixedSchedule;
 use App\Entity\FixedScheduleGroup;
@@ -210,6 +211,195 @@ class WorkScheduleService
         );
     }
 
+    public function clearFulltime(int $departmentId, int $userId): array
+    {
+        $fixedScheduleGroup = $this->entityManager->getRepository(FixedScheduleGroup::class)->findOneBy([
+            "member" => $userId,
+            "type" => "fulltime",
+        ]);
+
+        if (!$fixedScheduleGroup) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $fixedSchedules = $fixedScheduleGroup->getFixedSchedules();
+
+        foreach ($fixedSchedules as $fixedSchedule) {
+            $this->entityManager->remove($fixedSchedule);
+        }
+
+        $this->entityManager->remove($fixedScheduleGroup);
+
+        $this->fixedScheduleOverrideRepository->clearOverridesByUser($userId);
+
+        $this->entityManager->flush();
+
+        return $fixedScheduleGroup->jsonSerialize();
+    }
+
+    public function checkOverrideFulltime(int $userId, string $startDate, string $endDate): array
+    {
+        $user = $this->userRepository->find($userId);
+
+        if (!$user) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $startDateObject = new \DateTime($startDate);
+        $endDateObject = new \DateTime($endDate);
+
+        if ($startDateObject > $endDateObject) {
+            return [
+                'hasOverlap' => false,
+                'message' => t('work_schedule.invalid_date_range'),
+            ];
+        }
+
+        $overlappingOverrides = $this->fixedScheduleOverrideRepository
+            ->findOverlappingOverrides($user, $startDateObject, $endDateObject);
+
+        if (empty($overlappingOverrides)) {
+            return [
+                'hasOverlap' => false,
+                'message' => '',
+            ];
+        }
+
+        // Tính toán khoảng thời gian tổng hợp và số lượng
+        $count = count($overlappingOverrides);
+        $minStart = $startDateObject;
+        $maxEnd = $endDateObject;
+
+        foreach ($overlappingOverrides as $override) {
+            $overrideStart = $override->getStartDate();
+            $overrideEnd = $override->getEndDate();
+
+            if ($overrideStart && $overrideStart < $minStart) {
+                $minStart = $overrideStart;
+            }
+            if ($overrideEnd && $overrideEnd > $maxEnd) {
+                $maxEnd = $overrideEnd;
+            }
+        }
+
+        return [
+            'hasOverlap' => true,
+            'message' => t('work_schedule.has_override_overlap', [
+                '%count%' => $count,
+                '%startDate%' => $minStart->format('d/m/Y'),
+                '%endDate%' => $maxEnd->format('d/m/Y'),
+            ]),
+        ];
+    }
+
+    public function overrideFulltime(WorkScheduleFulltimeOverrideDTO $dto): array
+    {
+        $user = $this->userRepository->find($dto->userId);
+        if (!$user) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $newStartDate = new \DateTime($dto->startDate);
+        $newEndDate = new \DateTime($dto->endDate);
+        $newStartTime = \DateTime::createFromFormat('H:i:s', $dto->startTime) ?: \DateTime::createFromFormat('H:i', $dto->startTime);
+        $newEndTime = \DateTime::createFromFormat('H:i:s', $dto->endTime) ?: \DateTime::createFromFormat('H:i', $dto->endTime);
+
+        // Tìm tất cả các override đang overlap với range mới
+        $overlappingOverrides = $this->fixedScheduleOverrideRepository->findOverlappingOverrides(
+            $user,
+            $newStartDate,
+            $newEndDate
+        );
+
+        // Xử lý cắt đoạn từng override cũ
+        foreach ($overlappingOverrides as $existingOverride) {
+            $this->processOverrideSplit($existingOverride, $newStartDate, $newEndDate);
+        }
+
+        // Tạo override mới
+        $override = new FixedScheduleOverride();
+        $override->setMember($user);
+        $override->setStartDate($newStartDate);
+        $override->setEndDate($newEndDate);
+        $override->setStartTime($newStartTime);
+        $override->setEndTime($newEndTime);
+        $override->setReason($dto->note ?? '');
+        $override->setType('fulltime');
+        $this->entityManager->persist($override);
+
+        $this->entityManager->flush();
+
+        return $override->jsonSerialize();
+    }
+
+    private function processOverrideSplit(
+        FixedScheduleOverride $existing,
+        \DateTime $newStart,
+        \DateTime $newEnd
+    ): void {
+        $existingStart = $existing->getStartDate();
+        $existingEnd = $existing->getEndDate();
+
+        if (!$existingStart || !$existingEnd) {
+            $this->entityManager->remove($existing);
+            return;
+        }
+
+        // Chuyển về dạng timestamp để so sánh (bỏ qua time)
+        $newStartTs = (clone $newStart)->setTime(0, 0)->getTimestamp();
+        $newEndTs = (clone $newEnd)->setTime(0, 0)->getTimestamp();
+        $existStartTs = (clone $existingStart)->setTime(0, 0)->getTimestamp();
+        $existEndTs = (clone $existingEnd)->setTime(0, 0)->getTimestamp();
+
+        // Case 1: New bao phủ hoàn toàn existing -> xóa existing
+        if ($newStartTs <= $existStartTs && $newEndTs >= $existEndTs) {
+            $this->entityManager->remove($existing);
+            return;
+        }
+
+        // Case 2: Existing bao phủ hoàn toàn new -> cắt thành 2 phần
+        if ($newStartTs > $existStartTs && $newEndTs < $existEndTs) {
+            // Phần trước: existingStart -> newStart - 1 ngày
+            $leftPart = new FixedScheduleOverride();
+            $leftPart->setMember($existing->getMember());
+            $leftPart->setStartDate($existingStart);
+            $leftPart->setEndDate((clone $newStart)->modify('-1 day'));
+            $leftPart->setStartTime($existing->getStartTime());
+            $leftPart->setEndTime($existing->getEndTime());
+            $leftPart->setType($existing->getType());
+            $leftPart->setReason($existing->getReason());
+            $this->entityManager->persist($leftPart);
+
+            // Phần sau: newEnd + 1 ngày -> existingEnd
+            $rightPart = new FixedScheduleOverride();
+            $rightPart->setMember($existing->getMember());
+            $rightPart->setStartDate((clone $newEnd)->modify('+1 day'));
+            $rightPart->setEndDate($existingEnd);
+            $rightPart->setStartTime($existing->getStartTime());
+            $rightPart->setEndTime($existing->getEndTime());
+            $rightPart->setType($existing->getType());
+            $rightPart->setReason($existing->getReason());
+            $this->entityManager->persist($rightPart);
+
+            $this->entityManager->remove($existing);
+            return;
+        }
+
+        // Case 3: Chồng bên trái (new start < existing start, new end trong khoảng existing)
+        if ($newStartTs <= $existStartTs && $newEndTs >= $existStartTs && $newEndTs < $existEndTs) {
+            // Giữ lại phần bên phải: newEnd + 1 ngày -> existingEnd
+            $existing->setStartDate((clone $newEnd)->modify('+1 day'));
+            return;
+        }
+
+        // Case 4: Chồng bên phải (new start trong khoảng existing, new end > existing end)
+        if ($newStartTs > $existStartTs && $newStartTs <= $existEndTs && $newEndTs >= $existEndTs) {
+            // Giữ lại phần bên trái: existingStart -> newStart - 1 ngày
+            $existing->setEndDate((clone $newStart)->modify('-1 day'));
+            return;
+        }
+    }
+
     private function mapWorkingTimesByDayOfWeek(array $workingTimes): array
     {
         $dayOfWeekMap = array_flip(array_keys(Constanst::THOI_GIAN_LAM_VIEC));
@@ -360,31 +550,4 @@ class WorkScheduleService
     {
         return sprintf("%s-%s", $event["user_id"], $event["date"]);
     }
-
-    // public function update(int $id, WorkScheduleDTO $dto): array {
-    //     $item = $this->exampleRepository->find($id);
-
-    //     if (!$item) {
-    //         throw new \Exception(t('error.not_found'));
-    //     }
-
-    //     // TODO: Map DTO properties to entity
-    //     // Example: $item->setName($dto->name);
-
-    //     $this->entityManager->flush();
-
-    //     return $item->jsonSerialize();
-    // }
-
-    // public function delete(int $id): void
-    // {
-    //     $item = $this->exampleRepository->find($id);
-
-    //     if (!$item) {
-    //         throw new \Exception(t('error.not_found'));
-    //     }
-
-    //     $this->entityManager->remove($item);
-    //     $this->entityManager->flush();
-    // }
 }
