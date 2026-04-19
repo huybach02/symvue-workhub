@@ -346,6 +346,8 @@ class UserService
         $userPosition->setIsPrimary(true);
         $userPosition->setPositionSnapshot($position->jsonSerialize());
 
+        $user->setHinhThucLamViec($position->getEmploymentType());
+
         $this->entityManager->flush();
 
         $this->createUserPermission($user, $position);

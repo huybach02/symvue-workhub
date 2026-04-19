@@ -83,6 +83,20 @@ final class WorkScheduleController extends AbstractController
         }
     }
 
+    #[Route("/work-schedule/special-days", methods: ["GET"])]
+    public function getSpecialDays(
+        Request $request,
+    ): JsonResponse {
+        try {
+            $startDate = $request->query->get("startDate");
+            $endDate = $request->query->get("endDate");
+            $data = $this->workScheduleService->getSpecialDays($startDate, $endDate);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
     #[Route("/work-schedule/fulltime/override", methods: ["POST"])]
     public function overrideFulltime(
         #[

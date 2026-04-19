@@ -24,10 +24,13 @@ class WorkingTime
     #[ORM\Column(length: 255)]
     private ?string $thu = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(nullable: true)]
+    private ?int $dayOfWeek = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $gioBatDau = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $gioKetThuc = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -57,6 +60,18 @@ class WorkingTime
     public function setThu(string $thu): static
     {
         $this->thu = $thu;
+
+        return $this;
+    }
+
+    public function getDayOfWeek(): ?int
+    {
+        return $this->dayOfWeek;
+    }
+
+    public function setDayOfWeek(?int $dayOfWeek): static
+    {
+        $this->dayOfWeek = $dayOfWeek;
 
         return $this;
     }

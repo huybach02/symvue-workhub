@@ -75,8 +75,7 @@ class WorkScheduleService
                     $this->departmentService->getMembersByDepartment(
                         $departmentId,
                     ),
-                    fn(array $member): bool =>
-                    (int) ($member["hinhThucLamViec"] ?? 0) === 1,
+                    fn(array $member): bool => ($member["hinhThucLamViec"] ?? "") === Constanst::HINH_THUC_LAM_VIEC["FULL_TIME"],
                 ),
             ),
         );
@@ -103,10 +102,13 @@ class WorkScheduleService
             "member" => $memberIds,
         ]);
 
+        // Lấy danh sách ngày nghỉ lễ để loại trừ
+        $holidayDates = $this->getHolidayDatesMap();
+
         $events = [];
 
         foreach ($groups as $group) {
-            foreach ($this->buildEventsFromFixedScheduleGroup($group) as $event) {
+            foreach ($this->buildEventsFromFixedScheduleGroup($group, $holidayDates) as $event) {
                 $events[$this->getEventMapKey($event)] = $event;
             }
         }
@@ -304,32 +306,47 @@ class WorkScheduleService
         $newStartTime = \DateTime::createFromFormat('H:i:s', $dto->startTime) ?: \DateTime::createFromFormat('H:i', $dto->startTime);
         $newEndTime = \DateTime::createFromFormat('H:i:s', $dto->endTime) ?: \DateTime::createFromFormat('H:i', $dto->endTime);
 
-        // Tìm tất cả các override đang overlap với range mới
-        $overlappingOverrides = $this->fixedScheduleOverrideRepository->findOverlappingOverrides(
-            $user,
+        // Tính toán các segments dựa trên weekendOption
+        $segments = $this->calculateOverrideSegments(
             $newStartDate,
-            $newEndDate
+            $newEndDate,
+            $dto->weekendOption,
+            $dto->selectedDates
         );
 
-        // Xử lý cắt đoạn từng override cũ
-        foreach ($overlappingOverrides as $existingOverride) {
-            $this->processOverrideSplit($existingOverride, $newStartDate, $newEndDate);
-        }
+        $createdOverrides = [];
 
-        // Tạo override mới
-        $override = new FixedScheduleOverride();
-        $override->setMember($user);
-        $override->setStartDate($newStartDate);
-        $override->setEndDate($newEndDate);
-        $override->setStartTime($newStartTime);
-        $override->setEndTime($newEndTime);
-        $override->setReason($dto->note ?? '');
-        $override->setType('fulltime');
-        $this->entityManager->persist($override);
+        foreach ($segments as $segment) {
+            // Tìm các override overlap với segment này
+            $overlappingOverrides = $this->fixedScheduleOverrideRepository->findOverlappingOverrides(
+                $user,
+                $segment['start'],
+                $segment['end']
+            );
+
+            // Xử lý cắt đoạn từng override cũ
+            foreach ($overlappingOverrides as $existingOverride) {
+                $this->processOverrideSplit($existingOverride, $segment['start'], $segment['end']);
+            }
+
+            // Tạo override mới cho segment
+            $override = new FixedScheduleOverride();
+            $override->setMember($user);
+            $override->setStartDate($segment['start']);
+            $override->setEndDate($segment['end']);
+            $override->setStartTime($newStartTime);
+            $override->setEndTime($newEndTime);
+            $override->setReason($dto->note ?? '');
+            $override->setType('fulltime');
+            $this->entityManager->persist($override);
+
+            $createdOverrides[] = $override;
+        }
 
         $this->entityManager->flush();
 
-        return $override->jsonSerialize();
+        // Trả về danh sách các override đã tạo
+        return array_map(fn($o) => $o->jsonSerialize(), $createdOverrides);
     }
 
     private function processOverrideSplit(
@@ -400,6 +417,77 @@ class WorkScheduleService
         }
     }
 
+    private function calculateOverrideSegments(
+        \DateTime $start,
+        \DateTime $end,
+        string $weekendOption,
+        array $selectedDates
+    ): array {
+        $holidays = $this->holidayScheduleRepository->findByDateRange($start, $end);
+        $holidayMap = [];
+        foreach ($holidays as $holiday) {
+            $holidayMap[$holiday->getDate()->format("Y-m-d")] = true;
+        }
+
+        $workingTimes = $this->workingTimeRepository->findAll();
+        $workingDays = [];
+        foreach ($workingTimes as $wt) {
+            if ($wt->getGioBatDau() && $wt->getGioKetThuc()) {
+                $workingDays[$wt->getDayOfWeek()] = true;
+            }
+        }
+
+        $selectedMap = [];
+        foreach ($selectedDates as $date) {
+            $selectedMap[$date] = true;
+        }
+
+        $segments = [];
+        $currentSegmentStart = null;
+        $currentDate = clone $start;
+
+        while ($currentDate <= $end) {
+            $dateStr = $currentDate->format("Y-m-d");
+            $dayOfWeek = (int) $currentDate->format("N");
+
+            $isHoliday = isset($holidayMap[$dateStr]);
+            $isWorkingDay = isset($workingDays[$dayOfWeek]);
+
+            $shouldInclude = false;
+            if ($weekendOption === 'keep') {
+                $shouldInclude = $isWorkingDay && !$isHoliday;
+            } else {
+                $shouldInclude = isset($selectedMap[$dateStr]) || ($isWorkingDay && !$isHoliday);
+            }
+
+            if ($shouldInclude) {
+                if ($currentSegmentStart === null) {
+                    $currentSegmentStart = clone $currentDate;
+                }
+            } else {
+                if ($currentSegmentStart !== null) {
+                    $segments[] = [
+                        'start' => $currentSegmentStart,
+                        'end' => (clone $currentDate)->modify('-1 day'),
+                    ];
+                    $currentSegmentStart = null;
+                }
+            }
+
+            $currentDate->modify('+1 day');
+        }
+
+        // Đóng segment cuối nếu còn
+        if ($currentSegmentStart !== null) {
+            $segments[] = [
+                'start' => $currentSegmentStart,
+                'end' => clone $end,
+            ];
+        }
+
+        return $segments;
+    }
+
     private function mapWorkingTimesByDayOfWeek(array $workingTimes): array
     {
         $dayOfWeekMap = array_flip(array_keys(Constanst::THOI_GIAN_LAM_VIEC));
@@ -425,7 +513,17 @@ class WorkScheduleService
         return $mappedWorkingTimes;
     }
 
-    private function buildEventsFromFixedScheduleGroup(FixedScheduleGroup $group): array
+    private function getHolidayDatesMap(): array
+    {
+        $holidays = $this->holidayScheduleRepository->findBy(["status" => true]);
+        $holidayDates = [];
+        foreach ($holidays as $holiday) {
+            $holidayDates[$holiday->getDate()->format("Y-m-d")] = true;
+        }
+        return $holidayDates;
+    }
+
+    private function buildEventsFromFixedScheduleGroup(FixedScheduleGroup $group, array $holidayDates = []): array
     {
         $events = [];
         $scheduleByDay = [];
@@ -438,6 +536,14 @@ class WorkScheduleService
         $endDate = (clone $group->getEndDate())->setTime(0, 0);
 
         while ($currentDate <= $endDate) {
+            $dateStr = $currentDate->format("Y-m-d");
+
+            // Bỏ qua ngày nghỉ lễ
+            if (isset($holidayDates[$dateStr])) {
+                $currentDate->modify("+1 day");
+                continue;
+            }
+
             $dayOfWeek = (int) $currentDate->format("N");
             $schedule = $scheduleByDay[$dayOfWeek] ?? null;
 
@@ -449,7 +555,7 @@ class WorkScheduleService
                         $currentDate->format("Ymd"),
                     ),
                     userId: $group->getMember()?->getId(),
-                    date: $currentDate->format("Y-m-d"),
+                    date: $dateStr,
                     startTime: $schedule->getStartTime()?->format("H:i"),
                     endTime: $schedule->getEndTime()?->format("H:i"),
                     color: "blue",
@@ -466,10 +572,18 @@ class WorkScheduleService
     private function buildEventsFromOverride(FixedScheduleOverride $override): array
     {
         $events = [];
-        $currentDate = (clone $override->getStartDate())->setTime(0, 0);
-        $endDate = (clone $override->getEndDate())->setTime(0, 0);
+        $startDate = $override->getStartDate();
+        $endDate = $override->getEndDate();
+
+        if (!$startDate || !$endDate) {
+            return [];
+        }
+
+        $currentDate = clone $startDate;
 
         while ($currentDate <= $endDate) {
+            $dateStr = $currentDate->format("Y-m-d");
+
             $events[] = $this->makeEventItem(
                 id: sprintf(
                     "override-%d-%s",
@@ -477,7 +591,7 @@ class WorkScheduleService
                     $currentDate->format("Ymd"),
                 ),
                 userId: $override->getMember()?->getId(),
-                date: $currentDate->format("Y-m-d"),
+                date: $dateStr,
                 startTime: $override->getStartTime()?->format("H:i"),
                 endTime: $override->getEndTime()?->format("H:i"),
                 color: "orange",
@@ -549,5 +663,73 @@ class WorkScheduleService
     private function getEventMapKey(array $event): string
     {
         return sprintf("%s-%s", $event["user_id"], $event["date"]);
+    }
+
+    public function getSpecialDays(?string $startDate, ?string $endDate): array
+    {
+        if (!$startDate || !$endDate) {
+            throw new \Exception("Vui lòng cung cấp startDate và endDate");
+        }
+
+        $start = new \DateTime($startDate);
+        $end = new \DateTime($endDate);
+
+        if ($start > $end) {
+            throw new \Exception("Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc");
+        }
+
+        // Lấy danh sách ngày lễ trong khoảng
+        $holidays = $this->holidayScheduleRepository->findByDateRange($start, $end);
+        $holidayMap = [];
+        foreach ($holidays as $holiday) {
+            $dateKey = $holiday->getDate()->format("Y-m-d");
+            $holidayMap[$dateKey] = $holiday->getName() ?: "Ngày lễ";
+        }
+
+        // Mapping ngày trong tuần
+        $dayOfWeekMap = [
+            1 => "Thứ 2",
+            2 => "Thứ 3",
+            3 => "Thứ 4",
+            4 => "Thứ 5",
+            5 => "Thứ 6",
+            6 => "Thứ 7",
+            7 => "Chủ nhật",
+        ];
+
+        $specialDays = [];
+        $currentDate = clone $start;
+
+        $workingTimeByDay = [];
+        foreach ($this->workingTimeRepository->findAll() as $workingTime) {
+            if ($workingTime->getGioBatDau() && $workingTime->getGioKetThuc()) {
+                $workingTimeByDay[$workingTime->getDayOfWeek()] = $workingTime;
+            }
+        }
+
+        while ($currentDate <= $end) {
+            $dateStr = $currentDate->format("Y-m-d");
+            $dayOfWeek = (int) $currentDate->format("N"); // 1=Thứ 2, 7=Chủ nhật
+
+            $hasWorkingTime = isset($workingTimeByDay[$dayOfWeek]);
+            $isHoliday = isset($holidayMap[$dateStr]);
+            $isOfflineDay = !$hasWorkingTime;
+
+            if ($isOfflineDay || $isHoliday) {
+                $type = $isOfflineDay && $isHoliday ? "both" : ($isHoliday ? "holiday" : "offline");
+
+                $specialDays[] = [
+                    "date" => $dateStr,
+                    "dayOfWeek" => $dayOfWeek,
+                    "dayLabel" => $dayOfWeekMap[$dayOfWeek],
+                    "type" => $type,
+                    "holidayName" => $isHoliday ? $holidayMap[$dateStr] : null,
+                ];
+            }
+
+            $currentDate->modify("+1 day");
+        }
+
+        return $specialDays;
     }
 }

@@ -25,5 +25,10 @@ class WorkScheduleFulltimeOverrideDTO
 
         public readonly ?string $note = null,
 
+        public readonly string $weekendOption = "keep",
+
+        #[Assert\Type("array", groups: ["create", "update"])]
+        public readonly array $selectedDates = [],
+
     ) {}
 }

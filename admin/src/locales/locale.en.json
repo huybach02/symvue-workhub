@@ -322,6 +322,12 @@
       "id": "ID",
       "name": "Name"
     },
-    "confirm_delete": "Are you sure you want to delete this work schedule? This action cannot be undone."
+    "confirm_delete": "Are you sure you want to delete this work schedule? This action cannot be undone.",
+    "special_days_title": "Handle Weekend & Holiday Off Days",
+    "keep_weekend_holiday": "Keep weekend/holiday schedule",
+    "work_weekend_holiday": "Work overtime on weekends/holidays",
+    "days_will_keep_off": "The following days will remain as off days:",
+    "select_days_to_work": "Select days to work overtime (at least 1 day):",
+    "please_select_at_least_one_day": "Please select at least 1 day to work overtime"
   }
 }

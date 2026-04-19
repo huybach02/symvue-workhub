@@ -322,6 +322,12 @@
       "id": "ID",
       "name": "Tên"
     },
-    "confirm_delete": "Xác nhận xóa lịch làm việc? Hành động này không thể hoàn tác."
+    "confirm_delete": "Xác nhận xóa lịch làm việc? Hành động này không thể hoàn tác.",
+    "special_days_title": "Xử lý ngày nghỉ cuối tuần & ngày lễ",
+    "keep_weekend_holiday": "Giữ nguyên lịch nghỉ cuối tuần/ngày lễ",
+    "work_weekend_holiday": "Làm thêm vào ngày cuối tuần/ngày lễ",
+    "days_will_keep_off": "Các ngày sau sẽ được giữ nguyên lịch nghỉ:",
+    "select_days_to_work": "Chọn ngày làm thêm (ít nhất 1 ngày):",
+    "please_select_at_least_one_day": "Vui lòng chọn ít nhất 1 ngày để làm thêm"
   }
 }

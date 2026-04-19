@@ -1,12 +1,24 @@
 <template>
     <div>
         <div>
-            <FulltimeTabDialogCreate
-                ref="fulltimeTabDialogCreate"
-                :members="members"
-                @create="handleCreate"
-            />
-
+            <div class="flex justify-between align-center">
+                <div class="d-flex ga-3">
+                    <v-chip color="blue" variant="flat" size="small">
+                        Lịch làm việc cố định
+                    </v-chip>
+                    <v-chip color="orange" variant="flat" size="small">
+                        Lịch làm việc thay thế
+                    </v-chip>
+                    <v-chip color="red" variant="flat" size="small">
+                        Nghỉ lễ/tết
+                    </v-chip>
+                </div>
+                <FulltimeTabDialogCreate
+                    ref="fulltimeTabDialogCreate"
+                    :members="members"
+                    @create="handleCreate"
+                />
+            </div>
             <Calendar
                 :data-calendar="dataCalendar"
                 :type="tab"

@@ -6,36 +6,42 @@ final class Constanst
 {
     const THOI_GIAN_LAM_VIEC = [
         "Thứ 2" => [
+            "DAY_OF_WEEK" => 1,
             "GIO_BAT_DAU" => "08:00",
             "GIO_KET_THUC" => "17:00",
             "GHI_CHU" => "",
         ],
         "Thứ 3" => [
+            "DAY_OF_WEEK" => 2,
             "GIO_BAT_DAU" => "08:00",
             "GIO_KET_THUC" => "17:00",
             "GHI_CHU" => "",
         ],
         "Thứ 4" => [
+            "DAY_OF_WEEK" => 3,
             "GIO_BAT_DAU" => "08:00",
             "GIO_KET_THUC" => "17:00",
             "GHI_CHU" => "",
         ],
         "Thứ 5" => [
-            "GIO_BAT_DAU" => "08:00",
+            "DAY_OF_WEEK" => 4,
             "GIO_KET_THUC" => "17:00",
             "GHI_CHU" => "",
         ],
         "Thứ 6" => [
+            "DAY_OF_WEEK" => 5,
             "GIO_BAT_DAU" => "08:00",
             "GIO_KET_THUC" => "17:00",
             "GHI_CHU" => "",
         ],
         "Thứ 7" => [
+            "DAY_OF_WEEK" => 6,
             "GIO_BAT_DAU" => "08:00",
             "GIO_KET_THUC" => "17:00",
             "GHI_CHU" => "",
         ],
         "Chủ nhật" => [
+            "DAY_OF_WEEK" => 7,
             "GIO_BAT_DAU" => "08:00",
             "GIO_KET_THUC" => "17:00",
             "GHI_CHU" => "",
@@ -110,5 +116,12 @@ final class Constanst
         "Mùng 1 Tết" => "01/01",
         "Mùng 2 Tết" => "01/02",
         "Mùng 3 Tết" => "01/03",
+    ];
+
+    const HINH_THUC_LAM_VIEC = [
+        "FULL_TIME" => "FULL_TIME",
+        "PART_TIME" => "PART_TIME",
+        "INTERN" => "INTERN",
+        "CONTRACTOR" => "CONTRACTOR",
     ];
 }

@@ -92,7 +92,7 @@ class UserFixture extends Fixture implements FixtureGroupInterface
             // Trạng thái
             $user->setStatus($faker->randomElement([1])); // 0: inactive, 1: active
             $user->setIsNgoaiGio($faker->randomElement([0, 1])); // 0: cho phép, 1: không cho phép
-            $user->setHinhThucLamViec($faker->randomElement([1, 2])); // 1: full time, 2: part time
+            $user->setHinhThucLamViec($faker->randomElement(\App\Class\Constanst::HINH_THUC_LAM_VIEC));
             $user->setIsFirstLogin($faker->randomElement([0, 1])); // 0: đã đổi pass, 1: lần đầu
 
             $manager->persist($user);

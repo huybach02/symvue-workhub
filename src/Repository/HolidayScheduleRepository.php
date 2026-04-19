@@ -24,6 +24,20 @@ class HolidayScheduleRepository extends ServiceEntityRepository
             ->execute();
     }
 
+    public function findByDateRange(\DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    {
+        return $this->createQueryBuilder('h')
+            ->andWhere('h.date >= :startDate')
+            ->andWhere('h.date <= :endDate')
+            ->andWhere('h.status = :status')
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->setParameter('status', true)
+            ->orderBy('h.date', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return HolidaySchedule[] Returns an array of HolidaySchedule objects
     //     */

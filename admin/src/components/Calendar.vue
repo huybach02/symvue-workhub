@@ -89,10 +89,17 @@
                     <td class="sticky-col-left user-cell">
                         <div class="d-flex align-center justify-space-between">
                             <v-list-item
-                                :prepend-avatar="user.image"
                                 :title="user.name"
                                 class="px-0 flex-grow-1"
-                            />
+                            >
+                                <template #prepend>
+                                    <v-avatar
+                                        v-if="user.image"
+                                        :image="user.image"
+                                    />
+                                    <v-avatar v-else icon="mdi-account" />
+                                </template>
+                            </v-list-item>
                             <v-menu
                                 v-if="hasUserFixedSchedule(user)"
                                 :close-on-content-click="true"
@@ -139,7 +146,7 @@
                             <v-chip
                                 v-if="col.isHoliday"
                                 size="x-small"
-                                color="red-lighten-4"
+                                color="red"
                                 text-color="red-darken-3"
                                 class="ma-1 font-weight-bold holiday-tag"
                                 variant="flat"
@@ -167,10 +174,17 @@
                     <td class="sticky-col-left user-cell">
                         <div class="d-flex align-center justify-space-between">
                             <v-list-item
-                                :prepend-avatar="user.image"
                                 :title="user.name"
                                 class="px-0 flex-grow-1"
-                            />
+                            >
+                                <template #prepend>
+                                    <v-avatar
+                                        v-if="user.image"
+                                        :image="user.image"
+                                    />
+                                    <v-avatar v-else icon="mdi-account" />
+                                </template>
+                            </v-list-item>
                             <v-menu
                                 v-if="hasUserFixedSchedule(user)"
                                 :close-on-content-click="true"
@@ -268,17 +282,26 @@ export default {
         },
 
         events() {
-            return this.dataCalendar?.events ?? [];
+            return (
+                this.dataCalendar?.events.filter(
+                    (event) => event.startTime && event.endTime,
+                ) ?? []
+            );
         },
 
         // Tiêu đề hiển thị
         currentLabel() {
-            console.log(this.dataCalendar);
-            if (this.currentMode === "day")
-                return this.baseDate.format("DD/MM/YYYY");
+            if (this.currentMode === "day") {
+                const weekday = this.baseDate.format("dddd");
+                const capitalizedWeekday =
+                    weekday.charAt(0).toUpperCase() + weekday.slice(1);
+                return `${capitalizedWeekday} (${this.baseDate.format("DD/MM/YYYY")})`;
+            }
             if (this.currentMode === "week") {
-                const start = this.baseDate.startOf("week").format("DD/MM");
-                const end = this.baseDate.endOf("week").format("DD/MM");
+                const start = this.baseDate
+                    .startOf("week")
+                    .format("DD/MM/YYYY");
+                const end = this.baseDate.endOf("week").format("DD/MM/YYYY");
                 return `Tuần: ${start} - ${end}`;
             }
             return `Tháng ${this.baseDate.format("MM / YYYY")}`;
@@ -608,23 +631,14 @@ thead th.sticky-col-left {
     padding: 8px 16px !important;
 }
 
-/* --- CSS làm nổi bật ngày hôm nay --- */
-.today-header {
-    border-top: 3px solid #1867c0 !important; /* Viền trên đậm hơn để nhấn mạnh */
-    box-shadow:
-        inset 2px 0 0 #1867c0,
-        inset -2px 0 0 #1867c0;
-    border-bottom: none !important; /* Xóa viền dưới để liền mạch với cột bên dưới */
-}
-
 .today-cell {
     box-shadow:
-        inset 2px 0 0 #1867c0,
-        inset -2px 0 0 #1867c0;
+        inset 2px 0 0 #f44336,
+        inset -2px 0 0 #f44336;
 }
 
 /* Fix viền dưới cùng cho ô today-cell cuối cùng (nếu cần) */
 tbody tr:last-child .today-cell {
-    border-bottom: 2px solid #1867c0 !important;
+    border-bottom: 2px solid #f44336 !important;
 }
 </style>

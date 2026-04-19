@@ -85,8 +85,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
     #[ORM\Column(type: 'integer', options: ['default' => 0, 'comment' => '0: cho phép ngoài giờ, 1: không cho phép ngoài giờ'])]
     private int $isNgoaiGio = 0;
 
-    #[ORM\Column(type: 'integer', options: ['default' => 1, 'comment' => '1: full time, 2: part time'])]
-    private int $hinhThucLamViec = 1;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $hinhThucLamViec = null;
 
     #[ORM\Column(length: 50, nullable: true, unique: true)]
     private ?string $maNhanVien = null;
@@ -410,12 +410,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
         return $this;
     }
 
-    public function getHinhThucLamViec(): int
+    public function getHinhThucLamViec(): ?string
     {
         return $this->hinhThucLamViec;
     }
 
-    public function setHinhThucLamViec(int $hinhThucLamViec): static
+    public function setHinhThucLamViec(?string $hinhThucLamViec): static
     {
         $this->hinhThucLamViec = $hinhThucLamViec;
 

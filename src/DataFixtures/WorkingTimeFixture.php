@@ -16,6 +16,7 @@ class WorkingTimeFixture extends Fixture
         foreach ($data as $key => $item) {
             $thoiGianLamViec = new WorkingTime();
             $thoiGianLamViec->setThu($key);
+            $thoiGianLamViec->setDayOfWeek($item['DAY_OF_WEEK']);
             $thoiGianLamViec->setGioBatDau($item['GIO_BAT_DAU']);
             $thoiGianLamViec->setGioKetThuc($item['GIO_KET_THUC']);
             $thoiGianLamViec->setGhiChu($item['GHI_CHU']);
