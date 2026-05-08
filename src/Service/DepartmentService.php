@@ -463,10 +463,12 @@ class DepartmentService
     {
         $cacheKey = CacheKey::USER_PERMISSION . $userId;
         $lockKey = CacheKey::USER_PERMISSION . "lock_" . $userId;
+        $maxAttempts = max(1, min($this->userPermissionLockMaxAttempts, 10));
+        $waitUsleep = max(1_000, min($this->userPermissionLockWaitUsleep, 50_000));
 
         for (
             $attempt = 0;
-            $attempt < $this->userPermissionLockMaxAttempts;
+            $attempt < $maxAttempts;
             $attempt++
         ) {
             $userPermissions = $this->cacheService->get($cacheKey);
@@ -498,7 +500,7 @@ class DepartmentService
                 }
             }
 
-            usleep($this->userPermissionLockWaitUsleep);
+            usleep($waitUsleep);
         }
 
         $this->mergeUserPermissions($userId);

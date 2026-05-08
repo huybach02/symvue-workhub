@@ -615,9 +615,16 @@ class UserService
     public function checkUserHasCustomPermission(int $id)
     {
         $user = $this->entityManager->find(User::class, $id);
+        if (!$user) {
+            return null;
+        }
+
         $userHasCustomPermission = $this->entityManager
             ->getRepository(UserHasCustomPermission::class)
             ->findOneBy(["user" => $user]);
+        if (!$userHasCustomPermission) {
+            return null;
+        }
 
         $moduleName = [];
 
@@ -625,8 +632,7 @@ class UserService
             $moduleName[] = convertSlugToNameWithUpperWords($item["name"]);
         }
 
-
-        return $userHasCustomPermission !== null ? $moduleName : null;
+        return $moduleName;
     }
 
     public function updateUserPermission(int $id, array $permissions)

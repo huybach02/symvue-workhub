@@ -2,6 +2,7 @@
     <v-card variant="outlined" class="position-relative overflow-hidden">
         <v-overlay
             :model-value="permissionLoading"
+            absolute
             contained
             scrim="rgba(255, 255, 255, 0.6)"
             class="align-center justify-center"
