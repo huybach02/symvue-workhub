@@ -309,12 +309,18 @@ export default {
             }
         },
         syncPermissionStates() {
+            this.syncingFromModel = true;
+
             if (!this.permissions.length) {
-                this.permissionStates = [];
+                if (this.permissionStates.length) {
+                    this.permissionStates = [];
+                }
+
+                this.$nextTick(() => {
+                    this.syncingFromModel = false;
+                });
                 return;
             }
-
-            this.syncingFromModel = true;
 
             this.permissionStates = this.permissions.map((permission) => {
                 const stateByPosition = {};
