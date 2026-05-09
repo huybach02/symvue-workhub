@@ -69,6 +69,7 @@
     "position_is_manager": "Position is manager of department",
     "ngay_bat_dau": "Start Date",
     "ngay_ket_thuc": "End Date",
+    "chon_ngay": "Select Date",
     "thoi_gian_bat_dau": "Start Time",
     "thoi_gian_ket_thuc": "End Time"
   }

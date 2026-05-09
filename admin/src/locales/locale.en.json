@@ -328,6 +328,13 @@
     "work_weekend_holiday": "Work overtime on weekends/holidays",
     "days_will_keep_off": "The following days will remain as off days:",
     "select_days_to_work": "Select days to work overtime (at least 1 day):",
-    "please_select_at_least_one_day": "Please select at least 1 day to work overtime"
+    "please_select_at_least_one_day": "Please select at least 1 day to work overtime",
+    "fixed_schedule": "Fixed Work Schedule",
+    "override_schedule": "Override Work Schedule",
+    "holiday_schedule": "Holiday Schedule",
+    "add_override_schedule": "Add Override Schedule",
+    "please_select_time_and_members": "Please select time and members",
+    "add_fulltime_schedule": "Add Fixed Work Schedule",
+    "nhan_su": "Employee"
   }
 }

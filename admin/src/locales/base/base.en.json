@@ -20,7 +20,12 @@
     "note": "Note:",
     "yesterday": "Yesterday",
     "today": "Today",
-    "mobile_alert": "This feature is not available on mobile. Please use on desktop."
+    "mobile_alert": "This feature is not available on mobile. Please use on desktop.",
+    "selected": "Selected",
+    "select_all": "Select all",
+    "deselect_all": "Deselect all",
+    "empty_state": "Empty",
+    "not_available": "Not available"
   },
   "title": {
     "create": "Create",

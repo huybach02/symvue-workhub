@@ -2,13 +2,13 @@
     <div>
         <div class="text-right">
             <v-btn color="primary" @click="dialog = true">
-                Thêm lịch làm việc
+                {{ $t('work_schedule.add_fulltime_schedule') }}
             </v-btn>
         </div>
 
         <v-dialog v-model="dialog" max-width="1100" scrollable persistent>
             <v-card
-                title="Thêm lịch làm việc"
+                :title="$t('work_schedule.add_fulltime_schedule')"
                 :prepend-icon="'mdi-plus-circle-outline'"
                 class="position-relative"
             >
@@ -25,24 +25,24 @@
                     <v-row>
                         <v-col cols="12" md="6">
                             <div class="mb-2">
-                                Ngày bắt đầu
+                                {{ $t('field.ngay_bat_dau') }}
                                 <span class="text-red"> * </span>
                             </div>
                             <DatePicker
                                 :model-value="form.startDate"
-                                placeholder="Chọn ngày bắt đầu"
+                                :placeholder="$t('field.chon_ngay')"
                                 @update:model-value="form.startDate = $event"
                             />
                         </v-col>
 
                         <v-col cols="12" md="6">
                             <div class="mb-2">
-                                Ngày kết thúc
+                                {{ $t('field.ngay_ket_thuc') }}
                                 <span class="text-red"> * </span>
                             </div>
                             <DatePicker
                                 :model-value="form.endDate"
-                                placeholder="Chọn ngày kết thúc"
+                                :placeholder="$t('field.chon_ngay')"
                                 @update:model-value="form.endDate = $event"
                             />
                         </v-col>
@@ -54,10 +54,10 @@
                         >
                             <div>
                                 <div class="text-h6 font-weight-bold">
-                                    Danh sách nhân sự
+                                    {{ $t('work_schedule.danh_sach_nhan_su') }}
                                 </div>
                                 <div class="text-medium-emphasis text-body-2">
-                                    Chọn nhân sự áp dụng lịch làm việc cố định
+                                    {{ $t('work_schedule.chon_nhan_su_ap_dung') }}
                                 </div>
                             </div>
 
@@ -65,7 +65,7 @@
                                 class="d-flex align-center justify-end ga-2 w-100 w-sm-auto"
                             >
                                 <div class="text-body-2 text-medium-emphasis">
-                                    Đã chọn: {{ selectedMemberIds.length }}
+                                    {{ $t('base.selected') }}: {{ selectedMemberIds.length }}
                                 </div>
 
                                 <v-btn
@@ -75,8 +75,8 @@
                                 >
                                     {{
                                         isAllMembersSelected
-                                            ? "Bỏ chọn tất cả"
-                                            : "Chọn tất cả"
+                                            ? $t('base.deselect_all')
+                                            : $t('base.select_all')
                                     }}
                                 </v-btn>
                             </div>
@@ -122,7 +122,7 @@
                                                     {{
                                                         member.email ||
                                                         member.maNhanVien ||
-                                                        "Chưa có thông tin"
+                                                        $t('base.not_available')
                                                     }}
                                                 </div>
                                             </div>
@@ -147,8 +147,8 @@
                         <v-empty-state
                             v-else
                             icon="mdi-account-group-outline"
-                            text="Chưa có nhân sự nào để chọn"
-                            title="Danh sách nhân sự trống"
+                            :text="$t('base.no_data')"
+                            :title="$t('base.empty_state')"
                         />
                     </div>
                 </v-card-text>
@@ -161,7 +161,7 @@
                         :loading="isLoading"
                         @click="handleCreate"
                     >
-                        Xác nhận
+                        {{ $t('base.confirm') }}
                     </v-btn>
                 </v-card-actions>
             </v-card>

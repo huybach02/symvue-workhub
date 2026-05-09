@@ -64,7 +64,10 @@
         >
             <thead class="header-custom">
                 <tr>
-                    <th class="sticky-col-left column-header header-custom">
+                    <th
+                        v-if="showPersonnelColumn"
+                        class="sticky-col-left column-header header-custom personnel-header"
+                    >
                         Nhân sự
                     </th>
 
@@ -84,158 +87,25 @@
                 </tr>
             </thead>
 
-            <tbody v-if="currentMode !== 'day'">
-                <tr v-for="user in users" :key="user.id">
-                    <td class="sticky-col-left user-cell">
-                        <div class="d-flex align-center justify-space-between">
-                            <v-list-item
-                                :title="user.name"
-                                class="px-0 flex-grow-1"
-                            >
-                                <template #prepend>
-                                    <v-avatar
-                                        v-if="user.image"
-                                        :image="user.image"
-                                    />
-                                    <v-avatar v-else icon="mdi-account" />
-                                </template>
-                            </v-list-item>
-                            <v-menu
-                                v-if="hasUserFixedSchedule(user)"
-                                :close-on-content-click="true"
-                                location="top"
-                            >
-                                <template #activator="{ props }">
-                                    <v-btn
-                                        v-bind="props"
-                                        icon="mdi-dots-vertical"
-                                        variant="text"
-                                        density="compact"
-                                        @click="selectedUser = user"
-                                    />
-                                </template>
-                                <v-list density="compact">
-                                    <v-list-item
-                                        prepend-icon="mdi-calendar-plus"
-                                        title="Thêm lịch thay thế"
-                                        @click="handleAddOverride(user)"
-                                    />
-                                    <v-list-item
-                                        prepend-icon="mdi-calendar-remove"
-                                        title="Xóa lịch làm việc"
-                                        class="text-error"
-                                        @click="handleClearSchedule(user)"
-                                    />
-                                </v-list>
-                            </v-menu>
-                        </div>
-                    </td>
+            <CalendarFulltimeBody
+                v-if="isFulltime"
+                :users="users"
+                :events="events"
+                :calendar-columns="calendarColumns"
+                :current-mode="currentMode"
+                :base-date="baseDate"
+                @add-override="handleAddOverride"
+                @clear-schedule="handleClearSchedule"
+            />
 
-                    <td
-                        v-for="col in calendarColumns"
-                        :key="col.value"
-                        :title="col.holidayName || null"
-                        class="calendar-cell text-center"
-                        :class="{
-                            'holiday-cell': col.isHoliday,
-                            'weekend-cell': col.isWeekend && !col.isHoliday,
-                            'today-cell': col.isToday,
-                        }"
-                    >
-                        <div class="events-container">
-                            <v-chip
-                                v-if="col.isHoliday"
-                                size="x-small"
-                                color="red"
-                                text-color="red-darken-3"
-                                class="ma-1 font-weight-bold holiday-tag"
-                                variant="flat"
-                            >
-                                {{ col.holidayName || "Nghỉ lễ" }}
-                            </v-chip>
-
-                            <v-chip
-                                v-for="event in getEvents(user.id, col.value)"
-                                :key="event.id"
-                                :color="event.color"
-                                size="small"
-                                class="ma-1 w-100 justify-center font-weight-bold"
-                                variant="flat"
-                            >
-                                {{ event.title }}
-                            </v-chip>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-
-            <tbody v-else>
-                <tr v-for="user in users" :key="user.id">
-                    <td class="sticky-col-left user-cell">
-                        <div class="d-flex align-center justify-space-between">
-                            <v-list-item
-                                :title="user.name"
-                                class="px-0 flex-grow-1"
-                            >
-                                <template #prepend>
-                                    <v-avatar
-                                        v-if="user.image"
-                                        :image="user.image"
-                                    />
-                                    <v-avatar v-else icon="mdi-account" />
-                                </template>
-                            </v-list-item>
-                            <v-menu
-                                v-if="hasUserFixedSchedule(user)"
-                                :close-on-content-click="true"
-                                location="top"
-                            >
-                                <template #activator="{ props }">
-                                    <v-btn
-                                        v-bind="props"
-                                        icon="mdi-dots-vertical"
-                                        variant="text"
-                                        density="compact"
-                                        @click="selectedUser = user"
-                                    />
-                                </template>
-                                <v-list density="compact">
-                                    <v-list-item
-                                        v-if="hasUserFixedSchedule(user)"
-                                        prepend-icon="mdi-calendar-plus"
-                                        title="Thêm lịch thay thế"
-                                        @click="handleAddOverride(user)"
-                                    />
-                                    <v-list-item
-                                        prepend-icon="mdi-calendar-remove"
-                                        title="Xóa lịch làm việc"
-                                        class="text-error"
-                                        @click="handleClearSchedule(user)"
-                                    />
-                                </v-list>
-                            </v-menu>
-                        </div>
-                    </td>
-
-                    <td
-                        v-for="cell in getDayModeRowCells(user.id)"
-                        :key="cell.key"
-                        class="calendar-cell text-center day-mode-cell"
-                        :colspan="cell.colspan"
-                    >
-                        <div v-if="cell.event" class="day-mode-event-wrapper">
-                            <v-chip
-                                :color="cell.event.color"
-                                size="small"
-                                class="w-100 justify-center font-weight-bold day-mode-chip"
-                                variant="flat"
-                            >
-                                {{ cell.event.title }}
-                            </v-chip>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
+            <CalendarParttimeBody
+                v-else
+                :shifts="shifts"
+                :calendar-columns="calendarColumns"
+                :current-mode="currentMode"
+                :base-date="baseDate"
+                @shift-selected="handleShiftSelected"
+            />
         </v-table>
     </v-container>
 </template>
@@ -244,11 +114,13 @@
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import updateLocale from "dayjs/plugin/updateLocale";
+import CalendarFulltimeBody from "./calendar/CalendarFulltimeBody.vue";
+import CalendarParttimeBody from "./calendar/CalendarParttimeBody.vue";
+import {
+    DAY_MODE_END_HOUR,
+    DAY_MODE_START_HOUR,
+} from "./calendar/calendarShared";
 
-const DAY_MODE_START_HOUR = 0;
-const DAY_MODE_END_HOUR = 23;
-
-// Cấu hình Dayjs để tuần bắt đầu vào Thứ 2
 dayjs.extend(updateLocale);
 dayjs.updateLocale("vi", {
     weekStart: 1,
@@ -257,60 +129,74 @@ dayjs.locale("vi");
 
 export default {
     name: "ResourceCalendar",
+    components: {
+        CalendarFulltimeBody,
+        CalendarParttimeBody,
+    },
     props: {
         dataCalendar: {
-            type: Array,
-            default: () => [],
+            type: Object,
+            default: () => ({}),
         },
         type: {
             type: String,
             default: "fulltime",
         },
     },
-    emits: ["addOverride", "clearSchedule", "userSelected"],
+    emits: ["addOverride", "clearSchedule", "userSelected", "shiftSelected"],
     data() {
         return {
-            currentMode: "week", // 'day', 'week', 'month'
-            baseDate: dayjs(), // Mốc thời gian hiện tại đang xem
-            selectedUser: null, // User đang mở dropdown menu
+            currentMode: "week",
+            baseDate: dayjs(),
         };
     },
-
     computed: {
+        isFulltime() {
+            return this.type === "fulltime";
+        },
+        showPersonnelColumn() {
+            return this.isFulltime;
+        },
         users() {
             return this.dataCalendar?.users ?? [];
         },
-
         events() {
             return (
-                this.dataCalendar?.events.filter(
+                this.dataCalendar?.events?.filter(
                     (event) => event.startTime && event.endTime,
                 ) ?? []
             );
         },
-
-        // Tiêu đề hiển thị
+        shifts() {
+            return (
+                this.dataCalendar?.shifts?.filter(
+                    (shift) => shift.startTime && shift.endTime,
+                ) ?? []
+            );
+        },
         currentLabel() {
             if (this.currentMode === "day") {
                 const weekday = this.baseDate.format("dddd");
                 const capitalizedWeekday =
                     weekday.charAt(0).toUpperCase() + weekday.slice(1);
+
                 return `${capitalizedWeekday} (${this.baseDate.format("DD/MM/YYYY")})`;
             }
+
             if (this.currentMode === "week") {
                 const start = this.baseDate
                     .startOf("week")
                     .format("DD/MM/YYYY");
                 const end = this.baseDate.endOf("week").format("DD/MM/YYYY");
+
                 return `Tuần: ${start} - ${end}`;
             }
+
             return `Tháng ${this.baseDate.format("MM / YYYY")}`;
         },
-
-        // Logic sinh cột & Xác định ngày hôm nay
         calendarColumns() {
             const columns = [];
-            const today = dayjs(); // Lấy ngày thực tế của hệ thống
+            const today = dayjs();
 
             if (this.currentMode === "month") {
                 const daysInMonth = this.baseDate.daysInMonth();
@@ -318,74 +204,62 @@ export default {
 
                 for (let i = 0; i < daysInMonth; i++) {
                     const currentDay = startOfMonth.add(i, "day");
-                    const holiday = this.getHolidayInfo(currentDay);
-                    columns.push({
-                        label: this.formatWeekdayLabel(currentDay),
-                        value: currentDay.format("YYYY-MM-DD"),
-                        isWeekend:
-                            currentDay.day() === 0 || currentDay.day() === 6,
-                        isHoliday: !!holiday,
-                        holidayName: holiday?.name ?? "",
-                        isToday: currentDay.isSame(today, "day"), // So sánh có phải hôm nay không
-                    });
+                    columns.push(this.buildDateColumn(currentDay, today));
                 }
-            } else if (this.currentMode === "week") {
+
+                return columns;
+            }
+
+            if (this.currentMode === "week") {
                 const startOfWeek = this.baseDate.startOf("week");
 
                 for (let i = 0; i < 7; i++) {
                     const currentDay = startOfWeek.add(i, "day");
-                    const holiday = this.getHolidayInfo(currentDay);
-                    columns.push({
-                        label: this.formatWeekdayLabel(currentDay),
-                        value: currentDay.format("YYYY-MM-DD"),
-                        isWeekend:
-                            currentDay.day() === 0 || currentDay.day() === 6,
-                        isHoliday: !!holiday,
-                        holidayName: holiday?.name ?? "",
-                        isToday: currentDay.isSame(today, "day"), // So sánh có phải hôm nay không
-                    });
+                    columns.push(this.buildDateColumn(currentDay, today));
                 }
-            } else if (this.currentMode === "day") {
-                for (let i = DAY_MODE_START_HOUR; i <= DAY_MODE_END_HOUR; i++) {
-                    const hourStr = i < 10 ? `0${i}:00` : `${i}:00`;
-                    columns.push({
-                        label: `${i}:00`,
-                        value: hourStr,
-                        isWeekend: false,
-                        isHoliday: false,
-                        holidayName: "",
-                        isToday: false, // Ở Mode ngày (hiển thị giờ) không cần highlight cả cột
-                    });
-                }
+
+                return columns;
+            }
+
+            for (let i = DAY_MODE_START_HOUR; i <= DAY_MODE_END_HOUR; i++) {
+                const hourStr = i < 10 ? `0${i}:00` : `${i}:00`;
+                columns.push({
+                    label: `${i}:00`,
+                    value: hourStr,
+                    isWeekend: false,
+                    isHoliday: false,
+                    holidayName: "",
+                    isToday: false,
+                });
             }
 
             return columns;
         },
     },
-
     methods: {
-        hasUserFixedSchedule(user) {
-            return this.dataCalendar?.events?.some(
-                (event) =>
-                    event.source === "fixed_schedule" &&
-                    event.user_id === user.id,
-            );
+        buildDateColumn(currentDay, today) {
+            const holiday = this.getHolidayInfo(currentDay);
+
+            return {
+                label: this.formatWeekdayLabel(currentDay),
+                value: currentDay.format("YYYY-MM-DD"),
+                isWeekend: currentDay.day() === 0 || currentDay.day() === 6,
+                isHoliday: Boolean(holiday),
+                holidayName: holiday?.name ?? "",
+                isToday: currentDay.isSame(today, "day"),
+            };
         },
         getHolidayInfo(date) {
             const dateValue = date.format("YYYY-MM-DD");
             const year = date.year();
             const holidayRanges =
                 this.$store.getters["workSchedule/holidaySchedule"][year] ?? [];
-            const matchedHoliday = holidayRanges.find(
+
+            return holidayRanges.find(
                 (holiday) =>
                     dateValue >= holiday.start && dateValue <= holiday.end,
             );
-
-            if (matchedHoliday) {
-                return matchedHoliday;
-            }
         },
-
         formatWeekdayLabel(date) {
             const weekday = date.format("dddd");
             const capitalizedWeekday =
@@ -393,89 +267,18 @@ export default {
 
             return `${capitalizedWeekday} (${date.format("DD/MM")})`;
         },
-
-        getDayModeEvents(userId) {
-            return this.events
-                .filter(
-                    (event) =>
-                        event.user_id === userId &&
-                        event.date === this.baseDate.format("YYYY-MM-DD"),
-                )
-                .sort((left, right) =>
-                    left.startTime.localeCompare(right.startTime),
-                );
-        },
-
-        getEventSpanHours(event) {
-            const startHour = Number(event.startTime.split(":")[0]);
-            const endHour = Number(
-                (event.endTime || event.startTime).split(":")[0],
-            );
-
-            return Math.max(1, endHour - startHour);
-        },
-
-        getDayModeRowCells(userId) {
-            const cells = [];
-            const events = this.getDayModeEvents(userId);
-            let currentHour = DAY_MODE_START_HOUR;
-
-            events.forEach((event) => {
-                const startHour = Number(event.startTime.split(":")[0]);
-                const spanHours = this.getEventSpanHours(event);
-
-                if (startHour > currentHour) {
-                    cells.push({
-                        key: `empty-${userId}-${currentHour}`,
-                        colspan: startHour - currentHour,
-                        event: null,
-                    });
-                }
-
-                cells.push({
-                    key: `event-${event.id}`,
-                    colspan: spanHours,
-                    event,
-                });
-
-                currentHour = startHour + spanHours;
-            });
-
-            if (currentHour <= DAY_MODE_END_HOUR) {
-                cells.push({
-                    key: `empty-${userId}-${currentHour}-end`,
-                    colspan: DAY_MODE_END_HOUR + 1 - currentHour,
-                    event: null,
-                });
-            }
-
-            return cells;
-        },
-
-        getEvents(userId, colValue) {
-            return this.events.filter((event) => {
-                if (event.user_id !== userId) return false;
-
-                if (
-                    this.currentMode === "month" ||
-                    this.currentMode === "week"
-                ) {
-                    return event.date === colValue;
-                }
-            });
-        },
-
         changeDate(amount) {
             this.baseDate = this.baseDate.add(amount, this.currentMode);
+            this.scrollTodayIntoView();
         },
-
         goToToday() {
             this.baseDate = dayjs();
             this.scrollTodayIntoView();
         },
-
         scrollTodayIntoView() {
-            if (this.currentMode !== "month") return;
+            if (this.currentMode !== "month") {
+                return;
+            }
 
             this.$nextTick(() => {
                 const tableRef = this.$refs.calendarTable;
@@ -486,7 +289,9 @@ export default {
                     `th[data-date="${dayjs().format("YYYY-MM-DD")}"]`,
                 );
 
-                if (!wrapper || !todayColumn) return;
+                if (!wrapper || !todayColumn) {
+                    return;
+                }
 
                 const stickyColumnWidth =
                     tableElement.querySelector(".sticky-col-left")
@@ -500,15 +305,16 @@ export default {
                 });
             });
         },
-
         handleClearSchedule(user) {
             this.$emit("clearSchedule", user);
             this.$emit("userSelected", user);
         },
-
         handleAddOverride(user) {
             this.$emit("addOverride", user);
             this.$emit("userSelected", user);
+        },
+        handleShiftSelected(shift) {
+            this.$emit("shiftSelected", shift);
         },
     },
 };
@@ -564,81 +370,97 @@ export default {
     border: 1px solid #e0e0e0;
 }
 
-.column-header {
+:deep(.calendar-table table) {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+:deep(.column-header) {
     min-width: 120px;
     border-right: 1px solid #e0e0e0;
     border-bottom: 1px solid #e0e0e0;
 }
 
-.calendar-cell {
+:deep(.calendar-cell) {
     border-right: 1px solid #e0e0e0;
     border-bottom: 1px solid #e0e0e0;
     vertical-align: top;
     padding: 8px !important;
 }
 
-.day-mode-cell {
+:deep(.day-mode-cell) {
     padding: 6px !important;
 }
 
-.weekend-cell {
+:deep(.weekend-cell) {
     background-color: #fff3e0 !important;
 }
 
-.holiday-cell {
+:deep(.holiday-cell) {
     background-color: #ffebee !important;
 }
 
-.holiday-tag {
+:deep(.holiday-tag) {
     max-width: 100%;
 }
 
-.events-container {
+:deep(.events-container) {
     min-height: 40px;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.day-mode-event-wrapper {
+:deep(.day-mode-event-wrapper) {
     min-height: 40px;
     display: flex;
     align-items: center;
 }
 
-.day-mode-chip {
+:deep(.day-mode-chip) {
     min-height: 32px;
 }
 
-/* --- Sticky Column --- */
-.sticky-col-left {
+:deep(.sticky-col-left) {
     position: sticky;
     left: 0;
     background-color: white;
-    z-index: 2;
+    background-clip: padding-box;
+    z-index: 4;
     border-right: 2px solid #bdbdbd !important;
 }
 
-thead th.sticky-col-left {
-    z-index: 3;
+:deep(thead th.sticky-col-left) {
+    z-index: 6;
 }
 
-.user-cell {
+:deep(.user-cell) {
+    width: 250px;
     min-width: 250px;
+    max-width: 250px;
     border-right: 1px solid #e0e0e0;
     border-bottom: 1px solid #e0e0e0;
     vertical-align: top;
     padding: 8px 16px !important;
 }
 
-.today-cell {
+:deep(th.personnel-header) {
+    width: 250px;
+    min-width: 250px;
+    max-width: 250px;
+}
+
+:deep(.today-cell) {
     box-shadow:
         inset 2px 0 0 #f44336,
         inset -2px 0 0 #f44336;
 }
 
-/* Fix viền dưới cùng cho ô today-cell cuối cùng (nếu cần) */
-tbody tr:last-child .today-cell {
+:deep(tbody tr:last-child .today-cell) {
     border-bottom: 2px solid #f44336 !important;
+}
+
+.personnel-header {
+    background-color: #1da2ac !important;
 }
 </style>

@@ -20,7 +20,12 @@
     "note": "Ghi chú: ",
     "yesterday": "Hôm qua",
     "today": "Hôm nay",
-    "mobile_alert": "Chức năng này chưa khả dụng trên mobile. Vui lòng sử dụng trên máy tính."
+    "mobile_alert": "Chức năng này chưa khả dụng trên mobile. Vui lòng sử dụng trên máy tính.",
+    "selected": "Đã chọn",
+    "select_all": "Chọn tất cả",
+    "deselect_all": "Bỏ chọn tất cả",
+    "empty_state": "Trống",
+    "not_available": "Không có"
   },
   "title": {
     "create": "Thêm mới",

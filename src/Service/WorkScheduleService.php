@@ -157,12 +157,6 @@ class WorkScheduleService
             throw new \Exception("Chưa thiết lập thời gian làm việc cố định.");
         }
 
-        $workingTimeByDay = $this->mapWorkingTimesByDayOfWeek($workingTimes);
-
-        if ($workingTimeByDay === []) {
-            throw new \Exception("Không tìm thấy cấu hình thời gian làm việc hợp lệ.");
-        }
-
         $createdGroups = [];
 
         foreach ($users as $user) {
@@ -182,10 +176,10 @@ class WorkScheduleService
 
             $this->entityManager->persist($fixedScheduleGroup);
 
-            foreach ($workingTimeByDay as $dayOfWeek => $workingTime) {
+            foreach ($workingTimes as $workingTime) {
                 $fixedSchedule = new FixedSchedule();
                 $fixedSchedule->setFixedScheduleGroup($fixedScheduleGroup);
-                $fixedSchedule->setDayOfWeek($dayOfWeek);
+                $fixedSchedule->setDayOfWeek($workingTime->getDayOfWeek());
                 $fixedSchedule->setStartTime(
                     \DateTime::createFromFormat(
                         "H:i",
@@ -488,31 +482,6 @@ class WorkScheduleService
         return $segments;
     }
 
-    private function mapWorkingTimesByDayOfWeek(array $workingTimes): array
-    {
-        $dayOfWeekMap = array_flip(array_keys(Constanst::THOI_GIAN_LAM_VIEC));
-        $dayOfWeekMap = array_map(
-            fn(int $index) => $index + 1,
-            $dayOfWeekMap,
-        );
-
-        $mappedWorkingTimes = [];
-
-        foreach ($workingTimes as $workingTime) {
-            $dayOfWeek = $dayOfWeekMap[$workingTime->getThu()] ?? null;
-
-            if ($dayOfWeek === null) {
-                continue;
-            }
-
-            $mappedWorkingTimes[$dayOfWeek] = $workingTime;
-        }
-
-        ksort($mappedWorkingTimes);
-
-        return $mappedWorkingTimes;
-    }
-
     private function getHolidayDatesMap(): array
     {
         $holidays = $this->holidayScheduleRepository->findBy(["status" => true]);
@@ -731,5 +700,10 @@ class WorkScheduleService
         }
 
         return $specialDays;
+    }
+
+    public function getParttimeShifts(): array
+    {
+        
     }
 }

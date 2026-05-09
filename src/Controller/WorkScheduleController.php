@@ -112,30 +112,16 @@ final class WorkScheduleController extends AbstractController
         }
     }
 
-    // #[Route("/work-schedule/{id}", methods: ["PUT"])]
-    // public function update(
-    //     int $id,
-    //     #[
-    //         MapRequestPayload(validationGroups: ["update"]),
-    //     ]
-    //     WorkScheduleDTO $exampleDTO,
-    // ): JsonResponse {
-    //     try {
-    //         $data = $this->exampleService->update($id, $exampleDTO);
-    //         return CustomResponse::success($data, t("success.updated"));
-    //     } catch (\Throwable $th) {
-    //         return CustomResponse::error($th->getMessage());
-    //     }
-    // }
-
-    // #[Route("/work-schedule/{id}", methods: ["DELETE"])]
-    // public function delete(int $id): JsonResponse
-    // {
-    //     try {
-    //         $this->exampleService->delete($id);
-    //         return CustomResponse::success([], t("success.deleted"));
-    //     } catch (\Throwable $th) {
-    //         return CustomResponse::error($th->getMessage());
-    //     }
-    // }
+    #[Route("/work-schedule/parttime/shifts", methods: ["GET"])]
+    public function getParttimeShifts(
+        Request $request,
+    ): JsonResponse {
+        try {
+            $body = $request->toArray();
+            $data = $this->workScheduleService->getParttimeShifts();
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
 }

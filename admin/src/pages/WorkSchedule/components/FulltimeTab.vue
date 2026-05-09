@@ -4,13 +4,13 @@
             <div class="flex justify-between align-center">
                 <div class="d-flex ga-3">
                     <v-chip color="blue" variant="flat" size="small">
-                        Lịch làm việc cố định
+                        {{ $t('work_schedule.fixed_schedule') }}
                     </v-chip>
                     <v-chip color="orange" variant="flat" size="small">
-                        Lịch làm việc thay thế
+                        {{ $t('work_schedule.override_schedule') }}
                     </v-chip>
                     <v-chip color="red" variant="flat" size="small">
-                        Nghỉ lễ/tết
+                        {{ $t('work_schedule.holiday_schedule') }}
                     </v-chip>
                 </div>
                 <FulltimeTabDialogCreate
@@ -29,7 +29,7 @@
 
             <v-dialog v-model="dialog" max-width="1000" scrollable persistent>
                 <v-card
-                    :title="`Thêm lịch thay thế`"
+                    :title="$t('work_schedule.add_override_schedule')"
                     :prepend-icon="`mdi-plus`"
                     class="position-relative"
                 >
@@ -90,7 +90,7 @@ export default {
     },
     data() {
         return {
-            dataCalendar: [],
+            dataCalendar: {},
             showConfirmDelete: false,
             isDeleting: false,
             userSelected: null,
@@ -126,7 +126,7 @@ export default {
     methods: {
         async getFulltime() {
             if (!this.departmentId) {
-                this.dataCalendar = [];
+                this.dataCalendar = {};
                 return;
             }
 
@@ -139,7 +139,7 @@ export default {
 
         async handleCreate(startDate, endDate, selectedMemberIds) {
             if (!startDate || !endDate || selectedMemberIds.length === 0) {
-                toast.error("Vui lòng chọn thời gian và thành viên");
+                toast.error(this.$t('work_schedule.please_select_time_and_members'));
             }
 
             this.$refs.fulltimeTabDialogCreate.isLoading = true;
