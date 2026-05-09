@@ -335,6 +335,8 @@
     "add_override_schedule": "Add Override Schedule",
     "please_select_time_and_members": "Please select time and members",
     "add_fulltime_schedule": "Add Fixed Work Schedule",
-    "nhan_su": "Employee"
+    "nhan_su": "Employee",
+    "them_lich_thay_the": "Add Override Schedule",
+    "xoa_lich_lam_viec": "Delete Work Schedule"
   }
 }

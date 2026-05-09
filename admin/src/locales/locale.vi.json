@@ -337,6 +337,8 @@
     "add_fulltime_schedule": "Thêm lịch làm việc cố định",
     "danh_sach_nhan_su": "Danh sách nhân sự",
     "chon_nhan_su_ap_dung": "Chọn nhân sự áp dụng",
-    "nhan_su": "Nhân sự"
+    "nhan_su": "Nhân sự",
+    "them_lich_thay_the": "Thêm lịch thay thế",
+    "xoa_lich_lam_viec": "Xóa lịch làm việc"
   }
 }

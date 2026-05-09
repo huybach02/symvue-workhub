@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Class\Constanst;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -63,6 +64,34 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getQuery()
             ->getOneOrNullResult()
         ;
+    }
+
+    /**
+     * @return User[]
+     */
+    public function getListParttimeMembersByDepartmentId(string $departmentId): array
+    {
+        $qb = $this->createQueryBuilder('u');
+
+        return $qb
+            ->andWhere('u.deletedAt IS NULL')
+            ->andWhere('u.hinhThucLamViec = :hinhThucLamViec')
+            ->andWhere($qb->expr()->exists(
+                $this->getEntityManager()->createQueryBuilder()
+                    ->select('1')
+                    ->from('App\\Entity\\UserPosition', 'up')
+                    ->innerJoin('up.department', 'd')
+                    ->andWhere('up.member = u')
+                    ->andWhere('d.id = :departmentId')
+                    ->andWhere('up.deletedAt IS NULL')
+                    ->getDQL()
+            ))
+            ->setParameter('departmentId', $departmentId)
+            ->setParameter('hinhThucLamViec', Constanst::HINH_THUC_LAM_VIEC['PART_TIME'])
+            ->orderBy('u.name', 'ASC')
+            ->addOrderBy('u.id', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     //    public function findOneBySomeField($value): ?User

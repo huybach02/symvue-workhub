@@ -10,6 +10,7 @@ export const deleteData = async (path, id) => {
         } else {
             toast.error(res.message);
         }
+        return res;
     } catch (error) {
         handleAxiosError(error);
     }

@@ -51,13 +51,15 @@
                     <div class="schedule-content">
                         <FulltimeTab
                             v-if="tab === 'fulltime'"
+                            :key="`fulltime-${departmentId}`"
                             :tab="tab"
                             :department-id="departmentId"
                         />
 
                         <ParttimeTab
                             v-else-if="tab === 'parttime'"
-                            :members="parttimeMembers"
+                            :key="`parttime-${departmentId}`"
+                            :department-id="departmentId"
                         />
                     </div>
                 </v-col>

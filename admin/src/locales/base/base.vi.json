@@ -73,5 +73,19 @@
     "total": "Tổng",
     "unread": "Chưa đọc",
     "read": "Đã đọc"
+  },
+  "calendar":{
+    "today": "Hôm nay",
+    "day": "Ngày",
+    "week": "Tuần",
+    "month": "Tháng",
+    "normal_day": "Ngày thường",
+    "weekend": "Cuối tuần",
+    "holiday": "Ngày lễ/Tết",
+    "personnel": "Nhân sự",
+    "noShifts": "Chưa có ca làm việc",
+    "assigned": "Nhân sự đã được thiết lập",
+    "clickShiftToAssign": "Click vào ca làm việc để gán nhân sự",
+    "assignPersonnel": "Gán nhân sự cho ca làm việc"
   }
 }

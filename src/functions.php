@@ -224,3 +224,13 @@ if (!function_exists('convertSlugToNameWithUpperWords')) {
         return ucwords(str_replace('-', ' ', $slug));
     }
 }
+
+if (!function_exists('formatTimeString')) {
+    function formatTimeString(string $time): string
+    {
+        $dateTime = \DateTime::createFromFormat("H:i:s", $time)
+            ?: \DateTime::createFromFormat("H:i", $time);
+
+        return $dateTime ? $dateTime->format("H:i") : substr($time, 0, 5);
+    }
+}

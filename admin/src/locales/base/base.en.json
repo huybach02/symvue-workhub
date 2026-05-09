@@ -73,5 +73,19 @@
     "total": "Total",
     "unread": "Unread",
     "read": "Read"
+  },
+  "calendar":{
+    "today": "Today",
+    "day": "Day",
+    "week": "Week",
+    "month": "Month",
+    "normal_day": "Normal day",
+    "weekend": "Weekend",
+    "holiday": "Holiday",
+    "personnel": "Personnel",
+    "noShifts": "No shifts today",
+    "assigned": "Assigned personnel",
+    "clickShiftToAssign": "Click to assign personnel",
+    "assignPersonnel": "Assign personnel to shift"
   }
 }

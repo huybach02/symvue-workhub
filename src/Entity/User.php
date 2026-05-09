@@ -166,6 +166,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
     #[ORM\OneToMany(targetEntity: FixedScheduleOverride::class, mappedBy: 'member')]
     private Collection $fixedScheduleOverrides;
 
+    /**
+     * @var Collection<int, WorkShiftAssignment>
+     */
+    #[ORM\OneToMany(targetEntity: WorkShiftAssignment::class, mappedBy: 'member')]
+    private Collection $workShiftAssignments;
+
     public function __construct()
     {
         $this->folders = new ArrayCollection();
@@ -177,6 +183,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
         $this->leaveSchedules = new ArrayCollection();
         $this->fixedScheduleGroups = new ArrayCollection();
         $this->fixedScheduleOverrides = new ArrayCollection();
+        $this->workShiftAssignments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -809,6 +816,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
             // set the owning side to null (unless already changed)
             if ($fixedScheduleOverride->getMember() === $this) {
                 $fixedScheduleOverride->setMember(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, WorkShiftAssignment>
+     */
+    public function getWorkShiftAssignments(): Collection
+    {
+        return $this->workShiftAssignments;
+    }
+
+    public function addWorkShiftAssignment(WorkShiftAssignment $workShiftAssignment): static
+    {
+        if (!$this->workShiftAssignments->contains($workShiftAssignment)) {
+            $this->workShiftAssignments->add($workShiftAssignment);
+            $workShiftAssignment->setMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWorkShiftAssignment(WorkShiftAssignment $workShiftAssignment): static
+    {
+        if ($this->workShiftAssignments->removeElement($workShiftAssignment)) {
+            // set the owning side to null (unless already changed)
+            if ($workShiftAssignment->getMember() === $this) {
+                $workShiftAssignment->setMember(null);
             }
         }
 

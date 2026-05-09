@@ -1,5 +1,22 @@
 <template>
-    <tbody v-if="currentMode !== 'day'">
+    <tbody v-if="loading">
+        <tr>
+            <td
+                :colspan="calendarColumns.length + 1"
+                class="calendar-cell calendar-loading-cell"
+            >
+                <div class="calendar-loading-wrap">
+                    <v-progress-circular
+                        indeterminate
+                        color="primary"
+                        size="36"
+                    />
+                </div>
+            </td>
+        </tr>
+    </tbody>
+
+    <tbody v-else-if="currentMode !== 'day'">
         <tr v-for="user in users" :key="user.id">
             <td class="sticky-col-left user-cell">
                 <div class="d-flex align-center justify-space-between">
@@ -25,12 +42,12 @@
                         <v-list density="compact">
                             <v-list-item
                                 prepend-icon="mdi-calendar-plus"
-                                title="Thêm lịch thay thế"
+                                title="{{ $t('calendar.addOverride') }}"
                                 @click="$emit('addOverride', user)"
                             />
                             <v-list-item
                                 prepend-icon="mdi-calendar-remove"
-                                title="Xóa lịch làm việc"
+                                title="{{ $t('calendar.deleteSchedule') }}"
                                 class="text-error"
                                 @click="$emit('clearSchedule', user)"
                             />
@@ -103,12 +120,12 @@
                         <v-list density="compact">
                             <v-list-item
                                 prepend-icon="mdi-calendar-plus"
-                                title="Thêm lịch thay thế"
+                                title="{{ $t('calendar.addOverride') }}"
                                 @click="$emit('addOverride', user)"
                             />
                             <v-list-item
                                 prepend-icon="mdi-calendar-remove"
-                                title="Xóa lịch làm việc"
+                                title="{{ $t('calendar.deleteSchedule') }}"
                                 class="text-error"
                                 @click="$emit('clearSchedule', user)"
                             />
@@ -166,6 +183,11 @@ export default {
         },
     },
     emits: ["addOverride", "clearSchedule"],
+    computed: {
+        loading() {
+            return this.$store.getters["workSchedule/fulltimeLoading"];
+        },
+    },
     methods: {
         hasUserFixedSchedule(user) {
             return this.events.some(
@@ -195,3 +217,16 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.calendar-loading-cell {
+    padding: 32px 16px !important;
+}
+
+.calendar-loading-wrap {
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>

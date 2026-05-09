@@ -5,12 +5,24 @@
                 <v-icon>mdi-chevron-left</v-icon>
             </v-btn>
 
-            <v-toolbar-title
-                class="font-weight-bold text-h6"
-                style="min-width: 200px; text-align: center"
-            >
-                {{ currentLabel }}
-            </v-toolbar-title>
+            <div class="calendar-title-group">
+                <v-toolbar-title
+                    class="font-weight-bold text-h6 calendar-title"
+                >
+                    {{ currentLabel }}
+                </v-toolbar-title>
+
+                <DatePicker
+                    :model-value="baseDate.format('YYYY-MM-DD')"
+                    placeholder="Chọn ngày"
+                    icon-only
+                    icon="mdi-calendar-month-outline"
+                    icon-variant="text"
+                    density="compact"
+                    class="calendar-picker-trigger"
+                    @update:model-value="handleDatePicked"
+                />
+            </div>
 
             <v-btn icon @click="changeDate(1)">
                 <v-icon>mdi-chevron-right</v-icon>
@@ -22,7 +34,7 @@
                 size="small"
                 @click="goToToday"
             >
-                Hôm nay
+                {{ $t("calendar.today") }}
             </v-btn>
 
             <v-spacer></v-spacer>
@@ -34,24 +46,24 @@
                 variant="outlined"
                 density="compact"
             >
-                <v-btn value="day">Ngày</v-btn>
-                <v-btn value="week">Tuần</v-btn>
-                <v-btn value="month">Tháng</v-btn>
+                <v-btn value="day">{{ $t("calendar.day") }}</v-btn>
+                <v-btn value="week">{{ $t("calendar.week") }}</v-btn>
+                <v-btn value="month">{{ $t("calendar.month") }}</v-btn>
             </v-btn-toggle>
         </v-toolbar>
 
         <div class="calendar-legend">
             <div class="legend-item">
                 <span class="legend-color legend-color-normal"></span>
-                <span>Ngày thường</span>
+                <span>{{ $t("calendar.normal_day") }}</span>
             </div>
             <div class="legend-item">
                 <span class="legend-color legend-color-weekend"></span>
-                <span>Thứ 7, Chủ nhật</span>
+                <span>{{ $t("calendar.weekend") }}</span>
             </div>
             <div class="legend-item">
                 <span class="legend-color legend-color-holiday"></span>
-                <span>Ngày nghỉ lễ/Tết</span>
+                <span>{{ $t("calendar.holiday") }}</span>
             </div>
         </div>
 
@@ -68,7 +80,7 @@
                         v-if="showPersonnelColumn"
                         class="sticky-col-left column-header header-custom personnel-header"
                     >
-                        Nhân sự
+                        {{ $t("calendar.personnel") }}
                     </th>
 
                     <th
@@ -82,7 +94,20 @@
                                 col.isToday,
                         }"
                     >
-                        {{ col.label }}
+                        <div
+                            v-if="col.weekdayLabel && col.dateLabel"
+                            class="calendar-header-label"
+                        >
+                            <div class="calendar-header-weekday">
+                                {{ col.weekdayLabel }}
+                            </div>
+                            <div class="calendar-header-date">
+                                {{ col.dateLabel }}
+                            </div>
+                        </div>
+                        <template v-else>
+                            {{ col.label }}
+                        </template>
                     </th>
                 </tr>
             </thead>
@@ -114,6 +139,7 @@
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import updateLocale from "dayjs/plugin/updateLocale";
+import DatePicker from "@/components/DatePicker.vue";
 import CalendarFulltimeBody from "./calendar/CalendarFulltimeBody.vue";
 import CalendarParttimeBody from "./calendar/CalendarParttimeBody.vue";
 import {
@@ -130,6 +156,7 @@ dayjs.locale("vi");
 export default {
     name: "ResourceCalendar",
     components: {
+        DatePicker,
         CalendarFulltimeBody,
         CalendarParttimeBody,
     },
@@ -156,6 +183,11 @@ export default {
         },
         showPersonnelColumn() {
             return this.isFulltime;
+        },
+        loading() {
+            return this.isFulltime
+                ? this.$store.getters["workSchedule/fulltimeLoading"]
+                : this.$store.getters["workSchedule/parttimeLoading"];
         },
         users() {
             return this.dataCalendar?.users ?? [];
@@ -242,6 +274,8 @@ export default {
 
             return {
                 label: this.formatWeekdayLabel(currentDay),
+                weekdayLabel: this.getWeekdayDisplay(currentDay),
+                dateLabel: `(${currentDay.format("DD/MM")})`,
                 value: currentDay.format("YYYY-MM-DD"),
                 isWeekend: currentDay.day() === 0 || currentDay.day() === 6,
                 isHoliday: Boolean(holiday),
@@ -261,11 +295,11 @@ export default {
             );
         },
         formatWeekdayLabel(date) {
+            return `${this.getWeekdayDisplay(date)} (${date.format("DD/MM")})`;
+        },
+        getWeekdayDisplay(date) {
             const weekday = date.format("dddd");
-            const capitalizedWeekday =
-                weekday.charAt(0).toUpperCase() + weekday.slice(1);
-
-            return `${capitalizedWeekday} (${date.format("DD/MM")})`;
+            return weekday.charAt(0).toUpperCase() + weekday.slice(1);
         },
         changeDate(amount) {
             this.baseDate = this.baseDate.add(amount, this.currentMode);
@@ -273,6 +307,16 @@ export default {
         },
         goToToday() {
             this.baseDate = dayjs();
+            this.scrollTodayIntoView();
+        },
+        handleDatePicked(value) {
+            const normalizedDate = dayjs(value);
+
+            if (!normalizedDate.isValid()) {
+                return;
+            }
+
+            this.baseDate = normalizedDate;
             this.scrollTodayIntoView();
         },
         scrollTodayIntoView() {
@@ -328,6 +372,23 @@ export default {
 .calendar-toolbar {
     padding-inline: 0 !important;
     min-height: 56px !important;
+}
+
+.calendar-title-group {
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.calendar-title {
+    min-width: 200px;
+    text-align: center;
+}
+
+.calendar-picker-trigger {
+    flex-shrink: 0;
 }
 
 .calendar-legend {
@@ -462,5 +523,23 @@ export default {
 
 .personnel-header {
     background-color: #1da2ac !important;
+}
+
+.calendar-header-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 48px;
+    line-height: 1.2;
+}
+
+.calendar-header-weekday,
+.calendar-header-date {
+    display: block;
+    width: 100%;
+    white-space: normal;
+    text-align: center;
 }
 </style>

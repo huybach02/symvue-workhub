@@ -7,7 +7,20 @@
         :disabled="disabled"
     >
         <template #activator="{ props: activatorProps }">
+            <v-btn
+                v-if="iconOnly"
+                icon
+                :disabled="disabled"
+                :variant="iconVariant"
+                :density="density"
+                v-bind="activatorProps"
+                @click="handleActivatorClick"
+            >
+                <v-icon>{{ icon }}</v-icon>
+            </v-btn>
+
             <v-text-field
+                v-else
                 :model-value="displayValue"
                 :placeholder="placeholder"
                 :error-messages="errorMessages"
@@ -98,6 +111,18 @@ export default {
         density: {
             type: String,
             default: "default",
+        },
+        iconOnly: {
+            type: Boolean,
+            default: false,
+        },
+        icon: {
+            type: String,
+            default: "mdi-calendar-blank-outline",
+        },
+        iconVariant: {
+            type: String,
+            default: "text",
         },
     },
     emits: ["update:model-value", "blur"],

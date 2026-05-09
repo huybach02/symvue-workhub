@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\WorkShiftRepository;
 use App\Traits\ModifierTrait;
 use App\Traits\TimestampableTrait;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: WorkShiftRepository::class)]
@@ -30,6 +32,20 @@ class WorkShift
 
     #[ORM\Column(length: 255)]
     private ?string $ghiChu = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $color = null;
+
+    /**
+     * @var Collection<int, WorkShiftAssignment>
+     */
+    #[ORM\OneToMany(targetEntity: WorkShiftAssignment::class, mappedBy: 'workShift')]
+    private Collection $workShiftAssignments;
+
+    public function __construct()
+    {
+        $this->workShiftAssignments = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -97,5 +113,47 @@ class WorkShift
             'createdBy' => $this->createdBy,
             'updatedBy' => $this->updatedBy,
         ];
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(?string $color): static
+    {
+        $this->color = $color;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, WorkShiftAssignment>
+     */
+    public function getWorkShiftAssignments(): Collection
+    {
+        return $this->workShiftAssignments;
+    }
+
+    public function addWorkShiftAssignment(WorkShiftAssignment $workShiftAssignment): static
+    {
+        if (!$this->workShiftAssignments->contains($workShiftAssignment)) {
+            $this->workShiftAssignments->add($workShiftAssignment);
+            $workShiftAssignment->setWorkShift($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWorkShiftAssignment(WorkShiftAssignment $workShiftAssignment): static
+    {
+        if ($this->workShiftAssignments->removeElement($workShiftAssignment)) {
+            // set the owning side to null (unless already changed)
+            if ($workShiftAssignment->getWorkShift() === $this) {
+                $workShiftAssignment->setWorkShift(null);
+            }
+        }
+
+        return $this;
     }
 }

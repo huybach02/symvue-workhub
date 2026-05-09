@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Class\Constanst;
 use App\Class\CustomResponse;
 use App\DTO\WorkShiftDTO;
 use App\DTO\WorkingTimeDTO;
@@ -63,7 +64,6 @@ class WorkingTimeService
             throw new \Exception(t("error.not_found"));
         }
 
-        // KiÃ¡Â»Æ’m tra ca lÃƒÂ m viÃ¡Â»â€¡c Ã„â€˜ÃƒÂ£ tÃ¡Â»â€œn tÃ¡ÂºÂ¡i hay chÃ†Â°a
         $caLamViec = $this->caLamViecRepository->findOneBy([
             "thoiGianLamViec" => $thoiGianLamViec,
             "gioBatDau" => $caLamViecDTO->gioBatDau,
@@ -73,10 +73,14 @@ class WorkingTimeService
             throw new \Exception(t("error.exists"));
         }
 
+        $color = array_rand(Constanst::COLOR_SHIFT);
+        
         $caLamViec = new WorkShift();
         $caLamViec->setThoiGianLamViec($thoiGianLamViec);
         $caLamViec->setGioBatDau($caLamViecDTO->gioBatDau);
         $caLamViec->setGioKetThuc($caLamViecDTO->gioKetThuc);
+        $caLamViec->setColor(Constanst::COLOR_SHIFT[$color]);
+
         $caLamViec->setGhiChu($caLamViecDTO->ghiChu);
 
         $this->entityManager->persist($caLamViec);

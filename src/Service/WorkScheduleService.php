@@ -22,6 +22,10 @@ use App\Repository\LeaveScheduleRepository;
 use App\Repository\UserRepository;
 use App\Repository\WorkingTimeRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\DTO\WorkScheduleParttimeAssignDTO;
+use App\Entity\WorkShiftAssignment;
+use App\Repository\WorkShiftAssignmentRepository;
+use App\Repository\WorkShiftRepository;
 
 class WorkScheduleService
 {
@@ -34,6 +38,8 @@ class WorkScheduleService
         private readonly FixedScheduleOverrideRepository $fixedScheduleOverrideRepository,
         private readonly LeaveScheduleRepository $leaveScheduleRepository,
         private readonly DepartmentService $departmentService,
+        private readonly WorkShiftAssignmentRepository $workShiftAssignmentRepository,
+        private readonly WorkShiftRepository $workShiftRepository,
     ) {}
 
     public function getHolidaySchedule(): array
@@ -702,8 +708,232 @@ class WorkScheduleService
         return $specialDays;
     }
 
-    public function getParttimeShifts(): array
+    public function getParttimeShifts(?string $startDate, ?string $endDate, ?string $departmentId = null): array
     {
-        
+        if (!$startDate || !$endDate) {
+            throw new \Exception("Vui lòng cung cấp startDate và endDate");
+        }
+
+        $start = (new \DateTime($startDate))->setTime(0, 0);
+        $end = (new \DateTime($endDate))->setTime(0, 0);
+
+        if ($start > $end) {
+            throw new \Exception("Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc");
+        }
+
+        $shiftsByDay = [];
+        $workingTimes = $this->workingTimeRepository->findBy([], ["dayOfWeek" => "ASC", "id" => "ASC"]);
+        $assignmentMap = [];
+        $allowedMemberIds = null;
+
+        if ($departmentId) {
+            $allowedMemberIds = array_fill_keys(
+                array_map(
+                    fn(User $member): int => $member->getId(),
+                    $this->userRepository->getListParttimeMembersByDepartmentId($departmentId),
+                ),
+                true,
+            );
+        }
+
+        foreach ($this->workShiftAssignmentRepository->findByDateRange($start, $end) as $assignment) {
+            $member = $assignment->getMember();
+            $workShift = $assignment->getWorkShift();
+            $assignmentDate = $assignment->getDate();
+
+            if (!$member || !$workShift || !$assignmentDate) {
+                continue;
+            }
+
+            if ($allowedMemberIds !== null && !isset($allowedMemberIds[$member->getId()])) {
+                continue;
+            }
+
+            $assignmentKey = sprintf(
+                '%s-%d',
+                $assignmentDate->format('Y-m-d'),
+                $workShift->getId(),
+            );
+
+            $assignmentMap[$assignmentKey][] = [
+                'id' => $member->getId(),
+                'name' => $member->getName(),
+                'email' => $member->getEmail(),
+                'image' => $member->getImage(),
+            ];
+        }
+
+        foreach ($workingTimes as $workingTime) {
+            $dayOfWeek = $workingTime->getDayOfWeek();
+
+            if (!$dayOfWeek) {
+                continue;
+            }
+
+            foreach ($workingTime->getCaLamViecs() as $workShift) {
+                if (!$workShift->getGioBatDau() || !$workShift->getGioKetThuc()) {
+                    continue;
+                }
+
+                $shiftsByDay[$dayOfWeek][] = [
+                    "workingTimeId" => $workingTime->getId(),
+                    "workShiftId" => $workShift->getId(),
+                    "startTime" => formatTimeString($workShift->getGioBatDau()),
+                    "endTime" => formatTimeString($workShift->getGioKetThuc()),
+                    "color" => $workShift->getColor() ?? "#2e7d32",
+                    "note" => $workShift->getGhiChu() ?? "",
+                ];
+            }
+        }
+
+        foreach ($shiftsByDay as &$dayShifts) {
+            usort($dayShifts, fn(array $a, array $b): int => strcmp($a["startTime"], $b["startTime"]));
+        }
+        unset($dayShifts);
+
+        $shifts = [];
+        $currentDate = clone $start;
+
+        while ($currentDate <= $end) {
+            $date = $currentDate->format("Y-m-d");
+            $dayOfWeek = (int) $currentDate->format("N");
+
+            foreach (($shiftsByDay[$dayOfWeek] ?? []) as $index => $shift) {
+                $assignmentKey = sprintf('%s-%d', $date, $shift["workShiftId"]);
+                $assignedMembers = $assignmentMap[$assignmentKey] ?? [];
+
+                $shifts[] = [
+                    "id" => sprintf("%s-shift-%d", $date, $shift["workShiftId"]),
+                    "workShiftId" => $shift["workShiftId"],
+                    "workingTimeId" => $shift["workingTimeId"],
+                    "title" => sprintf("Ca %d", $index + 1),
+                    "date" => $date,
+                    "startTime" => $shift["startTime"],
+                    "endTime" => $shift["endTime"],
+                    "color" => $shift["color"],
+                    "assignedMembers" => $assignedMembers,
+                    "assignedUserIds" => array_values(array_map(
+                        fn(array $member): ?int => $member["id"] ?? null,
+                        $assignedMembers,
+                    )),
+                    "note" => $shift["note"],
+                ];
+            }
+
+            $currentDate->modify("+1 day");
+        }
+
+        return ["shifts" => $shifts];
+    }
+
+    public function getParttimeMembers(?string $departmentId, ?string $shiftId, ?string $date): array
+    {
+        $optionMembers = [];
+        $memberAssigneds = [];
+
+        if (!$departmentId || !$shiftId) {
+            throw new \Exception("Vui lòng cung cấp departmentId và shiftId");
+        }
+
+        $members = $this->userRepository->getListParttimeMembersByDepartmentId($departmentId);
+        $allowedMemberIds = [];
+
+        foreach ($members as $member) {
+            $allowedMemberIds[$member->getId()] = true;
+            $optionMembers[] = [
+                "title" => $member->getName(),
+                "value" => $member->getId(),
+                "image" => $member->getImage(),
+                "email" => $member->getEmail(),
+            ];
+        }
+
+        $assignments = $this->workShiftAssignmentRepository->findBy(["workShift" => $shiftId, "date" => new \DateTime($date)]);
+        foreach ($assignments as $assignment) {
+            $member = $assignment->getMember();
+            if (!$member || !isset($allowedMemberIds[$member->getId()])) {
+                continue;
+            }
+
+            $memberAssigneds[] = [
+                "id" => $member->getId(),
+                "name" => $member->getName(),
+                "email" => $member->getEmail(),
+                "image" => $member->getImage(),
+                "assignment" => $assignment->jsonSerialize(),
+            ];
+        }
+
+        return [
+            "optionMembers" => $optionMembers,
+            "memberAssigneds" => array_values($memberAssigneds),
+        ];
+    }
+
+    public function assignMemberParttimeShift(WorkScheduleParttimeAssignDTO $dto)
+    {
+        $workShift = $this->workShiftRepository->find($dto->workShiftId);
+        if (!$workShift) {
+            throw new \Exception("Ca làm việc không tồn tại");
+        }
+
+        foreach ($dto->userIds as $userId) {
+            $user = $this->userRepository->find($userId);
+            if (!$user) {
+                throw new \Exception("User không tồn tại");
+            }
+
+            $workShiftAssign = $this->workShiftAssignmentRepository->findOneBy(["member" => $user, "workShift" => $workShift]);
+            if ($workShiftAssign) {
+                continue;
+            }
+
+            $workShiftAssign = new WorkShiftAssignment();
+            $workShiftAssign->setMember($user);
+            $workShiftAssign->setWorkShift($workShift);
+            $workShiftAssign->setDate(new \DateTime($dto->date));
+            $this->entityManager->persist($workShiftAssign);
+        }
+
+        $this->entityManager->flush();
+
+        return true;
+    }
+
+    public function removeMemberParttimeShift(int $workShiftAssignmentId)
+    {
+        $workShiftAssign = $this->workShiftAssignmentRepository->find($workShiftAssignmentId);
+        if (!$workShiftAssign) {
+            throw new \Exception(t("error.not_found"));
+        }
+
+        $workShift = $workShiftAssign->getWorkShift();
+        $dateWorkShift = $workShiftAssign->getDate();
+        $startTime = $workShift?->getGioBatDau();
+
+        $currentDate = new \DateTime();
+
+        if (!$workShift || !$dateWorkShift || !$startTime) {
+            throw new \Exception(t("error.not_found"));
+        }
+
+        $shiftStartDateTime = \DateTime::createFromFormat(
+            'Y-m-d H:i',
+            sprintf('%s %s', $dateWorkShift->format('Y-m-d'), substr($startTime, 0, 5)),
+        );
+
+        if (!$shiftStartDateTime) {
+            throw new \Exception(t("error.not_found"));
+        }
+
+        // Không cho xóa khi ca làm việc đã bắt đầu hoặc đã qua
+        if ($currentDate >= $shiftStartDateTime) {
+            throw new \Exception(t("error.cannot_delete_work_shift"));
+        }
+
+        $this->entityManager->remove($workShiftAssign);
+        $this->entityManager->flush();
+
+        return true;
     }
 }

@@ -37,6 +37,7 @@ error:
     cannot_delete_manager_department: "Cannot delete manager department. Please transfer management first"
     user_already_member: "User already belongs to this department. Please choose another"
     bo_phan_has_position: "Department/Division %name% (Code: %ma_bo_phan%) has positions. Please remove all positions before deleting the department"
+    cannot_delete_work_shift: "Cannot delete work shift that has started or passed the start time"
 success:
     created: "Created successfully"
     updated: "Updated successfully"

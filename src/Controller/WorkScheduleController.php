@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\DTO\WorkScheduleParttimeAssignDTO;
 
 final class WorkScheduleController extends AbstractController
 {
@@ -117,9 +118,53 @@ final class WorkScheduleController extends AbstractController
         Request $request,
     ): JsonResponse {
         try {
-            $body = $request->toArray();
-            $data = $this->workScheduleService->getParttimeShifts();
+            $departmentId = $request->query->get("departmentId");
+            $startDate = $request->query->get("startDate");
+            $endDate = $request->query->get("endDate");
+            $data = $this->workScheduleService->getParttimeShifts($startDate, $endDate, $departmentId);
             return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route("/work-schedule/parttime/members", methods: ["GET"])]
+    public function getParttimeMembers(
+        Request $request,
+    ): JsonResponse {
+        try {
+            $departmentId = $request->query->get("departmentId");
+            $shiftId = $request->query->get("shiftId");
+            $date = $request->query->get("date");
+            $data = $this->workScheduleService->getParttimeMembers($departmentId, $shiftId, $date);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route("/work-schedule/parttime/assign", methods: ["POST"])]
+    public function assignMemberParttimeShift(
+        #[
+            MapRequestPayload(validationGroups: ["create"]),
+        ]
+        WorkScheduleParttimeAssignDTO $dto,
+    ): JsonResponse {
+        try {
+            $data = $this->workScheduleService->assignMemberParttimeShift($dto);
+            return CustomResponse::success($data, t("success.created"));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route("/work-schedule/parttime/assign/{workShiftAssignmentId}", methods: ["DELETE"])]
+    public function removeMemberParttimeShift(
+        int $workShiftAssignmentId,
+    ): JsonResponse {
+        try {
+            $data = $this->workScheduleService->removeMemberParttimeShift($workShiftAssignmentId);
+            return CustomResponse::success($data, t("success.deleted"));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }

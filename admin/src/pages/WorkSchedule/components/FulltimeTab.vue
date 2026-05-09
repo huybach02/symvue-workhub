@@ -127,14 +127,21 @@ export default {
         async getFulltime() {
             if (!this.departmentId) {
                 this.dataCalendar = {};
+                this.$store.commit("workSchedule/SET_FULLTIME_LOADING", false);
                 return;
             }
 
-            const res = await getListData(
-                `${API_ROUTES_CONFIG.workSchedule}/fulltime/${this.departmentId}`,
-            );
+            this.$store.commit("workSchedule/SET_FULLTIME_LOADING", true);
 
-            this.dataCalendar = res;
+            try {
+                const res = await getListData(
+                    `${API_ROUTES_CONFIG.workSchedule}/fulltime/${this.departmentId}`,
+                );
+
+                this.dataCalendar = res;
+            } finally {
+                this.$store.commit("workSchedule/SET_FULLTIME_LOADING", false);
+            }
         },
 
         async handleCreate(startDate, endDate, selectedMemberIds) {
