@@ -22,6 +22,9 @@ use Symfony\Component\DependencyInjection\Attribute\Target;
 #[AsEventListener(event: Events::AUTHENTICATION_SUCCESS, method: 'onAuthenticationSuccess', priority: -10)]
 class AuthenticationSuccessListener
 {
+    private const DEFAULT_REFRESH_TOKEN_TTL = 604800; // 7 days
+    private const REMEMBER_ME_REFRESH_TOKEN_TTL = 2592000; // 30 days
+
     public function __construct(
         private readonly UserRepository $userRepository,
         private GeneralSettingRepository $cauHinhChungRepository,
@@ -80,27 +83,39 @@ class AuthenticationSuccessListener
 
     private function handleRefreshTokenTTL(array $data): void
     {
-        if (isset($data['refresh_token'])) {
-            $request = $this->requestStack->getCurrentRequest();
-            try {
-                $payload = $request ? $request->toArray() : [];
-            } catch (\Exception $e) {
-                $payload = [];
-            }
+        if (!isset($data['refresh_token'])) {
+            return;
+        }
 
-            $rememberMe = $payload['rememberMe'] ?? false;
+        $request = $this->requestStack->getCurrentRequest();
 
-            $ttl = $rememberMe ? 604800 : 86400;
+        if (!$request || $request->getPathInfo() !== '/api/auth/login') {
+            return;
+        }
 
-            $refreshTokenString = $data['refresh_token'];
-            $refreshTokenObj = $this->refreshTokenManager->get($refreshTokenString);
+        try {
+            $payload = $request->toArray();
+        } catch (\Exception) {
+            $payload = [];
+        }
 
-            if ($refreshTokenObj) {
-                $validDate = new \DateTime();
-                $validDate->modify('+' . $ttl . ' seconds');
-                $refreshTokenObj->setValid($validDate);
-                $this->refreshTokenManager->save($refreshTokenObj);
-            }
+        $rememberMe = filter_var(
+            $payload['rememberMe'] ?? false,
+            FILTER_VALIDATE_BOOL
+        );
+
+        $ttl = $rememberMe
+            ? self::REMEMBER_ME_REFRESH_TOKEN_TTL
+            : self::DEFAULT_REFRESH_TOKEN_TTL;
+
+        $refreshTokenString = $data['refresh_token'];
+        $refreshTokenObj = $this->refreshTokenManager->get($refreshTokenString);
+
+        if ($refreshTokenObj) {
+            $validDate = new \DateTime();
+            $validDate->modify('+' . $ttl . ' seconds');
+            $refreshTokenObj->setValid($validDate);
+            $this->refreshTokenManager->save($refreshTokenObj);
         }
     }
 

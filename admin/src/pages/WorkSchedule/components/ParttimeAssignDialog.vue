@@ -2,7 +2,7 @@
     <div>
         <v-dialog v-model="isOpen" max-width="800">
             <v-card
-                title="{{ $t('calendar.assignPersonnel') }}"
+                :title="$t('calendar.assignPersonnel')"
                 class="position-relative parttime-dialog-card"
             >
                 <v-btn
@@ -37,7 +37,7 @@
                         :items="optionMembers"
                         item-title="title"
                         item-value="value"
-                        label="{{ $t('calendar.personnel') }}"
+                        :label="$t('calendar.personnel')"
                         variant="outlined"
                         multiple
                         chips

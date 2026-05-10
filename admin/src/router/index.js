@@ -19,9 +19,16 @@ router.beforeEach(async (to, from, next) => {
                     next({ name: NAME_ROUTES_CONFIG.dashboard });
                     return;
                 }
+
+                localStorage.removeItem("token");
+                localStorage.removeItem("refresh_token");
+                localStorage.removeItem("mercure_token");
             }
         } catch {
             console.log("Token invalid or expired");
+            localStorage.removeItem("token");
+            localStorage.removeItem("refresh_token");
+            localStorage.removeItem("mercure_token");
         }
     }
     next();

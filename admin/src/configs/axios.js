@@ -121,6 +121,7 @@ axiosInstance.interceptors.response.use(
                 },
                 {
                     headers: headers,
+                    timeout: axiosInstance.defaults.timeout || 10000,
                 },
             );
 
@@ -166,6 +167,7 @@ axiosInstance.interceptors.response.use(
 function handleLogout() {
     localStorage.removeItem("token");
     localStorage.removeItem("refresh_token");
+    localStorage.removeItem("mercure_token");
     // localStorage.removeItem("device_id");
 
     // Chuyển hướng về trang login (nếu không phải đang ở trang login)
