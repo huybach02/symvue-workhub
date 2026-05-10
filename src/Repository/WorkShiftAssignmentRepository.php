@@ -16,9 +16,13 @@ class WorkShiftAssignmentRepository extends ServiceEntityRepository
         parent::__construct($registry, WorkShiftAssignment::class);
     }
 
-    public function findByDateRange(\DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    public function findByDateRange(
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate,
+        ?array $memberIds = null,
+    ): array
     {
-        return $this->createQueryBuilder('wsa')
+        $qb = $this->createQueryBuilder('wsa')
             ->leftJoin('wsa.member', 'm')
             ->addSelect('m')
             ->leftJoin('wsa.workShift', 'ws')
@@ -26,6 +30,20 @@ class WorkShiftAssignmentRepository extends ServiceEntityRepository
             ->andWhere('wsa.date BETWEEN :startDate AND :endDate')
             ->setParameter('startDate', $startDate->format('Y-m-d'))
             ->setParameter('endDate', $endDate->format('Y-m-d'))
+        ;
+
+        if ($memberIds !== null) {
+            if ($memberIds === []) {
+                return [];
+            }
+
+            $qb
+                ->andWhere('m.id IN (:memberIds)')
+                ->setParameter('memberIds', $memberIds)
+            ;
+        }
+
+        return $qb
             ->orderBy('wsa.date', 'ASC')
             ->addOrderBy('wsa.id', 'ASC')
             ->getQuery()

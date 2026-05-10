@@ -727,25 +727,23 @@ class WorkScheduleService
         $allowedMemberIds = null;
 
         if ($departmentId) {
-            $allowedMemberIds = array_fill_keys(
-                array_map(
-                    fn(User $member): int => $member->getId(),
-                    $this->userRepository->getListParttimeMembersByDepartmentId($departmentId),
-                ),
-                true,
+            $allowedMemberIds = array_map(
+                fn(User $member): int => $member->getId(),
+                $this->userRepository->getListParttimeMembersByDepartmentId($departmentId),
             );
         }
 
-        foreach ($this->workShiftAssignmentRepository->findByDateRange($start, $end) as $assignment) {
+        $assignments = $allowedMemberIds === []
+            ? []
+            : $this->workShiftAssignmentRepository->findByDateRange($start, $end, $allowedMemberIds);
+
+        // Lấy ra danh sách nhân sự cho từng ca của từng ngày
+        foreach ($assignments as $assignment) {
             $member = $assignment->getMember();
             $workShift = $assignment->getWorkShift();
             $assignmentDate = $assignment->getDate();
 
             if (!$member || !$workShift || !$assignmentDate) {
-                continue;
-            }
-
-            if ($allowedMemberIds !== null && !isset($allowedMemberIds[$member->getId()])) {
                 continue;
             }
 
@@ -763,6 +761,7 @@ class WorkScheduleService
             ];
         }
 
+        // Lấy ra danh sách ca làm việc của từng ngày trong tuần và thông tin chi tiết ca làm việc đó
         foreach ($workingTimes as $workingTime) {
             $dayOfWeek = $workingTime->getDayOfWeek();
 
