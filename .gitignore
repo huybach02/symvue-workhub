@@ -23,3 +23,6 @@
 # /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
 .phpactor.json
+
+.lerd.yaml
+.php-version
