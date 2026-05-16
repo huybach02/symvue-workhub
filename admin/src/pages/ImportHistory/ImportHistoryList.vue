@@ -174,6 +174,7 @@ import FilterText from "@/components/filters/FilterText.vue";
 import FilterSelect from "@/components/filters/FilterSelect.vue";
 import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
+import { mapGetters } from "vuex";
 
 export default {
     name: "ImportHistoryList",
@@ -184,18 +185,6 @@ export default {
         path: {
             type: String,
             default: "",
-        },
-        items: {
-            type: Array,
-            default: () => [],
-        },
-        totalItems: {
-            type: Number,
-            default: 0,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
         },
     },
     emits: ["reload"],
@@ -297,6 +286,9 @@ export default {
                 },
             ],
         };
+    },
+    computed: {
+        ...mapGetters("importHistory", ["items", "totalItems", "loading"]),
     },
     methods: {
         openViewDialog(item) {

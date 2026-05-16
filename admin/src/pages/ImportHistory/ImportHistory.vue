@@ -4,9 +4,6 @@
             <v-col cols="12">
                 <ImportHistoryList
                     :path="path"
-                    :items="items"
-                    :total-items="totalItems"
-                    :loading="loading"
                     @reload="getDanhSach"
                 />
             </v-col>
@@ -17,7 +14,7 @@
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import ImportHistoryList from "./ImportHistoryList.vue";
-import { getListData } from "@/services/bases/getData";
+import { mapActions } from "vuex";
 
 export default {
     name: "ImportHistory",
@@ -27,26 +24,15 @@ export default {
     data() {
         return {
             path: API_ROUTES_CONFIG.lichSuImport,
-            items: [],
-            totalItems: 0,
-            loading: false,
         };
     },
     created() {
         this.getDanhSach();
     },
     methods: {
-        getDanhSach: async function (params) {
-            try {
-                this.loading = true;
-                const response = await getListData(this.path, params);
-                this.items = response.data || [];
-                this.totalItems = response.total || 0;
-            } catch (error) {
-                console.error("Lỗi khi lấy danh sách:", error);
-            } finally {
-                this.loading = false;
-            }
+        ...mapActions("importHistory", ["fetchImportHistory"]),
+        async getDanhSach(params) {
+            await this.fetchImportHistory(params);
         },
     },
 };

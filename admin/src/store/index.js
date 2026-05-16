@@ -8,6 +8,7 @@ import user from "./modules/user";
 import generalSettings from "./modules/generalSettings";
 import workingTime from "./modules/workingTime";
 import department from "./modules/department";
+import importHistory from "./modules/importHistory";
 
 const store = createStore({
     state() {
@@ -34,6 +35,7 @@ const store = createStore({
         generalSettings,
         workingTime,
         department,
+        importHistory,
     },
 });
 
