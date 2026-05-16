@@ -258,10 +258,8 @@ import { Form as VeeForm, Field as VeeField } from "vee-validate";
 import { workScheduleOverrideSchema } from "@/utils/schemas/workScheduleOverride";
 import DatePicker from "@/components/DatePicker.vue";
 import TimePicker from "@/components/TimePicker.vue";
-import { postData } from "@/services/bases/postData";
-import { getAllData } from "@/services/bases/getData";
-import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import { mapActions } from "vuex";
 
 export default {
     components: {
@@ -338,19 +336,19 @@ export default {
         }
     },
     methods: {
+        ...mapActions("workSchedule", {
+            checkFulltimeOverride: "checkFulltimeOverride",
+            createFulltimeOverride: "createFulltimeOverride",
+            fetchSpecialDaysAction: "fetchSpecialDays",
+        }),
         async handleSubmit(values) {
             this.valuesToSubmit = values;
             this.loading = true;
-            const response = await postData(
-                API_ROUTES_CONFIG.workSchedule + "/fulltime/check-override",
-                {
-                    userId: this.userSelected?.id,
-                    startDate: values.startDate,
-                    endDate: values.endDate,
-                },
-                () => {},
-                true,
-            );
+            const response = await this.checkFulltimeOverride({
+                userId: this.userSelected?.id,
+                startDate: values.startDate,
+                endDate: values.endDate,
+            });
 
             if (response) {
                 if (!response.hasOverlap && !response.message) {
@@ -368,35 +366,29 @@ export default {
         },
         async submitForm() {
             this.loadingConfirm = true;
-            await postData(
-                API_ROUTES_CONFIG.workSchedule + "/fulltime/override",
-                {
-                    userId: this.userSelected?.id,
-                    startDate: this.valuesToSubmit.startDate,
-                    endDate: this.valuesToSubmit.endDate,
-                    startTime: this.valuesToSubmit.startTime,
-                    endTime: this.valuesToSubmit.endTime,
-                    weekendOption: this.weekendOption,
-                    selectedDates:
-                        this.weekendOption === "work"
-                            ? this.selectedSpecialDates
-                            : [],
-                },
-            );
+            await this.createFulltimeOverride({
+                userId: this.userSelected?.id,
+                startDate: this.valuesToSubmit.startDate,
+                endDate: this.valuesToSubmit.endDate,
+                startTime: this.valuesToSubmit.startTime,
+                endTime: this.valuesToSubmit.endTime,
+                weekendOption: this.weekendOption,
+                selectedDates:
+                    this.weekendOption === "work"
+                        ? this.selectedSpecialDates
+                        : [],
+            });
             this.$emit("cancel");
             this.valuesToSubmit = null;
             this.loadingConfirm = false;
         },
         async fetchSpecialDays() {
             this.loadingSpecialDays = true;
-            const data = await getAllData(
-                API_ROUTES_CONFIG.workSchedule + "/special-days",
-                {
-                    startDate: this.formValues.startDate,
-                    endDate: this.formValues.endDate,
-                },
-            );
-            this.specialDays = data || [];
+            const data = await this.fetchSpecialDaysAction({
+                startDate: this.formValues.startDate,
+                endDate: this.formValues.endDate,
+            });
+            this.specialDays = data;
 
             this.selectedSpecialDates = [];
             this.loadingSpecialDays = false;

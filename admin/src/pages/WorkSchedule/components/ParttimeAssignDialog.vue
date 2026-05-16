@@ -125,11 +125,8 @@
 <script>
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
-import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import { getListData } from "@/services/bases/getData";
-import { postData } from "@/services/bases/postData";
-import { deleteData } from "@/services/bases/deleteData";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import { mapActions } from "vuex";
 
 dayjs.locale("vi");
 
@@ -235,6 +232,11 @@ export default {
         },
     },
     methods: {
+        ...mapActions("workSchedule", [
+            "assignParttimeMembers",
+            "fetchParttimeMembers",
+            "deleteParttimeAssignment",
+        ]),
         handleClose() {
             this.isOpen = false;
         },
@@ -251,14 +253,11 @@ export default {
 
             this.isLoading = true;
 
-            await postData(
-                `${API_ROUTES_CONFIG.workSchedule}/parttime/assign`,
-                {
-                    workShiftId: +this.selectedShift.workShiftId,
-                    userIds: [...this.selectedMemberIds],
-                    date: this.selectedShift.date,
-                },
-            );
+            await this.assignParttimeMembers({
+                workShiftId: +this.selectedShift.workShiftId,
+                userIds: [...this.selectedMemberIds],
+                date: this.selectedShift.date,
+            });
 
             this.isLoading = false;
             this.$emit("saved");
@@ -269,14 +268,11 @@ export default {
                 return;
             }
 
-            const res = await getListData(
-                `${API_ROUTES_CONFIG.workSchedule}/parttime/members`,
-                {
-                    shiftId: this.selectedShift.workShiftId,
-                    departmentId: this.departmentId,
-                    date: this.selectedShift.date,
-                },
-            );
+            const res = await this.fetchParttimeMembers({
+                shiftId: this.selectedShift.workShiftId,
+                departmentId: this.departmentId,
+                date: this.selectedShift.date,
+            });
 
             this.optionMembers = res.optionMembers;
             this.memberAssigneds = res.memberAssigneds;
@@ -297,8 +293,7 @@ export default {
 
             this.isProcessing = true;
 
-            const res = await deleteData(
-                `${API_ROUTES_CONFIG.workSchedule}/parttime/assign`,
+            const res = await this.deleteParttimeAssignment(
                 this.deleteAssignmentId,
             );
 

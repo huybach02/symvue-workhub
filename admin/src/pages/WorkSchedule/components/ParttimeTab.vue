@@ -12,6 +12,7 @@
         <Calendar
             :data-calendar="dataCalendar"
             type="parttime"
+            @date-range-change="handleDateRangeChange"
             @shift-selected="handleShiftSelected"
         />
 
@@ -28,8 +29,8 @@
 import dayjs from "dayjs";
 import Calendar from "@/components/Calendar.vue";
 import ParttimeAssignDialog from "./ParttimeAssignDialog.vue";
-import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import { getListData } from "@/services/bases/getData";
+import { functionHelper } from "@/helpers/functionHelper";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -44,13 +45,22 @@ export default {
     },
     data() {
         return {
-            dataCalendar: {
-                shifts: [],
-            },
             dialog: false,
             selectedShift: null,
-            latestShiftRequestId: 0,
+            currentFetchRange: functionHelper.getParttimeScheduleFetchRange(
+                dayjs(),
+            ),
         };
+    },
+    computed: {
+        ...mapGetters("workSchedule", ["parttimeDataByDepartment"]),
+        dataCalendar() {
+            if (!this.departmentId) {
+                return { shifts: [] };
+            }
+
+            return this.parttimeDataByDepartment(this.departmentId);
+        },
     },
     watch: {
         departmentId: {
@@ -59,8 +69,6 @@ export default {
                     this.dialog = false;
                     this.selectedShift = null;
                 }
-
-                this.getParttimeShifts();
             },
             immediate: true,
         },
@@ -71,59 +79,29 @@ export default {
         },
     },
     methods: {
-        async getParttimeShifts() {
-            const requestId = ++this.latestShiftRequestId;
+        ...mapActions("workSchedule", ["ensureParttimeShifts"]),
+        async getParttimeShifts(range = this.currentFetchRange, force = false) {
+            this.currentFetchRange = range;
 
-            if (!this.departmentId) {
-                if (requestId === this.latestShiftRequestId) {
-                    this.dataCalendar = { shifts: [] };
-                    this.$store.commit(
-                        "workSchedule/SET_PARTTIME_LOADING",
-                        false,
-                    );
-                }
-                return;
-            }
+            await this.ensureParttimeShifts({
+                departmentId: this.departmentId,
+                ...range,
+                force,
+            });
+        },
+        handleDateRangeChange(range) {
+            const fetchRange = functionHelper.getParttimeScheduleFetchRange(
+                range?.baseDate ?? dayjs(),
+            );
 
-            this.$store.commit("workSchedule/SET_PARTTIME_LOADING", true);
-            const today = dayjs();
-
-            try {
-                const res = await getListData(
-                    `${API_ROUTES_CONFIG.workSchedule}/parttime/shifts`,
-                    {
-                        departmentId: this.departmentId,
-                        startDate: today
-                            .subtract(1, "year")
-                            .startOf("year")
-                            .format("YYYY-MM-DD"),
-                        endDate: today
-                            .add(1, "year")
-                            .endOf("year")
-                            .format("YYYY-MM-DD"),
-                    },
-                );
-
-                if (requestId !== this.latestShiftRequestId) {
-                    return;
-                }
-
-                this.dataCalendar = res ?? { shifts: [] };
-            } finally {
-                if (requestId === this.latestShiftRequestId) {
-                    this.$store.commit(
-                        "workSchedule/SET_PARTTIME_LOADING",
-                        false,
-                    );
-                }
-            }
+            this.getParttimeShifts(fetchRange);
         },
         handleShiftSelected(shift) {
             this.selectedShift = shift;
             this.dialog = true;
         },
         handleAssignmentSaved() {
-            this.getParttimeShifts();
+            this.getParttimeShifts(this.currentFetchRange, true);
         },
     },
 };

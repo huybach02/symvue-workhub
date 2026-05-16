@@ -170,7 +170,13 @@ export default {
             default: "fulltime",
         },
     },
-    emits: ["addOverride", "clearSchedule", "userSelected", "shiftSelected"],
+    emits: [
+        "addOverride",
+        "clearSchedule",
+        "userSelected",
+        "shiftSelected",
+        "dateRangeChange",
+    ],
     data() {
         return {
             currentMode: "week",
@@ -268,6 +274,17 @@ export default {
             return columns;
         },
     },
+    watch: {
+        currentMode() {
+            this.emitDateRangeChange();
+        },
+        baseDate() {
+            this.emitDateRangeChange();
+        },
+    },
+    mounted() {
+        this.emitDateRangeChange();
+    },
     methods: {
         buildDateColumn(currentDay, today) {
             const holiday = this.getHolidayInfo(currentDay);
@@ -300,6 +317,37 @@ export default {
         getWeekdayDisplay(date) {
             const weekday = date.format("dddd");
             return weekday.charAt(0).toUpperCase() + weekday.slice(1);
+        },
+        getVisibleDateRange() {
+            if (this.currentMode === "day") {
+                return {
+                    baseDate: this.baseDate.format("YYYY-MM-DD"),
+                    startDate: this.baseDate.format("YYYY-MM-DD"),
+                    endDate: this.baseDate.format("YYYY-MM-DD"),
+                    mode: this.currentMode,
+                };
+            }
+
+            if (this.currentMode === "week") {
+                return {
+                    baseDate: this.baseDate.format("YYYY-MM-DD"),
+                    startDate: this.baseDate
+                        .startOf("week")
+                        .format("YYYY-MM-DD"),
+                    endDate: this.baseDate.endOf("week").format("YYYY-MM-DD"),
+                    mode: this.currentMode,
+                };
+            }
+
+            return {
+                baseDate: this.baseDate.format("YYYY-MM-DD"),
+                startDate: this.baseDate.startOf("month").format("YYYY-MM-DD"),
+                endDate: this.baseDate.endOf("month").format("YYYY-MM-DD"),
+                mode: this.currentMode,
+            };
+        },
+        emitDateRangeChange() {
+            this.$emit("dateRangeChange", this.getVisibleDateRange());
         },
         changeDate(amount) {
             this.baseDate = this.baseDate.add(amount, this.currentMode);

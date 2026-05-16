@@ -65,11 +65,9 @@
 import Calendar from "@/components/Calendar.vue";
 import FulltimeTabDialogCreate from "./FulltimeTabDialogCreate.vue";
 import { toast } from "@/main";
-import { postData } from "@/services/bases/postData";
-import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import { getListData } from "@/services/bases/getData";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import FulltimeOverrideForm from "./FulltimeOverrideForm.vue";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -90,7 +88,6 @@ export default {
     },
     data() {
         return {
-            dataCalendar: {},
             showConfirmDelete: false,
             isDeleting: false,
             userSelected: null,
@@ -98,6 +95,14 @@ export default {
         };
     },
     computed: {
+        ...mapGetters("workSchedule", ["fulltimeDataByDepartment"]),
+        dataCalendar() {
+            if (!this.departmentId) {
+                return {};
+            }
+
+            return this.fulltimeDataByDepartment(this.departmentId);
+        },
         members() {
             return this.dataCalendar.users || [];
         },
@@ -111,37 +116,18 @@ export default {
             },
             immediate: true,
         },
-        tab: {
-            handler(newVal, oldVal) {
-                if (newVal !== oldVal) {
-                    this.getFulltime();
-                }
-            },
-            immediate: true,
-        },
-    },
-    created() {
-        this.getFulltime();
     },
     methods: {
-        async getFulltime() {
-            if (!this.departmentId) {
-                this.dataCalendar = {};
-                this.$store.commit("workSchedule/SET_FULLTIME_LOADING", false);
-                return;
-            }
-
-            this.$store.commit("workSchedule/SET_FULLTIME_LOADING", true);
-
-            try {
-                const res = await getListData(
-                    `${API_ROUTES_CONFIG.workSchedule}/fulltime/${this.departmentId}`,
-                );
-
-                this.dataCalendar = res;
-            } finally {
-                this.$store.commit("workSchedule/SET_FULLTIME_LOADING", false);
-            }
+        ...mapActions("workSchedule", [
+            "fetchFulltimeSchedule",
+            "createFulltimeSchedule",
+            "clearFulltimeSchedule",
+        ]),
+        async getFulltime(force = false) {
+            await this.fetchFulltimeSchedule({
+                departmentId: this.departmentId,
+                force,
+            });
         },
 
         async handleCreate(startDate, endDate, selectedMemberIds) {
@@ -151,31 +137,29 @@ export default {
 
             this.$refs.fulltimeTabDialogCreate.isLoading = true;
 
-            await postData(API_ROUTES_CONFIG.workSchedule + "/fulltime", {
+            await this.createFulltimeSchedule({
+                departmentId: this.departmentId,
                 startDate,
                 endDate,
                 userIds: selectedMemberIds,
             });
-
-            await this.getFulltime();
 
             this.$refs.fulltimeTabDialogCreate.isLoading = false;
             this.$refs.fulltimeTabDialogCreate.dialog = false;
         },
         async handleDelete() {
             this.isDeleting = true;
-            await postData(API_ROUTES_CONFIG.workSchedule + "/fulltime/clear", {
+            await this.clearFulltimeSchedule({
                 departmentId: this.departmentId,
                 userId: this.userSelected.id,
             });
             this.isDeleting = false;
-            await this.getFulltime();
             this.showConfirmDelete = false;
         },
         handleCancelOverride() {
             this.dialog = false;
             this.userSelected = null;
-            this.getFulltime();
+            this.getFulltime(true);
         },
     },
 };

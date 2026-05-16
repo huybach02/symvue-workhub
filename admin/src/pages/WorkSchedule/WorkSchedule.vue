@@ -70,12 +70,8 @@
 
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import {
-    getDataById,
-    getDataSelect,
-    getListData,
-} from "@/services/bases/getData";
 import { usePermission } from "@/hooks/usePermission";
+import { mapActions, mapGetters } from "vuex";
 import FulltimeTab from "./components/FulltimeTab.vue";
 import ParttimeTab from "./components/ParttimeTab.vue";
 
@@ -102,16 +98,24 @@ export default {
                     value: "parttime",
                 },
             ],
-            departments: [],
-            departmentsLoading: false,
             departmentId: null,
-            members: [],
-            membersLoading: false,
         };
     },
     computed: {
+        ...mapGetters("workSchedule", [
+            "departments",
+            "departmentsLoading",
+            "membersByDepartment",
+        ]),
         permission() {
             return usePermission(this.path);
+        },
+        members() {
+            if (!this.departmentId) {
+                return [];
+            }
+
+            return this.membersByDepartment(this.departmentId);
         },
         fulltimeMembers() {
             return this.members.filter(
@@ -139,39 +143,26 @@ export default {
     },
     created() {
         this.getDepartments();
-        this.getHolidaySchedule();
+        this.fetchHolidaySchedule();
     },
     methods: {
+        ...mapActions("workSchedule", [
+            "fetchDepartments",
+            "fetchHolidaySchedule",
+            "fetchMembersByDepartment",
+        ]),
         async getDepartments() {
-            this.departmentsLoading = true;
-
-            try {
-                this.departments =
-                    (await getDataSelect(API_ROUTES_CONFIG.boPhan)) ?? [];
-            } finally {
-                this.departmentsLoading = false;
-            }
+            await this.fetchDepartments();
         },
         handleDepartmentChange(value) {
             this.departmentId = value;
         },
         async getMembersByDepartment() {
             if (!this.departmentId) {
-                this.members = [];
                 return;
             }
 
-            this.members = await getDataById(
-                API_ROUTES_CONFIG.boPhan,
-                this.departmentId,
-                "member",
-            );
-        },
-        async getHolidaySchedule() {
-            const res = await getListData(
-                API_ROUTES_CONFIG.workSchedule + "/holiday-schedule",
-            );
-            this.$store.commit("workSchedule/SET_HOLIDAY_SCHEDULES", res);
+            await this.fetchMembersByDepartment(this.departmentId);
         },
     },
 };

@@ -104,4 +104,58 @@ export const functionHelper = {
         const digits = String(value ?? "").replace(/[^\d]/g, "");
         return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".") || "--";
     },
+    getParttimeScheduleFetchRange(date = dayjs(), beforeMonths = 2, afterMonths = 2) {
+        const baseDate = dayjs(date);
+
+        return {
+            startDate: baseDate
+                .subtract(beforeMonths, "month")
+                .startOf("month")
+                .format("YYYY-MM-DD"),
+            endDate: baseDate
+                .add(afterMonths, "month")
+                .endOf("month")
+                .format("YYYY-MM-DD"),
+        };
+    },
+    isDateRangeCovered(targetRange, cachedRanges = []) {
+        if (!targetRange?.startDate || !targetRange?.endDate) {
+            return false;
+        }
+
+        return cachedRanges.some(
+            (range) =>
+                range.startDate <= targetRange.startDate &&
+                range.endDate >= targetRange.endDate,
+        );
+    },
+    mergeDateRanges(ranges = []) {
+        const sortedRanges = ranges
+            .filter((range) => range?.startDate && range?.endDate)
+            .sort((left, right) => left.startDate.localeCompare(right.startDate));
+
+        return sortedRanges.reduce((mergedRanges, range) => {
+            const lastRange = mergedRanges[mergedRanges.length - 1];
+
+            if (!lastRange) {
+                mergedRanges.push({ ...range });
+                return mergedRanges;
+            }
+
+            const nextAllowedDate = dayjs(lastRange.endDate)
+                .add(1, "day")
+                .format("YYYY-MM-DD");
+
+            if (range.startDate <= nextAllowedDate) {
+                lastRange.endDate =
+                    range.endDate > lastRange.endDate
+                        ? range.endDate
+                        : lastRange.endDate;
+            } else {
+                mergedRanges.push({ ...range });
+            }
+
+            return mergedRanges;
+        }, []);
+    },
 };
