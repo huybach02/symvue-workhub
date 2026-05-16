@@ -5,6 +5,7 @@ import mercure from "./modules/mercure";
 import chat from "./modules/chat";
 import workSchedule from "./modules/workSchedule";
 import user from "./modules/user";
+import generalSettings from "./modules/generalSettings";
 
 const store = createStore({
     state() {
@@ -28,6 +29,7 @@ const store = createStore({
         chat,
         workSchedule,
         user,
+        generalSettings,
     },
 });
 

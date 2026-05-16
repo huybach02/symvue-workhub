@@ -43,7 +43,7 @@
                                 {{ $t("system_config.cancel_button") }}
                             </v-btn>
                             <v-btn
-                                :loading="this.$store.state.isLoading"
+                                :loading="saving"
                                 color="primary"
                                 class="d-flex align-center"
                                 type="submit"
@@ -224,12 +224,10 @@
 
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import { NAME_ROUTES_CONFIG } from "@/configs/nameRouteConfig";
 import { usePermission } from "@/hooks/usePermission";
-import { getAllData } from "@/services/bases/getData";
-import { postData } from "@/services/bases/postData";
 import { cauHinhChungSchema } from "@/utils/schemas/cauHinhChung";
 import { Field, Form } from "vee-validate";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -239,20 +237,15 @@ export default {
     data() {
         return {
             isEditing: false,
-            dataLoaded: false,
             cauHinhChungSchema,
-            initialValues: {
-                soLanDangNhapSai: 0,
-                thoiGianTamKhoaTaiKhoan: 0,
-                xacThuc2YeuTo: false,
-                thoiGianHetHanMaOtp: 0,
-                thoiHanXacThucLaiThietBi: 0,
-                kiemTraThoiGianLamViec: false,
-                soThietBiDangNhapToiDa: 0,
-            },
         };
     },
     computed: {
+        ...mapGetters("generalSettings", [
+            "dataLoaded",
+            "initialValues",
+            "saving",
+        ]),
         permission() {
             return usePermission(API_ROUTES_CONFIG.cauHinhChung);
         },
@@ -261,53 +254,20 @@ export default {
         this.getAll();
     },
     methods: {
+        ...mapActions("generalSettings", ["fetchSettings", "updateSettings"]),
         async getAll() {
-            this.$store.commit("setIsLoading");
-            const response = await getAllData(API_ROUTES_CONFIG.cauHinhChung);
-
-            const mapping = {
-                SO_LAN_DANG_NHAP_SAI_TOI_DA: "soLanDangNhapSai",
-                THOI_GIAN_KHOA_TAI_KHOAN: "thoiGianTamKhoaTaiKhoan",
-                XAC_THUC_2_YEU_TO: "xacThuc2YeuTo",
-                THOI_GIAN_HET_HAN_OTP: "thoiGianHetHanMaOtp",
-                THOI_HAN_XAC_THUC_LAI_THIET_BI: "thoiHanXacThucLaiThietBi",
-                CHECK_THOI_GIAN_LAM_VIEC: "kiemTraThoiGianLamViec",
-                SO_THIET_BI_DANG_NHAP_TOI_DA: "soThietBiDangNhapToiDa",
-            };
-
-            const mappedData = {};
-            response.forEach((item) => {
-                const key = mapping[item.tenCauHinh];
-                if (key) {
-                    if (
-                        key === "xacThuc2YeuTo" ||
-                        key === "kiemTraThoiGianLamViec"
-                    ) {
-                        mappedData[key] = item.giaTri === "1";
-                    } else {
-                        mappedData[key] = parseInt(item.giaTri);
-                    }
-                }
-            });
-
-            this.initialValues = mappedData;
-            this.dataLoaded = true;
-            this.$store.commit("unsetIsLoading");
+            await this.fetchSettings();
         },
         async onSubmit(values) {
-            this.$store.commit("setIsLoading");
-            const response = await postData(
-                API_ROUTES_CONFIG.cauHinhChung,
-                values,
-            );
+            const response = await this.updateSettings(values);
+
             if (response) {
                 this.isEditing = false;
             }
-            this.$store.commit("unsetIsLoading");
         },
         cancelEdit() {
             this.isEditing = false;
-            // Reset form validation và values về initialValues
+
             if (this.$refs.formRef) {
                 this.$refs.formRef.resetForm();
             }
