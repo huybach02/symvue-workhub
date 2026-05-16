@@ -48,8 +48,10 @@ class MakeModuleCommand {
             const srcDir = path.join(adminDir, "src");
             const pagesDir = path.join(srcDir, "pages");
 
-            // Bước 1: Tạo các file Vue components
-            console.log("\n📁 Bước 1: Tạo các file Vue components...\n");
+            // Bước 1: Tạo các file Vue components và Vuex module
+            console.log(
+                "\n📁 Bước 1: Tạo các file Vue components và Vuex module...\n",
+            );
             FileGenerator.generateModuleFiles(moduleName, pagesDir);
 
             // Bước 2: Update các config files
@@ -65,10 +67,12 @@ class MakeModuleCommand {
             );
             console.log("\n📋 Tóm tắt:");
             console.log("   - Đã tạo 4 file Vue components");
+            console.log("   - Đã tạo 1 Vuex store module");
             console.log("   - Đã update apiRouteConfig.js");
             console.log("   - Đã update nameRouteConfig.js");
             console.log("   - Đã update menuSidebar.js");
             console.log("   - Đã update routes.js");
+            console.log("   - Đã update store/index.js");
             console.log("   - Đã update các file locale (vi & en)");
             console.log(
                 "\n💡 Bạn có thể bắt đầu custom các file trong thư mục:",

@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 class FileGenerator {
     /**
      * Đọc nội dung từ template file
-     * @param {string} templateName - Tên template (List, Form, Module, CreateEdit)
+     * @param {string} templateName - Tên template (List, Form, Module, CreateEdit, StoreModule)
      * @returns {string} - Nội dung template
      */
     static readTemplate(templateName) {
@@ -106,6 +106,9 @@ class FileGenerator {
      */
     static generateModuleFiles(moduleName, pagesDir) {
         const moduleDir = path.join(pagesDir, moduleName);
+        const srcDir = path.dirname(pagesDir);
+        const storeModulesDir = path.join(srcDir, "store", "modules");
+        const moduleLower = this.toCamelCase(moduleName);
 
         // Tạo thư mục module
         if (!fs.existsSync(moduleDir)) {
@@ -125,6 +128,12 @@ class FileGenerator {
             const outputPath = path.join(moduleDir, filename);
             this.generateFile(template, outputPath, moduleName);
         });
+
+        this.generateFile(
+            "StoreModule",
+            path.join(storeModulesDir, `${moduleLower}.js`),
+            moduleName,
+        );
 
         console.log(`\n✓ Đã tạo xong module ${moduleName} tại ${moduleDir}\n`);
     }

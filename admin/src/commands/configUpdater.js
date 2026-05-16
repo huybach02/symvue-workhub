@@ -149,6 +149,46 @@ class ConfigUpdater {
     }
 
     /**
+     * Update store/index.js
+     * @param {string} storeIndexPath - Đường dẫn đến store/index.js
+     * @param {string} moduleName - Tên module (PascalCase)
+     */
+    static updateStoreIndex(storeIndexPath, moduleName) {
+        const moduleLower = this.toCamelCase(moduleName);
+
+        let content = fs.readFileSync(storeIndexPath, "utf-8");
+
+        if (!content.includes(`./modules/${moduleLower}`)) {
+            const lastImportMatch = [
+                ...content.matchAll(/^import .+;$/gm),
+            ].pop();
+
+            if (lastImportMatch) {
+                const insertIndex =
+                    lastImportMatch.index + lastImportMatch[0].length;
+                content =
+                    content.slice(0, insertIndex) +
+                    `\nimport ${moduleLower} from "./modules/${moduleLower}";` +
+                    content.slice(insertIndex);
+            }
+        }
+
+        const modulesIndex = content.indexOf("modules: {");
+        const closingBraceIndex = content.indexOf("},", modulesIndex);
+        const moduleEntry = `        ${moduleLower},\n`;
+
+        if (!content.includes(moduleEntry)) {
+            content =
+                content.slice(0, closingBraceIndex) +
+                moduleEntry +
+                content.slice(closingBraceIndex);
+        }
+
+        fs.writeFileSync(storeIndexPath, content, "utf-8");
+        console.log(`✓ Đã update ${storeIndexPath}`);
+    }
+
+    /**
      * Update locale files (base.vi.json, base.en.json)
      * @param {string} localeBasePath - Đường dẫn đến file locale base
      * @param {string} moduleName - Tên module (PascalCase)
@@ -231,6 +271,12 @@ class ConfigUpdater {
 
         // Update routes.js
         this.updateRoutes(path.join(srcDir, "router", "routes.js"), moduleName);
+
+        // Update store/index.js
+        this.updateStoreIndex(
+            path.join(srcDir, "store", "index.js"),
+            moduleName,
+        );
 
         // Update locale base files
         this.updateLocaleBase(

@@ -160,7 +160,7 @@ import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import CreateEdit{{MODULE_NAME}} from "./CreateEdit{{MODULE_NAME}}.vue";
-import { deleteData } from "@/services/bases/deleteData";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     name: "{{MODULE_NAME}}List",
@@ -173,18 +173,6 @@ export default {
         path: {
             type: String,
             default: "",
-        },
-        items: {
-            type: Array,
-            default: () => [],
-        },
-        totalItems: {
-            type: Number,
-            default: 0,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
         },
         permission: {
             type: Object,
@@ -275,6 +263,7 @@ export default {
         };
     },
     computed: {
+        ...mapGetters("{{MODULE_LOWER}}", ["items", "loading", "totalItems"]),
         tableMinWidth() {
             return this.headers.reduce((total, col) => {
                 return total + (col.width || col.minWidth || 0);
@@ -282,13 +271,14 @@ export default {
         },
     },
     methods: {
+        ...mapActions("{{MODULE_LOWER}}", ["deleteItem"]),
         openDeleteDialog(id) {
             this.deletingId = id;
             this.showConfirmDelete = true;
         },
         async handleDelete() {
             this.isDeleting = true;
-            await deleteData(this.path, this.deletingId);
+            await this.deleteItem(this.deletingId);
             this.isDeleting = false;
             this.showConfirmDelete = false;
             this.deletingId = null;

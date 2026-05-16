@@ -26,9 +26,6 @@
                 <{{MODULE_NAME}}List
                     v-if="permission?.index"
                     :path="path"
-                    :items="items"
-                    :total-items="totalItems"
-                    :loading="loading"
                     :permission="permission"
                     @reload="getDanhSach"
                 />
@@ -40,11 +37,11 @@
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import {{MODULE_NAME}}List from "./{{MODULE_NAME}}List.vue";
-import { getListData } from "@/services/bases/getData";
 import CreateEdit{{MODULE_NAME}} from "./CreateEdit{{MODULE_NAME}}.vue";
 import ExportDataExcel from "@/components/ExportDataExcel.vue";
 import ImportDataExcel from "@/components/ImportDataExcel.vue";
 import { usePermission } from "@/hooks/usePermission";
+import { mapActions } from "vuex";
 
 export default {
     name: "{{MODULE_NAME}}",
@@ -57,9 +54,6 @@ export default {
     data() {
         return {
             path: API_ROUTES_CONFIG.{{MODULE_LOWER}},
-            items: [],
-            totalItems: 0,
-            loading: false,
         };
     },
     computed: {
@@ -68,17 +62,9 @@ export default {
         },
     },
     methods: {
-        getDanhSach: async function (params) {
-            try {
-                this.loading = true;
-                const response = await getListData(this.path, params);
-                this.items = response.data || [];
-                this.totalItems = response.total || 0;
-            } catch (error) {
-                console.error("Lỗi khi lấy danh sách:", error);
-            } finally {
-                this.loading = false;
-            }
+        ...mapActions("{{MODULE_LOWER}}", ["fetchItems"]),
+        async getDanhSach(params) {
+            await this.fetchItems(params);
         },
     },
 };
