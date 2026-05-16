@@ -54,8 +54,7 @@
 
 <script>
 import FulltimeDialog from "./FulltimeDialog.vue";
-import { getAllData } from "@/services/bases/getData";
-import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -69,28 +68,23 @@ export default {
     },
     data() {
         return {
-            data: [],
             isOpenDialog: false,
             itemEdit: null,
         };
     },
+    computed: {
+        ...mapGetters("workingTime", ["fulltimeList"]),
+        data() {
+            return this.fulltimeList;
+        },
+    },
     created() {
         this.fetchData();
-        console.log(this.permission);
     },
     methods: {
+        ...mapActions("workingTime", ["fetchFulltimeList"]),
         async fetchData() {
-            try {
-                this.$store.commit("setIsLoading");
-                const response = await getAllData(
-                    API_ROUTES_CONFIG.thoiGianLamViec,
-                    { type: "fulltime" },
-                );
-                this.$store.commit("unsetIsLoading");
-                this.data = response;
-            } catch (error) {
-                console.error(error);
-            }
+            await this.fetchFulltimeList();
         },
         handleEdit(item) {
             this.itemEdit = item;

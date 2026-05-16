@@ -5,7 +5,6 @@
                 <ParttimeCard
                     :permission="permission"
                     :thoi-gian-lam-viec="item"
-                    :is-refresh="isRefresh"
                     @open-dialog="openDialog"
                 />
             </v-col>
@@ -16,7 +15,7 @@
             :is-open="isOpenDialog"
             :thoi-gian-lam-viec="selectedThoiGianLamViec"
             @close="isOpenDialog = false"
-            @update="isRefresh = !isRefresh"
+            @update="handleParttimeUpdated"
         />
     </div>
 </template>
@@ -24,8 +23,7 @@
 <script>
 import ParttimeCard from "./ParttimeCard.vue";
 import ParttimeDialog from "./ParttimeDialog.vue";
-import { getAllData } from "@/services/bases/getData";
-import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -40,32 +38,30 @@ export default {
     },
     data() {
         return {
-            data: [],
             isOpenDialog: false,
             selectedThoiGianLamViec: null,
-            isRefresh: false,
         };
+    },
+    computed: {
+        ...mapGetters("workingTime", ["fulltimeList"]),
+        data() {
+            return this.fulltimeList;
+        },
     },
     created() {
         this.fetchThoiGianLamViec();
     },
     methods: {
+        ...mapActions("workingTime", ["fetchFulltimeList"]),
         async fetchThoiGianLamViec() {
-            try {
-                this.$store.commit("setIsLoading");
-                const response = await getAllData(
-                    API_ROUTES_CONFIG.thoiGianLamViec,
-                    { type: "fulltime" },
-                );
-                this.$store.commit("unsetIsLoading");
-                this.data = response;
-            } catch (error) {
-                console.error(error);
-            }
+            await this.fetchFulltimeList();
         },
         openDialog(thoiGianLamViec) {
             this.selectedThoiGianLamViec = thoiGianLamViec;
             this.isOpenDialog = true;
+        },
+        handleParttimeUpdated() {
+            this.isOpenDialog = false;
         },
     },
 };

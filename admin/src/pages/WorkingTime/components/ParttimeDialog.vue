@@ -106,7 +106,7 @@
                                 color="primary"
                                 :text="$t('ca_lam_viec.save_button')"
                                 type="submit"
-                                :loading="this.$store.state.isLoading"
+                                :loading="saving"
                             />
                         </v-col>
                     </v-row>
@@ -117,10 +117,9 @@
 </template>
 
 <script>
-import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import TimePicker from "@/components/TimePicker.vue";
-import { postData } from "@/services/bases/postData";
 import { Form as VeeForm, Field as VeeField } from "vee-validate";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -150,6 +149,7 @@ export default {
         };
     },
     computed: {
+        ...mapGetters("workingTime", ["saving"]),
         dialog: {
             get() {
                 return this.isOpen;
@@ -162,18 +162,17 @@ export default {
         },
     },
     methods: {
+        ...mapActions("workingTime", ["createParttimeShift"]),
         async onSubmit(values) {
-            this.$store.commit("setIsLoading");
-            values.thoiGianLamViecId = this.thoiGianLamViec.id;
-            const response = await postData(
-                API_ROUTES_CONFIG.thoiGianLamViec,
-                values,
-            );
+            const response = await this.createParttimeShift({
+                ...values,
+                thoiGianLamViecId: this.thoiGianLamViec.id,
+            });
+
             if (response) {
                 this.dialog = false;
                 this.$emit("update");
             }
-            this.$store.commit("unsetIsLoading");
         },
     },
 };

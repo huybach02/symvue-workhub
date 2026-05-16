@@ -49,17 +49,12 @@
 </template>
 
 <script>
-import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import { getAllData } from "@/services/bases/getData";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     props: {
         thoiGianLamViec: {
             type: Object,
-            required: true,
-        },
-        isRefresh: {
-            type: Boolean,
             required: true,
         },
         permission: {
@@ -68,35 +63,21 @@ export default {
         },
     },
     emits: ["open-dialog"],
-    data() {
-        return {
-            caLamViecList: [],
-        };
-    },
-    watch: {
-        isRefresh() {
-            this.fetchCaLamViecList();
+    computed: {
+        ...mapGetters("workingTime", ["parttimeShiftsByWorkingTime"]),
+        caLamViecList() {
+            return this.parttimeShiftsByWorkingTime(this.thoiGianLamViec.id);
         },
     },
     created() {
         this.fetchCaLamViecList();
     },
     methods: {
+        ...mapActions("workingTime", ["fetchParttimeShifts"]),
         async fetchCaLamViecList() {
-            try {
-                this.$store.commit("setIsLoading");
-                const response = await getAllData(
-                    API_ROUTES_CONFIG.thoiGianLamViec,
-                    {
-                        type: "parttime",
-                        thoiGianLamViecId: this.thoiGianLamViec.id,
-                    },
-                );
-                this.caLamViecList = response;
-                this.$store.commit("unsetIsLoading");
-            } catch (error) {
-                console.error(error);
-            }
+            await this.fetchParttimeShifts({
+                workingTimeId: this.thoiGianLamViec.id,
+            });
         },
     },
 };
