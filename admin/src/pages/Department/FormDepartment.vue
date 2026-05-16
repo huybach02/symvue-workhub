@@ -150,10 +150,9 @@
 import { Form as VeeForm, Field as VeeField } from "vee-validate";
 import { constant } from "@/utils/constants/constant";
 import LoadingForm from "@/components/LoadingForm.vue";
-import { getDataSelect } from "@/services/bases/getData";
-import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import { functionHelper } from "@/helpers/functionHelper";
 import { boPhanSchema } from "@/utils/schemas/boPhan";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -185,12 +184,15 @@ export default {
                 status: 1,
                 ghiChu: "",
             },
-            nguoiDungOptions: [],
             permissionsData: [],
             selectedQuanLyBoPhan: null,
         };
     },
     computed: {
+        ...mapGetters("department", ["userOptions"]),
+        nguoiDungOptions() {
+            return this.userOptions;
+        },
         statusOptions() {
             return constant.STATUS.map((item) => ({
                 value: item.value,
@@ -218,6 +220,7 @@ export default {
         this.getUser();
     },
     methods: {
+        ...mapActions("department", ["fetchUserOptions"]),
         onTenBoPhanChange(event, handleChange) {
             const tenBoPhan = event.target.value;
             handleChange(tenBoPhan);
@@ -239,12 +242,7 @@ export default {
             this.$emit("cancel");
         },
         async getUser() {
-            try {
-                const response = await getDataSelect(API_ROUTES_CONFIG.user);
-                this.nguoiDungOptions = response;
-            } catch (error) {
-                console.error(error);
-            }
+            await this.fetchUserOptions();
         },
     },
 };

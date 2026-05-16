@@ -15,9 +15,6 @@
                 <DepartmentList
                     v-if="permission?.index"
                     :path="path"
-                    :items="items"
-                    :total-items="totalItems"
-                    :loading="loading"
                     :permission="permission"
                     @reload="getDanhSach"
                 />
@@ -29,9 +26,9 @@
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import DepartmentList from "./DepartmentList.vue";
-import { getListData } from "@/services/bases/getData";
 import CreateEditDepartment from "./CreateEditDepartment.vue";
 import { usePermission } from "@/hooks/usePermission";
+import { mapActions } from "vuex";
 
 export default {
     name: "Department",
@@ -42,9 +39,6 @@ export default {
     data() {
         return {
             path: API_ROUTES_CONFIG.boPhan,
-            items: [],
-            totalItems: 0,
-            loading: false,
         };
     },
     computed: {
@@ -53,17 +47,9 @@ export default {
         },
     },
     methods: {
-        getDanhSach: async function (params) {
-            try {
-                this.loading = true;
-                const response = await getListData(this.path, params);
-                this.items = response.data || [];
-                this.totalItems = response.total || 0;
-            } catch (error) {
-                console.error("Lỗi khi lấy danh sách:", error);
-            } finally {
-                this.loading = false;
-            }
+        ...mapActions("department", ["fetchDepartments"]),
+        async getDanhSach(params) {
+            await this.fetchDepartments(params);
         },
     },
 };

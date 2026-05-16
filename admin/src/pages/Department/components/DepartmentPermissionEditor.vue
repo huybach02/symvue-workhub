@@ -223,7 +223,7 @@
 
 <script>
 import { constant } from "@/utils/constants/constant";
-import { getListPhanQuyenMacDinh } from "@/services/bases/getData";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     props: {
@@ -247,14 +247,22 @@ export default {
     emits: ["update:modelValue"],
     data() {
         return {
-            permissions: [],
             permissionStates: [],
-            permissionLoading: false,
             activePermissionIndex: 0,
             syncingFromModel: false,
         };
     },
     computed: {
+        ...mapGetters("department", [
+            "defaultPermissions",
+            "defaultPermissionsLoading",
+        ]),
+        permissions() {
+            return this.defaultPermissions;
+        },
+        permissionLoading() {
+            return this.defaultPermissionsLoading;
+        },
         availableActions() {
             return constant.ACTIONS;
         },
@@ -282,6 +290,13 @@ export default {
             deep: true,
             immediate: true,
         },
+        permissions: {
+            handler() {
+                this.activePermissionIndex = 0;
+                this.syncPermissionStates();
+            },
+            deep: true,
+        },
         permissionStates: {
             handler() {
                 if (!this.syncingFromModel) {
@@ -295,18 +310,9 @@ export default {
         this.getPermission();
     },
     methods: {
+        ...mapActions("department", ["fetchDefaultPermissions"]),
         async getPermission() {
-            this.permissionLoading = true;
-            try {
-                const response = await getListPhanQuyenMacDinh();
-                this.permissions = response ?? [];
-                this.activePermissionIndex = 0;
-                this.syncPermissionStates();
-            } catch (error) {
-                console.error(error);
-            } finally {
-                this.permissionLoading = false;
-            }
+            await this.fetchDefaultPermissions();
         },
         syncPermissionStates() {
             this.syncingFromModel = true;

@@ -14,7 +14,7 @@
             <v-card
                 :title="
                     $t('bo_phan.text.positionPermissionDialogTitle', {
-                        tenBoPhan: item.tenBoPhan,
+                        tenBoPhan: currentDepartment?.tenBoPhan,
                     })
                 "
                 prepend-icon="mdi-briefcase-account-outline"
@@ -30,7 +30,7 @@
                 />
 
                 <v-alert
-                    v-if="!item.positionManager"
+                    v-if="!currentDepartment?.positionManager"
                     type="error"
                     variant="tonal"
                 >
@@ -39,8 +39,10 @@
                 <v-alert v-else type="info" variant="tonal">
                     {{
                         $t("bo_phan.text.hasPositionManager", {
-                            positionManager: item.positionManager.name,
-                            positionManagerCode: item.positionManager.code,
+                            positionManager:
+                                currentDepartment.positionManager.name,
+                            positionManagerCode:
+                                currentDepartment.positionManager.code,
                         })
                     }}
                 </v-alert>
@@ -48,7 +50,7 @@
                 <v-card-text class="d-flex flex-column ga-6">
                     <DepartmentPositionTable
                         :items="positions"
-                        :loading="loading"
+                        :loading="positionsLoading"
                         @create="handlePositionAction('create')"
                         @edit="handlePositionAction('update', $event)"
                         @delete="handlePositionAction('delete', $event)"
@@ -98,7 +100,7 @@
             v-model="positionDialog"
             :item="selectedPosition"
             :mode="positionDialogMode"
-            :department="item"
+            :department="currentDepartment"
             :loading="savingPosition"
             @submit="submitPosition"
         />
@@ -114,14 +116,11 @@
 </template>
 
 <script>
-import { getDataById } from "@/services/bases/getData";
-import { postData } from "@/services/bases/postData";
-import { putData } from "@/services/bases/updateData";
-import { deleteData } from "@/services/bases/deleteData";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import DepartmentPermissionEditor from "./components/DepartmentPermissionEditor.vue";
 import DepartmentPositionDialog from "./components/DepartmentPositionDialog.vue";
 import DepartmentPositionTable from "./components/DepartmentPositionTable.vue";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -148,8 +147,6 @@ export default {
     data() {
         return {
             dialog: false,
-            loading: false,
-            positions: [],
             permissionsData: {},
             positionDialog: false,
             positionDialogMode: "create",
@@ -161,12 +158,30 @@ export default {
             deletingPositionLoading: false,
         };
     },
+    computed: {
+        ...mapGetters("department", [
+            "departmentDetailById",
+            "positionsByDepartment",
+            "positionsLoadingByDepartment",
+        ]),
+        departmentDetail() {
+            return this.departmentDetailById(this.item?.id);
+        },
+        currentDepartment() {
+            return this.departmentDetail ?? this.item;
+        },
+        positions() {
+            return this.positionsByDepartment(this.item?.id);
+        },
+        positionsLoading() {
+            return this.positionsLoadingByDepartment(this.item?.id);
+        },
+    },
     watch: {
         async dialog(isOpen) {
             if (isOpen) {
                 await this.loadData();
             } else {
-                this.positions = [];
                 this.permissionsData = {};
                 this.selectedPosition = null;
                 this.deletingPosition = null;
@@ -174,19 +189,27 @@ export default {
         },
     },
     methods: {
+        ...mapActions("department", [
+            "createPosition",
+            "deletePosition",
+            "fetchDepartmentDetail",
+            "fetchDepartmentPositions",
+            "updatePosition",
+            "updatePositionPermissions",
+        ]),
         async loadData() {
-            this.loading = true;
-            try {
-                const [department, positions] = await Promise.all([
-                    getDataById(this.path, this.item.id),
-                    getDataById(this.path, this.item.id, "chuc-vu"),
-                ]);
+            const [department] = await Promise.all([
+                this.fetchDepartmentDetail({
+                    departmentId: this.item.id,
+                    force: true,
+                }),
+                this.fetchDepartmentPositions({
+                    departmentId: this.item.id,
+                    force: true,
+                }),
+            ]);
 
-                this.permissionsData = department?.phanQuyen ?? {};
-                this.positions = positions ?? [];
-            } finally {
-                this.loading = false;
-            }
+            this.permissionsData = department?.phanQuyen ?? {};
         },
         handlePositionAction(type, position = null) {
             if (type === "delete") {
@@ -205,21 +228,22 @@ export default {
                 let response;
 
                 if (this.positionDialogMode === "create") {
-                    response = await postData(
-                        `${this.path}/${this.item.id}/chuc-vu`,
+                    response = await this.createPosition({
+                        departmentId: this.item.id,
                         values,
-                    );
+                    });
                 } else {
-                    response = await putData(
-                        `${this.path}/${this.item.id}/chuc-vu`,
-                        this.selectedPosition.id,
+                    response = await this.updatePosition({
+                        departmentId: this.item.id,
+                        positionId: this.selectedPosition.id,
                         values,
-                    );
+                    });
                 }
 
                 if (response) {
                     this.positionDialog = false;
-                    await this.loadData();
+                    this.permissionsData =
+                        this.departmentDetail?.phanQuyen ?? {};
                     this.$emit("reload");
                 }
             } finally {
@@ -231,13 +255,13 @@ export default {
 
             this.deletingPositionLoading = true;
             try {
-                await deleteData(
-                    `${this.path}/${this.item.id}/chuc-vu`,
-                    this.deletingPosition.id,
-                );
+                await this.deletePosition({
+                    departmentId: this.item.id,
+                    positionId: this.deletingPosition.id,
+                });
                 this.deleteDialog = false;
                 this.deletingPosition = null;
-                await this.loadData();
+                this.permissionsData = this.departmentDetail?.phanQuyen ?? {};
                 this.$emit("reload");
             } finally {
                 this.deletingPositionLoading = false;
@@ -246,11 +270,10 @@ export default {
         async savePermissions() {
             this.savingPermissions = true;
             try {
-                const response = await putData(
-                    `${this.path}/${this.item.id}/phan-quyen`,
-                    null,
-                    { phanQuyen: this.permissionsData },
-                );
+                const response = await this.updatePositionPermissions({
+                    departmentId: this.item.id,
+                    phanQuyen: this.permissionsData,
+                });
 
                 if (response) {
                     this.permissionsData = response.phanQuyen ?? {};

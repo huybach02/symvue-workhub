@@ -57,10 +57,8 @@
 </template>
 
 <script>
-import { postData } from "@/services/bases/postData";
 import FormDepartment from "./FormDepartment.vue";
-import { putData } from "@/services/bases/updateData";
-import { getDataById } from "@/services/bases/getData";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -88,6 +86,7 @@ export default {
         };
     },
     computed: {
+        ...mapGetters("department", ["departmentDetailById"]),
         titleCreate() {
             return this.$t("title.create") + " " + this.$t("bo_phan.title");
         },
@@ -98,26 +97,36 @@ export default {
     watch: {
         async dialog(isOpen) {
             if (isOpen && this.mode === "update") {
-                const res = await getDataById(this.path, this.item.id);
-                this.dataItem = res;
+                this.dataItem = this.departmentDetailById(this.item.id);
+                this.dataItem = await this.fetchDepartmentDetail({
+                    departmentId: this.item.id,
+                    force: true,
+                });
             }
         },
     },
     methods: {
+        ...mapActions("department", [
+            "createDepartment",
+            "fetchDepartmentDetail",
+            "updateDepartment",
+        ]),
         async onSubmit(values) {
-            if (this.mode === "create") {
-                this.$store.commit("setIsLoading");
-                await postData(this.path, values, () => {
-                    this.dialog = false;
-                    this.$emit("reload");
-                });
-                this.$store.commit("unsetIsLoading");
-            } else {
-                this.$store.commit("setIsLoading");
-                await putData(this.path, this.item.id, values, () => {
-                    this.dialog = false;
-                    this.$emit("reload");
-                });
+            this.$store.commit("setIsLoading");
+
+            try {
+                if (this.mode === "create") {
+                    await this.createDepartment(values);
+                } else {
+                    await this.updateDepartment({
+                        departmentId: this.item.id,
+                        values,
+                    });
+                }
+
+                this.dialog = false;
+                this.$emit("reload");
+            } finally {
                 this.$store.commit("unsetIsLoading");
             }
         },

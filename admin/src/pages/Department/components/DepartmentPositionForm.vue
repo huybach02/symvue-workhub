@@ -500,7 +500,6 @@ export default {
     watch: {
         item: {
             handler() {
-                console.log(this.item);
                 this.syncFormState();
             },
             deep: true,

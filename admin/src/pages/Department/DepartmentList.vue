@@ -213,11 +213,11 @@ import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import CreateEditDepartment from "./CreateEditDepartment.vue";
-import { deleteData } from "@/services/bases/deleteData";
 import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterAutoComplete from "@/components/filters/FilterAutoComplete.vue";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import PositionAndPermissionOfDepartment from "./PositionAndPermissionOfDepartment.vue";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     name: "DepartmentList",
@@ -231,18 +231,6 @@ export default {
         path: {
             type: String,
             default: "",
-        },
-        items: {
-            type: Array,
-            default: () => [],
-        },
-        totalItems: {
-            type: Number,
-            default: 0,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
         },
         permission: {
             type: Object,
@@ -353,6 +341,17 @@ export default {
         };
     },
     computed: {
+        ...mapGetters("department", [
+            "departments",
+            "departmentsLoading",
+            "totalItems",
+        ]),
+        items() {
+            return this.departments;
+        },
+        loading() {
+            return this.departmentsLoading;
+        },
         tableMinWidth() {
             return this.headers.reduce((total, col) => {
                 return total + (col.width || col.minWidth || 0);
@@ -360,13 +359,14 @@ export default {
         },
     },
     methods: {
+        ...mapActions("department", ["deleteDepartment"]),
         openDeleteDialog(id) {
             this.deletingId = id;
             this.showConfirmDelete = true;
         },
         async handleDelete() {
             this.isDeleting = true;
-            await deleteData(this.path, this.deletingId);
+            await this.deleteDepartment(this.deletingId);
             this.isDeleting = false;
             this.showConfirmDelete = false;
             this.deletingId = null;
