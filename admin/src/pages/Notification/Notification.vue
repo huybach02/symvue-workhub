@@ -16,9 +16,6 @@
                 <NotificationList
                     v-if="permission?.index"
                     :path="path"
-                    :items="items"
-                    :total-items="totalItems"
-                    :loading="loading"
                     :permission="permission"
                     @reload="getDanhSach"
                 />
@@ -30,9 +27,9 @@
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import NotificationList from "./NotificationList.vue";
-import { getListData } from "@/services/bases/getData";
 import CreateEditNotification from "./CreateEditNotification.vue";
 import { usePermission } from "@/hooks/usePermission";
+import { mapActions } from "vuex";
 
 export default {
     name: "Notification",
@@ -43,9 +40,6 @@ export default {
     data() {
         return {
             path: API_ROUTES_CONFIG.thongBao,
-            items: [],
-            totalItems: 0,
-            loading: false,
         };
     },
     computed: {
@@ -54,17 +48,9 @@ export default {
         },
     },
     methods: {
-        getDanhSach: async function (params) {
-            try {
-                this.loading = true;
-                const response = await getListData(this.path, params);
-                this.items = response.data || [];
-                this.totalItems = response.total || 0;
-            } catch (error) {
-                console.error("Lỗi khi lấy danh sách:", error);
-            } finally {
-                this.loading = false;
-            }
+        ...mapActions("notification", ["fetchNotifications"]),
+        async getDanhSach(params) {
+            await this.fetchNotifications(params);
         },
     },
 };

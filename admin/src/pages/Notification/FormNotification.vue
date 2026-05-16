@@ -209,9 +209,8 @@
 import { Form as VeeForm, Field as VeeField } from "vee-validate";
 import { constant } from "@/utils/constants/constant";
 import LoadingForm from "@/components/LoadingForm.vue";
-import { getDataSelect } from "@/services/bases/getData";
-import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import { thongBaoSchema } from "@/utils/schemas/thongBao";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -245,17 +244,28 @@ export default {
                 title: "",
                 body: "",
             },
-            // Giá trị sendTo hiện tại để điều khiển hiển thị
             selectedSendTo: "all",
-            // Dữ liệu cho autocomplete bộ phận
-            boPhanData: [],
-            isLoadingBoPhan: false,
-            // Dữ liệu cho autocomplete người dùng
-            userData: [],
-            isLoadingUser: false,
         };
     },
     computed: {
+        ...mapGetters("notification", [
+            "activeUserOptions",
+            "activeUserOptionsLoading",
+            "departmentOptions",
+            "departmentOptionsLoading",
+        ]),
+        boPhanData() {
+            return this.departmentOptions;
+        },
+        isLoadingBoPhan() {
+            return this.departmentOptionsLoading;
+        },
+        userData() {
+            return this.activeUserOptions;
+        },
+        isLoadingUser() {
+            return this.activeUserOptionsLoading;
+        },
         sendToOptions() {
             return constant.SEND_TO_OPTIONS.map((item) => ({
                 value: item.value,
@@ -290,6 +300,10 @@ export default {
         },
     },
     methods: {
+        ...mapActions("notification", [
+            "fetchActiveUserOptions",
+            "fetchDepartmentOptions",
+        ]),
         handleSubmit(values) {
             this.$emit("submit", values);
         },
@@ -308,24 +322,10 @@ export default {
             }
         },
         async getBoPhan() {
-            this.isLoadingBoPhan = true;
-            const res = await getDataSelect(API_ROUTES_CONFIG.boPhan);
-            this.boPhanData = res || [];
-            this.isLoadingBoPhan = false;
+            await this.fetchDepartmentOptions();
         },
         async getUsers() {
-            this.isLoadingUser = true;
-            const res = await getDataSelect(API_ROUTES_CONFIG.user, {
-                f: [
-                    {
-                        field: "status",
-                        operator: "equal",
-                        value: 1,
-                    },
-                ],
-            });
-            this.userData = res || [];
-            this.isLoadingUser = false;
+            await this.fetchActiveUserOptions();
         },
     },
 };

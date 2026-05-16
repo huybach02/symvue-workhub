@@ -156,9 +156,9 @@ import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import CreateEditNotification from "./CreateEditNotification.vue";
-import { deleteData } from "@/services/bases/deleteData";
 import FilterAutoComplete from "@/components/filters/FilterAutoComplete.vue";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     name: "NotificationList",
@@ -171,18 +171,6 @@ export default {
         path: {
             type: String,
             default: "",
-        },
-        items: {
-            type: Array,
-            default: () => [],
-        },
-        totalItems: {
-            type: Number,
-            default: 0,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
         },
         permission: {
             type: Object,
@@ -310,6 +298,14 @@ export default {
         };
     },
     computed: {
+        ...mapGetters("notification", [
+            "loading",
+            "notifications",
+            "totalItems",
+        ]),
+        items() {
+            return this.notifications;
+        },
         tableMinWidth() {
             return this.headers.reduce((total, col) => {
                 return total + (col.width || col.minWidth || 0);
@@ -317,13 +313,14 @@ export default {
         },
     },
     methods: {
+        ...mapActions("notification", ["deleteNotification"]),
         openDeleteDialog(id) {
             this.deletingId = id;
             this.showConfirmDelete = true;
         },
         async handleDelete() {
             this.isDeleting = true;
-            await deleteData(this.path, this.deletingId);
+            await this.deleteNotification(this.deletingId);
             this.isDeleting = false;
             this.showConfirmDelete = false;
             this.deletingId = null;
