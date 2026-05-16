@@ -128,8 +128,7 @@
 </template>
 
 <script>
-import { getDataById } from "@/services/bases/getData";
-import { postDataWithFile } from "@/services/bases/postData";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     props: {
@@ -152,9 +151,19 @@ export default {
             loading: false,
             uploading: false,
             files: [],
-            hasUserPosition: false,
-            contracts: [],
         };
+    },
+    computed: {
+        ...mapGetters("user", ["userPositionByUserId"]),
+        userPosition() {
+            return this.userPositionByUserId(this.item?.id);
+        },
+        hasUserPosition() {
+            return Boolean(this.userPosition?.id);
+        },
+        contracts() {
+            return this.userPosition?.contracts ?? [];
+        },
     },
     watch: {
         active: {
@@ -167,18 +176,15 @@ export default {
         },
     },
     methods: {
+        ...mapActions("user", {
+            fetchUserPosition: "fetchUserPosition",
+            uploadContractsAction: "uploadContracts",
+        }),
         async loadContracts() {
             this.loading = true;
 
             try {
-                const userPosition = await getDataById(
-                    this.path,
-                    this.item.id,
-                    "vi-tri-cong-viec",
-                );
-
-                this.hasUserPosition = Boolean(userPosition?.id);
-                this.contracts = userPosition?.contracts ?? [];
+                await this.fetchUserPosition(this.item.id);
             } finally {
                 this.loading = false;
             }
@@ -196,13 +202,12 @@ export default {
                     formData.append("files[]", file);
                 });
 
-                const response = await postDataWithFile(
-                    `${this.path}/${this.item.id}/hop-dong`,
+                const response = await this.uploadContractsAction({
+                    userId: this.item.id,
                     formData,
-                );
+                });
 
                 if (response) {
-                    this.contracts = response.contracts ?? [];
                     this.files = [];
                     this.$emit("reload");
                 }

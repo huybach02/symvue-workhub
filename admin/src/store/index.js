@@ -4,6 +4,7 @@ import media from "./modules/media";
 import mercure from "./modules/mercure";
 import chat from "./modules/chat";
 import workSchedule from "./modules/workSchedule";
+import user from "./modules/user";
 
 const store = createStore({
     state() {
@@ -26,6 +27,7 @@ const store = createStore({
         mercure,
         chat,
         workSchedule,
+        user,
     },
 });
 

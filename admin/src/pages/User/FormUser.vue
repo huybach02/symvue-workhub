@@ -404,10 +404,9 @@ import { functionHelper } from "@/helpers/functionHelper";
 import { addressHelper } from "@/helpers/addressHelper";
 import { userSchema } from "@/utils/schemas/user";
 import { constant } from "@/utils/constants/constant";
-import { getAllData } from "@/services/bases/getData";
-import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import ImageSelector from "@/components/ImageSelector.vue";
 import LoadingForm from "@/components/LoadingForm.vue";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -451,13 +450,12 @@ export default {
                 ward: "",
                 address: "",
             },
-            provinceData: {},
-            wardData: {},
             selectedProvince: "",
             selectedBoPhan: null,
         };
     },
     computed: {
+        ...mapGetters("user", ["provinceData", "wardDataByProvince"]),
         genderOptions() {
             return constant.GENDER.map((item) => ({
                 value: item.value,
@@ -474,7 +472,9 @@ export default {
             return addressHelper.getProvinceOptions(this.provinceData);
         },
         wardOptions() {
-            return addressHelper.getWardOptions(this.wardData);
+            return addressHelper.getWardOptions(
+                this.wardDataByProvince(this.selectedProvince),
+            );
         },
     },
     watch: {
@@ -515,6 +515,11 @@ export default {
         await Promise.all([this.getProvince(), this.getMaNhanVien()]);
     },
     methods: {
+        ...mapActions("user", [
+            "fetchEmployeeCode",
+            "fetchProvince",
+            "fetchWard",
+        ]),
         handleSubmit(values) {
             this.$emit("submit", values);
         },
@@ -538,20 +543,14 @@ export default {
             }
         },
         async getProvince() {
-            const res = await getAllData(API_ROUTES_CONFIG.user + "/province");
-            this.provinceData = res;
+            await this.fetchProvince();
         },
         async getWard(provinceId) {
-            const res = await getAllData(
-                API_ROUTES_CONFIG.user + "/ward/" + provinceId,
-            );
-            this.wardData = res;
+            await this.fetchWard({ provinceId });
         },
         async getMaNhanVien() {
             if (this.mode !== "create") return;
-            const res = await getAllData(
-                API_ROUTES_CONFIG.user + "/get-ma-nhan-vien",
-            );
+            const res = await this.fetchEmployeeCode();
             this.$nextTick(() => {
                 if (this.$refs.formRef) {
                     this.$refs.formRef.setFieldValue("maNhanVien", res);

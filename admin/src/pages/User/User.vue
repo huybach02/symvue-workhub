@@ -26,9 +26,6 @@
                 <UserList
                     v-if="permission?.index"
                     :path="path"
-                    :users="users"
-                    :total-items="totalItems"
-                    :loading="loading"
                     :permission="permission"
                     @reload="getDanhSach"
                 />
@@ -40,11 +37,11 @@
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import UserList from "./UserList.vue";
-import { getListData } from "@/services/bases/getData";
 import CreateEditUser from "./CreateEditUser.vue";
 import ExportDataExcel from "@/components/ExportDataExcel.vue";
 import ImportDataExcel from "@/components/ImportDataExcel.vue";
 import { usePermission } from "@/hooks/usePermission";
+import { mapActions } from "vuex";
 
 export default {
     name: "User",
@@ -57,9 +54,6 @@ export default {
     data() {
         return {
             path: API_ROUTES_CONFIG.user,
-            users: [],
-            totalItems: 0,
-            loading: false,
         };
     },
     computed: {
@@ -68,17 +62,9 @@ export default {
         },
     },
     methods: {
-        getDanhSach: async function (params) {
-            try {
-                this.loading = true;
-                const response = await getListData(this.path, params);
-                this.users = response.data || [];
-                this.totalItems = response.total || 0;
-            } catch (error) {
-                console.error("Lỗi khi lấy danh sách người dùng:", error);
-            } finally {
-                this.loading = false;
-            }
+        ...mapActions("user", ["fetchUsers"]),
+        async getDanhSach(params) {
+            await this.fetchUsers(params);
         },
     },
 };

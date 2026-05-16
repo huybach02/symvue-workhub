@@ -203,9 +203,9 @@ import FilterPlaceholder from "@/components/filters/FilterPlaceholder.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import CreateEditUser from "./CreateEditUser.vue";
-import { deleteData } from "@/services/bases/deleteData";
 import UserPosition from "./UserPosition.vue";
 import UserPositionAndPermission from "./UserPositionAndPermission.vue";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     name: "DataTable",
@@ -220,18 +220,6 @@ export default {
         path: {
             type: String,
             default: "",
-        },
-        users: {
-            type: Array,
-            default: () => [],
-        },
-        totalItems: {
-            type: Number,
-            default: 0,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
         },
         permission: {
             type: Object,
@@ -347,8 +335,12 @@ export default {
         };
     },
     computed: {
+        ...mapGetters("user", ["users", "totalItems", "usersLoading"]),
         items() {
             return this.users;
+        },
+        loading() {
+            return this.usersLoading;
         },
         tableMinWidth() {
             return this.headers.reduce((total, col) => {
@@ -360,13 +352,14 @@ export default {
         },
     },
     methods: {
+        ...mapActions("user", ["deleteUser"]),
         openDeleteDialog(id) {
             this.deletingId = id;
             this.showConfirmDelete = true;
         },
         async handleDelete() {
             this.isDeleting = true;
-            await deleteData(this.path, this.deletingId);
+            await this.deleteUser(this.deletingId);
             this.isDeleting = false;
             this.showConfirmDelete = false;
             this.deletingId = null;

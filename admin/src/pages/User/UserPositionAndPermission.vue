@@ -68,10 +68,9 @@
 </template>
 
 <script>
-import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import { getDataById } from "@/services/bases/getData";
 import UserPositionAndPermissionPermissionTab from "./components/UserPositionAndPermissionPermissionTab.vue";
 import UserPositionAndPermissionPositionTab from "./components/UserPositionAndPermissionPositionTab.vue";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -94,11 +93,14 @@ export default {
             dialog: false,
             tab: "position",
             loading: false,
-            positions: [],
             expandedDepartments: [],
         };
     },
     computed: {
+        ...mapGetters("user", ["userPositionListByUserId"]),
+        positions() {
+            return this.userPositionListByUserId(this.item?.id);
+        },
         groupedPositions() {
             const groupedByDepartmentId = new Map();
 
@@ -144,16 +146,12 @@ export default {
         },
     },
     methods: {
+        ...mapActions("user", ["fetchUserPositionList"]),
         async loadPositions() {
             this.loading = true;
 
             try {
-                this.positions =
-                    (await getDataById(
-                        API_ROUTES_CONFIG.user,
-                        this.item?.id,
-                        "vi-tri-cong-viec/danh-sach",
-                    )) ?? [];
+                await this.fetchUserPositionList(this.item?.id);
             } finally {
                 this.loading = false;
             }

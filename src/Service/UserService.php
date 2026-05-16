@@ -159,12 +159,21 @@ class UserService
             throw new \Exception(t("error.not_found"));
         }
 
-        // Nếu user này là quản lý của 1 bộ phận thì báo lỗi không cho xóa
+        // Nếu user này là quản lý của 1 bộ phận thì báo lỗi không cho xóa.
+        // Department::quanLyBoPhan là dữ liệu tổng hợp từ position manager,
+        // không phải relation trực tiếp nên không dùng findOneBy trên cột JSON.
         $checkIsManager = $this->entityManager
             ->getRepository(Department::class)
-            ->findOneBy([
-                "quanLyBoPhan" => $item,
-            ]);
+            ->createQueryBuilder("department")
+            ->innerJoin("department.positions", "position")
+            ->innerJoin("position.userPositions", "userPosition")
+            ->andWhere("position.isManager = 1")
+            ->andWhere("userPosition.isPrimary = 1")
+            ->andWhere("userPosition.member = :user")
+            ->setParameter("user", $item)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
 
         if ($checkIsManager) {
             throw new \Exception(

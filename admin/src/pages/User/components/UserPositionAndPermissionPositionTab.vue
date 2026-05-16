@@ -315,12 +315,10 @@
 </template>
 
 <script>
-import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import DepartmentPermissionEditor from "@/pages/Department/components/DepartmentPermissionEditor.vue";
-import { postData } from "@/services/bases/postData";
 import UserTemporaryPositionDialog from "./UserTemporaryPositionDialog.vue";
-import { deleteData } from "@/services/bases/deleteData";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import { mapActions } from "vuex";
 
 export default {
     components: {
@@ -399,6 +397,10 @@ export default {
         },
     },
     methods: {
+        ...mapActions("user", {
+            createTemporaryPositionAction: "createTemporaryPosition",
+            deleteTemporaryPositionAction: "deleteTemporaryPosition",
+        }),
         async submitTemporaryPosition(value) {
             if (!this.item?.id) {
                 return;
@@ -407,12 +409,10 @@ export default {
             this.submittingTemporaryPosition = true;
 
             try {
-                const response = await postData(
-                    `${this.path || API_ROUTES_CONFIG.user}/${this.item.id}/vi-tri-cong-viec/temp`,
-                    {
-                        ...value,
-                    },
-                );
+                const response = await this.createTemporaryPositionAction({
+                    userId: this.item.id,
+                    values: value,
+                });
 
                 if (response) {
                     this.dialog = false;
@@ -435,8 +435,7 @@ export default {
                 return;
             }
             this.isDeleting = true;
-            await deleteData(
-                `${this.path || API_ROUTES_CONFIG.user}/vi-tri-cong-viec/temp`,
+            await this.deleteTemporaryPositionAction(
                 this.selectedPositionItem.id,
             );
             this.isDeleting = false;

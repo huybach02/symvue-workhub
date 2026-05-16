@@ -233,10 +233,9 @@
 <script>
 import DatePicker from "@/components/DatePicker.vue";
 import TimePicker from "@/components/TimePicker.vue";
-import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import { getDataById, getDataSelect } from "@/services/bases/getData";
 import { userTemporaryPositionSchema } from "@/utils/schemas/userTemporaryPosition";
 import { Form as VeeForm, Field as VeeField } from "vee-validate";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -258,8 +257,6 @@ export default {
     emits: ["update:modelValue", "submit"],
     data() {
         return {
-            departmentOptions: [],
-            departmentOptionsLoading: false,
             initialValues: {
                 departmentId: null,
                 positionId: null,
@@ -268,13 +265,17 @@ export default {
                 endTempDate: "",
                 endTempTime: "",
             },
-            positionOptions: [],
-            positionOptionsLoading: false,
             selectedDepartmentId: null,
             validationSchema: userTemporaryPositionSchema,
         };
     },
     computed: {
+        ...mapGetters("user", [
+            "departmentOptions",
+            "departmentOptionsLoading",
+            "positionOptionsByDepartment",
+            "positionOptionsLoadingByDepartment",
+        ]),
         model: {
             get() {
                 return this.modelValue;
@@ -283,39 +284,32 @@ export default {
                 this.$emit("update:modelValue", value);
             },
         },
+        positionOptions() {
+            return this.positionOptionsByDepartment(this.selectedDepartmentId);
+        },
+        positionOptionsLoading() {
+            return this.positionOptionsLoadingByDepartment(
+                this.selectedDepartmentId,
+            );
+        },
     },
     created() {
         this.loadDepartmentOptions();
     },
     methods: {
+        ...mapActions("user", [
+            "fetchDepartmentOptions",
+            "fetchDepartmentPositions",
+        ]),
         async loadDepartmentOptions() {
-            this.departmentOptionsLoading = true;
-
-            try {
-                this.departmentOptions =
-                    (await getDataSelect(API_ROUTES_CONFIG.boPhan)) ?? [];
-            } finally {
-                this.departmentOptionsLoading = false;
-            }
+            await this.fetchDepartmentOptions();
         },
         async loadPositionOptions(departmentId) {
             if (!departmentId) {
-                this.positionOptions = [];
                 return;
             }
 
-            this.positionOptionsLoading = true;
-
-            try {
-                this.positionOptions =
-                    (await getDataById(
-                        API_ROUTES_CONFIG.boPhan,
-                        departmentId,
-                        "chuc-vu",
-                    )) ?? [];
-            } finally {
-                this.positionOptionsLoading = false;
-            }
+            await this.fetchDepartmentPositions({ departmentId });
         },
         async handleDepartmentChange(
             value,

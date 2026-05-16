@@ -59,11 +59,9 @@
 </template>
 
 <script>
-import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import DepartmentPermissionEditor from "@/pages/Department/components/DepartmentPermissionEditor.vue";
-import { getDataById } from "@/services/bases/getData";
-import { putData } from "@/services/bases/updateData";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -84,14 +82,17 @@ export default {
         return {
             saving: false,
             permissions: [],
-            customPermission: null,
             showConfirmRestore: false,
             isRestoring: false,
         };
     },
     computed: {
+        ...mapGetters("user", ["customPermissionByUserId"]),
+        customPermission() {
+            return this.customPermissionByUserId(this.userId);
+        },
         listModuleCustomPermission() {
-            return this.customPermission.join(", ");
+            return (this.customPermission ?? []).join(", ");
         },
     },
     watch: {
@@ -104,18 +105,19 @@ export default {
         },
     },
     methods: {
+        ...mapActions("user", [
+            "fetchUserCustomPermission",
+            "fetchUserPermissions",
+            "restoreDefaultPermissions",
+            "updateUserPermissions",
+        ]),
         async loadPermissions() {
             if (!this.userId) {
                 this.permissions = [];
                 return;
             }
 
-            this.permissions =
-                (await getDataById(
-                    API_ROUTES_CONFIG.user,
-                    this.userId,
-                    "permission",
-                )) ?? [];
+            this.permissions = await this.fetchUserPermissions(this.userId);
         },
         async savePermissions() {
             if (!this.userId) {
@@ -125,18 +127,17 @@ export default {
             this.saving = true;
 
             try {
-                const response = await putData(
-                    `${API_ROUTES_CONFIG.user}/${this.userId}/permission`,
-                    null,
-                    { permissions: this.permissions },
-                );
+                const response = await this.updateUserPermissions({
+                    userId: this.userId,
+                    permissions: this.permissions,
+                });
 
                 if (response) {
                     this.permissions = response ?? [];
                 }
             } finally {
                 this.saving = false;
-                this.checkUserHasCustomPermission();
+                await this.checkUserHasCustomPermission();
             }
         },
         async checkUserHasCustomPermission() {
@@ -144,28 +145,13 @@ export default {
                 return;
             }
 
-            const response = await getDataById(
-                API_ROUTES_CONFIG.user,
-                this.userId,
-                "has-custom-permission",
-            );
-
-            if (response) {
-                this.customPermission = response;
-            }
+            await this.fetchUserCustomPermission(this.userId);
         },
         async restorePermissions() {
             this.isRestoring = true;
 
-            await getDataById(
-                `${API_ROUTES_CONFIG.user}`,
-                this.userId,
-                "restore-default-permission",
-            );
-
+            await this.restoreDefaultPermissions(this.userId);
             this.isRestoring = false;
-            this.loadPermissions();
-            this.checkUserHasCustomPermission();
             this.showConfirmRestore = false;
         },
     },

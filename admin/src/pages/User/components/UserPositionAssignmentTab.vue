@@ -42,11 +42,9 @@
 </template>
 
 <script>
-import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import { getDataById, getDataSelect } from "@/services/bases/getData";
-import { putData } from "@/services/bases/updateData";
 import UserPositionForm from "./UserPositionForm.vue";
 import UserPositionInfoCard from "./UserPositionInfoCard.vue";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -72,13 +70,19 @@ export default {
         return {
             loading: false,
             saving: false,
-            departmentOptions: [],
-            positionOptions: [],
             selectedPosition: null,
             form: this.createDefaultForm(),
         };
     },
     computed: {
+        ...mapGetters("user", [
+            "departmentOptions",
+            "positionOptionsByDepartment",
+            "userPositionByUserId",
+        ]),
+        positionOptions() {
+            return this.positionOptionsByDepartment(this.form.departmentId);
+        },
         displayPosition() {
             return this.selectedPosition || this.form.positionSnapshot || null;
         },
@@ -94,6 +98,12 @@ export default {
         },
     },
     methods: {
+        ...mapActions("user", [
+            "fetchDepartmentOptions",
+            "fetchDepartmentPositions",
+            "fetchUserPosition",
+            "updateUserPosition",
+        ]),
         createDefaultForm() {
             return {
                 departmentId: null,
@@ -116,16 +126,13 @@ export default {
             this.loading = true;
 
             try {
-                const [departments, userPosition] = await Promise.all([
-                    getDataSelect(API_ROUTES_CONFIG.boPhan),
-                    getDataById(this.path, this.item.id, "vi-tri-cong-viec"),
+                const [, userPosition] = await Promise.all([
+                    this.fetchDepartmentOptions(),
+                    this.fetchUserPosition(this.item.id),
                 ]);
-
-                this.departmentOptions = departments ?? [];
 
                 if (!userPosition) {
                     this.form = this.createDefaultForm();
-                    this.positionOptions = [];
                     this.selectedPosition = null;
                     return;
                 }
@@ -153,7 +160,6 @@ export default {
         },
         async loadPositions(departmentId, resetPosition = true) {
             if (!departmentId) {
-                this.positionOptions = [];
                 this.selectedPosition = null;
 
                 if (resetPosition) {
@@ -167,12 +173,9 @@ export default {
                 return;
             }
 
-            this.positionOptions =
-                (await getDataById(
-                    API_ROUTES_CONFIG.boPhan,
-                    departmentId,
-                    "chuc-vu",
-                )) ?? [];
+            const positionOptions = await this.fetchDepartmentPositions({
+                departmentId,
+            });
 
             if (resetPosition) {
                 this.form = {
@@ -186,7 +189,7 @@ export default {
             }
 
             this.selectedPosition =
-                this.positionOptions.find(
+                positionOptions.find(
                     (position) => position.id === this.form.positionId,
                 ) || null;
         },
@@ -217,10 +220,9 @@ export default {
             this.saving = true;
 
             try {
-                const response = await putData(
-                    `${this.path}/${this.item.id}/vi-tri-cong-viec`,
-                    null,
-                    {
+                const response = await this.updateUserPosition({
+                    userId: this.item.id,
+                    values: {
                         departmentId: values.departmentId,
                         positionId: values.positionId,
                         salary: values.salary,
@@ -235,7 +237,7 @@ export default {
                         insuranceCode: values.insuranceCode || null,
                         note: values.note || null,
                     },
-                );
+                });
 
                 if (response) {
                     this.form = {
