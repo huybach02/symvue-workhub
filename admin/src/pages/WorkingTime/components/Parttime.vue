@@ -14,6 +14,7 @@
         <ParttimeDialog
             :is-open="isOpenDialog"
             :thoi-gian-lam-viec="selectedThoiGianLamViec"
+            :item-edit="selectedCaLamViec"
             @close="isOpenDialog = false"
             @update="handleParttimeUpdated"
         />
@@ -40,6 +41,7 @@ export default {
         return {
             isOpenDialog: false,
             selectedThoiGianLamViec: null,
+            selectedCaLamViec: null,
         };
     },
     computed: {
@@ -49,6 +51,7 @@ export default {
         },
     },
     created() {
+        console.log(this.permission);
         this.fetchThoiGianLamViec();
     },
     methods: {
@@ -56,12 +59,14 @@ export default {
         async fetchThoiGianLamViec() {
             await this.fetchFulltimeList();
         },
-        openDialog(thoiGianLamViec) {
+        openDialog({ thoiGianLamViec, caLamViec = null }) {
             this.selectedThoiGianLamViec = thoiGianLamViec;
+            this.selectedCaLamViec = caLamViec;
             this.isOpenDialog = true;
         },
         handleParttimeUpdated() {
             this.isOpenDialog = false;
+            this.selectedCaLamViec = null;
         },
     },
 };

@@ -15,5 +15,8 @@ class WorkingTimeDTO
 
         #[Assert\Type(type: "string")]
         public readonly string $ghiChu,
+
+        #[Assert\Type(type: "bool")]
+        public readonly bool $applyToExistingSchedules = false,
     ) {}
 }

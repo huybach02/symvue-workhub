@@ -770,7 +770,11 @@ class WorkScheduleService
             }
 
             foreach ($workingTime->getCaLamViecs() as $workShift) {
-                if (!$workShift->getGioBatDau() || !$workShift->getGioKetThuc()) {
+                if (
+                    !$workShift->isStatus() ||
+                    !$workShift->getGioBatDau() ||
+                    !$workShift->getGioKetThuc()
+                ) {
                     continue;
                 }
 
@@ -874,6 +878,9 @@ class WorkScheduleService
         $workShift = $this->workShiftRepository->find($dto->workShiftId);
         if (!$workShift) {
             throw new \Exception("Ca làm việc không tồn tại");
+        }
+        if (!$workShift->isStatus()) {
+            throw new \Exception("Ca làm việc đã ngưng hoạt động");
         }
 
         foreach ($dto->userIds as $userId) {

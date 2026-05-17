@@ -13,7 +13,9 @@
                                 size="small"
                                 variant="outlined"
                                 color="primary"
-                                @click="$emit('open-dialog', thoiGianLamViec)"
+                                @click="
+                                    $emit('open-dialog', { thoiGianLamViec })
+                                "
                             />
                         </template>
                     </v-tooltip>
@@ -33,12 +35,30 @@
 
                         <template v-slot:append>
                             <v-btn
-                                v-if="permission.delete"
-                                icon="mdi-trash-can-outline"
+                                v-if="permission.edit"
+                                icon="mdi-pencil-outline"
                                 size="x-small"
                                 variant="outlined"
-                                color="error"
-                                @click="deleteCaLamViec(caLamViec.id)"
+                                color="primary"
+                                class="mr-1"
+                                @click="
+                                    $emit('open-dialog', {
+                                        thoiGianLamViec,
+                                        caLamViec,
+                                    })
+                                "
+                            />
+                            <v-switch
+                                v-if="permission.edit"
+                                :model-value="Boolean(caLamViec.status)"
+                                color="success"
+                                hide-details
+                                density="compact"
+                                inset
+                                @update:model-value="
+                                    (value) =>
+                                        toggleShiftStatus(caLamViec, value)
+                                "
                             />
                         </template>
                     </v-list-item>
@@ -73,10 +93,20 @@ export default {
         this.fetchCaLamViecList();
     },
     methods: {
-        ...mapActions("workingTime", ["fetchParttimeShifts"]),
+        ...mapActions("workingTime", [
+            "fetchParttimeShifts",
+            "updateParttimeShiftStatus",
+        ]),
         async fetchCaLamViecList() {
             await this.fetchParttimeShifts({
                 workingTimeId: this.thoiGianLamViec.id,
+            });
+        },
+        async toggleShiftStatus(caLamViec, value) {
+            await this.updateParttimeShiftStatus({
+                id: caLamViec.id,
+                workingTimeId: this.thoiGianLamViec.id,
+                status: value,
             });
         },
     },

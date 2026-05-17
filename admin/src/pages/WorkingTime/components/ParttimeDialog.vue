@@ -2,7 +2,7 @@
     <v-dialog v-model="dialog" max-width="600">
         <v-card
             prepend-icon="mdi-clock-outline"
-            :title="$t('ca_lam_viec.create')"
+            :title="itemEdit ? $t('ca_lam_viec.edit') : $t('ca_lam_viec.create')"
         >
             <v-divider />
 
@@ -75,6 +75,78 @@
                                 />
                             </VeeField>
                         </v-col>
+                        <v-col v-if="itemEdit" cols="12">
+                            <VeeField
+                                v-slot="{ field, handleChange }"
+                                name="applyToExistingSchedules"
+                            >
+                                <div>
+                                    <v-label class="mb-2 font-weight-bold">
+                                        {{
+                                            $t("thoi_gian_lam_viec.apply_scope")
+                                        }}
+                                    </v-label>
+
+                                    <v-radio-group
+                                        :model-value="field.value"
+                                        hide-details
+                                        @update:model-value="
+                                            onApplyScopeChange(
+                                                handleChange,
+                                                $event,
+                                            )
+                                        "
+                                    >
+                                        <v-card
+                                            class="mb-3"
+                                            :color="
+                                                field.value === true
+                                                    ? 'primary'
+                                                    : undefined
+                                            "
+                                            variant="tonal"
+                                            @click="handleChange(true)"
+                                        >
+                                            <v-card-text class="pa-3">
+                                                <v-radio
+                                                    :label="
+                                                        $t(
+                                                            'thoi_gian_lam_viec.apply_existing_schedules',
+                                                        )
+                                                    "
+                                                    :value="true"
+                                                    color="primary"
+                                                    hide-details
+                                                />
+                                            </v-card-text>
+                                        </v-card>
+
+                                        <v-card
+                                            :color="
+                                                field.value === false
+                                                    ? 'primary'
+                                                    : undefined
+                                            "
+                                            variant="tonal"
+                                            @click="handleChange(false)"
+                                        >
+                                            <v-card-text class="pa-3">
+                                                <v-radio
+                                                    :label="
+                                                        $t(
+                                                            'thoi_gian_lam_viec.apply_new_schedules_only',
+                                                        )
+                                                    "
+                                                    :value="false"
+                                                    color="primary"
+                                                    hide-details
+                                                />
+                                            </v-card-text>
+                                        </v-card>
+                                    </v-radio-group>
+                                </div>
+                            </VeeField>
+                        </v-col>
                         <v-col cols="12">
                             <VeeField
                                 v-slot="{ field, errorMessage }"
@@ -118,6 +190,7 @@
 
 <script>
 import TimePicker from "@/components/TimePicker.vue";
+import { toast } from "@/main";
 import { Form as VeeForm, Field as VeeField } from "vee-validate";
 import { mapActions, mapGetters } from "vuex";
 
@@ -136,6 +209,10 @@ export default {
             type: Object,
             default: null,
         },
+        itemEdit: {
+            type: Object,
+            default: null,
+        },
     },
     emits: ["close", "update"],
     data() {
@@ -145,6 +222,7 @@ export default {
                 gioBatDau: "",
                 gioKetThuc: "",
                 ghiChu: "",
+                applyToExistingSchedules: null,
             },
         };
     },
@@ -161,13 +239,72 @@ export default {
             },
         },
     },
+    watch: {
+        itemEdit: {
+            handler() {
+                this.initialValues = this.itemEdit
+                    ? {
+                          ...this.itemEdit,
+                          applyToExistingSchedules: null,
+                      }
+                    : {
+                          thu: "",
+                          gioBatDau: "",
+                          gioKetThuc: "",
+                          ghiChu: "",
+                          applyToExistingSchedules: null,
+                      };
+            },
+            immediate: true,
+        },
+        isOpen(value) {
+            if (!value) {
+                return;
+            }
+
+            this.initialValues = this.itemEdit
+                ? {
+                      ...this.itemEdit,
+                      applyToExistingSchedules: null,
+                  }
+                : {
+                      thu: "",
+                      gioBatDau: "",
+                      gioKetThuc: "",
+                      ghiChu: "",
+                      applyToExistingSchedules: null,
+                  };
+        },
+    },
     methods: {
-        ...mapActions("workingTime", ["createParttimeShift"]),
+        ...mapActions("workingTime", ["createParttimeShift", "updateParttimeShift"]),
+        onApplyScopeChange(handleChange, value) {
+            handleChange(value);
+        },
         async onSubmit(values) {
-            const response = await this.createParttimeShift({
+            if (
+                this.itemEdit &&
+                values.applyToExistingSchedules !== true &&
+                values.applyToExistingSchedules !== false
+            ) {
+                toast.error(this.$t("thoi_gian_lam_viec.apply_scope_required"));
+                return;
+            }
+
+            const payload = {
                 ...values,
                 thoiGianLamViecId: this.thoiGianLamViec.id,
-            });
+                applyToExistingSchedules:
+                    this.itemEdit === null
+                        ? false
+                        : values.applyToExistingSchedules,
+            };
+            const response = this.itemEdit
+                ? await this.updateParttimeShift({
+                      id: this.itemEdit.id,
+                      values: payload,
+                  })
+                : await this.createParttimeShift(payload);
 
             if (response) {
                 this.dialog = false;

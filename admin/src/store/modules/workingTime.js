@@ -156,6 +156,53 @@ const actions = {
             commit("SET_SAVING", false);
         }
     },
+    async updateParttimeShift({ commit, dispatch }, { id, values }) {
+        commit("SET_SAVING", true);
+
+        try {
+            const response = await putData(
+                `${API_ROUTES_CONFIG.thoiGianLamViec}/ca-lam-viec?id=${id}`,
+                null,
+                values,
+            );
+
+            if (response) {
+                await dispatch("fetchParttimeShifts", {
+                    workingTimeId: values.thoiGianLamViecId,
+                    force: true,
+                });
+            }
+
+            return response;
+        } finally {
+            commit("SET_SAVING", false);
+        }
+    },
+    async updateParttimeShiftStatus(
+        { commit, dispatch },
+        { id, workingTimeId, status },
+    ) {
+        commit("SET_SAVING", true);
+
+        try {
+            const response = await putData(
+                `${API_ROUTES_CONFIG.thoiGianLamViec}/ca-lam-viec/status?id=${id}`,
+                null,
+                { status },
+            );
+
+            if (response) {
+                await dispatch("fetchParttimeShifts", {
+                    workingTimeId,
+                    force: true,
+                });
+            }
+
+            return response;
+        } finally {
+            commit("SET_SAVING", false);
+        }
+    },
 };
 
 export default {

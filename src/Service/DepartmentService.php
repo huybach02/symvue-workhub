@@ -523,6 +523,7 @@ class DepartmentService
 
             if (
                 (int) $userPosition->getStatus() !== 1 ||
+                (int) $userPosition->getIsPrimary() !== 1 ||
                 !$member ||
                 $member->getStatus() !== 1 ||
                 $member->getId() === null

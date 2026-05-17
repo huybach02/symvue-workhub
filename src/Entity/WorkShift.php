@@ -36,6 +36,9 @@ class WorkShift
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $color = null;
 
+    #[ORM\Column(options: ["default" => true])]
+    private ?bool $status = true;
+
     /**
      * @var Collection<int, WorkShiftAssignment>
      */
@@ -108,6 +111,7 @@ class WorkShift
             'gioBatDau' => $this->gioBatDau,
             'gioKetThuc' => $this->gioKetThuc,
             'ghiChu' => $this->ghiChu,
+            'status' => $this->status,
             'createdAt' => $this->createdAt,
             'updatedAt' => $this->updatedAt,
             'createdBy' => $this->createdBy,
@@ -123,6 +127,18 @@ class WorkShift
     public function setColor(?string $color): static
     {
         $this->color = $color;
+
+        return $this;
+    }
+
+    public function isStatus(): ?bool
+    {
+        return $this->status;
+    }
+
+    public function setStatus(bool $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }

@@ -22,6 +22,7 @@ error:
     not_found: "Not found"
     exists: "Data already exists"
     file_not_found: "File not found"
+    param_invalid: "Invalid parameter"
     imported_with_errors: "Import failed with %count% errors. Please check the import file or go to the Import History page for details"
     quan_ly_bo_phan_exist: "%name% is already the manager of %bo_phan%"
     bo_phan_exist: "Department/Division %name% with code %ma_bo_phan% already exists"

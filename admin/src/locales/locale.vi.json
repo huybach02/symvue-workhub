@@ -51,7 +51,11 @@
     "thu": "Thứ",
     "gio_bat_dau": "Giờ bắt đầu",
     "gio_ket_thuc": "Giờ kết thúc",
-    "ghi_chu": "Ghi chú"
+    "ghi_chu": "Ghi chú",
+    "apply_scope": "Phạm vi áp dụng",
+    "apply_existing_schedules": "Áp dụng cho các lịch làm việc đã có trên hệ thống (ghi đè các dữ liệu đã có)",
+    "apply_new_schedules_only": "Chỉ áp dụng cho các lịch làm việc mới",
+    "apply_scope_required": "Vui lòng chọn phạm vi áp dụng"
   },
   "ca_lam_viec": {
     "ten_ca": "Tên ca",

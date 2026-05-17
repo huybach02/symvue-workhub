@@ -84,6 +84,84 @@
                         </v-col>
                         <v-col cols="12">
                             <VeeField
+                                v-slot="{ field, errorMessage, handleChange }"
+                                name="applyToExistingSchedules"
+                            >
+                                <div>
+                                    <v-label class="mb-2 font-weight-bold">
+                                        {{
+                                            $t("thoi_gian_lam_viec.apply_scope")
+                                        }}
+                                    </v-label>
+
+                                    <v-radio-group
+                                        :model-value="field.value"
+                                        hide-details
+                                        @update:model-value="
+                                            onApplyScopeChange(
+                                                handleChange,
+                                                $event,
+                                            )
+                                        "
+                                    >
+                                        <v-card
+                                            class="mb-3"
+                                            :color="
+                                                field.value === true
+                                                    ? 'primary'
+                                                    : undefined
+                                            "
+                                            variant="tonal"
+                                            @click="handleChange(true)"
+                                        >
+                                            <v-card-text class="pa-3">
+                                                <v-radio
+                                                    :label="
+                                                        $t(
+                                                            'thoi_gian_lam_viec.apply_existing_schedules',
+                                                        )
+                                                    "
+                                                    :value="true"
+                                                    color="primary"
+                                                    hide-details
+                                                />
+                                            </v-card-text>
+                                        </v-card>
+
+                                        <v-card
+                                            :color="
+                                                field.value === false
+                                                    ? 'primary'
+                                                    : undefined
+                                            "
+                                            variant="tonal"
+                                            @click="handleChange(false)"
+                                        >
+                                            <v-card-text class="pa-3">
+                                                <v-radio
+                                                    :label="
+                                                        $t(
+                                                            'thoi_gian_lam_viec.apply_new_schedules_only',
+                                                        )
+                                                    "
+                                                    :value="false"
+                                                    color="primary"
+                                                    hide-details
+                                                />
+                                            </v-card-text>
+                                        </v-card>
+                                    </v-radio-group>
+
+                                    <v-messages
+                                        v-if="errorMessage"
+                                        color="error"
+                                        :messages="[errorMessage]"
+                                    />
+                                </div>
+                            </VeeField>
+                        </v-col>
+                        <v-col cols="12">
+                            <VeeField
                                 v-slot="{ field, errorMessage }"
                                 name="ghiChu"
                             >
@@ -125,6 +203,7 @@
 
 <script>
 import TimePicker from "@/components/TimePicker.vue";
+import { toast } from "@/main";
 import { Form as VeeForm, Field as VeeField } from "vee-validate";
 import { mapActions, mapGetters } from "vuex";
 
@@ -152,6 +231,7 @@ export default {
                 gioBatDau: "",
                 gioKetThuc: "",
                 ghiChu: "",
+                applyToExistingSchedules: null,
             },
             dataLoaded: false,
         };
@@ -181,10 +261,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions("workingTime", [
-            "fetchFulltimeDetail",
-            "updateFulltime",
-        ]),
+        ...mapActions("workingTime", ["fetchFulltimeDetail", "updateFulltime"]),
         async fetchItemById() {
             if (this.itemEdit) {
                 this.dataLoaded = false;
@@ -198,12 +275,26 @@ export default {
                 });
 
                 if (response) {
-                    this.initialValues = response;
+                    this.initialValues = {
+                        ...response,
+                        applyToExistingSchedules: null,
+                    };
                     this.dataLoaded = true;
                 }
             }
         },
+        onApplyScopeChange(handleChange, value) {
+            handleChange(value);
+        },
         async onSubmit(values) {
+            if (
+                values.applyToExistingSchedules !== true &&
+                values.applyToExistingSchedules !== false
+            ) {
+                toast.error(this.$t("thoi_gian_lam_viec.apply_scope_required"));
+                return;
+            }
+
             const response = await this.updateFulltime({
                 id: this.itemEdit.id,
                 values,

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Class\CustomResponse;
 use App\DTO\WorkShiftDTO;
+use App\DTO\WorkShiftStatusDTO;
 use App\DTO\WorkingTimeDTO;
 use App\Service\WorkingTimeService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,17 +19,19 @@ final class WorkingTimeController extends AbstractController
         private readonly WorkingTimeService $thoiGianLamViecService,
     ) {}
 
-    #[Route('/thoi-gian-lam-viec', methods: ['GET'])]
+    #[Route("/thoi-gian-lam-viec", methods: ["GET"])]
     public function getAll(Request $request): JsonResponse
     {
-        $type = $request->query->get('type');
-        $id = $request->query->get('id');
-        $thoiGianLamViecId = $request->query->get('thoiGianLamViecId');
+        $type = $request->query->get("type");
+        $id = $request->query->get("id");
+        $thoiGianLamViecId = $request->query->get("thoiGianLamViecId");
 
         try {
-            if ($type === 'fulltime') {
+            if ($type === "fulltime") {
                 if ($id !== null) {
-                    $thoiGianLamViec = $this->thoiGianLamViecService->findById((int) $id);
+                    $thoiGianLamViec = $this->thoiGianLamViecService->findById(
+                        (int) $id,
+                    );
                     return CustomResponse::success($thoiGianLamViec);
                 }
 
@@ -36,39 +39,88 @@ final class WorkingTimeController extends AbstractController
                 return CustomResponse::success($thoiGianLamViecList);
             }
 
-            if ($type === 'parttime') {
-                $thoiGianLamViecList = $this->thoiGianLamViecService->findAllParttimeByThoiGianLamViecId((int) $thoiGianLamViecId);
+            if ($type === "parttime") {
+                $thoiGianLamViecList = $this->thoiGianLamViecService->findAllParttimeByThoiGianLamViecId(
+                    (int) $thoiGianLamViecId,
+                );
                 return CustomResponse::success($thoiGianLamViecList);
             }
 
-            return CustomResponse::error('Tham số type không hợp lệ. Vui lòng truy�n type=fulltime hoặc type=parttime.');
+            return CustomResponse::error(t("error.param_invalid"));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
     }
 
-    #[Route('/thoi-gian-lam-viec', methods: ['PUT'])]
+    #[Route("/thoi-gian-lam-viec", methods: ["PUT"])]
     public function updateFulltime(
         Request $request,
-        #[MapRequestPayload] WorkingTimeDTO $thoiGianLamViecDTO
+        #[MapRequestPayload] WorkingTimeDTO $thoiGianLamViecDTO,
     ): JsonResponse {
-        $id = $request->query->get('id');
+        $id = $request->query->get("id");
 
         try {
-            $thoiGianLamViec = $this->thoiGianLamViecService->updateFulltime((int) $id, $thoiGianLamViecDTO);
-            return CustomResponse::success($thoiGianLamViec, t('success.updated'));
+            $thoiGianLamViec = $this->thoiGianLamViecService->updateFulltime(
+                (int) $id,
+                $thoiGianLamViecDTO,
+            );
+            return CustomResponse::success(
+                $thoiGianLamViec,
+                t("success.updated"),
+            );
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
     }
 
-    #[Route('/thoi-gian-lam-viec', methods: ['POST'])]
+    #[Route("/thoi-gian-lam-viec", methods: ["POST"])]
     public function createParttime(
-        #[MapRequestPayload] WorkShiftDTO $caLamViecDTO
+        #[MapRequestPayload] WorkShiftDTO $caLamViecDTO,
     ): JsonResponse {
         try {
-            $thoiGianLamViec = $this->thoiGianLamViecService->createParttime($caLamViecDTO);
-            return CustomResponse::success($thoiGianLamViec, t('success.created'));
+            $thoiGianLamViec = $this->thoiGianLamViecService->createParttime(
+                $caLamViecDTO,
+            );
+            return CustomResponse::success(
+                $thoiGianLamViec,
+                t("success.created"),
+            );
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route("/thoi-gian-lam-viec/ca-lam-viec", methods: ["PUT"])]
+    public function updateParttime(
+        Request $request,
+        #[MapRequestPayload] WorkShiftDTO $caLamViecDTO,
+    ): JsonResponse {
+        $id = $request->query->get("id");
+
+        try {
+            $caLamViec = $this->thoiGianLamViecService->updateParttime(
+                (int) $id,
+                $caLamViecDTO,
+            );
+            return CustomResponse::success($caLamViec, t("success.updated"));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route("/thoi-gian-lam-viec/ca-lam-viec/status", methods: ["PUT"])]
+    public function updateParttimeStatus(
+        Request $request,
+        #[MapRequestPayload] WorkShiftStatusDTO $dto,
+    ): JsonResponse {
+        $id = $request->query->get("id");
+
+        try {
+            $caLamViec = $this->thoiGianLamViecService->updateParttimeStatus(
+                (int) $id,
+                $dto,
+            );
+            return CustomResponse::success($caLamViec, t("success.updated"));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }

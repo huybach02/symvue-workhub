@@ -145,11 +145,15 @@ export default {
         this.getDepartments();
         this.fetchHolidaySchedule();
     },
+    beforeUnmount() {
+        this.resetWorkScheduleState();
+    },
     methods: {
         ...mapActions("workSchedule", [
             "fetchDepartments",
             "fetchHolidaySchedule",
             "fetchMembersByDepartment",
+            "resetWorkScheduleState",
         ]),
         async getDepartments() {
             await this.fetchDepartments();

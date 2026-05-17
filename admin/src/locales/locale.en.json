@@ -51,7 +51,11 @@
     "thu": "Day",
     "gio_bat_dau": "Start Time",
     "gio_ket_thuc": "End Time",
-    "ghi_chu": "Note"
+    "ghi_chu": "Note",
+    "apply_scope": "Apply scope",
+    "apply_existing_schedules": "Apply to existing work schedules (overwrite existing data)",
+    "apply_new_schedules_only": "Only apply to new work schedules",
+    "apply_scope_required": "Please select apply scope"
   },
   "ca_lam_viec": {
     "ten_ca": "Shift name",

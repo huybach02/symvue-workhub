@@ -9,7 +9,7 @@ import {
 import { deleteData } from "@/services/bases/deleteData";
 import { postData } from "@/services/bases/postData";
 
-const state = {
+const getDefaultState = () => ({
     departments: [],
     departmentsLoading: false,
     membersByDepartment: {},
@@ -18,7 +18,9 @@ const state = {
     parttimeDataByDepartment: {},
     fulltimeLoading: false,
     parttimeLoading: false,
-};
+});
+
+const state = getDefaultState();
 
 const getters = {
     departments: (state) => state.departments,
@@ -117,6 +119,9 @@ const mutations = {
     },
     SET_PARTTIME_LOADING(state, value) {
         state.parttimeLoading = value;
+    },
+    RESET_STATE(state) {
+        Object.assign(state, getDefaultState());
     },
 };
 
@@ -321,6 +326,9 @@ const actions = {
             `${API_ROUTES_CONFIG.workSchedule}/parttime/assign`,
             assignmentId,
         );
+    },
+    resetWorkScheduleState({ commit }) {
+        commit("RESET_STATE");
     },
 };
 
