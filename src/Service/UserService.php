@@ -413,8 +413,8 @@ class UserService
         $userPosition->setPosition($position);
         $userPosition->setIsPrimary(false);
 
-        $startTemp = new \DateTime($dto->startTempDate . " " . $dto->startTempTime)->getTimestamp();
-        $endTemp = new \DateTime($dto->endTempDate . " " . $dto->endTempTime)->getTimestamp();
+        $startTemp = (new \DateTime($dto->startTempDate . " " . $dto->startTempTime))->getTimestamp();
+        $endTemp = (new \DateTime($dto->endTempDate . " " . $dto->endTempTime))->getTimestamp();
 
         $userPosition->setStartTemp($startTemp);
         $userPosition->setEndTemp($endTemp);
@@ -506,7 +506,7 @@ class UserService
                 "size" => $size,
                 "mime" => $mime,
                 "extension" => $extension,
-                "uploadedAt" => new \DateTime()->format("Y-m-d H:i:s"),
+                "uploadedAt" => (new \DateTime())->format("Y-m-d H:i:s"),
             ];
         }
 

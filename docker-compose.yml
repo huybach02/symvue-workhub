@@ -5,10 +5,12 @@ services:
             dockerfile: Dockerfile
         container_name: symfony_php
         restart: unless-stopped
+        env_file:
+            - .env.prod.local
         environment:
             APP_ENV: prod
             MERCURE_URL: http://mercure/.well-known/mercure
-            MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-https://mercure-erp.huybach02.io.vn/.well-known/mercure}
+            MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-https://novatify-mercure.huybach02.io.vn/.well-known/mercure}
         volumes:
             - symfony_var:/var/www/html/var
             - symfony_uploads:/var/www/html/public/uploads
@@ -32,8 +34,8 @@ services:
             context: ./admin
             dockerfile: Dockerfile
             args:
-                VITE_API_BASE_URL: ${VITE_API_BASE_URL:-https://api-erp.huybach02.io.vn/api}
-                VITE_MERCURE_URL: ${VITE_MERCURE_URL:-https://mercure-erp.huybach02.io.vn/.well-known/mercure}
+                VITE_API_BASE_URL: ${VITE_API_BASE_URL:-https://novatify-api.huybach02.io.vn/api}
+                VITE_MERCURE_URL: ${VITE_MERCURE_URL:-https://novatify-mercure.huybach02.io.vn/.well-known/mercure}
         container_name: vue_admin
         restart: unless-stopped
         expose:
@@ -47,11 +49,13 @@ services:
             dockerfile: Dockerfile
         container_name: symfony_messenger
         restart: unless-stopped
+        env_file:
+            - .env.prod.local
         command: php bin/console messenger:consume async -vv --time-limit=3600 --memory-limit=128M
         environment:
             APP_ENV: prod
             MERCURE_URL: http://mercure/.well-known/mercure
-            MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-https://mercure-erp.huybach02.io.vn/.well-known/mercure}
+            MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-https://novatify-mercure.huybach02.io.vn/.well-known/mercure}
         volumes:
             - symfony_var:/var/www/html/var
             - ./config/jwt:/var/www/html/config/jwt
@@ -64,11 +68,13 @@ services:
             dockerfile: Dockerfile
         container_name: symfony_scheduler
         restart: unless-stopped
+        env_file:
+            - .env.prod.local
         command: php bin/console messenger:consume scheduler_default -vv --time-limit=3600 --memory-limit=128M
         environment:
             APP_ENV: prod
             MERCURE_URL: http://mercure/.well-known/mercure
-            MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-https://mercure-erp.huybach02.io.vn/.well-known/mercure}
+            MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-https://novatify-mercure.huybach02.io.vn/.well-known/mercure}
         volumes:
             - symfony_var:/var/www/html/var
             - ./config/jwt:/var/www/html/config/jwt
@@ -79,12 +85,14 @@ services:
         image: dunglas/mercure
         container_name: mercure_hub
         restart: unless-stopped
+        env_file:
+            - .env.prod.local
         environment:
             SERVER_NAME: :80
             MERCURE_PUBLISHER_JWT_KEY: ${MERCURE_JWT_SECRET:-071c26246473e3a27780cfddf6123f5df4116fb8fc6f1456e04fabbeb8dd193a}
             MERCURE_SUBSCRIBER_JWT_KEY: ${MERCURE_JWT_SECRET:-071c26246473e3a27780cfddf6123f5df4116fb8fc6f1456e04fabbeb8dd193a}
             MERCURE_EXTRA_DIRECTIVES: |
-                cors_origins https://erp.huybach02.io.vn https://api-erp.huybach02.io.vn https://mercure-erp.huybach02.io.vn
+                cors_origins https://novatify.huybach02.io.vn https://novatify-api.huybach02.io.vn https://novatify-mercure.huybach02.io.vn
         expose:
             - "80"
 
