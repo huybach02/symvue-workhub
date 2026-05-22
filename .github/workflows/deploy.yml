@@ -1,4 +1,4 @@
-name: Deploy to AWS EC2
+name: Deploy to Production VPS
 
 on:
     push:
@@ -29,34 +29,42 @@ jobs:
 
                       cd "${{ secrets.EC2_APP_DIR }}"
 
-                      echo "[1/9] Update source code"
+                      if [ ! -f .env.prod.local ]; then
+                        echo ".env.prod.local was not found on the server."
+                        exit 1
+                      fi
+
+                      echo "[1/10] Update source code"
                       git fetch origin main
                       git checkout main
                       git reset --hard origin/main
 
-                      echo "[2/9] Export frontend build variables"
-                      export VITE_API_BASE_URL="${{ secrets.VITE_API_BASE_URL }}"
-                      export VITE_MERCURE_URL="${{ secrets.VITE_MERCURE_URL }}"
+                      echo "[2/10] Build Docker images"
+                      docker compose --env-file .env.prod.local build --no-cache
 
-                      echo "[3/9] Build Docker images"
-                      docker compose build --no-cache
+                      echo "[3/10] Recreate application services"
+                      docker compose --env-file .env.prod.local up -d --force-recreate be-php be-nginx fe-nginx mercure messenger scheduler npm
 
-                      echo "[4/9] Start or refresh containers"
-                      docker compose up -d
+                      echo "[4/10] Run database migrations"
+                      docker compose --env-file .env.prod.local exec -T be-php php bin/console doctrine:migrations:migrate --no-interaction --env=prod
 
-                      echo "[5/9] Run database migrations"
-                      docker compose exec -T be-php php bin/console doctrine:migrations:migrate --no-interaction --env=prod
+                      echo "[5/10] Clear Symfony cache"
+                      docker compose --env-file .env.prod.local exec -T be-php php bin/console cache:clear --env=prod --no-debug
 
-                      echo "[6/9] Clear Symfony cache"
-                      docker compose exec -T be-php php bin/console cache:clear --env=prod --no-debug
+                      echo "[6/10] Show service status"
+                      docker compose --env-file .env.prod.local ps
 
-                      echo "[7/9] Show service status"
-                      docker compose ps
+                      echo "[7/10] Verify backend health"
+                      docker compose --env-file .env.prod.local logs --tail=50 be-nginx
+                      docker compose --env-file .env.prod.local logs --tail=50 be-php
 
-                      echo "[8/9] Verify scheduler service"
-                      docker compose logs scheduler --tail=50
+                      echo "[8/10] Verify scheduler service"
+                      docker compose --env-file .env.prod.local logs --tail=50 scheduler
 
-                      echo "[9/9] Clean unused Docker resources"
+                      echo "[9/10] Verify messenger service"
+                      docker compose --env-file .env.prod.local logs --tail=50 messenger
+
+                      echo "[10/10] Clean unused Docker resources"
                       docker image prune -af
                       docker builder prune -af
 
