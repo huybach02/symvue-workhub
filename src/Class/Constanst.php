@@ -83,7 +83,7 @@ final class Constanst
         '/cau-hinh-chung'       => 'cau-hinh-chung',
         '/thoi-gian-lam-viec'   => 'thoi-gian-lam-viec',
         '/user'                 => 'nguoi-dung',
-        '/bo-phan'              => 'bo-phan',
+        '/departments'          => 'departments',
     ];
 
     /**

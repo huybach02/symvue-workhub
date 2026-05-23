@@ -81,7 +81,7 @@ export const exportData = async (path) => {
 export const getListPhanQuyenMacDinh = async () => {
     try {
         const resp = await axiosInstance.get(
-            API_ROUTES_CONFIG.phanQuyenMacDinh,
+            API_ROUTES_CONFIG.departmentPermissions,
         );
         if (resp.success) {
             return resp.data;

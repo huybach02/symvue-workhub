@@ -45,7 +45,7 @@ return [
         ],
     ],
     [
-        "name" => "bo-phan",
+        "name" => "departments",
         "actions" => [
             "index" => true,
             "create" => true,
@@ -64,7 +64,7 @@ return [
         ],
     ],
     [
-        "name" => "work-schedule",
+        "name" => "lich-lam-viec",
         "actions" => [
             "index" => true,
             "create" => true,

@@ -30,10 +30,10 @@ export const menuSidebar = [
             },
             {
                 title: i18n.global.t("sidebar.bo_phan"),
-                key: "bo-phan",
+                key: "departments",
                 icon: "mdi-account-multiple-outline",
-                value: NAME_ROUTES_CONFIG.boPhan,
-                to: { name: NAME_ROUTES_CONFIG.boPhan },
+                value: NAME_ROUTES_CONFIG.department,
+                to: { name: NAME_ROUTES_CONFIG.department },
             },
         ],
     },
@@ -67,6 +67,7 @@ export const menuSidebar = [
     },
     {
         title: i18n.global.t("sidebar.work_schedule"),
+        key: "lich-lam-viec",
         icon: "mdi-calendar-clock",
         value: NAME_ROUTES_CONFIG.workSchedule,
         to: { name: NAME_ROUTES_CONFIG.workSchedule },

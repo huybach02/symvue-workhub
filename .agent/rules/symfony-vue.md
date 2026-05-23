@@ -4,104 +4,450 @@ trigger: always_on
 
 # Project Context & Tech Stack
 
-You are an expert Senior Fullstack Developer specializing in PHP (Symfony) and JavaScript (Vue.js). You are working on a project with the following specific technology stack. You must strictly adhere to these constraints and coding styles.
+You are an expert Senior Fullstack Developer specializing in PHP (Symfony) and JavaScript (Vue.js).
 
-## Backend Stack
+You are working on a project with the following technology stack and architecture rules.
 
-- **Framework:** Symfony 7.4 (PHP 8.2+)
-- **Database:** PostgreSQL
-- **ORM:** Doctrine (Use PHP Attributes for mapping)
-- **Auth:** lexik/jwt-authentication-bundle, gesdinet/jwt-refresh-token-bundle
-- **Utils:** spatie/ray (for debugging), nelmio/cors-bundle
-- **Cache:** Redis
-- **Realtime:** Mercure
-
-## Frontend Stack
-
-- **Framework:** Vue.js 3
-- **API Style:** **OPTIONAL API** (Strictly enforced. Do NOT use Composition API or `<script setup>`)
-- **State Management:** Vuex (Do NOT use Pinia)
-- **UI Library:** Vuetify 3
-- **Form/Validation:** Vee-validate + Yup
-- **HTTP Client:** Axios
+You MUST strictly follow all rules below.
 
 ---
 
-# Backend Rules (Symfony)
+# Backend Stack
 
-1.  **Architecture & Pattern:**
-    - Use **Service Pattern**. Controllers should be thin and only handle request/response logic. Business logic must reside in Services.
-    - Use **Dependency Injection** via constructor.
-    - Use **DTOs** (Data Transfer Objects) for request validation and response formatting.
+- Framework: Symfony 7.4
+- PHP Version: PHP 8.2+
+- Database: PostgreSQL
+- ORM: Doctrine ORM
+- Cache: Redis
+- Realtime: Mercure
 
-2.  **Symfony 7.4 Standards:**
-    - ALWAYS use **PHP Attributes** (`#[Route]`, `#[ORM\Column]`) instead of Annotations or YAML/XML configuration.
-    - Use strict typing in PHP (`declare(strict_types=1);`).
-    - Use `AsController` attribute for controllers.
+## Authentication
 
-3.  **Authentication & Security:**
-    - Implement JWT flow using `LexikJWTAuthenticationBundle`.
-    - Handle Refresh Tokens using `GesdinetJWTRefreshTokenBundle`.
-    - Ensure CORS is correctly handled via `NelmioCorsBundle`.
+- lexik/jwt-authentication-bundle
+- gesdinet/jwt-refresh-token-bundle
 
-4.  **Database & Caching:**
-    - Use Doctrine Query Builder for complex queries.
-    - Use Redis for caching expensive queries or session data.
+## Utilities
 
-5.  **Debugging:**
-    - Use `ray()` for debugging variables instead of `dump()` or `dd()` when instructed.
-
-6.  **Realtime:**
-    - Use Mercure to function realtime
+- spatie/ray
+- nelmio/cors-bundle
 
 ---
 
-# Frontend Rules (Vue.js)
+# Frontend Stack
 
-1.  **Coding Style (CRITICAL):**
-    - **MUST USE** Vue 3 **Optional API** structure (`data`, `methods`, `computed`, `mounted`, etc.).
-    - **FORBIDDEN:** Do NOT use `<script setup>` or Composition API syntax unless explicitly requested for a specific edge case.
+- Framework: Vue.js 3
+- Coding Style: Optional API ONLY
+- State Management: Vuex
+- UI Library: Vuetify 3
+- Validation:
+  - vee-validate
+  - yup
+- HTTP Client: Axios
 
-2.  **State Management (Vuex):**
-    - Use `mapState`, `mapGetters`, `mapActions`, `mapMutations` in components.
-    - Organize Vuex store into modules (state, getters, actions, mutations).
+---
 
-3.  **UI & Components (Vuetify):**
-    - Use Vuetify 3 components (`v-card`, `v-btn`, `v-text-field`, etc.).
-    - Utilize Vuetify's grid system (`v-row`, `v-col`) for layout.
+# Backend Rules
 
-4.  **Forms & Validation:**
-    - Use `vee-validate` components (`<Form>`, `<Field>`, `<ErrorMessage>`) or higher-order components.
-    - Define validation schemas using `yup`.
+## Architecture & Structure
 
-5.  **API Interaction:**
-    - Base Services: Do not write raw Axios calls directly inside components or Vuex modules. You MUST use the predefined base functions located in src/service/bases/. Depending on the HTTP method, import and use:
-        - getData.js (for GET requests)
+- Use Service Pattern.
+- Controllers must remain thin.
+- Controllers should only handle:
+  - Request parsing
+  - DTO mapping
+  - Response formatting
+- Business logic MUST be handled inside Services.
+- Use constructor Dependency Injection ONLY.
+- Use DTOs for:
+  - Request validation
+  - Data transformation
+  - Response formatting
+- Avoid business logic inside:
+  - Controllers
+  - Entities
+  - Event Subscribers
 
-        - postData.js (for POST requests)
+---
 
-        - updateData.js (for PUT/PATCH requests)
+## Symfony Standards
 
-        - deleteData.js (for DELETE requests)
+- ALWAYS use PHP Attributes.
+- ALWAYS use:
+  - `#[Route]`
+  - `#[ORM\Column]`
+  - `#[AsController]`
+- NEVER use:
+  - Doctrine Annotations
+  - YAML mapping
+  - XML mapping
 
-    - Axios Instance: If a specific edge case requires working directly with Axios (e.g., custom interceptors, specific file upload configs not covered by base services), you MUST import and use the configured axiosInstance from src/configs/axios.js. Never import the global axios library directly.
+Always enable strict typing:
 
-    - Error Handling: Handle API errors gracefully within these service wrappers or Vuex actions, and display appropriate notifications to the user.
+```php
+declare(strict_types=1);
+```
+
+- Follow PSR-12 coding standards.
+- Use readonly properties whenever appropriate.
+
+---
+
+## Authentication & Security
+
+- Use LexikJWTAuthenticationBundle for JWT authentication.
+- Use GesdinetJWTRefreshTokenBundle for refresh token handling.
+- Configure CORS using NelmioCorsBundle.
+- Never expose sensitive internal exception details.
+- Always validate permissions before sensitive actions.
+
+---
+
+## Database & Doctrine
+
+- Use Doctrine Query Builder for:
+  - Complex queries
+  - Dynamic filtering
+  - Pagination
+  - Conditional queries
+- Use Repository classes for database query logic.
+- Avoid N+1 query problems.
+- Database naming convention:
+  - tables: snake_case
+  - columns: snake_case
+
+---
+
+## Redis & Cache
+
+- Use Redis for:
+  - Expensive query caching
+  - Session storage
+  - Temporary application state
+- Cache keys must be structured and predictable.
+
+Example:
+
+```txt
+user.profile.{id}
+product.list.page.{page}
+```
+
+---
+
+## Mercure Realtime
+
+- Use Mercure for realtime functionality.
+- Realtime updates should use:
+  - Topics
+  - Event publishing
+  - Frontend subscriptions
+- Keep realtime payloads lightweight.
+
+---
+
+## Debugging
+
+- Use `ray()` and `ds()` for debugging.
+- Avoid:
+  - `dump()`
+  - `dd()`
+  - `var_dump()`
+
+unless explicitly requested.
+
+---
+
+# Frontend Rules
+
+## Vue Coding Style (CRITICAL)
+
+### REQUIRED
+
+- Use Vue 3 Optional API.
+- Use:
+  - `data`
+  - `methods`
+  - `computed`
+  - `watch`
+  - `mounted`
+
+### FORBIDDEN
+
+- Composition API
+- `<script setup>`
+- `setup()`
+
+unless explicitly requested.
+
+---
+
+## Vuex State Management
+
+- Use Vuex modules.
+- Vuex modules must contain:
+  - state
+  - getters
+  - actions
+  - mutations
+- Use:
+  - `mapState`
+  - `mapGetters`
+  - `mapActions`
+  - `mapMutations`
+
+inside components.
+
+---
+
+## API State Management via Vuex
+
+- All API calls MUST be handled through Vuex actions.
+- API response data MUST be stored inside Vuex state.
+- Components should NOT directly call APIs using `async/await` unless explicitly required.
+- Components should:
+  - dispatch Vuex actions
+  - consume state via `mapState`
+  - consume computed data via `mapGetters`
+- Centralize:
+  - loading states
+  - error states
+  - pagination states
+  - API response states
+
+inside Vuex.
+
+- Avoid placing:
+  - raw axios calls
+  - API business logic
+  - API transformation logic
+
+inside Vue components.
+
+---
+
+## API Service Layer
+
+### Axios Instance
+
+- NEVER import global `axios` directly.
+- ALWAYS use:
+
+```js
+src/configs/axios.js
+```
+
+---
+
+### Base Service Wrappers
+
+Use predefined base service functions only:
+
+| HTTP Method | Service File |
+|---|---|
+| GET | `src/service/bases/getData.js` |
+| POST | `src/service/bases/postData.js` |
+| PUT/PATCH | `src/service/bases/updateData.js` |
+| DELETE | `src/service/bases/deleteData.js` |
+
+---
+
+### Restrictions
+
+- Do NOT write raw axios calls inside:
+  - Vue components
+  - Vuex modules
+
+unless explicitly required for edge cases.
+
+---
+
+## Vuetify Rules
+
+- Use Vuetify 3 components.
+- Prefer:
+  - `v-card`
+  - `v-btn`
+  - `v-text-field`
+  - `v-select`
+  - `v-dialog`
+  - `v-table`
+
+Use Vuetify Grid System:
+
+- `v-container`
+- `v-row`
+- `v-col`
+
+Maintain responsive layouts.
+
+---
+
+## Forms & Validation
+
+- Use:
+  - `vee-validate`
+  - `yup`
+- Validation schemas must be reusable.
+- Avoid inline validation logic.
+- Handle API validation errors gracefully.
 
 ---
 
 # General Coding Guidelines
 
-1.  **Language:**
-    - Variable/Function names: **English** (camelCase).
-    - Database tables/columns: **English** (snake_case).
-    - Comments/Explanations: **Vietnamese** (Tiếng Việt).
+## Naming Convention
 
-2.  **Error Handling:**
-    - Always strictly check for null or invalid types.
-    - Backend: Return standard JSON error responses (status, message, code).
-    - Frontend: Catch Promise errors and log/notify appropriate messages.
+Use English for:
 
-3.  **Refactoring:**
-    - When modifying code, prioritize readability and maintainability.
-    - Remove unused imports and dead code.
+- Variables
+- Functions
+- Classes
+- DTOs
+- Services
+- Database names
+
+### Naming Style
+
+| Type | Style |
+|---|---|
+| Variables | camelCase |
+| Functions | camelCase |
+| Classes | PascalCase |
+| Database Tables | snake_case |
+| Database Columns | snake_case |
+
+---
+
+## Comments & Explanations
+
+- Comments must be written in Vietnamese.
+- Explain:
+  - complex logic
+  - edge cases
+  - business rules
+- Avoid obvious comments.
+
+### Bad Example
+
+```php
+// increment i
+$i++;
+```
+
+### Good Example
+
+```php
+// Tăng version để tránh conflict cache phía frontend
+$version++;
+```
+
+---
+
+# Error Handling
+
+## Backend
+
+- Always return standardized JSON responses.
+- Validate:
+  - null values
+  - invalid types
+  - missing resources
+- Use proper HTTP status codes.
+
+Example:
+
+```json
+{
+  "status": false,
+  "message": "User not found",
+  "code": 404
+}
+```
+
+---
+
+## Frontend
+
+- Always catch Promise/API errors.
+- Display proper notifications/messages.
+- Avoid silent failures.
+- Handle:
+  - loading states
+  - empty states
+  - timeout states
+
+---
+
+# Refactoring & Clean Code
+
+- Prioritize:
+  - readability
+  - maintainability
+  - scalability
+- Remove:
+  - unused imports
+  - dead code
+  - duplicated logic
+- Reuse:
+  - shared services
+  - utility functions
+  - reusable components
+
+---
+
+# Code Quality
+
+- Prefer small reusable methods.
+- Avoid giant components/services.
+- Separate concerns properly.
+- Keep modules organized and scalable.
+
+---
+
+# Restrictions
+
+## Backend Restrictions
+
+- Do NOT place business logic inside Controllers.
+- Do NOT use Doctrine Annotations.
+- Do NOT use raw SQL unless absolutely necessary.
+
+---
+
+## Frontend Restrictions
+
+- Do NOT use Composition API.
+- Do NOT use Pinia.
+- Do NOT use `<script setup>`.
+- Do NOT call APIs directly inside components unless explicitly required.
+
+---
+
+# Expected Development Style
+
+- Clean Architecture mindset
+- Enterprise-level structure
+- Scalable architecture
+- Strong separation of concerns
+- Reusable business logic
+- Predictable state management
+
+---
+
+# Important Communication Rule
+
+- If there is any unclear requirement, ambiguous logic, missing information, inconsistent behavior, or architecture concern, you MUST ask for clarification immediately before implementation.
+- NEVER make assumptions by yourself for business logic, system behavior, API contract, database structure, UI behavior, validation rules, or expected flow when the requirement is not fully clear.
+- NEVER silently implement guessed behavior.
+- When detecting a potentially problematic or suboptimal approach, explicitly explain the concern and ask for confirmation before continuing.
+- Prioritize requirement validation before coding.
+
+---
+
+# Stack Summary Keyword
+
+When asked for stack summary, ALWAYS include:
+
+```txt
+SV-RULE-OK
+```

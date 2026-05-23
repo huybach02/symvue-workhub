@@ -128,17 +128,17 @@ export const routes = [
                 },
             },
             {
-                path: "bo-phan",
-                name: NAME_ROUTES_CONFIG.boPhan,
+                path: "departments",
+                name: NAME_ROUTES_CONFIG.department,
                 component: () => import("../pages/Department/Department.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.boPhan,
+                            NAME_ROUTES_CONFIG.department,
                         ).title || "",
                     icon:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.boPhan,
+                            NAME_ROUTES_CONFIG.department,
                         ).icon || "",
                 },
             },
@@ -158,7 +158,7 @@ export const routes = [
                 },
             },
             {
-                path: "work-schedule",
+                path: "lich-lam-viec",
                 name: NAME_ROUTES_CONFIG.workSchedule,
                 component: () => import("../pages/WorkSchedule/WorkSchedule.vue"),
                 meta: {

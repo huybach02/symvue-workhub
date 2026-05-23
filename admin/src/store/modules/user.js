@@ -206,7 +206,7 @@ const actions = {
 
         try {
             const departments =
-                (await getDataSelect(API_ROUTES_CONFIG.boPhan)) ?? [];
+                (await getDataSelect(API_ROUTES_CONFIG.department)) ?? [];
             commit("SET_DEPARTMENT_OPTIONS", departments);
 
             return departments;
@@ -232,9 +232,9 @@ const actions = {
         try {
             const positions =
                 (await getDataById(
-                    API_ROUTES_CONFIG.boPhan,
+                    API_ROUTES_CONFIG.department,
                     departmentId,
-                    "chuc-vu",
+                    "positions",
                 )) ?? [];
             commit("SET_POSITION_OPTIONS", { departmentId, positions });
 

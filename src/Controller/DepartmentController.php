@@ -19,7 +19,7 @@ final class DepartmentController extends AbstractController
         private readonly DepartmentService $boPhanService,
     ) {}
 
-    #[Route("/bo-phan", methods: ["GET"])]
+    #[Route("/departments", methods: ["GET"])]
     public function getAll(Request $request): JsonResponse
     {
         $params = $request->query->all();
@@ -43,7 +43,7 @@ final class DepartmentController extends AbstractController
         }
     }
 
-    #[Route("/bo-phan/{id}", methods: ["GET"], priority: -1)]
+    #[Route("/departments/{id}", methods: ["GET"], priority: -1)]
     public function getOne(int $id): JsonResponse
     {
         try {
@@ -54,7 +54,7 @@ final class DepartmentController extends AbstractController
         }
     }
 
-    #[Route("/bo-phan", methods: ["POST"])]
+    #[Route("/departments", methods: ["POST"])]
     public function create(
         #[
             MapRequestPayload(validationGroups: ["create"]),
@@ -69,7 +69,7 @@ final class DepartmentController extends AbstractController
         }
     }
 
-    #[Route("/bo-phan/{id}", methods: ["PUT"])]
+    #[Route("/departments/{id}", methods: ["PUT"])]
     public function update(
         int $id,
         #[
@@ -85,7 +85,7 @@ final class DepartmentController extends AbstractController
         }
     }
 
-    #[Route("/bo-phan/{id}", methods: ["DELETE"])]
+    #[Route("/departments/{id}", methods: ["DELETE"])]
     public function delete(int $id): JsonResponse
     {
         try {
@@ -96,7 +96,7 @@ final class DepartmentController extends AbstractController
         }
     }
 
-    #[Route("/bo-phan/select", methods: ["GET"])]
+    #[Route("/departments/select", methods: ["GET"])]
     public function getDataSelect(Request $request): JsonResponse
     {
         $params = $request->query->all();
@@ -110,7 +110,7 @@ final class DepartmentController extends AbstractController
         }
     }
 
-    #[Route("/bo-phan/permission", methods: ["GET"])]
+    #[Route("/departments/permissions", methods: ["GET"])]
     public function getPermission(): JsonResponse
     {
         try {
@@ -121,7 +121,7 @@ final class DepartmentController extends AbstractController
         }
     }
 
-    #[Route("/bo-phan/{id}/chuc-vu", methods: ["GET"])]
+    #[Route("/departments/{id}/positions", methods: ["GET"])]
     public function getPositions(int $id): JsonResponse
     {
         try {
@@ -132,7 +132,7 @@ final class DepartmentController extends AbstractController
         }
     }
 
-    #[Route("/bo-phan/{id}/chuc-vu", methods: ["POST"])]
+    #[Route("/departments/{id}/positions", methods: ["POST"])]
     public function createPosition(
         int $id,
         #[
@@ -148,7 +148,7 @@ final class DepartmentController extends AbstractController
         }
     }
 
-    #[Route("/bo-phan/{id}/chuc-vu/{positionId}", methods: ["PUT"])]
+    #[Route("/departments/{id}/positions/{positionId}", methods: ["PUT"])]
     public function updatePosition(
         int $id,
         int $positionId,
@@ -169,7 +169,7 @@ final class DepartmentController extends AbstractController
         }
     }
 
-    #[Route("/bo-phan/{id}/chuc-vu/{positionId}", methods: ["DELETE"])]
+    #[Route("/departments/{id}/positions/{positionId}", methods: ["DELETE"])]
     public function deletePosition(int $id, int $positionId): JsonResponse
     {
         try {
@@ -180,7 +180,7 @@ final class DepartmentController extends AbstractController
         }
     }
 
-    #[Route("/bo-phan/{id}/phan-quyen", methods: ["PUT"])]
+    #[Route("/departments/{id}/permissions", methods: ["PUT"])]
     public function updatePositionPermission(
         int $id,
         Request $request,
@@ -197,7 +197,7 @@ final class DepartmentController extends AbstractController
         }
     }
 
-    #[Route("/bo-phan/{id}/member", methods: ["GET"])]
+    #[Route("/departments/{id}/members", methods: ["GET"])]
     public function getMembersByDepartment(int $id): JsonResponse
     {
         try {

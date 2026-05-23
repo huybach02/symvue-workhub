@@ -78,7 +78,10 @@ const actions = {
         commit("SET_DEPARTMENTS_LOADING", true);
 
         try {
-            const response = await getListData(API_ROUTES_CONFIG.boPhan, params);
+            const response = await getListData(
+                API_ROUTES_CONFIG.department,
+                params,
+            );
             const departments = response?.data ?? [];
             const totalItems = response?.total ?? 0;
 
@@ -98,19 +101,22 @@ const actions = {
             return cachedData;
         }
 
-        const data = await getDataById(API_ROUTES_CONFIG.boPhan, departmentId);
+        const data = await getDataById(
+            API_ROUTES_CONFIG.department,
+            departmentId,
+        );
         commit("SET_DEPARTMENT_DETAIL", { departmentId, data });
 
         return data;
     },
     async createDepartment(_, values) {
-        return postData(API_ROUTES_CONFIG.boPhan, values);
+        return postData(API_ROUTES_CONFIG.department, values);
     },
     async updateDepartment(_, { departmentId, values }) {
-        return putData(API_ROUTES_CONFIG.boPhan, departmentId, values);
+        return putData(API_ROUTES_CONFIG.department, departmentId, values);
     },
     async deleteDepartment(_, departmentId) {
-        return deleteData(API_ROUTES_CONFIG.boPhan, departmentId);
+        return deleteData(API_ROUTES_CONFIG.department, departmentId);
     },
     async fetchUserOptions({ commit, state }, { force = false } = {}) {
         if (!force && state.userOptions.length) {
@@ -141,9 +147,9 @@ const actions = {
         try {
             const positions =
                 (await getDataById(
-                    API_ROUTES_CONFIG.boPhan,
+                    API_ROUTES_CONFIG.department,
                     departmentId,
-                    "chuc-vu",
+                    "positions",
                 )) ?? [];
             commit("SET_POSITIONS", { departmentId, positions });
 
@@ -154,7 +160,7 @@ const actions = {
     },
     async createPosition({ dispatch }, { departmentId, values }) {
         const response = await postData(
-            `${API_ROUTES_CONFIG.boPhan}/${departmentId}/chuc-vu`,
+            `${API_ROUTES_CONFIG.department}/${departmentId}/positions`,
             values,
         );
 
@@ -172,7 +178,7 @@ const actions = {
     },
     async updatePosition({ dispatch }, { departmentId, positionId, values }) {
         const response = await putData(
-            `${API_ROUTES_CONFIG.boPhan}/${departmentId}/chuc-vu`,
+            `${API_ROUTES_CONFIG.department}/${departmentId}/positions`,
             positionId,
             values,
         );
@@ -191,7 +197,7 @@ const actions = {
     },
     async deletePosition({ dispatch }, { departmentId, positionId }) {
         const response = await deleteData(
-            `${API_ROUTES_CONFIG.boPhan}/${departmentId}/chuc-vu`,
+            `${API_ROUTES_CONFIG.department}/${departmentId}/positions`,
             positionId,
         );
 
@@ -209,7 +215,7 @@ const actions = {
     },
     async updatePositionPermissions({ commit }, { departmentId, phanQuyen }) {
         const response = await putData(
-            `${API_ROUTES_CONFIG.boPhan}/${departmentId}/phan-quyen`,
+            `${API_ROUTES_CONFIG.department}/${departmentId}/permissions`,
             null,
             { phanQuyen },
         );

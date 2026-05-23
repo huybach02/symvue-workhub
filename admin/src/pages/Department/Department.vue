@@ -38,7 +38,7 @@ export default {
     },
     data() {
         return {
-            path: API_ROUTES_CONFIG.boPhan,
+            path: API_ROUTES_CONFIG.department,
         };
     },
     computed: {

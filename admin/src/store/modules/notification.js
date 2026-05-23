@@ -103,7 +103,7 @@ const actions = {
 
         try {
             const departmentOptions =
-                (await getDataSelect(API_ROUTES_CONFIG.boPhan)) ?? [];
+                (await getDataSelect(API_ROUTES_CONFIG.department)) ?? [];
             commit("SET_DEPARTMENT_OPTIONS", departmentOptions);
 
             return departmentOptions;
