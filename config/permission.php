@@ -56,7 +56,7 @@ return [
         ],
     ],
     [
-        "name" => "thong-bao",
+        "name" => "notifications",
         "actions" => [
             "index" => true,
             "create" => true,

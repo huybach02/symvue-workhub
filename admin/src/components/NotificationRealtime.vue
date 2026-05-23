@@ -214,7 +214,7 @@ export default {
 
             try {
                 await axiosInstance.get(
-                    `/mercure/danh-sach-thong-bao/${this.currentUser?.id}/read-one/${code}`,
+                    `/mercure/notification-list/${this.currentUser?.id}/read/${code}`,
                 );
             } catch (error) {
                 console.error(
@@ -233,7 +233,7 @@ export default {
 
             try {
                 await axiosInstance.get(
-                    `/mercure/danh-sach-thong-bao/${this.currentUser?.id}/read-all`,
+                    `/mercure/notification-list/${this.currentUser?.id}/read-all`,
                 );
             } catch (error) {
                 console.error(

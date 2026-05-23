@@ -60,10 +60,10 @@ export const menuSidebar = [
     },
     {
         title: i18n.global.t("sidebar.thong_bao"),
-        key: "thong-bao",
+        key: "notifications",
         icon: "mdi-bell",
-        value: NAME_ROUTES_CONFIG.thongBao,
-        to: { name: NAME_ROUTES_CONFIG.thongBao },
+        value: NAME_ROUTES_CONFIG.notifications,
+        to: { name: NAME_ROUTES_CONFIG.notifications },
     },
     {
         title: i18n.global.t("sidebar.work_schedule"),

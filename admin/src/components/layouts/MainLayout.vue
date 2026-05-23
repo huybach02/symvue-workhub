@@ -247,7 +247,7 @@ export default {
         async danhSachThongBao() {
             try {
                 const res = await axiosInstance.get(
-                    `/mercure/danh-sach-thong-bao/${this.currentUser?.id}`,
+                    `/mercure/notification-list/${this.currentUser?.id}`,
                 );
                 this.$store.commit("mercure/SET_NOTIFICATIONS", res.data);
             } catch (error) {

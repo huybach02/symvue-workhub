@@ -19,7 +19,7 @@ export const API_ROUTES_CONFIG = {
     importHistory: "/import-history",
     department: "/departments",
     departmentPermissions: "/departments/permissions",
-    thongBao: "/thong-bao",
+    notifications: "/notifications",
     conversation: "/conversation",
     message: "/message",
     presence: "/presence",

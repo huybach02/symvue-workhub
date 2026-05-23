@@ -60,7 +60,10 @@ const actions = {
         commit("SET_LOADING", true);
 
         try {
-            const response = await getListData(API_ROUTES_CONFIG.thongBao, params);
+            const response = await getListData(
+                API_ROUTES_CONFIG.notifications,
+                params,
+            );
             const notifications = response?.data ?? [];
             const totalItems = response?.total ?? 0;
 
@@ -80,19 +83,26 @@ const actions = {
             return cachedData;
         }
 
-        const data = await getDataById(API_ROUTES_CONFIG.thongBao, notificationId);
+        const data = await getDataById(
+            API_ROUTES_CONFIG.notifications,
+            notificationId,
+        );
         commit("SET_NOTIFICATION_DETAIL", { notificationId, data });
 
         return data;
     },
     async createNotification(_, values) {
-        return postData(API_ROUTES_CONFIG.thongBao, values);
+        return postData(API_ROUTES_CONFIG.notifications, values);
     },
     async updateNotification(_, { notificationId, values }) {
-        return putData(API_ROUTES_CONFIG.thongBao, notificationId, values);
+        return putData(
+            API_ROUTES_CONFIG.notifications,
+            notificationId,
+            values,
+        );
     },
     async deleteNotification(_, notificationId) {
-        return deleteData(API_ROUTES_CONFIG.thongBao, notificationId);
+        return deleteData(API_ROUTES_CONFIG.notifications, notificationId);
     },
     async fetchDepartmentOptions({ commit, state }, { force = false } = {}) {
         if (!force && state.departmentOptions.length) {

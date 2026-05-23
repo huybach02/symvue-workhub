@@ -39,7 +39,7 @@ export default {
     },
     data() {
         return {
-            path: API_ROUTES_CONFIG.thongBao,
+            path: API_ROUTES_CONFIG.notifications,
         };
     },
     computed: {

@@ -17,7 +17,7 @@ class NotificationController extends AbstractController
     ) {}
 
 
-    #[Route('/thong-bao', methods: ['GET'])]
+    #[Route('/notifications', methods: ['GET'])]
     public function getAll(Request $request): JsonResponse
     {
         $params = $request->query->all();
@@ -44,7 +44,7 @@ class NotificationController extends AbstractController
         }
     }
 
-    #[Route('/mercure/danh-sach-thong-bao/{userId}', name: 'mercure_danh_sach_thong_bao', methods: ['GET'])]
+    #[Route('/mercure/notification-list/{userId}', name: 'mercure_notification_list', methods: ['GET'])]
     public function danhSachThongBao(int $userId): JsonResponse
     {
         $thongBao = $this->mercureService->danhSachThongBao($userId);
@@ -52,7 +52,7 @@ class NotificationController extends AbstractController
         return CustomResponse::success($thongBao, "Lấy danh sách thông báo thành công!");
     }
 
-    #[Route('/mercure/danh-sach-thong-bao/{userId}/read-one/{code}', name: 'mercure_danh_sach_thong_bao_doc_mot_thong_bao', methods: ['GET'], priority: -1)]
+    #[Route('/mercure/notification-list/{userId}/read/{code}', name: 'mercure_notification_list_read_one', methods: ['GET'], priority: -1)]
     public function markOneRead(int $userId, string $code): JsonResponse
     {
         $result = $this->mercureService->markOneRead($userId, $code);
@@ -60,7 +60,7 @@ class NotificationController extends AbstractController
         return CustomResponse::success($result, "Đọc một thông báo thành công!");
     }
 
-    #[Route('/mercure/danh-sach-thong-bao/{userId}/read-all', name: 'mercure_danh_sach_thong_bao_doc_tat_ca', methods: ['GET'], priority: -1)]
+    #[Route('/mercure/notification-list/{userId}/read-all', name: 'mercure_notification_list_read_all', methods: ['GET'], priority: -1)]
     public function markAllRead(int $userId): JsonResponse
     {
         $result = $this->mercureService->markAllRead($userId);
@@ -68,7 +68,7 @@ class NotificationController extends AbstractController
         return CustomResponse::success($result, "Đọc tất cả thông báo thành công!");
     }
 
-    #[Route('/thong-bao', name: 'thong_bao', methods: ['POST'])]
+    #[Route('/notifications', name: 'notifications', methods: ['POST'])]
     public function thongBao(Request $request): JsonResponse
     {
         /** @var User $user */
@@ -89,7 +89,7 @@ class NotificationController extends AbstractController
         return CustomResponse::success([], "Gửi thông báo thành công!");
     }
 
-    #[Route('/mercure/thong-bao-he-thong', name: 'mercure_thong_bao_he_thong', methods: ['POST'])]
+    #[Route('/mercure/system-notification', name: 'mercure_system_notification', methods: ['POST'])]
     public function thongBaoHeThong(): JsonResponse
     {
         /** @var User $user */
@@ -99,7 +99,7 @@ class NotificationController extends AbstractController
         return CustomResponse::success([], "Gửi thông báo thành công!");
     }
 
-    #[Route('/mercure/thong-bao-ca-nhan/{userId}', name: 'mercure_thong_bao_ca_nhan', methods: ['POST'])]
+    #[Route('/mercure/user-notification/{userId}', name: 'mercure_user_notification', methods: ['POST'])]
     public function thongBaoDenUser($userId): JsonResponse
     {
         /** @var User $user */
@@ -109,7 +109,7 @@ class NotificationController extends AbstractController
         return CustomResponse::success([], "Gửi thông báo thành công!");
     }
 
-    #[Route('/mercure/thong-bao-phong-ban/{departmentId}', name: 'mercure_thong_bao_phong_ban', methods: ['POST'])]
+    #[Route('/mercure/department-notification/{departmentId}', name: 'mercure_department_notification', methods: ['POST'])]
     public function thongBaoDenPhongBan($departmentId): JsonResponse
     {
         /** @var User $user */

@@ -31,7 +31,7 @@ class PermissionListener
         'api/auth/logout',
         'api/auth/change-password',
         'api/auth/forgot-password',
-        'api/mercure/danh-sach-thong-bao',
+        'api/mercure/notification-list',
     ];
 
     // Các từ khóa trong path sẽ được bỏ qua kiểm tra quyền

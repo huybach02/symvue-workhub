@@ -143,17 +143,17 @@ export const routes = [
                 },
             },
                     {
-                path: "thong-bao",
-                name: NAME_ROUTES_CONFIG.thongBao,
+                path: "notifications",
+                name: NAME_ROUTES_CONFIG.notifications,
                 component: () => import("../pages/Notification/Notification.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.thongBao,
+                            NAME_ROUTES_CONFIG.notifications,
                         ).title || "",
                     icon:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.thongBao,
+                            NAME_ROUTES_CONFIG.notifications,
                         ).icon || "",
                 },
             },

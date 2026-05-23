@@ -11,6 +11,6 @@ export const NAME_ROUTES_CONFIG = {
     userManagementUser: "system.userManagementUser",
     importHistory: "system.importHistory",
     department: "system.department",
-    thongBao: "system.thongBao",
+    notifications: "system.notifications",
     workSchedule: "system.workSchedule",
 };
