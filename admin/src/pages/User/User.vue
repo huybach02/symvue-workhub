@@ -53,7 +53,7 @@ export default {
     },
     data() {
         return {
-            path: API_ROUTES_CONFIG.user,
+            path: API_ROUTES_CONFIG.users,
         };
     },
     computed: {

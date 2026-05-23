@@ -302,7 +302,7 @@ export default {
                     key: "quanLyBoPhan",
                     width: 250,
                     filterComponent: markRaw(FilterAutoComplete),
-                    path: API_ROUTES_CONFIG.user,
+                    path: API_ROUTES_CONFIG.users,
                     sortable: false,
                 },
                 {

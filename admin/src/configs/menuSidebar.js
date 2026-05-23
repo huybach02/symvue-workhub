@@ -44,10 +44,10 @@ export const menuSidebar = [
         children: [
             {
                 title: i18n.global.t("sidebar.user_management_user"),
-                key: "nguoi-dung",
+                key: "users",
                 icon: "mdi-account-outline",
-                value: NAME_ROUTES_CONFIG.userManagementUser,
-                to: { name: NAME_ROUTES_CONFIG.userManagementUser },
+                value: NAME_ROUTES_CONFIG.users,
+                to: { name: NAME_ROUTES_CONFIG.users },
             },
         ],
     },

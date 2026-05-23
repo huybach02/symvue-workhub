@@ -21,7 +21,7 @@ return [
         ],
     ],
     [
-        "name" => "nguoi-dung",
+        "name" => "users",
         "actions" => [
             "index" => true,
             "create" => true,

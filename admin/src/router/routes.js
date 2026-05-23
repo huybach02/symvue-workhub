@@ -97,17 +97,17 @@ export const routes = [
                 },
             },
             {
-                path: "nguoi-dung",
-                name: NAME_ROUTES_CONFIG.userManagementUser,
+                path: "users",
+                name: NAME_ROUTES_CONFIG.users,
                 component: () => import("../pages/User/User.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.userManagementUser,
+                            NAME_ROUTES_CONFIG.users,
                         ).title || "",
                     icon:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.userManagementUser,
+                            NAME_ROUTES_CONFIG.users,
                         ).icon || "",
                 },
             },

@@ -82,7 +82,7 @@ final class Constanst
     const ROUTE_PERMISSION_MAP = [
         '/general-settings'     => 'general-settings',
         '/thoi-gian-lam-viec'   => 'thoi-gian-lam-viec',
-        '/user'                 => 'nguoi-dung',
+        '/users'                => 'users',
         '/departments'          => 'departments',
     ];
 

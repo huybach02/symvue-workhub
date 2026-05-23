@@ -130,7 +130,7 @@ const actions = {
 
         try {
             const activeUserOptions =
-                (await getDataSelect(API_ROUTES_CONFIG.user, {
+                (await getDataSelect(API_ROUTES_CONFIG.users, {
                     f: [
                         {
                             field: "status",

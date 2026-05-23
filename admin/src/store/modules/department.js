@@ -124,7 +124,7 @@ const actions = {
         }
 
         const userOptions =
-            (await getDataSelect(API_ROUTES_CONFIG.user)) ?? [];
+            (await getDataSelect(API_ROUTES_CONFIG.users)) ?? [];
         commit("SET_USER_OPTIONS", userOptions);
 
         return userOptions;

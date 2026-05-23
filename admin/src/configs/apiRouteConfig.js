@@ -15,7 +15,7 @@ export const API_ROUTES_CONFIG = {
         restore: "/media/restore",
         deletePermanently: "/media/delete-permanently",
     },
-    user: "/nguoi-dung",
+    users: "/users",
     importHistory: "/import-history",
     department: "/departments",
     departmentPermissions: "/departments/permissions",

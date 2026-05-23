@@ -127,7 +127,7 @@ const actions = {
         commit("SET_USERS_LOADING", true);
 
         try {
-            const response = await getListData(API_ROUTES_CONFIG.user, params);
+            const response = await getListData(API_ROUTES_CONFIG.users, params);
             const users = response?.data ?? [];
             const totalItems = response?.total ?? 0;
 
@@ -138,7 +138,7 @@ const actions = {
         }
     },
     async deleteUser(_, userId) {
-        return deleteData(API_ROUTES_CONFIG.user, userId);
+        return deleteData(API_ROUTES_CONFIG.users, userId);
     },
     async fetchUserDetail({ commit, state }, { userId, force = false }) {
         if (!userId) {
@@ -150,16 +150,16 @@ const actions = {
             return cachedData;
         }
 
-        const data = await getDataById(API_ROUTES_CONFIG.user, userId);
+        const data = await getDataById(API_ROUTES_CONFIG.users, userId);
         commit("SET_USER_DETAIL", { userId, data });
 
         return data;
     },
     async createUser(_, values) {
-        return postData(API_ROUTES_CONFIG.user, values);
+        return postData(API_ROUTES_CONFIG.users, values);
     },
     async updateUser(_, { userId, values }) {
-        return putData(API_ROUTES_CONFIG.user, userId, values);
+        return putData(API_ROUTES_CONFIG.users, userId, values);
     },
     async fetchProvince({ commit, state }, { force = false } = {}) {
         if (!force && Object.keys(state.provinceData ?? {}).length) {
@@ -167,7 +167,7 @@ const actions = {
         }
 
         const data =
-            (await getAllData(API_ROUTES_CONFIG.user + "/province")) ?? {};
+            (await getAllData(API_ROUTES_CONFIG.users + "/provinces")) ?? {};
         commit("SET_PROVINCE_DATA", data);
 
         return data;
@@ -183,7 +183,7 @@ const actions = {
         }
 
         const data =
-            (await getAllData(API_ROUTES_CONFIG.user + "/ward/" + provinceId)) ??
+            (await getAllData(API_ROUTES_CONFIG.users + "/wards/" + provinceId)) ??
             {};
         commit("SET_WARD_DATA", { provinceId, data });
 
@@ -191,7 +191,7 @@ const actions = {
     },
     async fetchEmployeeCode({ commit }) {
         const employeeCode =
-            (await getAllData(API_ROUTES_CONFIG.user + "/get-ma-nhan-vien")) ??
+            (await getAllData(API_ROUTES_CONFIG.users + "/employee-code")) ??
             "";
         commit("SET_EMPLOYEE_CODE", employeeCode);
 
@@ -253,9 +253,9 @@ const actions = {
 
         const data =
             (await getDataById(
-                API_ROUTES_CONFIG.user,
+                API_ROUTES_CONFIG.users,
                 userId,
-                "vi-tri-cong-viec",
+                "job-positions",
             )) ?? null;
         commit("SET_USER_POSITION", { userId, data });
 
@@ -263,7 +263,7 @@ const actions = {
     },
     async updateUserPosition({ commit }, { userId, values }) {
         const response = await putData(
-            `${API_ROUTES_CONFIG.user}/${userId}/vi-tri-cong-viec`,
+            `${API_ROUTES_CONFIG.users}/${userId}/job-positions`,
             null,
             values,
         );
@@ -281,9 +281,9 @@ const actions = {
 
         const positions =
             (await getDataById(
-                API_ROUTES_CONFIG.user,
+                API_ROUTES_CONFIG.users,
                 userId,
-                "vi-tri-cong-viec/danh-sach",
+                "job-positions/list",
             )) ?? [];
         commit("SET_USER_POSITION_LIST", { userId, positions });
 
@@ -291,7 +291,7 @@ const actions = {
     },
     async createTemporaryPosition(_, { userId, values }) {
         return postData(
-            `${API_ROUTES_CONFIG.user}/${userId}/vi-tri-cong-viec/temp`,
+            `${API_ROUTES_CONFIG.users}/${userId}/temporary-positions`,
             {
                 ...values,
             },
@@ -299,13 +299,13 @@ const actions = {
     },
     async deleteTemporaryPosition(_, temporaryPositionId) {
         return deleteData(
-            `${API_ROUTES_CONFIG.user}/vi-tri-cong-viec/temp`,
+            `${API_ROUTES_CONFIG.users}/temporary-positions`,
             temporaryPositionId,
         );
     },
     async uploadContracts({ commit, state }, { userId, formData }) {
         const response = await postDataWithFile(
-            `${API_ROUTES_CONFIG.user}/${userId}/hop-dong`,
+            `${API_ROUTES_CONFIG.users}/${userId}/contracts`,
             formData,
         );
 
@@ -328,7 +328,11 @@ const actions = {
         }
 
         const permissions =
-            (await getDataById(API_ROUTES_CONFIG.user, userId, "permission")) ??
+            (await getDataById(
+                API_ROUTES_CONFIG.users,
+                userId,
+                "permissions",
+            )) ??
             [];
         commit("SET_USER_PERMISSIONS", { userId, permissions });
 
@@ -336,7 +340,7 @@ const actions = {
     },
     async updateUserPermissions({ commit }, { userId, permissions }) {
         const response = await putData(
-            `${API_ROUTES_CONFIG.user}/${userId}/permission`,
+            `${API_ROUTES_CONFIG.users}/${userId}/permissions`,
             null,
             { permissions },
         );
@@ -356,9 +360,9 @@ const actions = {
         }
 
         const customPermission = await getDataById(
-            API_ROUTES_CONFIG.user,
+            API_ROUTES_CONFIG.users,
             userId,
-            "has-custom-permission",
+            "custom-permissions",
         );
         commit("SET_USER_CUSTOM_PERMISSION", { userId, customPermission });
 
@@ -366,9 +370,9 @@ const actions = {
     },
     async restoreDefaultPermissions({ dispatch }, userId) {
         await getDataById(
-            API_ROUTES_CONFIG.user,
+            API_ROUTES_CONFIG.users,
             userId,
-            "restore-default-permission",
+            "restore-default-permissions",
         );
 
         await Promise.all([

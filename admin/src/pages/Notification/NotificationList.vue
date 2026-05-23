@@ -219,7 +219,7 @@ export default {
                     sortable: false,
                     width: 180,
                     filterComponent: markRaw(FilterAutoComplete),
-                    path: API_ROUTES_CONFIG.user,
+                    path: API_ROUTES_CONFIG.users,
                 },
                 {
                     title: this.$t("thong_bao.columns.sendTo"),

@@ -8,7 +8,7 @@ export const NAME_ROUTES_CONFIG = {
     systemGeneralSettings: "system.generalSettings",
     systemConfigWorkingTime: "system.configWorkingTime",
     userManagement: "system.userManagement",
-    userManagementUser: "system.userManagementUser",
+    users: "system.users",
     importHistory: "system.importHistory",
     department: "system.department",
     notifications: "system.notifications",
