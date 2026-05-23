@@ -2,7 +2,7 @@
 
 return [
     [
-        "name" => "cau-hinh-chung",
+        "name" => "general-settings",
         "actions" => [
             "index" => true,
             "edit" => true,

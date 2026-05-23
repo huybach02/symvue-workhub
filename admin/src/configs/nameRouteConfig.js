@@ -5,7 +5,7 @@ export const NAME_ROUTES_CONFIG = {
     changePassword: "auth.changePassword",
     dashboard: "system.dashboard",
     systemConfig: "system.config",
-    systemConfigGeneral: "system.configGeneral",
+    systemGeneralSettings: "system.generalSettings",
     systemConfigWorkingTime: "system.configWorkingTime",
     userManagement: "system.userManagement",
     userManagementUser: "system.userManagementUser",

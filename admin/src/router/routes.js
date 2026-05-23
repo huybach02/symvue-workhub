@@ -65,18 +65,18 @@ export const routes = [
                 },
             },
             {
-                path: "cau-hinh-chung",
-                name: NAME_ROUTES_CONFIG.systemConfigGeneral,
+                path: "general-settings",
+                name: NAME_ROUTES_CONFIG.systemGeneralSettings,
                 component: () =>
                     import("../pages/GeneralSettings/GeneralSettings.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.systemConfigGeneral,
+                            NAME_ROUTES_CONFIG.systemGeneralSettings,
                         ).title || "",
                     icon:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.systemConfigGeneral,
+                            NAME_ROUTES_CONFIG.systemGeneralSettings,
                         ).icon || "",
                 },
             },

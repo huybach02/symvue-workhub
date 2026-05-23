@@ -16,7 +16,7 @@ final class GeneralSettingController extends AbstractController
         private readonly GeneralSettingService $cauHinhChungService,
     ) {}
 
-    #[Route("/cau-hinh-chung", methods: ["GET"])]
+    #[Route("/general-settings", methods: ["GET"])]
     public function index(): Response
     {
         try {
@@ -27,7 +27,7 @@ final class GeneralSettingController extends AbstractController
         }
     }
 
-    #[Route("/cau-hinh-chung", methods: ["POST"])]
+    #[Route("/general-settings", methods: ["POST"])]
     public function update(
         #[MapRequestPayload] GeneralSettingDTO $cauHinhChungDTO
     ) {

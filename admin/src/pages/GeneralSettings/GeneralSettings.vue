@@ -247,7 +247,7 @@ export default {
             "saving",
         ]),
         permission() {
-            return usePermission(API_ROUTES_CONFIG.cauHinhChung);
+            return usePermission(API_ROUTES_CONFIG.generalSettings);
         },
     },
     created() {

@@ -84,7 +84,7 @@ const actions = {
 
         try {
             const settings =
-                (await getAllData(API_ROUTES_CONFIG.cauHinhChung)) ?? [];
+                (await getAllData(API_ROUTES_CONFIG.generalSettings)) ?? [];
             commit("SET_SETTINGS", settings);
 
             return settings;
@@ -97,7 +97,7 @@ const actions = {
 
         try {
             const response = await postData(
-                API_ROUTES_CONFIG.cauHinhChung,
+                API_ROUTES_CONFIG.generalSettings,
                 values,
             );
 

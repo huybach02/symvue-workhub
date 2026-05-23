@@ -16,10 +16,10 @@ export const menuSidebar = [
         children: [
             {
                 title: i18n.global.t("sidebar.system_config_general"),
-                key: "cau-hinh-chung",
+                key: "general-settings",
                 icon: "mdi-cog-outline",
-                value: NAME_ROUTES_CONFIG.systemConfigGeneral,
-                to: { name: NAME_ROUTES_CONFIG.systemConfigGeneral },
+                value: NAME_ROUTES_CONFIG.systemGeneralSettings,
+                to: { name: NAME_ROUTES_CONFIG.systemGeneralSettings },
             },
             {
                 title: i18n.global.t("sidebar.system_config_working_time"),

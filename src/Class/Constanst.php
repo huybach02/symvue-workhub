@@ -80,7 +80,7 @@ final class Constanst
      * Cần cập nhật khi thêm module mới vào hệ thống.
      */
     const ROUTE_PERMISSION_MAP = [
-        '/cau-hinh-chung'       => 'cau-hinh-chung',
+        '/general-settings'     => 'general-settings',
         '/thoi-gian-lam-viec'   => 'thoi-gian-lam-viec',
         '/user'                 => 'nguoi-dung',
         '/departments'          => 'departments',
