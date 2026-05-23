@@ -57,3 +57,37 @@ chat:
 work_schedule:
     invalid_date_range: "Invalid date range"
     has_override_overlap: "There are %count% schedule overrides in the period %startDate% to %endDate%. Creating a new schedule will automatically calculate and update these existing schedules."
+request:
+    title:
+        leave: "Leave request"
+        leave_range: "Leave request from %startDate% to %endDate%"
+        default: "Request"
+    payload:
+        leave_type_default: "Leave"
+    error:
+        unsupported_type: "Unsupported request type"
+        invalid_leave_payload_format: "Invalid leave request payload format"
+        primary_department_not_found: "Cannot determine the requester's primary department"
+        approver_not_found: "No direct manager or admin found to approve this request"
+        invalid_leave_payload_for_apply: "Invalid leave payload for applying related data"
+        cannot_update: "You do not have permission to update this request"
+        only_rejected_can_update: "Only rejected requests can be updated"
+        reject_reason_required: "Please enter a rejection reason"
+        cannot_cancel: "You do not have permission to cancel this request"
+        only_pending_or_rejected_can_cancel: "Only pending or rejected requests can be cancelled"
+        cannot_delete: "You do not have permission to delete this request"
+        only_rejected_or_cancelled_can_delete: "Only rejected or cancelled requests can be deleted"
+        not_current_approver: "You are not the current approver of this request"
+        request_not_pending: "This request is no longer pending"
+        current_approval_step_not_found: "Current approval step not found"
+        cannot_view: "You do not have permission to view this request"
+    event_comment:
+        requester_cancelled: "Requester cancelled the request"
+    notification:
+        pending: "A new request is waiting for approval"
+        approved: "Your request has been approved"
+        rejected: "Your request has been rejected"
+        pending_body: "%requesterName% has submitted %requestTitle%"
+        rejected_body: "%approverName% rejected your request. Reason: %reason%"
+        approved_body: "%approverName% approved your request"
+        note_suffix: "Note: %comment%"

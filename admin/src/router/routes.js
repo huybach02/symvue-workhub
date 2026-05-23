@@ -172,6 +172,21 @@ export const routes = [
                         ).icon || "",
                 },
             },
+            {
+                path: "requests",
+                name: NAME_ROUTES_CONFIG.requests,
+                component: () => import("../pages/Request/Request.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.requests,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.requests,
+                        ).icon || "",
+                },
+            },
 ],
     },
 ];

@@ -344,5 +344,49 @@
     "nhan_su": "Nhân sự",
     "them_lich_thay_the": "Thêm lịch thay thế",
     "xoa_lich_lam_viec": "Xóa lịch làm việc"
+  },
+  "request": {
+    "title": "Đề xuất",
+    "description": "Quản lý các đề xuất của bạn và những đề xuất đang chờ bạn duyệt.",
+    "drawer_title": "Loại đề xuất",
+    "create_title": "Tạo đề xuất",
+    "edit_title": "Cập nhật đề xuất",
+    "create_button": "Thêm mới",
+    "my_requests": "Đề xuất của tôi",
+    "my_requests_short": "của tôi",
+    "approval_requests": "Phê duyệt đề xuất",
+    "pending_approval": "Chờ tôi duyệt",
+    "pending_approval_short": "chờ duyệt",
+    "approved_requests": "Đã duyệt",
+    "column_title": "Tiêu đề",
+    "column_code": "Mã đề xuất",
+    "request_type": "Loại đề xuất",
+    "detail_info": "Thông tin đề xuất",
+    "timeline": "Lịch sử xử lý",
+    "requester": "Người tạo",
+    "approver": "Người duyệt hiện tại",
+    "last_reject_reason": "Lý do từ chối gần nhất",
+    "approval_action": "Xử lý duyệt",
+    "approval_note": "Ghi chú xử lý",
+    "approve_button": "Đồng ý",
+    "reject_button": "Từ chối",
+    "cancel_button": "Hủy đề xuất",
+    "status": {
+      "pending": "Chờ duyệt",
+      "rejected": "Bị từ chối",
+      "approved": "Đã duyệt",
+      "cancelled": "Đã hủy"
+    },
+    "event": {
+      "created": "Đã tạo đề xuất",
+      "submitted": "Đã gửi đề xuất",
+      "edited": "Đã chỉnh sửa đề xuất",
+      "resubmitted": "Đã gửi lại đề xuất",
+      "approved": "Đề xuất được duyệt",
+      "rejected": "Đề xuất bị từ chối",
+      "cancelled": "Đề xuất đã bị hủy",
+      "effect_applied": "Đã áp dụng dữ liệu liên quan",
+      "deleted": "Đề xuất đã bị xóa"
+    }
   }
 }

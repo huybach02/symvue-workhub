@@ -72,4 +72,11 @@ export const menuSidebar = [
         value: NAME_ROUTES_CONFIG.workSchedules,
         to: { name: NAME_ROUTES_CONFIG.workSchedules },
     },
+    {
+        title: i18n.global.t("sidebar.request"),
+        key: "requests",
+        icon: "mdi-file-document-edit-outline",
+        value: NAME_ROUTES_CONFIG.requests,
+        to: { name: NAME_ROUTES_CONFIG.requests },
+    },
 ];

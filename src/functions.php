@@ -1,5 +1,8 @@
 <?php
 
+use App\Class\Request\RequestConstant;
+use App\Entity\Request;
+use App\Entity\User;
 use App\Class\TranslationHelper;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -49,7 +52,7 @@ if (!function_exists('generateRandomString')) {
 }
 
 if (!function_exists('validateFilterParams')) {
-    function validateFilterParams(array &$params)
+    function validateFilterParams(array $params)
     {
         // Đảm bảo các tham số có giá trị mặc định
         $params['page'] = isset($params['page']) ? (int) $params['page'] : 1;
@@ -232,5 +235,55 @@ if (!function_exists('formatTimeString')) {
             ?: \DateTime::createFromFormat("H:i", $time);
 
         return $dateTime ? $dateTime->format("H:i") : substr($time, 0, 5);
+    }
+}
+
+if (!function_exists('generateCode')) {
+    function generateCode(string $prefix = 'CODE'): string
+    {
+        return sprintf(
+            '%s-%s%s',
+            strtoupper($prefix),
+            date('ymdHi'),
+            strtoupper(substr(bin2hex(random_bytes(1)), 0, 2))
+        );
+    }
+}
+
+if (!function_exists('buildRequestPermissions')) {
+    function buildRequestPermissions(Request $request, User $currentUser): array
+    {
+        return [
+            'canApprove' => $request->getCurrentApprover()?->getId() === $currentUser->getId()
+                && $request->getStatus() === RequestConstant::STATUS_PENDING,
+            'canReject' => $request->getCurrentApprover()?->getId() === $currentUser->getId()
+                && $request->getStatus() === RequestConstant::STATUS_PENDING,
+            'canEdit' => $request->getRequester()?->getId() === $currentUser->getId()
+                && $request->getStatus() === RequestConstant::STATUS_REJECTED,
+            'canCancel' => $request->getRequester()?->getId() === $currentUser->getId()
+                && in_array($request->getStatus(), [RequestConstant::STATUS_PENDING, RequestConstant::STATUS_REJECTED], true),
+            'canDelete' => $request->getRequester()?->getId() === $currentUser->getId()
+                && in_array($request->getStatus(), [RequestConstant::STATUS_REJECTED, RequestConstant::STATUS_CANCELLED], true),
+        ];
+    }
+}
+
+if (!function_exists('canViewRequest')) {
+    function canViewRequest(Request $request, User $currentUser): bool
+    {
+        $watcherIds = array_map(
+            fn($watcher) => $watcher->getUser()?->getId(),
+            $request->getWatchers()->toArray()
+        );
+
+        $result = $request->getRequester()?->getId() === $currentUser->getId()
+            || $request->getCurrentApprover()?->getId() === $currentUser->getId()
+            || in_array($currentUser->getId(), $watcherIds, true)
+            || isAdmin($currentUser);
+
+        if (!$result) {
+            throw new \Exception(t('request.error.cannot_view'));
+        }
+        return $result;
     }
 }

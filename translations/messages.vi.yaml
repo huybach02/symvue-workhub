@@ -57,3 +57,37 @@ chat:
 work_schedule:
     invalid_date_range: "Khoảng thời gian không hợp lệ"
     has_override_overlap: "Đã có %count% lịch thay thế trong khoảng %startDate% đến %endDate%. Việc tạo lịch thay thế mới sẽ tự động tính toán và cập nhật các lịch đã có."
+request:
+    title:
+        leave: "Đề xuất nghỉ phép"
+        leave_range: "Đề xuất nghỉ phép từ %startDate% đến %endDate%"
+        default: "Đề xuất"
+    payload:
+        leave_type_default: "Nghỉ phép"
+    error:
+        unsupported_type: "Loại đề xuất chưa được hỗ trợ"
+        invalid_leave_payload_format: "Dữ liệu đề xuất nghỉ phép không đúng định dạng"
+        primary_department_not_found: "Không xác định được bộ phận chính của người tạo đề xuất"
+        approver_not_found: "Không tìm thấy quản lý trực tiếp hoặc admin để duyệt đề xuất"
+        invalid_leave_payload_for_apply: "Dữ liệu nghỉ phép không hợp lệ để áp dụng"
+        cannot_update: "Bạn không có quyền cập nhật đề xuất này"
+        only_rejected_can_update: "Chỉ có thể cập nhật đề xuất đang bị từ chối"
+        reject_reason_required: "Vui lòng nhập lý do từ chối"
+        cannot_cancel: "Bạn không có quyền hủy đề xuất này"
+        only_pending_or_rejected_can_cancel: "Chỉ có thể hủy đề xuất đang chờ duyệt hoặc bị từ chối"
+        cannot_delete: "Bạn không có quyền xóa đề xuất này"
+        only_rejected_or_cancelled_can_delete: "Chỉ có thể xóa đề xuất đã bị từ chối hoặc đã hủy"
+        not_current_approver: "Bạn không phải người duyệt hiện tại của đề xuất này"
+        request_not_pending: "Đề xuất này không còn ở trạng thái chờ duyệt"
+        current_approval_step_not_found: "Không tìm thấy bước duyệt hiện tại"
+        cannot_view: "Bạn không có quyền xem đề xuất này"
+    event_comment:
+        requester_cancelled: "Người tạo đã hủy đề xuất"
+    notification:
+        pending: "Có đề xuất mới cần duyệt"
+        approved: "Đề xuất đã được duyệt"
+        rejected: "Đề xuất bị từ chối"
+        pending_body: "%requesterName% vừa gửi %requestTitle%"
+        rejected_body: "%approverName% đã từ chối đề xuất của bạn. Lý do: %reason%"
+        approved_body: "%approverName% đã duyệt đề xuất của bạn"
+        note_suffix: "Ghi chú: %comment%"

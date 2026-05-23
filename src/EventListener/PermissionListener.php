@@ -35,7 +35,7 @@ class PermissionListener
     ];
 
     // Các từ khóa trong path sẽ được bỏ qua kiểm tra quyền
-    protected array $excludedKeywords = ['select', 'import', 'export', 'template-import', 'media', 'conversation', 'message', 'presence'];
+    protected array $excludedKeywords = ['select', 'import', 'export', 'template-import', 'media', 'conversation', 'message', 'presence', 'request-types'];
 
     public function onKernelRequest(RequestEvent $event): void
     {

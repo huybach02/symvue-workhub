@@ -20,6 +20,8 @@ export const API_ROUTES_CONFIG = {
     department: "/departments",
     departmentPermissions: "/departments/permissions",
     notifications: "/notifications",
+    requestTypes: "/request-types",
+    requests: "/requests",
     conversation: "/conversation",
     message: "/message",
     presence: "/presence",

@@ -54,7 +54,8 @@
     "lich_su_import": "Lịch sử import",
     "bo_phan": "Phòng ban/Bộ phận",
     "thong_bao": "Quản lý thông báo",
-    "work_schedule": "Lịch làm việc"
+    "work_schedule": "Lịch làm việc",
+    "request": "Đề xuất"
   },
   "gender": {
     "male": "Nam",

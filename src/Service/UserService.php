@@ -17,6 +17,7 @@ use App\Entity\UserPermission;
 use App\Entity\UserPosition;
 use App\Repository\ImageRepository;
 use App\Repository\UserPermissionRepository;
+use App\Repository\UserPositionRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -33,6 +34,8 @@ class UserService
         private readonly ParameterBagInterface $parameterBag,
         private readonly ImageRepository $imageRepository,
         private readonly DepartmentService $boPhanService,
+        private readonly UserPositionRepository $userPositionRepository,
+        private readonly UserPermissionRepository $userPermissionRepository,
     ) {}
 
     public function findAll(array $params): array
@@ -693,5 +696,31 @@ class UserService
         $this->entityManager->persist($userHasCustomPermission);
         $this->entityManager->flush();
         $this->boPhanService->mergeUserPermissions($user->getId());
+    }
+
+    public function findDirectManager(
+        User $user,
+    ): User {
+        $primaryPosition = $this->userPositionRepository->findLatestPrimaryPositionByUser($user);
+
+        if (!$primaryPosition || !$primaryPosition->getDepartment()) {
+            throw new \Exception(t('request.error.primary_department_not_found'));
+        }
+
+        $approver = $this->userPositionRepository->findPrimaryManagerByDepartmentExcludingUser(
+            $primaryPosition->getDepartment(),
+            $user,
+        );
+
+        if ($approver instanceof UserPosition && $approver->getMember()) {
+            return $approver->getMember();
+        }
+
+        $adminApprover = $this->userRepository->findFirstActiveAdmin();
+        if (!$adminApprover instanceof User) {
+            throw new \Exception(t('request.error.approver_not_found'));
+        }
+
+        return $adminApprover;
     }
 }

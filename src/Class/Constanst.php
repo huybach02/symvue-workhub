@@ -84,6 +84,7 @@ final class Constanst
         '/working-times'        => 'working-times',
         '/users'                => 'users',
         '/departments'          => 'departments',
+        '/requests'             => 'requests',
     ];
 
     /**

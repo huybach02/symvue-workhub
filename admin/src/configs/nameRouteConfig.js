@@ -13,4 +13,5 @@ export const NAME_ROUTES_CONFIG = {
     department: "system.department",
     notifications: "system.notifications",
     workSchedules: "system.workSchedules",
+    requests: "system.requests",
 };

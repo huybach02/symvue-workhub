@@ -342,5 +342,49 @@
     "nhan_su": "Employee",
     "them_lich_thay_the": "Add Override Schedule",
     "xoa_lich_lam_viec": "Delete Work Schedule"
+  },
+  "request": {
+    "title": "Requests",
+    "description": "Manage your requests and the requests waiting for your approval.",
+    "drawer_title": "Request type",
+    "create_title": "Create request",
+    "edit_title": "Update request",
+    "create_button": "Create",
+    "my_requests": "My requests",
+    "my_requests_short": "mine",
+    "approval_requests": "Request approvals",
+    "pending_approval": "Waiting for my approval",
+    "pending_approval_short": "pending",
+    "approved_requests": "Approved",
+    "column_title": "Title",
+    "column_code": "Request code",
+    "request_type": "Request type",
+    "detail_info": "Request details",
+    "timeline": "Timeline",
+    "requester": "Requester",
+    "approver": "Current approver",
+    "last_reject_reason": "Latest reject reason",
+    "approval_action": "Approval action",
+    "approval_note": "Approval note",
+    "approve_button": "Approve",
+    "reject_button": "Reject",
+    "cancel_button": "Cancel request",
+    "status": {
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "approved": "Approved",
+      "cancelled": "Cancelled"
+    },
+    "event": {
+      "created": "Request created",
+      "submitted": "Request submitted",
+      "edited": "Request edited",
+      "resubmitted": "Request resubmitted",
+      "approved": "Request approved",
+      "rejected": "Request rejected",
+      "cancelled": "Request cancelled",
+      "effect_applied": "Related data applied",
+      "deleted": "Request deleted"
+    }
   }
 }

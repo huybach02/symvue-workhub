@@ -158,4 +158,54 @@ export const functionHelper = {
             return mergedRanges;
         }, []);
     },
+    getRequestStatusLabel(status) {
+        const labels = {
+            pending: i18n.global.t("request.status.pending"),
+            rejected: i18n.global.t("request.status.rejected"),
+            approved: i18n.global.t("request.status.approved"),
+            cancelled: i18n.global.t("request.status.cancelled"),
+        };
+
+        return labels[status] || status || "--";
+    },
+    getRequestStatusColor(status) {
+        const colors = {
+            pending: "warning",
+            rejected: "error",
+            approved: "success",
+            cancelled: "grey",
+        };
+
+        return colors[status] || "primary";
+    },
+    getRequestEventTitle(eventType) {
+        const labels = {
+            created: i18n.global.t("request.event.created"),
+            submitted: i18n.global.t("request.event.submitted"),
+            edited: i18n.global.t("request.event.edited"),
+            resubmitted: i18n.global.t("request.event.resubmitted"),
+            approved: i18n.global.t("request.event.approved"),
+            rejected: i18n.global.t("request.event.rejected"),
+            cancelled: i18n.global.t("request.event.cancelled"),
+            effect_applied: i18n.global.t("request.event.effect_applied"),
+            deleted: i18n.global.t("request.event.deleted"),
+        };
+
+        return labels[eventType] || eventType || "--";
+    },
+    getRequestEventColor(eventType) {
+        const colors = {
+            created: "primary",
+            submitted: "primary",
+            edited: "warning",
+            resubmitted: "warning",
+            approved: "success",
+            rejected: "error",
+            cancelled: "grey",
+            effect_applied: "info",
+            deleted: "error",
+        };
+
+        return colors[eventType] || "primary";
+    },
 };

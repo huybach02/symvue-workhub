@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use App\Entity\Department;
+use App\Entity\User;
 use App\Entity\UserPosition;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,28 +18,30 @@ class UserPositionRepository extends ServiceEntityRepository
         parent::__construct($registry, UserPosition::class);
     }
 
-    //    /**
-    //     * @return UserPosition[] Returns an array of UserPosition objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('u.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findLatestPrimaryPositionByUser(User $user): ?UserPosition
+    {
+        return $this->findOneBy(
+            ['member' => $user, 'isPrimary' => true],
+            ['id' => 'DESC']
+        );
+    }
 
-    //    public function findOneBySomeField($value): ?UserPosition
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findPrimaryManagerByDepartmentExcludingUser(
+        Department $department,
+        User $excludedUser
+    ): ?UserPosition {
+        $result = $this->createQueryBuilder('userPosition')
+            ->join('userPosition.position', 'position')
+            ->andWhere('userPosition.department = :department')
+            ->andWhere('userPosition.isPrimary = 1')
+            ->andWhere('position.isManager = 1')
+            ->andWhere('userPosition.member != :excludedUser')
+            ->setParameter('department', $department)
+            ->setParameter('excludedUser', $excludedUser)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $result instanceof UserPosition ? $result : null;
+    }
 }

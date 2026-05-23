@@ -10,6 +10,7 @@ import workingTime from "./modules/workingTime";
 import department from "./modules/department";
 import importHistory from "./modules/importHistory";
 import notification from "./modules/notification";
+import request from "./modules/request";
 
 const store = createStore({
     state() {
@@ -38,6 +39,7 @@ const store = createStore({
         department,
         importHistory,
         notification,
+        request,
     },
 });
 

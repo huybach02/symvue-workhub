@@ -54,7 +54,8 @@
     "lich_su_import": "Import history",
     "bo_phan": "Departments",
     "thong_bao": "Notification",
-    "work_schedule": "Work Schedule"
+    "work_schedule": "Work Schedule",
+    "request": "Requests"
   },
   "gender": {
     "male": "Male",
