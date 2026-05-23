@@ -23,10 +23,10 @@ export const menuSidebar = [
             },
             {
                 title: i18n.global.t("sidebar.system_config_working_time"),
-                key: "thoi-gian-lam-viec",
+                key: "working-times",
                 icon: "mdi-clock-time-four-outline",
-                value: NAME_ROUTES_CONFIG.systemConfigWorkingTime,
-                to: { name: NAME_ROUTES_CONFIG.systemConfigWorkingTime },
+                value: NAME_ROUTES_CONFIG.workingTimes,
+                to: { name: NAME_ROUTES_CONFIG.workingTimes },
             },
             {
                 title: i18n.global.t("sidebar.bo_phan"),

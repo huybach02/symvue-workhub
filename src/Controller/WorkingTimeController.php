@@ -19,12 +19,12 @@ final class WorkingTimeController extends AbstractController
         private readonly WorkingTimeService $thoiGianLamViecService,
     ) {}
 
-    #[Route("/thoi-gian-lam-viec", methods: ["GET"])]
+    #[Route("/working-times", methods: ["GET"])]
     public function getAll(Request $request): JsonResponse
     {
         $type = $request->query->get("type");
         $id = $request->query->get("id");
-        $thoiGianLamViecId = $request->query->get("thoiGianLamViecId");
+        $workingTimeId = $request->query->get("workingTimeId");
 
         try {
             if ($type === "fulltime") {
@@ -41,7 +41,7 @@ final class WorkingTimeController extends AbstractController
 
             if ($type === "parttime") {
                 $thoiGianLamViecList = $this->thoiGianLamViecService->findAllParttimeByThoiGianLamViecId(
-                    (int) $thoiGianLamViecId,
+                    (int) $workingTimeId,
                 );
                 return CustomResponse::success($thoiGianLamViecList);
             }
@@ -52,7 +52,7 @@ final class WorkingTimeController extends AbstractController
         }
     }
 
-    #[Route("/thoi-gian-lam-viec", methods: ["PUT"])]
+    #[Route("/working-times", methods: ["PUT"])]
     public function updateFulltime(
         Request $request,
         #[MapRequestPayload] WorkingTimeDTO $thoiGianLamViecDTO,
@@ -73,7 +73,7 @@ final class WorkingTimeController extends AbstractController
         }
     }
 
-    #[Route("/thoi-gian-lam-viec", methods: ["POST"])]
+    #[Route("/working-times", methods: ["POST"])]
     public function createParttime(
         #[MapRequestPayload] WorkShiftDTO $caLamViecDTO,
     ): JsonResponse {
@@ -90,7 +90,7 @@ final class WorkingTimeController extends AbstractController
         }
     }
 
-    #[Route("/thoi-gian-lam-viec/ca-lam-viec", methods: ["PUT"])]
+    #[Route("/working-times/work-shifts", methods: ["PUT"])]
     public function updateParttime(
         Request $request,
         #[MapRequestPayload] WorkShiftDTO $caLamViecDTO,
@@ -108,7 +108,7 @@ final class WorkingTimeController extends AbstractController
         }
     }
 
-    #[Route("/thoi-gian-lam-viec/ca-lam-viec/status", methods: ["PUT"])]
+    #[Route("/working-times/work-shifts/status", methods: ["PUT"])]
     public function updateParttimeStatus(
         Request $request,
         #[MapRequestPayload] WorkShiftStatusDTO $dto,

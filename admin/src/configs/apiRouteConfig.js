@@ -6,7 +6,7 @@ export const API_ROUTES_CONFIG = {
     forgotPassword: "/auth/forgot-password",
     changePassword: "/auth/change-password",
     generalSettings: "/general-settings",
-    thoiGianLamViec: "/thoi-gian-lam-viec",
+    workingTimes: "/working-times",
     media: {
         upload: "/media/upload",
         getAll: "/media",

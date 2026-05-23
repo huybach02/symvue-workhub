@@ -81,18 +81,18 @@ export const routes = [
                 },
             },
             {
-                path: "thoi-gian-lam-viec",
-                name: NAME_ROUTES_CONFIG.systemConfigWorkingTime,
+                path: "working-times",
+                name: NAME_ROUTES_CONFIG.workingTimes,
                 component: () =>
                     import("../pages/WorkingTime/WorkingTime.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.systemConfigWorkingTime,
+                            NAME_ROUTES_CONFIG.workingTimes,
                         ).title || "",
                     icon:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.systemConfigWorkingTime,
+                            NAME_ROUTES_CONFIG.workingTimes,
                         ).icon || "",
                 },
             },

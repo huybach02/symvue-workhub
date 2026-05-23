@@ -6,7 +6,7 @@ export const NAME_ROUTES_CONFIG = {
     dashboard: "system.dashboard",
     systemConfig: "system.config",
     systemGeneralSettings: "system.generalSettings",
-    systemConfigWorkingTime: "system.configWorkingTime",
+    workingTimes: "system.workingTimes",
     userManagement: "system.userManagement",
     users: "system.users",
     importHistory: "system.importHistory",

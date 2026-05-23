@@ -10,7 +10,7 @@ return [
         ],
     ],
     [
-        "name" => "thoi-gian-lam-viec",
+        "name" => "working-times",
         "actions" => [
             "index" => true,
             "create" => true,

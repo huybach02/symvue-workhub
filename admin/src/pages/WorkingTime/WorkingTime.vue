@@ -32,6 +32,7 @@
 
 <script>
 import { usePermission } from "@/hooks/usePermission";
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import Fulltime from "./components/Fulltime.vue";
 import Parttime from "./components/Parttime.vue";
 
@@ -47,7 +48,7 @@ export default {
     },
     computed: {
         permission() {
-            return usePermission("/thoi-gian-lam-viec");
+            return usePermission(API_ROUTES_CONFIG.workingTimes);
         },
     },
     methods: {

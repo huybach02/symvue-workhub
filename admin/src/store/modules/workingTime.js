@@ -59,7 +59,7 @@ const actions = {
 
         try {
             const data =
-                (await getAllData(API_ROUTES_CONFIG.thoiGianLamViec, {
+                (await getAllData(API_ROUTES_CONFIG.workingTimes, {
                     type: "fulltime",
                 })) ?? [];
             commit("SET_FULLTIME_LIST", data);
@@ -79,7 +79,7 @@ const actions = {
             return cachedData;
         }
 
-        const data = await getAllData(API_ROUTES_CONFIG.thoiGianLamViec, {
+        const data = await getAllData(API_ROUTES_CONFIG.workingTimes, {
             type: "fulltime",
             id,
         });
@@ -92,7 +92,7 @@ const actions = {
 
         try {
             const response = await putData(
-                `${API_ROUTES_CONFIG.thoiGianLamViec}?type=fulltime&id=${id}`,
+                `${API_ROUTES_CONFIG.workingTimes}?type=fulltime&id=${id}`,
                 null,
                 values,
             );
@@ -124,9 +124,9 @@ const actions = {
 
         try {
             const data =
-                (await getAllData(API_ROUTES_CONFIG.thoiGianLamViec, {
+                (await getAllData(API_ROUTES_CONFIG.workingTimes, {
                     type: "parttime",
-                    thoiGianLamViecId: workingTimeId,
+                    workingTimeId,
                 })) ?? [];
             commit("SET_PARTTIME_SHIFTS", { workingTimeId, data });
 
@@ -140,7 +140,7 @@ const actions = {
 
         try {
             const response = await postData(
-                API_ROUTES_CONFIG.thoiGianLamViec,
+                API_ROUTES_CONFIG.workingTimes,
                 values,
             );
 
@@ -161,7 +161,7 @@ const actions = {
 
         try {
             const response = await putData(
-                `${API_ROUTES_CONFIG.thoiGianLamViec}/ca-lam-viec?id=${id}`,
+                `${API_ROUTES_CONFIG.workingTimes}/work-shifts?id=${id}`,
                 null,
                 values,
             );
@@ -186,7 +186,7 @@ const actions = {
 
         try {
             const response = await putData(
-                `${API_ROUTES_CONFIG.thoiGianLamViec}/ca-lam-viec/status?id=${id}`,
+                `${API_ROUTES_CONFIG.workingTimes}/work-shifts/status?id=${id}`,
                 null,
                 { status },
             );
