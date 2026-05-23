@@ -23,5 +23,5 @@ export const API_ROUTES_CONFIG = {
     conversation: "/conversation",
     message: "/message",
     presence: "/presence",
-    workSchedule: "/work-schedule",
+    workSchedules: "/work-schedules",
 };

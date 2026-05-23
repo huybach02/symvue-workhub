@@ -64,7 +64,7 @@ return [
         ],
     ],
     [
-        "name" => "lich-lam-viec",
+        "name" => "work-schedules",
         "actions" => [
             "index" => true,
             "create" => true,

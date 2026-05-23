@@ -12,5 +12,5 @@ export const NAME_ROUTES_CONFIG = {
     importHistory: "system.importHistory",
     department: "system.department",
     notifications: "system.notifications",
-    workSchedule: "system.workSchedule",
+    workSchedules: "system.workSchedules",
 };

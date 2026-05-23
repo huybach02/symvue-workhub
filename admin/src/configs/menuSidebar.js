@@ -67,9 +67,9 @@ export const menuSidebar = [
     },
     {
         title: i18n.global.t("sidebar.work_schedule"),
-        key: "lich-lam-viec",
+        key: "work-schedules",
         icon: "mdi-calendar-clock",
-        value: NAME_ROUTES_CONFIG.workSchedule,
-        to: { name: NAME_ROUTES_CONFIG.workSchedule },
+        value: NAME_ROUTES_CONFIG.workSchedules,
+        to: { name: NAME_ROUTES_CONFIG.workSchedules },
     },
 ];

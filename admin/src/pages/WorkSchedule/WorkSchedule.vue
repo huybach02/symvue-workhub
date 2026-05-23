@@ -83,7 +83,7 @@ export default {
     },
     data() {
         return {
-            path: API_ROUTES_CONFIG.workSchedule,
+            path: API_ROUTES_CONFIG.workSchedules,
             items: [],
             totalItems: 0,
             loading: false,

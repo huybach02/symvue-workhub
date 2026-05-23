@@ -158,17 +158,17 @@ export const routes = [
                 },
             },
             {
-                path: "lich-lam-viec",
-                name: NAME_ROUTES_CONFIG.workSchedule,
+                path: "work-schedules",
+                name: NAME_ROUTES_CONFIG.workSchedules,
                 component: () => import("../pages/WorkSchedule/WorkSchedule.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.workSchedule,
+                            NAME_ROUTES_CONFIG.workSchedules,
                         ).title || "",
                     icon:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.workSchedule,
+                            NAME_ROUTES_CONFIG.workSchedules,
                         ).icon || "",
                 },
             },

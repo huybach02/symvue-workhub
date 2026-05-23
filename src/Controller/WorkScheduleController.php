@@ -20,7 +20,7 @@ final class WorkScheduleController extends AbstractController
         private readonly WorkScheduleService $workScheduleService,
     ) {}
 
-    #[Route("/work-schedule/holiday-schedule", methods: ["GET"])]
+    #[Route("/work-schedules/holiday-schedule", methods: ["GET"])]
     public function getHolidaySchedule(): JsonResponse
     {
         try {
@@ -31,7 +31,7 @@ final class WorkScheduleController extends AbstractController
         }
     }
 
-    #[Route("/work-schedule/fulltime/{departmentId}", methods: ["GET"], priority: -1)]
+    #[Route("/work-schedules/fulltime/{departmentId}", methods: ["GET"], priority: -1)]
     public function getFulltime(int $departmentId): JsonResponse
     {
         try {
@@ -42,7 +42,7 @@ final class WorkScheduleController extends AbstractController
         }
     }
 
-    #[Route("/work-schedule/fulltime", methods: ["POST"])]
+    #[Route("/work-schedules/fulltime", methods: ["POST"])]
     public function createFulltime(
         #[
             MapRequestPayload(validationGroups: ["create"]),
@@ -57,7 +57,7 @@ final class WorkScheduleController extends AbstractController
         }
     }
 
-    #[Route("/work-schedule/fulltime/clear", methods: ["POST"])]
+    #[Route("/work-schedules/fulltime/clear", methods: ["POST"])]
     public function clearFulltime(
         Request $request,
     ): JsonResponse {
@@ -71,7 +71,7 @@ final class WorkScheduleController extends AbstractController
         }
     }
 
-    #[Route("/work-schedule/fulltime/check-override", methods: ["POST"])]
+    #[Route("/work-schedules/fulltime/check-override", methods: ["POST"])]
     public function checkOverrideFulltime(
         Request $request,
     ): JsonResponse {
@@ -84,7 +84,7 @@ final class WorkScheduleController extends AbstractController
         }
     }
 
-    #[Route("/work-schedule/special-days", methods: ["GET"])]
+    #[Route("/work-schedules/special-days", methods: ["GET"])]
     public function getSpecialDays(
         Request $request,
     ): JsonResponse {
@@ -98,7 +98,7 @@ final class WorkScheduleController extends AbstractController
         }
     }
 
-    #[Route("/work-schedule/fulltime/override", methods: ["POST"])]
+    #[Route("/work-schedules/fulltime/override", methods: ["POST"])]
     public function overrideFulltime(
         #[
             MapRequestPayload(validationGroups: ["create"]),
@@ -113,7 +113,7 @@ final class WorkScheduleController extends AbstractController
         }
     }
 
-    #[Route("/work-schedule/parttime/shifts", methods: ["GET"])]
+    #[Route("/work-schedules/parttime/shifts", methods: ["GET"])]
     public function getParttimeShifts(
         Request $request,
     ): JsonResponse {
@@ -128,7 +128,7 @@ final class WorkScheduleController extends AbstractController
         }
     }
 
-    #[Route("/work-schedule/parttime/members", methods: ["GET"])]
+    #[Route("/work-schedules/parttime/members", methods: ["GET"])]
     public function getParttimeMembers(
         Request $request,
     ): JsonResponse {
@@ -143,7 +143,7 @@ final class WorkScheduleController extends AbstractController
         }
     }
 
-    #[Route("/work-schedule/parttime/assign", methods: ["POST"])]
+    #[Route("/work-schedules/parttime/assign", methods: ["POST"])]
     public function assignMemberParttimeShift(
         #[
             MapRequestPayload(validationGroups: ["create"]),
@@ -158,7 +158,7 @@ final class WorkScheduleController extends AbstractController
         }
     }
 
-    #[Route("/work-schedule/parttime/assign/{workShiftAssignmentId}", methods: ["DELETE"])]
+    #[Route("/work-schedules/parttime/assign/{workShiftAssignmentId}", methods: ["DELETE"])]
     public function removeMemberParttimeShift(
         int $workShiftAssignmentId,
     ): JsonResponse {

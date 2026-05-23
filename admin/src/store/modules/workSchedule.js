@@ -157,7 +157,7 @@ const actions = {
     async fetchHolidaySchedule({ commit }) {
         const scheduleList =
             (await getListData(
-                API_ROUTES_CONFIG.workSchedule + "/holiday-schedule",
+                API_ROUTES_CONFIG.workSchedules + "/holiday-schedule",
             )) ?? [];
         commit("SET_HOLIDAY_SCHEDULES", scheduleList);
 
@@ -179,7 +179,7 @@ const actions = {
         try {
             const data =
                 (await getListData(
-                    `${API_ROUTES_CONFIG.workSchedule}/fulltime/${departmentId}`,
+                    `${API_ROUTES_CONFIG.workSchedules}/fulltime/${departmentId}`,
                 )) ?? {};
             commit("SET_FULLTIME_DATA", { departmentId, data });
 
@@ -192,7 +192,7 @@ const actions = {
         { dispatch },
         { departmentId, startDate, endDate, userIds },
     ) {
-        await postData(API_ROUTES_CONFIG.workSchedule + "/fulltime", {
+        await postData(API_ROUTES_CONFIG.workSchedules + "/fulltime", {
             startDate,
             endDate,
             userIds,
@@ -204,7 +204,7 @@ const actions = {
         });
     },
     async clearFulltimeSchedule({ dispatch }, { departmentId, userId }) {
-        await postData(API_ROUTES_CONFIG.workSchedule + "/fulltime/clear", {
+        await postData(API_ROUTES_CONFIG.workSchedules + "/fulltime/clear", {
             departmentId,
             userId,
         });
@@ -216,7 +216,7 @@ const actions = {
     },
     async checkFulltimeOverride(_, { userId, startDate, endDate }) {
         return postData(
-            API_ROUTES_CONFIG.workSchedule + "/fulltime/check-override",
+            API_ROUTES_CONFIG.workSchedules + "/fulltime/check-override",
             {
                 userId,
                 startDate,
@@ -238,7 +238,7 @@ const actions = {
             selectedDates,
         },
     ) {
-        return postData(API_ROUTES_CONFIG.workSchedule + "/fulltime/override", {
+        return postData(API_ROUTES_CONFIG.workSchedules + "/fulltime/override", {
             userId,
             startDate,
             endDate,
@@ -250,7 +250,7 @@ const actions = {
     },
     async fetchSpecialDays(_, { startDate, endDate }) {
         return (
-            (await getAllData(API_ROUTES_CONFIG.workSchedule + "/special-days", {
+            (await getAllData(API_ROUTES_CONFIG.workSchedules + "/special-days", {
                 startDate,
                 endDate,
             })) ?? []
@@ -280,7 +280,7 @@ const actions = {
         try {
             const data =
                 (await getListData(
-                    `${API_ROUTES_CONFIG.workSchedule}/parttime/shifts`,
+                    `${API_ROUTES_CONFIG.workSchedules}/parttime/shifts`,
                     {
                         departmentId,
                         startDate,
@@ -302,7 +302,7 @@ const actions = {
     async fetchParttimeMembers(_, { shiftId, departmentId, date }) {
         return (
             (await getListData(
-                `${API_ROUTES_CONFIG.workSchedule}/parttime/members`,
+                `${API_ROUTES_CONFIG.workSchedules}/parttime/members`,
                 {
                     shiftId,
                     departmentId,
@@ -315,7 +315,7 @@ const actions = {
         );
     },
     async assignParttimeMembers(_, { workShiftId, userIds, date }) {
-        return postData(`${API_ROUTES_CONFIG.workSchedule}/parttime/assign`, {
+        return postData(`${API_ROUTES_CONFIG.workSchedules}/parttime/assign`, {
             workShiftId,
             userIds,
             date,
@@ -323,7 +323,7 @@ const actions = {
     },
     async deleteParttimeAssignment(_, assignmentId) {
         return deleteData(
-            `${API_ROUTES_CONFIG.workSchedule}/parttime/assign`,
+            `${API_ROUTES_CONFIG.workSchedules}/parttime/assign`,
             assignmentId,
         );
     },
