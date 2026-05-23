@@ -53,10 +53,10 @@ export const menuSidebar = [
     },
     {
         title: i18n.global.t("sidebar.lich_su_import"),
-        key: "lich-su-import",
+        key: "import-history",
         icon: "mdi-history",
-        value: NAME_ROUTES_CONFIG.lichSuImport,
-        to: { name: NAME_ROUTES_CONFIG.lichSuImport },
+        value: NAME_ROUTES_CONFIG.importHistory,
+        to: { name: NAME_ROUTES_CONFIG.importHistory },
     },
     {
         title: i18n.global.t("sidebar.thong_bao"),

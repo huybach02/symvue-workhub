@@ -16,7 +16,7 @@ export const API_ROUTES_CONFIG = {
         deletePermanently: "/media/delete-permanently",
     },
     user: "/nguoi-dung",
-    lichSuImport: "/lich-su-import",
+    importHistory: "/import-history",
     department: "/departments",
     departmentPermissions: "/departments/permissions",
     thongBao: "/thong-bao",

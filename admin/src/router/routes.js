@@ -112,18 +112,18 @@ export const routes = [
                 },
             },
             {
-                path: "lich-su-import",
-                name: NAME_ROUTES_CONFIG.lichSuImport,
+                path: "import-history",
+                name: NAME_ROUTES_CONFIG.importHistory,
                 component: () =>
                     import("../pages/ImportHistory/ImportHistory.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.lichSuImport,
+                            NAME_ROUTES_CONFIG.importHistory,
                         ).title || "",
                     icon:
                         functionHelper.findMenuItemByValue(
-                            NAME_ROUTES_CONFIG.lichSuImport,
+                            NAME_ROUTES_CONFIG.importHistory,
                         ).icon || "",
                 },
             },

@@ -17,7 +17,7 @@ final class ImportLogController extends AbstractController
         private readonly ImportLogService $importLogService,
     ) {}
 
-    #[Route('/lich-su-import', methods: ['GET'])]
+    #[Route('/import-history', methods: ['GET'])]
     public function getAll(Request $request): JsonResponse
     {
         $params = $request->query->all();
@@ -42,7 +42,7 @@ final class ImportLogController extends AbstractController
         }
     }
 
-    #[Route('/lich-su-import/{id}', methods: ['GET'])]
+    #[Route('/import-history/{id}', methods: ['GET'])]
     public function getOne(int $id): JsonResponse
     {
         try {

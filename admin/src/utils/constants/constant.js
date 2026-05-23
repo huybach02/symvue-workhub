@@ -19,7 +19,7 @@ export const constant = {
         { value: 1, key: "status.active" },
         { value: 0, key: "status.inactive" },
     ],
-    ROUTE_PUBLIC: ["dashboard", "profile", "lich-su-import"],
+    ROUTE_PUBLIC: ["dashboard", "profile", "import-history"],
     SEND_TO_OPTIONS: [
         { value: "all", key: "thong_bao.options.sendTo.all" },
         { value: "department", key: "thong_bao.options.sendTo.department" },

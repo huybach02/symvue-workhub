@@ -23,7 +23,7 @@ export default {
     },
     data() {
         return {
-            path: API_ROUTES_CONFIG.lichSuImport,
+            path: API_ROUTES_CONFIG.importHistory,
         };
     },
     created() {

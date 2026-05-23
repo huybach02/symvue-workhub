@@ -29,7 +29,7 @@ const actions = {
 
         try {
             const response = await getListData(
-                API_ROUTES_CONFIG.lichSuImport,
+                API_ROUTES_CONFIG.importHistory,
                 params,
             );
             const items = response?.data ?? [];
