@@ -1,6 +1,98 @@
 <template>
     <v-card-text class="pa-4">
         <v-row dense>
+            <v-col cols="12" md="6">
+                <v-sheet
+                    rounded="lg"
+                    border
+                    color="grey-lighten-5"
+                    class="pa-4 h-100"
+                >
+                    <div class="d-flex align-center ga-2 mb-2">
+                        <v-icon
+                            icon="mdi-account-outline"
+                            size="18"
+                            color="primary"
+                        />
+                        <div class="text-caption text-medium-emphasis">
+                            {{ $t("field.requester_name") }}
+                        </div>
+                    </div>
+
+                    <div class="text-body-1 font-weight-bold">
+                        {{ item?.requester?.name || "--" }}
+                    </div>
+                </v-sheet>
+            </v-col>
+
+            <v-col cols="12" md="6">
+                <v-sheet
+                    rounded="lg"
+                    border
+                    color="grey-lighten-5"
+                    class="pa-4 h-100"
+                >
+                    <div class="d-flex align-center ga-2 mb-2">
+                        <v-icon icon="mdi-domain" size="18" color="primary" />
+                        <div class="text-caption text-medium-emphasis">
+                            {{ $t("field.requester_department") }}
+                        </div>
+                    </div>
+
+                    <div class="text-body-1 font-weight-bold">
+                        {{ item?.requesterDepartment?.tenBoPhan || "--" }}
+                    </div>
+                </v-sheet>
+            </v-col>
+
+            <v-col cols="12" md="6">
+                <v-sheet
+                    rounded="lg"
+                    border
+                    color="grey-lighten-5"
+                    class="pa-4 h-100"
+                >
+                    <div class="d-flex align-center ga-2 mb-2">
+                        <v-icon
+                            icon="mdi-briefcase-outline"
+                            size="18"
+                            color="primary"
+                        />
+                        <div class="text-caption text-medium-emphasis">
+                            {{ $t("field.requester_position") }}
+                        </div>
+                    </div>
+
+                    <div class="text-body-1 font-weight-bold">
+                        {{ item?.requesterPosition?.name || "--" }}
+                    </div>
+                </v-sheet>
+            </v-col>
+
+            <v-col cols="12" md="6">
+                <v-sheet
+                    rounded="lg"
+                    border
+                    color="grey-lighten-5"
+                    class="pa-4 h-100"
+                >
+                    <div class="d-flex align-center ga-2 mb-2">
+                        <v-icon
+                            icon="mdi-calendar-plus-outline"
+                            size="18"
+                            color="primary"
+                        />
+                        <div class="text-caption text-medium-emphasis">
+                            {{ $t("field.request_created_at") }}
+                        </div>
+                    </div>
+
+                    <div class="text-body-1 font-weight-bold">
+                        {{ item?.createdAt || "--" }}
+                    </div>
+                </v-sheet>
+            </v-col>
+
             <v-col cols="12" md="12">
                 <v-sheet
                     rounded="lg"

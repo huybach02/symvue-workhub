@@ -147,6 +147,12 @@ const actions = {
             commit("SET_TIMELINE_LOADING", false);
         }
     },
+    clearRequestDetail({ commit }) {
+        commit("SET_REQUEST_DETAIL", null);
+    },
+    clearRequestTimeline({ commit }) {
+        commit("SET_REQUEST_TIMELINE", []);
+    },
     async createRequest(_, values) {
         return postData(API_ROUTES_CONFIG.requests, values);
     },

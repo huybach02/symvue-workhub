@@ -217,6 +217,8 @@ export default {
             "fetchRequests",
             "fetchRequestDetail",
             "fetchRequestTimeline",
+            "clearRequestDetail",
+            "clearRequestTimeline",
         ]),
         async fetchPendingApprovalRequests() {
             await this.fetchRequests({
@@ -293,12 +295,16 @@ export default {
             this.detailDialog = false;
             this.formDialog = true;
         },
-        async openDetailDialog(requestId) {
-            await Promise.all([
+        openDetailDialog(requestId) {
+            this.detailDialog = true;
+
+            this.clearRequestDetail();
+            this.clearRequestTimeline();
+
+            return Promise.all([
                 this.fetchRequestDetail(requestId),
                 this.fetchRequestTimeline(requestId),
             ]);
-            this.detailDialog = true;
         },
         async handleSaved() {
             this.formDialog = false;

@@ -1,7 +1,7 @@
 <template>
     <v-dialog
         :model-value="modelValue"
-        max-width="1120"
+        max-width="1500"
         width="calc(100vw - 24px)"
         scrollable
         @update:model-value="$emit('update:modelValue', $event)"
@@ -20,7 +20,7 @@
 
                     <div class="min-w-0">
                         <div class="text-h6 font-weight-bold dialog-title">
-                            {{ item?.title || "--" }}
+                            {{ item?.title || "" }}
                         </div>
 
                         <div class="d-flex flex-wrap align-center ga-2 mt-2">
@@ -30,7 +30,7 @@
                                 size="small"
                                 variant="flat"
                             >
-                                {{ item?.code || "--" }}
+                                {{ item?.code || "" }}
                             </v-chip>
 
                             <v-chip
@@ -56,13 +56,13 @@
             <v-divider />
 
             <v-card-text class="pa-6">
-                <v-progress-linear
-                    v-if="loading"
-                    indeterminate
-                    color="primary"
-                    class="mb-4"
-                    rounded
-                />
+                <div v-if="loading" class="loading-circle mb-4">
+                    <v-progress-circular
+                        indeterminate
+                        color="primary"
+                        size="40"
+                    />
+                </div>
 
                 <template v-if="item">
                     <div class="meta-bar mb-5">
@@ -90,7 +90,7 @@
                     </div>
 
                     <v-row>
-                        <v-col cols="12" md="7">
+                        <v-col cols="12" md="9">
                             <v-card class="section-card" rounded="lg">
                                 <div class="section-title">
                                     <v-icon
@@ -169,7 +169,7 @@
                             </v-card>
                         </v-col>
 
-                        <v-col cols="12" md="5">
+                        <v-col cols="12" md="3">
                             <v-card
                                 class="section-card timeline-card"
                                 rounded="lg"
@@ -213,12 +213,8 @@
                                                         event.actor?.name ||
                                                         "Hệ thống"
                                                     }}
-                                                    ·
-                                                    {{
-                                                        formatMessageTime(
-                                                            event.createdAt,
-                                                        )
-                                                    }}
+                                                    -
+                                                    {{ event.createdAt || "" }}
                                                 </div>
 
                                                 <div
@@ -287,6 +283,7 @@
 </template>
 
 <script>
+import dayjs from "dayjs";
 import { mapActions } from "vuex";
 import { functionHelper } from "@/helpers/functionHelper";
 import { getRequestTypeComponentConfig } from "./request-types/requestTypeComponentRegistry";
@@ -351,9 +348,6 @@ export default {
         },
         getEventColor(eventType) {
             return functionHelper.getRequestEventColor(eventType);
-        },
-        formatMessageTime(value) {
-            return functionHelper.formatMessageTime(value);
         },
         async handleApprove() {
             await this.approveRequest({
@@ -447,6 +441,14 @@ export default {
 }
 .min-w-0 {
     min-width: 0;
+}
+
+.loading-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    color: rgba(var(--v-theme-on-surface), 0.85);
 }
 
 .dialog-title {

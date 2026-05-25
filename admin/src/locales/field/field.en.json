@@ -73,6 +73,10 @@
     "thoi_gian_bat_dau": "Start Time",
     "thoi_gian_ket_thuc": "End Time",
     "leave_type": "Leave Type",
+    "requester_name": "Requester Name",
+    "requester_department": "Department",
+    "requester_position": "Position",
+    "request_created_at": "Request Created At",
     "request_reason": "Request Reason",
     "handover_note": "Handover Note"
   }

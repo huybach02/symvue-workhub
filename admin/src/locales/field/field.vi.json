@@ -77,6 +77,10 @@
     "thoi_gian_bat_dau": "Thời gian bắt đầu làm việc",
     "thoi_gian_ket_thuc": "Thời gian kết thúc làm việc",
     "leave_type": "Loại nghỉ",
+    "requester_name": "Tên người đề xuất",
+    "requester_department": "Phòng ban",
+    "requester_position": "Chức vụ",
+    "request_created_at": "Ngày tạo đề xuất",
     "request_reason": "Lý do đề xuất",
     "handover_note": "Ghi chú bàn giao"
   }
