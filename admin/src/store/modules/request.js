@@ -20,6 +20,7 @@ const state = {
     approvedLoading: false,
     detailLoading: false,
     timelineLoading: false,
+    refreshUUID: "",
 };
 
 const getters = {
@@ -38,6 +39,7 @@ const getters = {
     approvedLoading: (state) => state.approvedLoading,
     detailLoading: (state) => state.detailLoading,
     timelineLoading: (state) => state.timelineLoading,
+    refreshUUID: (state) => state.refreshUUID,
 };
 
 const mutations = {
@@ -79,6 +81,9 @@ const mutations = {
     },
     SET_TIMELINE_LOADING(state, value) {
         state.timelineLoading = value;
+    },
+    SET_REFRESH_UUID(state, value) {
+        state.refreshUUID = value;
     },
 };
 

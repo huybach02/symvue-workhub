@@ -252,6 +252,22 @@ class MercureService
         );
     }
 
+    public function requestRefresh(int $toUserId, int $requestId, ?\DateTimeInterface $occurredAt = null): void
+    {
+        $topic = str_replace(':userId', (string) $toUserId, $this->mercureConfig['topics']['request']);
+        $timestamp = ($occurredAt ?? new \DateTimeImmutable())->format(DATE_ATOM);
+
+        $data = [
+            'type' => 'request_refresh',
+            'toId' => $toUserId,
+            'requestId' => $requestId,
+            'timestamp' => $timestamp,
+        ];
+
+        $update = new Update($topic, json_encode($data), false);
+        $this->hub->publish($update);
+    }
+
     public function thongBaoPhongBan($fromUserId, $departmentId, $title, $body, $type = "primary", $createdAt = null, $link = ""): void
     {
         $code = uniqid();

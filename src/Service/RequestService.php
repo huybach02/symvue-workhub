@@ -543,7 +543,12 @@ class RequestService
             ]),
             'warning',
             new \DateTime(),
-            '/system/requests'
+            $this->buildRequestNotificationLink($request)
+        );
+
+        $this->mercureService->requestRefresh(
+            $approver->getId(),
+            $request->getId(),
         );
     }
 
@@ -566,7 +571,7 @@ class RequestService
             ]),
             'error',
             new \DateTime(),
-            '/system/requests'
+            $this->buildRequestNotificationLink($request)
         );
     }
 
@@ -595,7 +600,12 @@ class RequestService
             $body,
             'success',
             new \DateTime(),
-            '/system/requests'
+            $this->buildRequestNotificationLink($request)
         );
+    }
+
+    private function buildRequestNotificationLink(Request $request): string
+    {
+        return sprintf('/system/requests?requestId=%d', $request->getId());
     }
 }

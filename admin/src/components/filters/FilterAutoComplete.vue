@@ -10,7 +10,23 @@
         :menu-props="{ width: '350px' }"
         @update:model-value="onChange"
         @click:clear="handleClear"
-    />
+    >
+        <template #no-data>
+            <div class="filter-autocomplete-state">
+                <template v-if="isLoading">
+                    <v-progress-circular
+                        indeterminate
+                        size="18"
+                        width="2"
+                        color="primary"
+                    />
+                </template>
+                <span v-else class="text-body-2">
+                    {{ $t("base.no_data") }}
+                </span>
+            </div>
+        </template>
+    </v-autocomplete>
 </template>
 
 <script>
@@ -36,6 +52,7 @@ export default {
     data() {
         return {
             listData: [],
+            isLoading: false,
         };
     },
     computed: {
@@ -68,14 +85,30 @@ export default {
             });
         },
         async getItems() {
-            const res = await getDataSelect(this.path);
-            this.listData = res.map((item) => {
-                return {
-                    title: item.label,
-                    value: item.value,
-                };
-            });
+            this.isLoading = true;
+            try {
+                const res = (await getDataSelect(this.path)) ?? [];
+                this.listData = res.map((item) => {
+                    return {
+                        title: item.label,
+                        value: item.value,
+                    };
+                });
+            } finally {
+                this.isLoading = false;
+            }
         },
     },
 };
 </script>
+
+<style scoped>
+.filter-autocomplete-state {
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+}
+</style>

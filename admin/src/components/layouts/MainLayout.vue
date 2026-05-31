@@ -218,6 +218,12 @@ export default {
                                 seenAt: data.seenAt,
                             });
                             break;
+                        case "request_refresh":
+                            this.$store.commit(
+                                "request/SET_REFRESH_UUID",
+                                `${data.requestId || "all"}-${data.timestamp || Date.now()}`,
+                            );
+                            break;
                         default:
                             this.$store.commit(
                                 "mercure/ADD_NOTIFICATION",

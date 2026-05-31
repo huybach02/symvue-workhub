@@ -97,6 +97,10 @@
                 {{ item.requester?.name || "--" }}
             </template>
 
+            <template #[`item.currentApprover`]="{ item }">
+                {{ item.currentApprover?.name || "--" }}
+            </template>
+
             <template #[`item.type`]="{ item }">
                 {{ getRequestTypeTitle(item.type) }}
             </template>
@@ -184,6 +188,10 @@ export default {
         showStatusFilter: {
             type: Boolean,
             default: true,
+        },
+        showApprover: {
+            type: Boolean,
+            default: false,
         },
         permission: {
             type: Object,
@@ -275,6 +283,17 @@ export default {
                 headers.push({
                     title: this.$t("request.requester"),
                     key: "requester",
+                    minWidth: 180,
+                    filterComponent: markRaw(FilterAutoComplete),
+                    path: API_ROUTES_CONFIG.users,
+                    sortable: false,
+                });
+            }
+
+            if (this.showApprover) {
+                headers.push({
+                    title: this.$t("request.approver"),
+                    key: "currentApprover",
                     minWidth: 180,
                     filterComponent: markRaw(FilterAutoComplete),
                     path: API_ROUTES_CONFIG.users,

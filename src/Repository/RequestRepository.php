@@ -76,6 +76,11 @@ class RequestRepository extends ServiceEntityRepository
                     'alias' => 'requesterFilter',
                     'targetField' => 'id',
                 ],
+                'currentApprover' => [
+                    'joinField' => 'request.currentApprover',
+                    'alias' => 'currentApproverFilter',
+                    'targetField' => 'id',
+                ],
             ]
         );
     }

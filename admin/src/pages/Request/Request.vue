@@ -156,6 +156,7 @@ export default {
             "approvedLoading",
             "detailLoading",
             "timelineLoading",
+            "refreshUUID",
         ]),
         activeApprovalItems() {
             return this.approvalTab === "approved"
@@ -195,6 +196,30 @@ export default {
     },
     async created() {
         await this.fetchRequestTypes();
+    },
+    watch: {
+        "$route.query.requestId": {
+            immediate: true,
+            handler(requestId) {
+                if (!requestId) {
+                    return;
+                }
+
+                this.openDetailDialog(requestId);
+            },
+        },
+        detailDialog(value) {
+            if (value) {
+                return;
+            }
+
+            this.clearDetailDialogQuery();
+        },
+        refreshUUID(value) {
+            if (value) {
+                this.reloadApprovalTable();
+            }
+        },
     },
     methods: {
         ...mapActions("request", [
@@ -286,6 +311,18 @@ export default {
                 this.fetchRequestDetail(requestId),
                 this.fetchRequestTimeline(requestId),
             ]);
+        },
+        clearDetailDialogQuery() {
+            if (!this.$route.query.requestId) {
+                return;
+            }
+
+            const query = { ...this.$route.query };
+            delete query.requestId;
+
+            this.$router.replace({
+                query,
+            });
         },
         async handleSaved() {
             this.formDialog = false;

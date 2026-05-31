@@ -1,7 +1,10 @@
 <template>
     <v-row>
-        <v-col cols="12" md="6">
-            <VeeField v-slot="{ field, errorMessage, handleChange }" name="leaveType">
+        <v-col cols="12" md="12">
+            <VeeField
+                v-slot="{ field, errorMessage, handleChange }"
+                name="leaveType"
+            >
                 <div class="mb-2">
                     {{ $t("field.leave_type") }}
                     <span class="text-error">*</span>
@@ -19,16 +22,18 @@
         </v-col>
 
         <v-col cols="12" md="6">
-            <VeeField v-slot="{ field, errorMessage, handleChange, handleBlur }" name="startDate">
+            <VeeField
+                v-slot="{ field, errorMessage, handleChange, handleBlur }"
+                name="startDate"
+            >
                 <div class="mb-2">
                     {{ $t("field.ngay_bat_dau") }}
                     <span class="text-error">*</span>
                 </div>
-                <v-text-field
+                <DatePicker
                     :model-value="field.value"
-                    type="date"
-                    variant="outlined"
                     :error-messages="errorMessage"
+                    :placeholder="`${$t('base.enter')} ${$t('field.ngay_bat_dau')}`"
                     @update:model-value="handleChange"
                     @blur="handleBlur"
                 />
@@ -36,16 +41,18 @@
         </v-col>
 
         <v-col cols="12" md="6">
-            <VeeField v-slot="{ field, errorMessage, handleChange, handleBlur }" name="endDate">
+            <VeeField
+                v-slot="{ field, errorMessage, handleChange, handleBlur }"
+                name="endDate"
+            >
                 <div class="mb-2">
                     {{ $t("field.ngay_ket_thuc") }}
                     <span class="text-error">*</span>
                 </div>
-                <v-text-field
+                <DatePicker
                     :model-value="field.value"
-                    type="date"
-                    variant="outlined"
                     :error-messages="errorMessage"
+                    :placeholder="`${$t('base.enter')} ${$t('field.ngay_ket_thuc')}`"
                     @update:model-value="handleChange"
                     @blur="handleBlur"
                 />
@@ -85,11 +92,13 @@
 
 <script>
 import { Field as VeeField } from "vee-validate";
+import DatePicker from "@/components/DatePicker.vue";
 import { LEAVE_TYPE_OPTIONS } from "@/utils/constants/request";
 
 export default {
     name: "RequestLeaveFormFields",
     components: {
+        DatePicker,
         VeeField,
     },
     computed: {

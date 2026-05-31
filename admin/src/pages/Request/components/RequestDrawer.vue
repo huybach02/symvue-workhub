@@ -60,6 +60,7 @@
                         :loading="loading"
                         :request-types="requestTypes"
                         :show-requester="false"
+                        :show-approver="true"
                         :show-type="false"
                         :show-status-filter="true"
                         :permission="permission"

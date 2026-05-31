@@ -94,6 +94,7 @@
                                 :class="{ 'unread-item': !item.seen }"
                                 class="notification-item px-4 py-3"
                                 style="cursor: pointer"
+                                @click="handleNotificationClick(item)"
                             >
                                 <p
                                     class="text-caption text-grey font-weight-regular mb-1 text-right"
@@ -140,7 +141,7 @@
                                         variant="tonal"
                                         size="small"
                                         color="success"
-                                        @click="markAsRead(item.code)"
+                                        @click.stop="markAsRead(item.code)"
                                     >
                                         <v-icon size="16">
                                             mdi-checkbox-marked-circle-outline
@@ -207,6 +208,23 @@ export default {
     methods: {
         openDrawer() {
             this.drawer = true;
+        },
+        async handleNotificationClick(item) {
+            if (!item) {
+                return;
+            }
+
+            if (!item.seen) {
+                await this.markAsRead(item.code);
+            }
+
+            this.drawer = false;
+
+            if (!item.link) {
+                return;
+            }
+
+            await this.$router.push(item.link).catch(() => {});
         },
 
         async markAsRead(code) {
