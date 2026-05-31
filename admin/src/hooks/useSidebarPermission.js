@@ -1,12 +1,10 @@
 import { constant } from "@/utils/constants/constant";
-import { useStore } from "vuex";
+import store from "@/store";
 
 export const useSidebarPermission = (menuSidebar) => {
     const isKeyValid = (key) => {
         return constant.ROUTE_PUBLIC.includes(key);
     };
-
-    const store = useStore();
 
     const user = store.getters["auth/currentUser"];
 

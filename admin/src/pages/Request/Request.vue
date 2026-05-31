@@ -25,7 +25,7 @@
                             variant="text"
                             prepend-icon="mdi-refresh"
                             class="ml-4"
-                            @click="fetchActiveApprovalTab"
+                            @click="reloadApprovalTable"
                         >
                             {{ $t("button.update") }}
                         </v-btn>
@@ -35,15 +35,16 @@
 
                     <v-card-text>
                         <RequestTable
+                            ref="approvalTable"
                             :key="approvalTab"
                             :items="activeApprovalItems"
                             :total-items="activeApprovalTotal"
                             :loading="activeApprovalLoading"
-                            :query="activeApprovalQuery"
                             :request-types="requestTypes"
                             :show-requester="true"
                             :show-type="true"
-                            @update:query="handleApprovalQueryChange"
+                            :show-status-filter="false"
+                            :isApproval="true"
                             @reload="fetchActiveApprovalTab"
                             @show-detail="openDetailDialog"
                         />
@@ -57,14 +58,16 @@
                         class="bg-primary text-white d-flex align-center py-4"
                         style="min-height: 84px"
                     >
-                        <div class="text-h6">Quản lý đề xuất</div>
+                        <div class="text-h6">
+                            {{ $t("request.management_title") }}
+                        </div>
                     </v-card-title>
 
                     <v-divider />
 
                     <v-card-text>
                         <RequestTypeCards
-                            :items="requestTypes"
+                            :items="visibleRequestTypes"
                             @select="handleSelectType"
                         />
                     </v-card-text>
@@ -73,19 +76,18 @@
         </v-row>
 
         <RequestDrawer
+            ref="requestDrawer"
             :open="drawer"
             :selected-type="selectedType"
             :mine-items="mineItems"
             :mine-total="totalMineItems"
             :loading="mineLoading"
             :permission="permission"
-            :query="mineQuery"
             :request-types="requestTypes"
-            @close="drawer = false"
+            @close="handleCloseDrawer"
             @create="openCreateDialog"
             @refresh="fetchMineRequests"
             @show-detail="openDetailDialog"
-            @update:query="handleMineQueryChange"
         />
 
         <RequestFormDialog
@@ -101,6 +103,7 @@
             :item="requestDetail"
             :timeline="requestTimeline"
             :loading="detailLoading || timelineLoading"
+            :permission="permission"
             @refresh="handleRefreshAll"
             @edit="openEditDialog"
         />
@@ -135,27 +138,6 @@ export default {
             formMode: "create",
             editingItem: null,
             approvalTab: "pending",
-            pendingApprovalQuery: {
-                page: 1,
-                limit: 10,
-                sort_column: null,
-                sort_direction: null,
-                f: [],
-            },
-            approvedQuery: {
-                page: 1,
-                limit: 10,
-                sort_column: null,
-                sort_direction: null,
-                f: [],
-            },
-            mineQuery: {
-                page: 1,
-                limit: 10,
-                sort_column: null,
-                sort_direction: null,
-                f: [],
-            },
         };
     },
     computed: {
@@ -190,26 +172,29 @@ export default {
                 ? this.approvedLoading
                 : this.approvalLoading;
         },
-        activeApprovalQuery() {
-            return this.approvalTab === "approved"
-                ? this.approvedQuery
-                : this.pendingApprovalQuery;
+        visibleRequestTypes() {
+            return this.requestTypes.filter((item) => {
+                const permission = usePermission(
+                    API_ROUTES_CONFIG.requests,
+                    `requests:${item.code}`,
+                );
+
+                return permission?.index;
+            });
         },
         permission() {
-            return usePermission(API_ROUTES_CONFIG.requests);
-        },
-    },
-    watch: {
-        approvalTab() {
-            this.fetchActiveApprovalTab();
+            if (!this.selectedType?.code && !this.requestDetail?.type) {
+                return usePermission(API_ROUTES_CONFIG.requests);
+            }
+
+            return usePermission(
+                API_ROUTES_CONFIG.requests,
+                `requests:${this.selectedType?.code || this.requestDetail?.type || ""}`,
+            );
         },
     },
     async created() {
-        await Promise.all([
-            this.fetchRequestTypes(),
-            this.fetchPendingApprovalRequests(),
-            this.fetchApprovedRequests(),
-        ]);
+        await this.fetchRequestTypes();
     },
     methods: {
         ...mapActions("request", [
@@ -220,28 +205,28 @@ export default {
             "clearRequestDetail",
             "clearRequestTimeline",
         ]),
-        async fetchPendingApprovalRequests() {
+        async fetchPendingApprovalRequests(query = {}) {
             await this.fetchRequests({
                 view: "approval",
-                ...this.pendingApprovalQuery,
+                ...query,
             });
         },
-        async fetchApprovedRequests() {
+        async fetchApprovedRequests(query = {}) {
             await this.fetchRequests({
                 view: "approval",
                 status: "approved",
-                ...this.approvedQuery,
+                ...query,
             });
         },
-        async fetchActiveApprovalTab() {
+        async fetchActiveApprovalTab(query = {}) {
             if (this.approvalTab === "approved") {
-                await this.fetchApprovedRequests();
+                await this.fetchApprovedRequests(query);
                 return;
             }
 
-            await this.fetchPendingApprovalRequests();
+            await this.fetchPendingApprovalRequests(query);
         },
-        async fetchMineRequests() {
+        async fetchMineRequests(query = {}) {
             if (!this.selectedType?.code) {
                 return;
             }
@@ -249,40 +234,36 @@ export default {
             await this.fetchRequests({
                 type: this.selectedType.code,
                 view: "mine",
-                ...this.mineQuery,
+                ...query,
             });
         },
-        async handleSelectType(item) {
+        handleSelectType(item) {
             this.selectedType = item;
-            this.mineQuery = {
-                ...this.mineQuery,
-                page: 1,
-                f: [],
-            };
             this.drawer = true;
-            await this.fetchMineRequests();
         },
         async handleRefreshAll() {
             await Promise.all([
-                this.fetchPendingApprovalRequests(),
-                this.fetchApprovedRequests(),
-                this.fetchMineRequests(),
+                this.reloadApprovalTable(),
+                this.reloadMineTable(),
             ]);
 
             if (this.requestDetail?.id) {
                 await this.openDetailDialog(this.requestDetail.id);
             }
         },
-        handleApprovalQueryChange(query) {
-            if (this.approvalTab === "approved") {
-                this.approvedQuery = { ...query };
-                return;
-            }
+        reloadApprovalTable() {
+            const query = this.$refs.approvalTable?.getCurrentQuery?.() ?? {};
 
-            this.pendingApprovalQuery = { ...query };
+            return this.fetchActiveApprovalTab(query);
         },
-        handleMineQueryChange(query) {
-            this.mineQuery = { ...query };
+        reloadMineTable() {
+            const query = this.$refs.requestDrawer?.getCurrentQuery?.() ?? {};
+
+            return this.fetchMineRequests(query);
+        },
+        handleCloseDrawer() {
+            this.drawer = false;
+            this.selectedType = null;
         },
         openCreateDialog() {
             this.formMode = "create";

@@ -150,9 +150,7 @@ class RemoveModuleCommand extends Command
 
         $content = file_get_contents($permissionFilePath);
 
-        // T\u00ecm v\u00e0 x\u00f3a to\u00e0n b\u1ed9 block item c\u00f3 name t\u01b0\u01a1ng \u1ee9ng trong m\u1ea3ng
-        // Pattern kh\u1edbp v\u1edbi c\u1ea3 \r\n (Windows) l\u1eabn \n (Unix)
-        $pattern = '/\r?\n    \[\r?\n        "name" => "' . preg_quote($moduleNameKebab, '/') . '",\r?\n        "actions" => \[[\s\S]*?\]\r?\n    \],/';
+        $pattern = '/\r?\n    \[\r?\n        "name" => "' . preg_quote($moduleNameKebab, '/') . '",[\s\S]*?\r?\n    \],/';
 
         $updatedContent = preg_replace($pattern, '', $content);
 

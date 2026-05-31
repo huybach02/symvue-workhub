@@ -21,7 +21,11 @@ class RequestRepository extends ServiceEntityRepository
         parent::__construct($registry, Request::class);
     }
 
-    public function findWithPaginationForUser(array $params, User $currentUser): array
+    public function findWithPaginationForUser(
+        array $params,
+        User $currentUser,
+        array $allowedTypes = [],
+    ): array
     {
         $type = trim((string) ($params['type'] ?? ''));
         $view = trim((string) ($params['view'] ?? 'mine'));
@@ -33,6 +37,11 @@ class RequestRepository extends ServiceEntityRepository
 
         if ($type !== '') {
             $qb->andWhere('request.type = :type')->setParameter('type', $type);
+        }
+
+        if ($allowedTypes !== []) {
+            $qb->andWhere('request.type IN (:allowedTypes)')
+                ->setParameter('allowedTypes', $allowedTypes);
         }
 
         if ($status !== '') {

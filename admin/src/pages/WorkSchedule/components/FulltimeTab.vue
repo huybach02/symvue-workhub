@@ -10,6 +10,9 @@
                         {{ $t('work_schedule.override_schedule') }}
                     </v-chip>
                     <v-chip color="red" variant="flat" size="small">
+                        {{ $t('work_schedule.leave_schedule') }}
+                    </v-chip>
+                    <v-chip color="red" variant="flat" size="small">
                         {{ $t('work_schedule.holiday_schedule') }}
                     </v-chip>
                 </div>

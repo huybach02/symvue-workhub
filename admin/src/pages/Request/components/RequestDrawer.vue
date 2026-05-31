@@ -12,12 +12,18 @@
                         {{ selectedType?.title || "--" }}
                     </div>
                     <v-spacer />
-                    <v-btn icon="mdi-close" variant="text" @click="$emit('close')" />
+                    <v-btn
+                        icon="mdi-close"
+                        variant="text"
+                        @click="$emit('close')"
+                    />
                 </v-toolbar>
 
                 <v-divider />
 
-                <div class="d-flex align-center justify-space-between ga-3 px-6 py-4">
+                <div
+                    class="d-flex align-center justify-space-between ga-3 px-6 py-4"
+                >
                     <v-chip color="primary" variant="tonal">
                         {{ mineTotal }} {{ $t("request.my_requests_short") }}
                     </v-chip>
@@ -27,7 +33,7 @@
                             color="primary"
                             variant="text"
                             prepend-icon="mdi-refresh"
-                            @click="$emit('refresh')"
+                            @click="reloadCurrentQuery"
                         >
                             {{ $t("button.update") }}
                         </v-btn>
@@ -46,17 +52,22 @@
 
                 <div class="px-6 py-4">
                     <RequestTable
+                        v-if="selectedType"
+                        ref="mineRequestTable"
+                        :key="selectedType.code"
                         :items="mineItems"
                         :total-items="mineTotal"
                         :loading="loading"
-                        :query="query"
                         :request-types="requestTypes"
                         :show-requester="false"
                         :show-type="false"
                         :show-status-filter="true"
-                        @update:query="(value) => $emit('update:query', value)"
-                        @reload="$emit('refresh')"
-                        @show-detail="(requestId) => $emit('show-detail', requestId)"
+                        :permission="permission"
+                        :selected-type="selectedType"
+                        @reload="(query) => $emit('refresh', query)"
+                        @show-detail="
+                            (requestId) => $emit('show-detail', requestId)
+                        "
                     />
                 </div>
             </v-card>
@@ -97,21 +108,19 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        query: {
-            type: Object,
-            required: true,
-        },
         requestTypes: {
             type: Array,
             default: () => [],
         },
     },
-    emits: [
-        "close",
-        "create",
-        "refresh",
-        "show-detail",
-        "update:query",
-    ],
+    emits: ["close", "create", "refresh", "show-detail"],
+    methods: {
+        getCurrentQuery() {
+            return this.$refs.mineRequestTable?.getCurrentQuery?.() ?? {};
+        },
+        reloadCurrentQuery() {
+            this.$refs.mineRequestTable?.reloadCurrentQuery();
+        },
+    },
 };
 </script>

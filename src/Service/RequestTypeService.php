@@ -65,7 +65,7 @@ class RequestTypeService
         return match ($type) {
             RequestConstant::TYPE_LEAVE => trim(sprintf(
                 '%s | %s -> %s',
-                $payload->leaveType ?? t('request.payload.leave_type_default'),
+                t('request.payload.leave_type_default'),
                 $payload->startDate,
                 $payload->endDate
             )),

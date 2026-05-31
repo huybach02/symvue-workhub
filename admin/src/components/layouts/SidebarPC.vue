@@ -26,7 +26,7 @@
             <MenuSidebar />
         </v-navigation-drawer>
 
-        <v-app-bar>
+        <v-app-bar style="z-index: 3000">
             <v-app-bar-title
                 class="font-weight-bold text-uppercase text-primary"
             >

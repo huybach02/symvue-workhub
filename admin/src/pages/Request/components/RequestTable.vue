@@ -59,6 +59,18 @@
 
             <template #[`item.action`]="{ item }">
                 <v-btn
+                    v-if="permission.show && selectedType"
+                    v-bind="tooltipProps"
+                    icon
+                    size="small"
+                    variant="outlined"
+                    color="primary"
+                    @click.stop="$emit('show-detail', item.id)"
+                >
+                    <v-icon>mdi-eye</v-icon>
+                </v-btn>
+                <v-btn
+                    v-if="isApproval"
                     v-bind="tooltipProps"
                     icon
                     size="small"
@@ -119,8 +131,8 @@
 
         <FilterPagination
             :total-items="totalItems"
-            :current-page="query.page"
-            :items-per-page="query.limit"
+            :current-page="tableQuery.page"
+            :items-per-page="tableQuery.limit"
             @update:page="onPageChange"
             @update:items-per-page="onLimitChange"
         />
@@ -135,7 +147,9 @@ import FilterAutoComplete from "@/components/filters/FilterAutoComplete.vue";
 import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import { functionHelper } from "@/helpers/functionHelper";
+import { useFilterPagination } from "@/hooks/useFilterPagination.js";
+import { constant } from "@/utils/constants/constant";
+import FilterPlaceholder from "@/components/filters/FilterPlaceholder.vue";
 
 export default {
     name: "RequestTable",
@@ -155,10 +169,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        query: {
-            type: Object,
-            required: true,
-        },
         requestTypes: {
             type: Array,
             default: () => [],
@@ -175,40 +185,69 @@ export default {
             type: Boolean,
             default: true,
         },
+        permission: {
+            type: Object,
+            default: () => ({}),
+        },
+        selectedType: {
+            type: [Object, String],
+            default: null,
+        },
+        isApproval: {
+            type: Boolean,
+            default: false,
+        },
     },
-    emits: ["update:query", "reload", "show-detail"],
+    emits: ["reload", "show-detail"],
+    setup(_, { emit }) {
+        const {
+            query: tableQuery,
+            sortArray,
+            onOptions,
+            onPageChange,
+            onLimitChange,
+            onFilter,
+        } = useFilterPagination((queryData) => {
+            emit("reload", {
+                ...queryData,
+                f: Array.isArray(queryData?.f) ? [...queryData.f] : [],
+            });
+        });
+
+        const getCurrentQuery = () => ({
+            ...tableQuery.value,
+            f: Array.isArray(tableQuery.value?.f)
+                ? [...tableQuery.value.f]
+                : [],
+        });
+
+        const reloadCurrentQuery = () => {
+            emit("reload", getCurrentQuery());
+        };
+
+        return {
+            getCurrentQuery,
+            tableQuery,
+            sortArray,
+            onOptions,
+            onPageChange,
+            onLimitChange,
+            onFilter,
+            reloadCurrentQuery,
+        };
+    },
+    mounted() {
+        this.reloadCurrentQuery();
+    },
     data() {
         return {
-            statusFilterItems: [
-                { title: this.$t("request.status.pending"), value: "pending" },
-                {
-                    title: this.$t("request.status.rejected"),
-                    value: "rejected",
-                },
-                {
-                    title: this.$t("request.status.approved"),
-                    value: "approved",
-                },
-                {
-                    title: this.$t("request.status.cancelled"),
-                    value: "cancelled",
-                },
-            ],
+            statusFilterItems: constant.REQUEST_STATUS.map((item) => ({
+                title: this.$t(item.key),
+                value: item.value,
+            })),
         };
     },
     computed: {
-        sortArray() {
-            if (!this.query.sort_column) {
-                return [];
-            }
-
-            return [
-                {
-                    key: this.query.sort_column,
-                    order: this.query.sort_direction,
-                },
-            ];
-        },
         headers() {
             const headers = [
                 {
@@ -221,7 +260,7 @@ export default {
                 {
                     title: this.$t("request.column_title"),
                     key: "title",
-                    minWidth: 260,
+                    minWidth: 400,
                     filterComponent: markRaw(FilterText),
                 },
                 {
@@ -262,7 +301,7 @@ export default {
                 minWidth: 170,
                 filterComponent: this.showStatusFilter
                     ? markRaw(FilterSelect)
-                    : null,
+                    : markRaw(FilterPlaceholder),
                 items: this.statusFilterItems,
             });
 
@@ -277,60 +316,18 @@ export default {
         },
     },
     methods: {
-        emitQuery(query) {
-            this.$emit("update:query", query);
-            this.$emit("reload", query);
-        },
-        onOptions(opt) {
-            this.emitQuery({
-                ...this.query,
-                page: 1,
-                sort_column: opt.sortBy?.length ? opt.sortBy[0].key : null,
-                sort_direction: opt.sortBy?.length ? opt.sortBy[0].order : null,
-            });
-        },
-        onPageChange(page) {
-            this.emitQuery({
-                ...this.query,
-                page,
-            });
-        },
-        onLimitChange(limit) {
-            this.emitQuery({
-                ...this.query,
-                page: 1,
-                limit,
-            });
-        },
-        onFilter(field, filterObj) {
-            const filters = (this.query.f ?? []).filter(
-                (item) => item.field !== field,
-            );
-            const hasValue =
-                filterObj.value !== undefined &&
-                filterObj.value !== null &&
-                filterObj.value !== "" &&
-                (!Array.isArray(filterObj.value) || filterObj.value.length > 0);
-
-            if (hasValue && filterObj.type) {
-                filters.push({
-                    field,
-                    operator: filterObj.type,
-                    value: filterObj.value,
-                });
-            }
-
-            this.emitQuery({
-                ...this.query,
-                page: 1,
-                f: filters,
-            });
-        },
         getRequestStatusLabel(status) {
-            return functionHelper.getRequestStatusLabel(status);
+            const requestStatus = constant.REQUEST_STATUS.find(
+                (item) => item.value === status,
+            );
+
+            return requestStatus ? this.$t(requestStatus.key) : status || "--";
         },
         getRequestStatusColor(status) {
-            return functionHelper.getRequestStatusColor(status);
+            return (
+                constant.REQUEST_STATUS.find((item) => item.value === status)
+                    ?.color || "primary"
+            );
         },
         getRequestTypeTitle(type) {
             return (

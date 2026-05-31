@@ -7,6 +7,7 @@ namespace App\EventListener;
 use App\Class\CustomResponse;
 use App\Entity\User;
 use App\Service\DepartmentService;
+use App\Service\PermissionCheckerService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,6 +25,7 @@ class PermissionListener
     public function __construct(
         private readonly Security $security,
         private readonly DepartmentService $departmentService,
+        private readonly PermissionCheckerService $permissionCheckerService,
     ) {}
 
     protected $excludedRoutes = [
@@ -45,7 +47,6 @@ class PermissionListener
 
         $request = $event->getRequest();
         $path    = $request->getPathInfo();
-        $method  = $request->getMethod();
 
         $user = $this->security->getUser();
 
@@ -71,24 +72,11 @@ class PermissionListener
 
         $userPermission = $this->departmentService->getCachedUserPermissions($user->getId());
 
-        $path = str_replace("/api/", "", $path);
-
-        $action = convertMethod($path, $method);
-
-        $permission = null;
-        foreach ($userPermission ?? [] as $item) {
-            if (str_contains($path, $item['name']) && ($item['actions'][$action] ?? false) === true) {
-                $permission = $item;
-                break;
-            }
-        }
-
-        if (!$permission) {
+        if (!$this->permissionCheckerService->hasAccess($request, $userPermission ?? [])) {
             $event->setResponse(CustomResponse::error(
                 "Bạn không có quyền truy cập vào nội dung này",
                 Response::HTTP_FORBIDDEN
             ));
-            return;
         }
     }
 

@@ -26,32 +26,101 @@
                         class="permission-module-list"
                         nav
                         density="comfortable"
+                        v-model:opened="openedGroups"
+                        open-strategy="single"
                     >
-                        <v-list-item
-                            v-for="(permission, index) in permissions"
-                            :key="permission.name"
-                            :active="index === activePermissionIndex"
-                            color="primary"
-                            rounded="lg"
-                            @click="setActivePermissionIndex(index)"
-                        >
-                            <v-list-item-title>
-                                {{ formatModuleName(permission.name) }}
-                            </v-list-item-title>
+                        <template v-for="group in moduleGroups" :key="group.key">
+                            <v-list-group
+                                v-if="group.children.length"
+                                :value="group.key"
+                            >
+                                <template #activator="{ props }">
+                                    <v-list-item
+                                        v-bind="props"
+                                        :active="
+                                            group.parentIndex === activePermissionIndex
+                                        "
+                                        color="primary"
+                                        rounded="lg"
+                                        @click="handleParentClick(group)"
+                                    >
+                                        <v-list-item-title
+                                            class="permission-module-title"
+                                        >
+                                            <span>
+                                                {{ formatModuleName(group.key) }}
+                                            </span>
+                                            <v-chip
+                                                size="small"
+                                                variant="tonal"
+                                                color="primary"
+                                            >
+                                                {{
+                                                    group.parentPermission
+                                                        ? getPermissionActionList(
+                                                              group.parentPermission,
+                                                          ).length
+                                                        : group.children.length
+                                                }}
+                                            </v-chip>
+                                        </v-list-item-title>
+                                    </v-list-item>
+                                </template>
 
-                            <template #append>
-                                <v-chip
-                                    size="small"
-                                    variant="tonal"
+                                <v-list-item
+                                    v-for="child in group.children"
+                                    :key="child.permission.name"
+                                    :active="child.index === activePermissionIndex"
                                     color="primary"
+                                    rounded="lg"
+                                    @click="setActivePermissionIndex(child.index)"
                                 >
-                                    {{
-                                        getPermissionActionList(permission)
-                                            .length
-                                    }}
-                                </v-chip>
-                            </template>
-                        </v-list-item>
+                                    <v-list-item-title
+                                        class="permission-module-title"
+                                    >
+                                        <span>{{ child.label }}</span>
+                                        <v-chip
+                                            size="small"
+                                            variant="tonal"
+                                            color="primary"
+                                        >
+                                            {{
+                                                getPermissionActionList(
+                                                    child.permission,
+                                                ).length
+                                            }}
+                                        </v-chip>
+                                    </v-list-item-title>
+                                </v-list-item>
+                            </v-list-group>
+
+                            <v-list-item
+                                v-else-if="group.parentPermission"
+                                :active="group.parentIndex === activePermissionIndex"
+                                color="primary"
+                                rounded="lg"
+                                @click="setActivePermissionIndex(group.parentIndex)"
+                            >
+                                <v-list-item-title
+                                    class="permission-module-title"
+                                >
+                                    <span>
+                                        {{ formatModuleName(group.key) }}
+                                    </span>
+                                    <v-chip
+                                        size="small"
+                                        variant="tonal"
+                                        color="primary"
+                                    >
+                                        {{
+                                            getPermissionActionList(
+                                                group.parentPermission,
+                                            ).length
+                                        }}
+                                    </v-chip>
+                                </v-list-item-title>
+                            </v-list-item>
+                        </template>
                     </v-list>
                 </v-card>
             </v-col>
@@ -222,7 +291,6 @@
 </template>
 
 <script>
-import { constant } from "@/utils/constants/constant";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
@@ -249,6 +317,7 @@ export default {
         return {
             permissionStates: [],
             activePermissionIndex: 0,
+            openedGroups: [],
             syncingFromModel: false,
         };
     },
@@ -263,8 +332,42 @@ export default {
         permissionLoading() {
             return this.defaultPermissionsLoading;
         },
-        availableActions() {
-            return constant.ACTIONS;
+        moduleGroups() {
+            const groupsByKey = {};
+            const orderedKeys = [];
+
+            this.permissions.forEach((permission, index) => {
+                const name = permission?.name || "";
+                const [rootKey, ...childSegments] = name.split(":");
+
+                if (!rootKey) {
+                    return;
+                }
+
+                if (!groupsByKey[rootKey]) {
+                    groupsByKey[rootKey] = {
+                        key: rootKey,
+                        parentPermission: null,
+                        parentIndex: null,
+                        children: [],
+                    };
+                    orderedKeys.push(rootKey);
+                }
+
+                if (!childSegments.length) {
+                    groupsByKey[rootKey].parentPermission = permission;
+                    groupsByKey[rootKey].parentIndex = index;
+                    return;
+                }
+
+                groupsByKey[rootKey].children.push({
+                    index,
+                    permission,
+                    label: this.formatChildModuleName(name),
+                });
+            });
+
+            return orderedKeys.map((key) => groupsByKey[key]);
         },
         activePermission() {
             return this.permissions[this.activePermissionIndex] || null;
@@ -293,6 +396,7 @@ export default {
         permissions: {
             handler() {
                 this.activePermissionIndex = 0;
+                this.openedGroups = [];
                 this.syncPermissionStates();
             },
             deep: true,
@@ -396,18 +500,46 @@ export default {
         },
         setActivePermissionIndex(index) {
             this.activePermissionIndex = index;
+
+            const rootKey = this.permissions[index]?.name?.split(":")[0];
+            this.openedGroups = rootKey ? [rootKey] : [];
+        },
+        handleParentClick(group) {
+            const targetIndex =
+                group.parentIndex ?? group.children[0]?.index ?? null;
+
+            if (
+                targetIndex !== null &&
+                targetIndex !== this.activePermissionIndex
+            ) {
+                this.setActivePermissionIndex(targetIndex);
+            }
         },
         getPermissionActionList(permission) {
             if (!permission?.actions) {
                 return [];
             }
 
-            return this.availableActions.filter(
-                (action) => permission.actions[action.key] !== undefined,
-            );
+            return Object.keys(permission.actions).map((actionKey) => ({
+                key: actionKey,
+                label: permission.actionLabel?.[actionKey] || actionKey,
+            }));
         },
         formatModuleName(name) {
             return name
+                .split(":")
+                .map((segment) => this.formatModuleSegment(segment))
+                .join(" / ");
+        },
+        formatChildModuleName(name) {
+            const [, ...childSegments] = name.split(":");
+
+            return childSegments
+                .map((segment) => this.formatModuleSegment(segment))
+                .join(" / ");
+        },
+        formatModuleSegment(segment) {
+            return segment
                 .split("-")
                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                 .join(" ");
@@ -446,6 +578,14 @@ export default {
 .permission-module-list {
     max-height: 520px;
     overflow: auto;
+}
+
+.permission-module-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
 }
 
 .permission-checkbox-row {

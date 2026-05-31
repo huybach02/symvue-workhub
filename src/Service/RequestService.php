@@ -22,6 +22,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class RequestService
 {
+    private const REQUEST_PERMISSION_PREFIX = 'requests:';
+
     public function __construct(
         private readonly RequestRepository $requestRepository,
         private readonly RequestApprovalStepRepository $requestApprovalStepRepository,
@@ -42,7 +44,26 @@ class RequestService
 
     public function getAll(array $params, User $currentUser): array
     {
-        $result = $this->requestRepository->findWithPaginationForUser($params, $currentUser);
+        $allowedTypes = [];
+
+        if (!isAdmin($currentUser)) {
+            $allowedTypes = $this->getAllowedRequestTypes($currentUser, 'approve');
+            $requestedType = trim((string) ($params['type'] ?? ''));
+
+            if ($requestedType !== '' && !in_array($requestedType, $allowedTypes, true)) {
+                throw new \Exception(t('request.error.cannot_access_type'));
+            }
+
+            if ($allowedTypes === []) {
+                throw new \Exception(t('request.error.cannot_access_type'));
+            }
+        }
+
+        $result = $this->requestRepository->findWithPaginationForUser(
+            $params,
+            $currentUser,
+            $allowedTypes,
+        );
         $result['collection'] = array_map(
             fn(Request $request) => $this->serializeRequest($request, $currentUser),
             $result['collection']
@@ -399,6 +420,19 @@ class RequestService
             ->setStatus(RequestConstant::STATUS_PENDING);
 
         return $approvalStep;
+    }
+
+    private function getAllowedRequestTypes(User $currentUser, string $action): array
+    {
+        if (isAdmin($currentUser)) {
+            return RequestConstant::allTypes();
+        }
+
+        return getPermissionSuffixesByPrefix(
+            $this->userService->getUserPermission($currentUser->getId()),
+            self::REQUEST_PERMISSION_PREFIX,
+            $action,
+        );
     }
 
     private function createWatchers(Request $request, array $watcherIds): void

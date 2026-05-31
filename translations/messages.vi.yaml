@@ -39,6 +39,19 @@ error:
     user_already_member: "Người dùng đã là thành viên của bộ phận này. Vui lòng chọn lại"
     bo_phan_has_position: "Phòng ban/Bộ phận %name% (Mã: %ma_bo_phan%) có tồn tại chức vụ. Vui lòng xóa hết chức vụ trước khi xóa Phòng ban/Bộ phận"
     cannot_delete_work_shift: "Không thể xóa ca làm việc đã bắt đầu hoặc đã qua"
+permission:
+    actions:
+        index: "Xem danh sách"
+        create: "Thêm mới"
+        show: "Xem chi tiết"
+        edit: "Chỉnh sửa"
+        delete: "Xóa"
+        export: "Xuất file"
+        import: "Import file"
+        showMenu: "Hiển thị menu"
+        approve: "Duyệt"
+        reject: "Từ chối"
+        cancel: "Hủy"
 success:
     created: "Tạo mới thành công"
     updated: "Cập nhật thành công"
@@ -70,6 +83,7 @@ request:
         primary_department_not_found: "Không xác định được bộ phận chính của người tạo đề xuất"
         approver_not_found: "Không tìm thấy quản lý trực tiếp hoặc admin để duyệt đề xuất"
         invalid_leave_payload_for_apply: "Dữ liệu nghỉ phép không hợp lệ để áp dụng"
+        cannot_access_type: "Bạn không có quyền truy cập vào loại đề xuất này"
         cannot_update: "Bạn không có quyền cập nhật đề xuất này"
         only_rejected_can_update: "Chỉ có thể cập nhật đề xuất đang bị từ chối"
         reject_reason_required: "Vui lòng nhập lý do từ chối"

@@ -199,11 +199,15 @@ export default {
             return this.dataCalendar?.users ?? [];
         },
         events() {
-            return (
-                this.dataCalendar?.events?.filter(
+            const events = this.dataCalendar?.events ?? [];
+
+            if (this.currentMode === "day") {
+                return events.filter(
                     (event) => event.startTime && event.endTime,
-                ) ?? []
-            );
+                );
+            }
+
+            return events;
         },
         shifts() {
             return (

@@ -158,26 +158,6 @@ export const functionHelper = {
             return mergedRanges;
         }, []);
     },
-    getRequestStatusLabel(status) {
-        const labels = {
-            pending: i18n.global.t("request.status.pending"),
-            rejected: i18n.global.t("request.status.rejected"),
-            approved: i18n.global.t("request.status.approved"),
-            cancelled: i18n.global.t("request.status.cancelled"),
-        };
-
-        return labels[status] || status || "--";
-    },
-    getRequestStatusColor(status) {
-        const colors = {
-            pending: "warning",
-            rejected: "error",
-            approved: "success",
-            cancelled: "grey",
-        };
-
-        return colors[status] || "primary";
-    },
     getRequestEventTitle(eventType) {
         const labels = {
             created: i18n.global.t("request.event.created"),

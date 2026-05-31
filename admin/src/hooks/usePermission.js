@@ -1,8 +1,6 @@
-import { useStore } from "vuex";
+import store from "@/store";
 
-export const usePermission = (path) => {
-    const store = useStore();
-
+export const usePermission = (path, permissionName) => {
     const user = store.getters["auth/currentUser"];
 
     if (user?.roles?.includes("ROLE_ADMIN")) {
@@ -33,6 +31,13 @@ export const usePermission = (path) => {
     const phanQuyen = user?.permissions || [];
     const pathNameArr = path.split("/");
     const lastPathName = pathNameArr.pop() || "";
+
+    if (permissionName) {
+        return (
+            user.permissions.find((item) => item.name === permissionName)?.actions ||
+            {}
+        );
+    }
 
     const checkPermission = phanQuyen.find((item) => {
         if (pathNameArr.length > 0 && lastPathName.includes(item.name)) {

@@ -5,6 +5,7 @@ use App\Entity\Request;
 use App\Entity\User;
 use App\Class\TranslationHelper;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
 
 if (!function_exists('t')) {
     function t(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
@@ -200,6 +201,98 @@ if (!function_exists('convertMethod')) {
         }
 
         return "index";
+    }
+}
+
+if (!function_exists('getRequestBodyValue')) {
+    function getRequestBodyValue(HttpRequest $request, string $key): mixed
+    {
+        if ($key === '') {
+            return null;
+        }
+
+        try {
+            $data = $request->toArray();
+        } catch (\Throwable) {
+            return null;
+        }
+
+        return $data[$key] ?? null;
+    }
+}
+
+if (!function_exists('normalizePermissionSegment')) {
+    function normalizePermissionSegment(mixed $value): ?string
+    {
+        if (!is_scalar($value)) {
+            return null;
+        }
+
+        $normalized = trim((string) $value);
+
+        return $normalized !== '' ? $normalized : null;
+    }
+}
+
+if (!function_exists('resolveEntityClass')) {
+    function resolveEntityClass(mixed $entity): ?string
+    {
+        if (!is_string($entity) || $entity === '') {
+            return null;
+        }
+
+        return class_exists($entity) ? $entity : null;
+    }
+}
+
+if (!function_exists('readObjectField')) {
+    function readObjectField(object $object, string $field): mixed
+    {
+        $camelField = str_replace(' ', '', ucwords(str_replace(['_', '-'], ' ', $field)));
+        $getter = 'get' . $camelField;
+        $isser = 'is' . $camelField;
+
+        if (method_exists($object, $getter)) {
+            return $object->{$getter}();
+        }
+
+        if (method_exists($object, $isser)) {
+            return $object->{$isser}();
+        }
+
+        return null;
+    }
+}
+
+if (!function_exists('getPermissionSuffixesByPrefix')) {
+    function getPermissionSuffixesByPrefix(
+        array $permissions,
+        string $prefix,
+        string $action,
+    ): array {
+        $suffixes = [];
+
+        foreach ($permissions as $permission) {
+            $name = (string) ($permission['name'] ?? '');
+            $actions = $permission['actions'] ?? [];
+
+            if (!str_starts_with($name, $prefix)) {
+                continue;
+            }
+
+            if (($actions[$action] ?? false) !== true) {
+                continue;
+            }
+
+            $suffixes[] = substr($name, strlen($prefix));
+        }
+
+        $suffixes = array_filter(
+            array_unique($suffixes),
+            static fn(string $suffix): bool => $suffix !== '',
+        );
+
+        return array_values($suffixes);
     }
 }
 

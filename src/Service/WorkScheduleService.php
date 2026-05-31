@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Class\Constanst;
 use App\Class\FilterWithPagination;
+use App\Class\Request\RequestConstant;
 use App\DTO\WorkScheduleDTO;
 use App\DTO\WorkScheduleFulltimeDTO;
 use App\DTO\WorkScheduleFulltimeOverrideDTO;
@@ -106,36 +107,52 @@ class WorkScheduleService
         ]);
         $leaveSchedules = $this->leaveScheduleRepository->findBy([
             "member" => $memberIds,
+            "status" => RequestConstant::STATUS_APPROVED,
         ]);
 
         // Lấy danh sách ngày nghỉ lễ để loại trừ
         $holidayDates = $this->getHolidayDatesMap();
 
-        $events = [];
+        $workEvents = [];
+        $leaveEvents = [];
 
         foreach ($groups as $group) {
             foreach ($this->buildEventsFromFixedScheduleGroup($group, $holidayDates) as $event) {
-                $events[$this->getEventMapKey($event)] = $event;
+                $workEvents[$this->getEventMapKey($event)] = $event;
             }
         }
 
         foreach ($overrides as $override) {
             foreach ($this->buildEventsFromOverride($override) as $event) {
-                $events[$this->getEventMapKey($event)] = $event;
+                $workEvents[$this->getEventMapKey($event)] = $event;
             }
         }
 
         foreach ($leaveSchedules as $leaveSchedule) {
             foreach ($this->buildEventsFromLeaveSchedule($leaveSchedule) as $event) {
-                $events[$this->getEventMapKey($event)] = $event;
+                $leaveEvents[] = $event;
             }
         }
+
+        $events = [...array_values($workEvents), ...$leaveEvents];
 
         usort(
             $events,
             fn(array $left, array $right): int => strcmp(
-                "{$left['date']}-{$left['user_id']}-{$left['startTime']}",
-                "{$right['date']}-{$right['user_id']}-{$right['startTime']}",
+                sprintf(
+                    "%s-%s-%d-%s",
+                    $left['date'],
+                    $left['user_id'],
+                    $this->getEventSortOrder($left),
+                    $left['startTime'] ?? '99:99',
+                ),
+                sprintf(
+                    "%s-%s-%d-%s",
+                    $right['date'],
+                    $right['user_id'],
+                    $this->getEventSortOrder($right),
+                    $right['startTime'] ?? '99:99',
+                ),
             ),
         );
 
@@ -632,12 +649,27 @@ class WorkScheduleService
 
     private function formatLeaveTitle(LeaveSchedule $leaveSchedule): string
     {
-        return $leaveSchedule->getType() ?: "Nghỉ phép";
+        return match ($leaveSchedule->getType()) {
+            "annual_leave" => "Nghỉ phép",
+            "unpaid_leave" => "Nghỉ không lương",
+            "personal_leave" => "Nghỉ việc riêng",
+            default => "Nghỉ phép",
+        };
     }
 
     private function getEventMapKey(array $event): string
     {
         return sprintf("%s-%s", $event["user_id"], $event["date"]);
+    }
+
+    private function getEventSortOrder(array $event): int
+    {
+        return match ($event['source'] ?? '') {
+            'fixed_schedule' => 1,
+            'fixed_schedule_override' => 2,
+            'leave_schedule' => 3,
+            default => 9,
+        };
     }
 
     public function getSpecialDays(?string $startDate, ?string $endDate): array

@@ -34,7 +34,7 @@
                 temporary
                 :scrim="false"
                 width="450"
-                style="z-index: 2100; top: 0; height: 100vh"
+                style="z-index: 3100; top: 0; height: 100vh"
             >
                 <div class="drawer-header ps-4 pt-3 pb-2">
                     <div class="d-flex align-center justify-space-between">
@@ -250,6 +250,7 @@ export default {
 .notification-wrapper {
     display: inline-flex;
     align-items: center;
+    position: relative;
 }
 
 .bell-shake {

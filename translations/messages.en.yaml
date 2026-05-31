@@ -39,6 +39,19 @@ error:
     user_already_member: "User already belongs to this department. Please choose another"
     bo_phan_has_position: "Department/Division %name% (Code: %ma_bo_phan%) has positions. Please remove all positions before deleting the department"
     cannot_delete_work_shift: "Cannot delete work shift that has started or passed the start time"
+permission:
+    actions:
+        index: "View list"
+        create: "Create"
+        show: "View detail"
+        edit: "Edit"
+        delete: "Delete"
+        export: "Export file"
+        import: "Import file"
+        showMenu: "Show menu"
+        approve: "Approve"
+        reject: "Reject"
+        cancel: "Cancel"
 success:
     created: "Created successfully"
     updated: "Updated successfully"
@@ -70,6 +83,7 @@ request:
         primary_department_not_found: "Cannot determine the requester's primary department"
         approver_not_found: "No direct manager or admin found to approve this request"
         invalid_leave_payload_for_apply: "Invalid leave payload for applying related data"
+        cannot_access_type: "You do not have permission to access this request type"
         cannot_update: "You do not have permission to update this request"
         only_rejected_can_update: "Only rejected requests can be updated"
         reject_reason_required: "Please enter a rejection reason"

@@ -200,7 +200,9 @@ export default {
             return this.events.filter(
                 (event) =>
                     event.user_id === userId &&
-                    event.date === this.baseDate.format("YYYY-MM-DD"),
+                    event.date === this.baseDate.format("YYYY-MM-DD") &&
+                    event.startTime &&
+                    event.endTime,
             );
         },
         getDayModeRowCells(userId) {

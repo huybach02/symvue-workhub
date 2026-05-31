@@ -180,9 +180,9 @@ export default {
 <style scoped>
 .popup-notification-stack {
     position: fixed;
-    top: 70px;
+    top: 60px;
     right: 16px;
-    z-index: 2200;
+    z-index: 3200;
     display: flex;
     flex-direction: column;
     gap: 10px;

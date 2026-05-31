@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     [
         "name" => "general-settings",
@@ -7,6 +9,11 @@ return [
             "index" => true,
             "edit" => true,
             "showMenu" => true,
+        ],
+        "actionLabel" => [
+            "index" => t("permission.actions.index"),
+            "edit" => t("permission.actions.edit"),
+            "showMenu" => t("permission.actions.showMenu"),
         ],
     ],
     [
@@ -18,6 +25,14 @@ return [
             "edit" => true,
             "delete" => true,
             "showMenu" => true,
+        ],
+        "actionLabel" => [
+            "index" => t("permission.actions.index"),
+            "create" => t("permission.actions.create"),
+            "show" => t("permission.actions.show"),
+            "edit" => t("permission.actions.edit"),
+            "delete" => t("permission.actions.delete"),
+            "showMenu" => t("permission.actions.showMenu"),
         ],
     ],
     [
@@ -32,6 +47,16 @@ return [
             "import" => true,
             "showMenu" => true,
         ],
+        "actionLabel" => [
+            "index" => t("permission.actions.index"),
+            "create" => t("permission.actions.create"),
+            "show" => t("permission.actions.show"),
+            "edit" => t("permission.actions.edit"),
+            "delete" => t("permission.actions.delete"),
+            "export" => t("permission.actions.export"),
+            "import" => t("permission.actions.import"),
+            "showMenu" => t("permission.actions.showMenu"),
+        ],
     ],
     [
         "name" => "vai-tro",
@@ -42,6 +67,14 @@ return [
             "edit" => true,
             "delete" => true,
             "showMenu" => true,
+        ],
+        "actionLabel" => [
+            "index" => t("permission.actions.index"),
+            "create" => t("permission.actions.create"),
+            "show" => t("permission.actions.show"),
+            "edit" => t("permission.actions.edit"),
+            "delete" => t("permission.actions.delete"),
+            "showMenu" => t("permission.actions.showMenu"),
         ],
     ],
     [
@@ -54,6 +87,14 @@ return [
             "delete" => true,
             "showMenu" => true,
         ],
+        "actionLabel" => [
+            "index" => t("permission.actions.index"),
+            "create" => t("permission.actions.create"),
+            "show" => t("permission.actions.show"),
+            "edit" => t("permission.actions.edit"),
+            "delete" => t("permission.actions.delete"),
+            "showMenu" => t("permission.actions.showMenu"),
+        ],
     ],
     [
         "name" => "notifications",
@@ -61,6 +102,11 @@ return [
             "index" => true,
             "create" => true,
             "showMenu" => true,
+        ],
+        "actionLabel" => [
+            "index" => t("permission.actions.index"),
+            "create" => t("permission.actions.create"),
+            "showMenu" => t("permission.actions.showMenu"),
         ],
     ],
     [
@@ -73,16 +119,70 @@ return [
             "delete" => true,
             "showMenu" => true,
         ],
+        "actionLabel" => [
+            "index" => t("permission.actions.index"),
+            "create" => t("permission.actions.create"),
+            "show" => t("permission.actions.show"),
+            "edit" => t("permission.actions.edit"),
+            "delete" => t("permission.actions.delete"),
+            "showMenu" => t("permission.actions.showMenu"),
+        ],
     ],
     [
         "name" => "requests",
+        "actions" => [
+            "index" => true,
+            "showMenu" => true,
+        ],
+        "actionLabel" => [
+            "index" => t("permission.actions.index"),
+            "showMenu" => t("permission.actions.showMenu"),
+        ],
+    ],
+    [
+        "name" => "requests:leave",
         "actions" => [
             "index" => true,
             "create" => true,
             "show" => true,
             "edit" => true,
             "delete" => true,
-            "showMenu" => true,
+            "approve" => true,
+            "reject" => true,
+            "cancel" => true,
+        ],
+        "actionLabel" => [
+            "index" => t("permission.actions.index"),
+            "create" => t("permission.actions.create"),
+            "show" => t("permission.actions.show"),
+            "edit" => t("permission.actions.edit"),
+            "delete" => t("permission.actions.delete"),
+            "approve" => t("permission.actions.approve"),
+            "reject" => t("permission.actions.reject"),
+            "cancel" => t("permission.actions.cancel"),
+        ],
+    ],
+    [
+        "name" => "requests:stock:stock-in",
+        "actions" => [
+            "index" => true,
+            "create" => true,
+            "show" => true,
+            "edit" => true,
+            "delete" => true,
+            "approve" => true,
+            "reject" => true,
+            "cancel" => true,
+        ],
+        "actionLabel" => [
+            "index" => t("permission.actions.index"),
+            "create" => t("permission.actions.create"),
+            "show" => t("permission.actions.show"),
+            "edit" => t("permission.actions.edit"),
+            "delete" => t("permission.actions.delete"),
+            "approve" => t("permission.actions.approve"),
+            "reject" => t("permission.actions.reject"),
+            "cancel" => t("permission.actions.cancel"),
         ],
     ],
 ];
