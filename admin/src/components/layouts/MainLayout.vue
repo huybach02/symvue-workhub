@@ -35,6 +35,7 @@ import { EventSourcePolyfill } from "event-source-polyfill";
 import { topicMercure } from "@/configs/topicMercure";
 import axiosInstance from "@/configs/axios";
 import presenceService from "@/services/presenceService";
+import { mapActions } from "vuex";
 
 export default {
     name: "MainLayout",
@@ -58,6 +59,9 @@ export default {
             return this.$vuetify.display.mobile;
         },
     },
+    created() {
+        this.fetchDefaultPermissions();
+    },
     watch: {
         currentUser(newVal) {
             if (newVal && newVal.id) {
@@ -78,6 +82,7 @@ export default {
         presenceService.stopPresence();
     },
     methods: {
+        ...mapActions("department", ["fetchDefaultPermissions"]),
         clearReadTimers(conversationId) {
             const timers = this.pendingReadTimers[conversationId] ?? [];
             timers.forEach((timerId) => window.clearTimeout(timerId));

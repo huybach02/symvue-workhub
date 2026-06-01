@@ -36,7 +36,8 @@ class UserService
         private readonly DepartmentService $boPhanService,
         private readonly UserPositionRepository $userPositionRepository,
         private readonly UserPermissionRepository $userPermissionRepository,
-    ) {}
+    ) {
+    }
 
     public function findAll(array $params): array
     {
@@ -703,9 +704,9 @@ class UserService
     ): User {
         $primaryPosition = $this->userPositionRepository->findLatestPrimaryPositionByUser($user);
 
-        if (!$primaryPosition || !$primaryPosition->getDepartment()) {
-            throw new \Exception(t('request.error.primary_department_not_found'));
-        }
+        // if (!$primaryPosition || !$primaryPosition->getDepartment()) {
+        //     throw new \Exception(t('request.error.primary_department_not_found'));
+        // }
 
         $approver = $this->userPositionRepository->findPrimaryManagerByDepartmentExcludingUser(
             $primaryPosition->getDepartment(),

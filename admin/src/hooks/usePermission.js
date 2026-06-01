@@ -2,30 +2,23 @@ import store from "@/store";
 
 export const usePermission = (path, permissionName) => {
     const user = store.getters["auth/currentUser"];
+    const defaultPermissions = store.getters["department/defaultPermissions"];
 
     if (user?.roles?.includes("ROLE_ADMIN")) {
-        return {
-            index: true,
-            create: true,
-            show: true,
-            edit: true,
-            delete: true,
-            export: true,
-            import: true,
-            showMenu: true,
-        };
+        user.permissions = defaultPermissions;
     }
 
     if (!user?.permissions) {
-        return {
-            index: false,
-            create: false,
-            show: false,
-            edit: false,
-            delete: false,
-            export: false,
-            showMenu: false,
-        };
+        user.permissions = defaultPermissions.map((permission) => ({
+            ...permission,
+            actions: Object.keys(permission?.actions ?? {}).reduce(
+                (acc, actionKey) => {
+                    acc[actionKey] = false;
+                    return acc;
+                },
+                {},
+            ),
+        }));
     }
 
     const phanQuyen = user?.permissions || [];
@@ -34,8 +27,8 @@ export const usePermission = (path, permissionName) => {
 
     if (permissionName) {
         return (
-            user.permissions.find((item) => item.name === permissionName)?.actions ||
-            {}
+            user.permissions.find((item) => item.name === permissionName)
+                ?.actions || {}
         );
     }
 
