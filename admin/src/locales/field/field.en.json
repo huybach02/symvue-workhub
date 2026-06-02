@@ -78,6 +78,24 @@
     "requester_position": "Position",
     "request_created_at": "Request Created At",
     "request_reason": "Request Reason",
-    "handover_note": "Handover Note"
+    "handover_note": "Handover Note",
+    "checkInGraceMinutes": "Check-in grace minutes",
+    "lateLimitMinutes": "Late limit minutes",
+    "checkInEarliestMinutes": "Check-in earliest minutes",
+    "checkOutGraceMinutes": "Check-out grace minutes",
+    "checkOutLatestMinutes": "Check-out latest minutes",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "radiusMeters": "Valid radius",
+    "addressDisplay": "Display address",
+    "ipAddress": "Valid IP address",
+    "qrTtlSeconds": "QR code TTL",
+    "photoRetentionDays": "Photo retention days",
+    "maxDevicesPerEmployee": "Max devices per employee",
+    "sameDeviceMaxEmployees": "Max employees per device",
+    "remindMissingCheckIn": "Remind missing check-in",
+    "remindMissingCheckOut": "Remind missing check-out",
+    "checkInReminderMinutesBefore": "Check-in reminder minutes before",
+    "checkOutReminderMinutesBefore": "Check-out reminder minutes before"
   }
 }

@@ -82,6 +82,24 @@
     "requester_position": "Chức vụ",
     "request_created_at": "Ngày tạo đề xuất",
     "request_reason": "Lý do đề xuất",
-    "handover_note": "Ghi chú bàn giao"
+    "handover_note": "Ghi chú bàn giao",
+    "checkInGraceMinutes": "Cho phép vào trễ không tính trễ",
+    "lateLimitMinutes": "Thời gian trễ tối đa",
+    "checkInEarliestMinutes": "Cho phép chấm công sớm tối đa",
+    "checkOutGraceMinutes": "Cho phép ra sớm không bị tính về sớm",
+    "checkOutLatestMinutes": "Cho phép chấm công muộn tối đa",
+    "latitude": "Vĩ độ",
+    "longitude": "Kinh độ",
+    "radiusMeters": "Bán kính hợp lệ",
+    "addressDisplay": "Địa chỉ hiển thị",
+    "ipAddress": "Địa chỉ IP hợp lệ",
+    "qrTtlSeconds": "Thời gian hết hạn mã QR",
+    "photoRetentionDays": "Thời hạn lưu trữ ảnh chấm công",
+    "maxDevicesPerEmployee": "Số thiết bị chấm công tối đa cho mỗi nhân viên",
+    "sameDeviceMaxEmployees": "Số nhân viên tối đa chấm công cùng thiết bị",
+    "remindMissingCheckIn": "Nhắc nhở đến giờ chấm công vào",
+    "remindMissingCheckOut": "Nhắc nhở đến giờ chấm công ra",
+    "checkInReminderMinutesBefore": "Nhắc nhở chấm công vào trước",
+    "checkOutReminderMinutesBefore": "Nhắc nhở chấm công ra trước"
   }
 }

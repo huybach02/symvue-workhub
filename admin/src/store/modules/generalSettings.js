@@ -10,6 +10,24 @@ const defaultValues = {
     thoiHanXacThucLaiThietBi: 0,
     kiemTraThoiGianLamViec: false,
     soThietBiDangNhapToiDa: 0,
+    checkInGraceMinutes: 0,
+    lateLimitMinutes: 0,
+    checkInEarliestMinutes: 0,
+    checkOutGraceMinutes: 0,
+    checkOutLatestMinutes: 0,
+    latitude: 0,
+    longitude: 0,
+    radiusMeters: 0,
+    addressDisplay: "",
+    ipAddress: "",
+    qrTtlSeconds: 0,
+    photoRetentionDays: 0,
+    maxDevicesPerEmployee: 0,
+    sameDeviceMaxEmployees: 0,
+    remindMissingCheckIn: false,
+    remindMissingCheckOut: false,
+    checkInReminderMinutesBefore: 0,
+    checkOutReminderMinutesBefore: 0,
 };
 
 const configMapping = {
@@ -20,9 +38,36 @@ const configMapping = {
     THOI_HAN_XAC_THUC_LAI_THIET_BI: "thoiHanXacThucLaiThietBi",
     CHECK_THOI_GIAN_LAM_VIEC: "kiemTraThoiGianLamViec",
     SO_THIET_BI_DANG_NHAP_TOI_DA: "soThietBiDangNhapToiDa",
+    CHECK_IN_GRACE_MINUTES: "checkInGraceMinutes",
+    LATE_LIMIT_MINUTES: "lateLimitMinutes",
+    CHECK_IN_EARLIEST_MINUTES: "checkInEarliestMinutes",
+    CHECK_OUT_GRACE_MINUTES: "checkOutGraceMinutes",
+    CHECK_OUT_LATEST_MINUTES: "checkOutLatestMinutes",
+    LATITUDE: "latitude",
+    LONGITUDE: "longitude",
+    RADIUS_METERS: "radiusMeters",
+    ADDRESS_DISPLAY: "addressDisplay",
+    IP_ADDRESS: "ipAddress",
+    QR_TTL_SECONDS: "qrTtlSeconds",
+    PHOTO_RETENTION_DAYS: "photoRetentionDays",
+    MAX_DEVICES_PER_EMPLOYEE: "maxDevicesPerEmployee",
+    SAME_DEVICE_MAX_EMPLOYEES: "sameDeviceMaxEmployees",
+    REMIND_MISSING_CHECK_IN: "remindMissingCheckIn",
+    REMIND_MISSING_CHECK_OUT: "remindMissingCheckOut",
+    CHECK_IN_REMINDER_MINUTES_BEFORE: "checkInReminderMinutesBefore",
+    CHECK_OUT_REMINDER_MINUTES_BEFORE: "checkOutReminderMinutesBefore",
 };
 
-const booleanFields = ["xacThuc2YeuTo", "kiemTraThoiGianLamViec"];
+const booleanFields = [
+    "xacThuc2YeuTo",
+    "kiemTraThoiGianLamViec",
+    "remindMissingCheckIn",
+    "remindMissingCheckOut",
+];
+
+const stringFields = ["addressDisplay", "ipAddress"];
+
+const decimalFields = ["latitude", "longitude"];
 
 const mapConfigToValues = (settings = []) => {
     const values = { ...defaultValues };
@@ -34,9 +79,15 @@ const mapConfigToValues = (settings = []) => {
             return;
         }
 
-        values[key] = booleanFields.includes(key)
-            ? item.giaTri === "1"
-            : parseInt(item.giaTri);
+        if (booleanFields.includes(key)) {
+            values[key] = item.giaTri === "1";
+        } else if (stringFields.includes(key)) {
+            values[key] = item.giaTri ?? "";
+        } else if (decimalFields.includes(key)) {
+            values[key] = parseFloat(item.giaTri);
+        } else {
+            values[key] = parseInt(item.giaTri);
+        }
     });
 
     return values;

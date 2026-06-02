@@ -35,6 +35,24 @@ final class GeneralSettingService
                 'thoiHanXacThucLaiThietBi' => 'THOI_HAN_XAC_THUC_LAI_THIET_BI',
                 'kiemTraThoiGianLamViec' => 'CHECK_THOI_GIAN_LAM_VIEC',
                 'soThietBiDangNhapToiDa' => 'SO_THIET_BI_DANG_NHAP_TOI_DA',
+                'checkInGraceMinutes' => 'CHECK_IN_GRACE_MINUTES',
+                'lateLimitMinutes' => 'LATE_LIMIT_MINUTES',
+                'checkInEarliestMinutes' => 'CHECK_IN_EARLIEST_MINUTES',
+                'checkOutGraceMinutes' => 'CHECK_OUT_GRACE_MINUTES',
+                'checkOutLatestMinutes' => 'CHECK_OUT_LATEST_MINUTES',
+                'latitude' => 'LATITUDE',
+                'longitude' => 'LONGITUDE',
+                'radiusMeters' => 'RADIUS_METERS',
+                'addressDisplay' => 'ADDRESS_DISPLAY',
+                'ipAddress' => 'IP_ADDRESS',
+                'qrTtlSeconds' => 'QR_TTL_SECONDS',
+                'photoRetentionDays' => 'PHOTO_RETENTION_DAYS',
+                'maxDevicesPerEmployee' => 'MAX_DEVICES_PER_EMPLOYEE',
+                'sameDeviceMaxEmployees' => 'SAME_DEVICE_MAX_EMPLOYEES',
+                'remindMissingCheckIn' => 'REMIND_MISSING_CHECK_IN',
+                'remindMissingCheckOut' => 'REMIND_MISSING_CHECK_OUT',
+                'checkInReminderMinutesBefore' => 'CHECK_IN_REMINDER_MINUTES_BEFORE',
+                'checkOutReminderMinutesBefore' => 'CHECK_OUT_REMINDER_MINUTES_BEFORE',
             ];
 
             $cauHinhChungList = $this->cauHinhChungRepository->findAll();
@@ -45,6 +63,10 @@ final class GeneralSettingService
             }
 
             foreach ($mapping as $dtoField => $tenCauHinh) {
+                if (!property_exists($cauHinhChungDTO, $dtoField)) {
+                    continue;
+                }
+
                 $giaTri = $cauHinhChungDTO->$dtoField;
 
                 if (is_bool($giaTri)) {

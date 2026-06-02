@@ -62,16 +62,27 @@
 
             <v-divider class="my-5" />
 
-            <div class="text-h6 font-weight-bold mb-5 d-flex align-center ga-2">
+            <v-sheet
+                color="primary"
+                theme="dark"
+                class="pa-3 mb-5 rounded d-flex align-center ga-2 section-title"
+                elevation="1"
+            >
                 <v-icon icon="mdi-wrench-outline" size="22" />
-                <p>{{ $t("system_config.login_fail_setting") }}</p>
-            </div>
+                <p class="text-h6 font-weight-bold ma-0">
+                    {{ $t("system_config.login_fail_setting") }}
+                </p>
+            </v-sheet>
             <v-row>
                 <v-col cols="12" md="3">
                     <VeeField
                         v-slot="{ field, errorMessage }"
                         name="soLanDangNhapSai"
                     >
+                        <div class="mb-2">
+                            {{ $t("system_config.max_login_fail") }}
+                            <span class="text-red"> * </span>
+                        </div>
                         <v-text-field
                             v-bind="field"
                             :error-messages="errorMessage"
@@ -79,12 +90,7 @@
                             variant="outlined"
                             :readonly="!isEditing"
                             persistent-placeholder
-                        >
-                            <template #label>
-                                {{ $t("system_config.max_login_fail") }}
-                                <span class="text-red">*</span>
-                            </template>
-                        </v-text-field>
+                        />
                     </VeeField>
                 </v-col>
                 <v-col cols="12" md="3">
@@ -92,6 +98,10 @@
                         v-slot="{ field, errorMessage }"
                         name="thoiGianTamKhoaTaiKhoan"
                     >
+                        <div class="mb-2">
+                            {{ $t("system_config.lock_account_time") }}
+                            <span class="text-red"> * </span>
+                        </div>
                         <v-text-field
                             v-bind="field"
                             :error-messages="errorMessage"
@@ -99,23 +109,25 @@
                             variant="outlined"
                             :readonly="!isEditing"
                             persistent-placeholder
-                        >
-                            <template #label>
-                                {{ $t("system_config.lock_account_time") }}
-                                <span class="text-red">*</span>
-                            </template>
-                        </v-text-field>
+                        />
                     </VeeField>
                 </v-col>
             </v-row>
 
             <v-divider class="my-5" />
 
-            <div class="text-h6 font-weight-bold mb-5 d-flex align-center ga-2">
+            <v-sheet
+                color="primary"
+                theme="dark"
+                class="pa-3 mb-5 rounded d-flex align-center ga-2"
+                elevation="1"
+            >
                 <v-icon icon="mdi-shield-check-outline" size="22" />
-                <p>{{ $t("system_config.two_factor_setting") }}</p>
-            </div>
-            <v-row>
+                <p class="text-h6 font-weight-bold ma-0">
+                    {{ $t("system_config.two_factor_setting") }}
+                </p>
+            </v-sheet>
+            <v-row align="center">
                 <v-col cols="12" md="3">
                     <VeeField
                         v-slot="{ field, errorMessage }"
@@ -136,6 +148,10 @@
                         v-slot="{ field, errorMessage }"
                         name="thoiGianHetHanMaOtp"
                     >
+                        <div class="mb-2">
+                            {{ $t("system_config.otp_expire_time") }}
+                            <span class="text-red"> * </span>
+                        </div>
                         <v-text-field
                             v-bind="field"
                             :error-messages="errorMessage"
@@ -143,12 +159,7 @@
                             variant="outlined"
                             :readonly="!isEditing"
                             persistent-placeholder
-                        >
-                            <template #label>
-                                {{ $t("system_config.otp_expire_time") }}
-                                <span class="text-red">*</span>
-                            </template>
-                        </v-text-field>
+                        />
                     </VeeField>
                 </v-col>
                 <v-col cols="12" md="3">
@@ -156,6 +167,10 @@
                         v-slot="{ field, errorMessage }"
                         name="soThietBiDangNhapToiDa"
                     >
+                        <div class="mb-2">
+                            {{ $t("system_config.max_device_login") }}
+                            <span class="text-red"> * </span>
+                        </div>
                         <v-text-field
                             v-bind="field"
                             :error-messages="errorMessage"
@@ -163,12 +178,7 @@
                             variant="outlined"
                             :readonly="!isEditing"
                             persistent-placeholder
-                        >
-                            <template #label>
-                                {{ $t("system_config.max_device_login") }}
-                                <span class="text-red">*</span>
-                            </template>
-                        </v-text-field>
+                        />
                     </VeeField>
                 </v-col>
                 <v-col cols="12" md="3">
@@ -176,6 +186,10 @@
                         v-slot="{ field, errorMessage }"
                         name="thoiHanXacThucLaiThietBi"
                     >
+                        <div class="mb-2">
+                            {{ $t("system_config.device_verify_time") }}
+                            <span class="text-red"> * </span>
+                        </div>
                         <v-text-field
                             v-bind="field"
                             :error-messages="errorMessage"
@@ -183,22 +197,24 @@
                             variant="outlined"
                             :readonly="!isEditing"
                             persistent-placeholder
-                        >
-                            <template #label>
-                                {{ $t("system_config.device_verify_time") }}
-                                <span class="text-red">*</span>
-                            </template>
-                        </v-text-field>
+                        />
                     </VeeField>
                 </v-col>
             </v-row>
 
             <v-divider class="my-5" />
 
-            <div class="text-h6 font-weight-bold mb-5 d-flex align-center ga-2">
+            <v-sheet
+                color="primary"
+                theme="dark"
+                class="pa-3 mb-5 rounded d-flex align-center ga-2"
+                elevation="1"
+            >
                 <v-icon icon="mdi-clock-outline" size="22" />
-                <p>{{ $t("system_config.working_time_setting") }}</p>
-            </div>
+                <p class="text-h6 font-weight-bold ma-0">
+                    {{ $t("system_config.working_time_setting") }}
+                </p>
+            </v-sheet>
             <v-row>
                 <v-col cols="12" md="3">
                     <VeeField
@@ -218,6 +234,458 @@
                     </VeeField>
                 </v-col>
             </v-row>
+
+            <v-divider class="my-5" />
+
+            <v-sheet
+                color="primary"
+                theme="dark"
+                class="pa-3 mb-5 rounded d-flex align-center ga-2"
+                elevation="1"
+            >
+                <v-icon icon="mdi-calendar-check-outline" size="22" />
+                <p class="text-h6 font-weight-bold ma-0">
+                    {{ $t("system_config.check_in_setting") }}
+                </p>
+            </v-sheet>
+
+            <v-card variant="outlined" class="mb-4">
+                <v-card-item>
+                    <v-card-title
+                        class="text-subtitle-1 d-flex align-center ga-2 pa-0"
+                    >
+                        <v-icon icon="mdi-clock-time-five-outline" size="20" />
+                        {{ $t("system_config.group_time_setting") }}
+                    </v-card-title>
+                </v-card-item>
+                <v-card-text>
+                    <v-row align="center">
+                        <v-col cols="12" md="3">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="checkInGraceMinutes"
+                            >
+                                <div class="mb-2">
+                                    {{
+                                        $t(
+                                            "system_config.check_in_grace_minutes",
+                                        )
+                                    }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-text-field
+                                    v-bind="field"
+                                    :error-messages="errorMessage"
+                                    type="number"
+                                    variant="outlined"
+                                    :readonly="!isEditing"
+                                    persistent-placeholder
+                                />
+                            </VeeField>
+                        </v-col>
+                        <v-col cols="12" md="3">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="lateLimitMinutes"
+                            >
+                                <div class="mb-2">
+                                    {{ $t("system_config.late_limit_minutes") }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-text-field
+                                    v-bind="field"
+                                    :error-messages="errorMessage"
+                                    type="number"
+                                    variant="outlined"
+                                    :readonly="!isEditing"
+                                    persistent-placeholder
+                                />
+                            </VeeField>
+                        </v-col>
+                        <v-col cols="12" md="3">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="checkInEarliestMinutes"
+                            >
+                                <div class="mb-2">
+                                    {{
+                                        $t(
+                                            "system_config.check_in_earliest_minutes",
+                                        )
+                                    }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-text-field
+                                    v-bind="field"
+                                    :error-messages="errorMessage"
+                                    type="number"
+                                    variant="outlined"
+                                    :readonly="!isEditing"
+                                    persistent-placeholder
+                                />
+                            </VeeField>
+                        </v-col>
+                        <v-col cols="12" md="3">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="checkOutGraceMinutes"
+                            >
+                                <div class="mb-2">
+                                    {{
+                                        $t(
+                                            "system_config.check_out_grace_minutes",
+                                        )
+                                    }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-text-field
+                                    v-bind="field"
+                                    :error-messages="errorMessage"
+                                    type="number"
+                                    variant="outlined"
+                                    :readonly="!isEditing"
+                                    persistent-placeholder
+                                />
+                            </VeeField>
+                        </v-col>
+                        <v-col cols="12" md="3">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="checkOutLatestMinutes"
+                            >
+                                <div class="mb-2">
+                                    {{
+                                        $t(
+                                            "system_config.check_out_latest_minutes",
+                                        )
+                                    }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-text-field
+                                    v-bind="field"
+                                    :error-messages="errorMessage"
+                                    type="number"
+                                    variant="outlined"
+                                    :readonly="!isEditing"
+                                    persistent-placeholder
+                                />
+                            </VeeField>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+
+            <v-card variant="outlined" class="mb-4">
+                <v-card-item>
+                    <v-card-title
+                        class="text-subtitle-1 d-flex align-center ga-2 pa-0"
+                    >
+                        <v-icon icon="mdi-map-marker-outline" size="20" />
+                        {{ $t("system_config.group_location_setting") }}
+                    </v-card-title>
+                </v-card-item>
+                <v-card-text>
+                    <v-row align="center">
+                        <v-col cols="12" md="3">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="latitude"
+                            >
+                                <div class="mb-2">
+                                    {{ $t("system_config.latitude") }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-text-field
+                                    v-bind="field"
+                                    :error-messages="errorMessage"
+                                    type="number"
+                                    variant="outlined"
+                                    :readonly="!isEditing"
+                                    persistent-placeholder
+                                />
+                            </VeeField>
+                        </v-col>
+                        <v-col cols="12" md="3">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="longitude"
+                            >
+                                <div class="mb-2">
+                                    {{ $t("system_config.longitude") }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-text-field
+                                    v-bind="field"
+                                    :error-messages="errorMessage"
+                                    type="number"
+                                    variant="outlined"
+                                    :readonly="!isEditing"
+                                    persistent-placeholder
+                                />
+                            </VeeField>
+                        </v-col>
+                        <v-col cols="12" md="3">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="radiusMeters"
+                            >
+                                <div class="mb-2">
+                                    {{ $t("system_config.radius_meters") }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-text-field
+                                    v-bind="field"
+                                    :error-messages="errorMessage"
+                                    type="number"
+                                    variant="outlined"
+                                    :readonly="!isEditing"
+                                    persistent-placeholder
+                                />
+                            </VeeField>
+                        </v-col>
+                        <v-col cols="12" md="3">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="addressDisplay"
+                            >
+                                <div class="mb-2">
+                                    {{ $t("system_config.address_display") }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-text-field
+                                    v-bind="field"
+                                    :error-messages="errorMessage"
+                                    variant="outlined"
+                                    :readonly="!isEditing"
+                                    persistent-placeholder
+                                />
+                            </VeeField>
+                        </v-col>
+                        <v-col cols="12" md="3">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="ipAddress"
+                            >
+                                <div class="mb-2">
+                                    {{ $t("system_config.ip_address") }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-text-field
+                                    v-bind="field"
+                                    :error-messages="errorMessage"
+                                    variant="outlined"
+                                    :readonly="!isEditing"
+                                    persistent-placeholder
+                                />
+                            </VeeField>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+
+            <v-card variant="outlined" class="mb-4">
+                <v-card-item>
+                    <v-card-title
+                        class="text-subtitle-1 d-flex align-center ga-2 pa-0"
+                    >
+                        <v-icon icon="mdi-cellphone-link" size="20" />
+                        {{ $t("system_config.group_device_setting") }}
+                    </v-card-title>
+                </v-card-item>
+                <v-card-text>
+                    <v-row align="center">
+                        <v-col cols="12" md="4">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="qrTtlSeconds"
+                            >
+                                <div class="mb-2">
+                                    {{ $t("system_config.qr_ttl_seconds") }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-text-field
+                                    v-bind="field"
+                                    :error-messages="errorMessage"
+                                    type="number"
+                                    variant="outlined"
+                                    :readonly="!isEditing"
+                                    persistent-placeholder
+                                />
+                            </VeeField>
+                        </v-col>
+                        <v-col cols="12" md="4">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="photoRetentionDays"
+                            >
+                                <div class="mb-2">
+                                    {{
+                                        $t("system_config.photo_retention_days")
+                                    }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-text-field
+                                    v-bind="field"
+                                    :error-messages="errorMessage"
+                                    type="number"
+                                    variant="outlined"
+                                    :readonly="!isEditing"
+                                    persistent-placeholder
+                                />
+                            </VeeField>
+                        </v-col>
+                        <v-col cols="12" md="4">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="maxDevicesPerEmployee"
+                            >
+                                <div class="mb-2">
+                                    {{
+                                        $t(
+                                            "system_config.max_devices_per_employee",
+                                        )
+                                    }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-text-field
+                                    v-bind="field"
+                                    :error-messages="errorMessage"
+                                    type="number"
+                                    variant="outlined"
+                                    :readonly="!isEditing"
+                                    persistent-placeholder
+                                />
+                            </VeeField>
+                        </v-col>
+                        <v-col cols="12" md="4">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="sameDeviceMaxEmployees"
+                            >
+                                <div class="mb-2">
+                                    {{
+                                        $t(
+                                            "system_config.same_device_max_employees",
+                                        )
+                                    }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-text-field
+                                    v-bind="field"
+                                    :error-messages="errorMessage"
+                                    type="number"
+                                    variant="outlined"
+                                    :readonly="!isEditing"
+                                    persistent-placeholder
+                                />
+                            </VeeField>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+
+            <v-card variant="outlined" class="mb-4">
+                <v-card-item>
+                    <v-card-title
+                        class="text-subtitle-1 d-flex align-center ga-2 pa-0"
+                    >
+                        <v-icon icon="mdi-bell-outline" size="20" />
+                        {{ $t("system_config.group_reminder_setting") }}
+                    </v-card-title>
+                </v-card-item>
+                <v-card-text>
+                    <v-row align="center">
+                        <v-col cols="12" md="3">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="remindMissingCheckIn"
+                            >
+                                <v-switch
+                                    :model-value="field.value"
+                                    :error-messages="errorMessage"
+                                    :label="
+                                        $t(
+                                            'system_config.remind_missing_check_in',
+                                        )
+                                    "
+                                    color="primary"
+                                    :readonly="!isEditing"
+                                    @update:model-value="
+                                        field['onChange']($event)
+                                    "
+                                />
+                            </VeeField>
+                        </v-col>
+                        <v-col cols="12" md="3">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="checkInReminderMinutesBefore"
+                            >
+                                <div class="mb-2">
+                                    {{
+                                        $t(
+                                            "system_config.check_in_reminder_minutes_before",
+                                        )
+                                    }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-text-field
+                                    v-bind="field"
+                                    :error-messages="errorMessage"
+                                    type="number"
+                                    variant="outlined"
+                                    :readonly="!isEditing"
+                                    persistent-placeholder
+                                />
+                            </VeeField>
+                        </v-col>
+                        <v-col cols="12" md="3">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="remindMissingCheckOut"
+                            >
+                                <v-switch
+                                    :model-value="field.value"
+                                    :error-messages="errorMessage"
+                                    :label="
+                                        $t(
+                                            'system_config.remind_missing_check_out',
+                                        )
+                                    "
+                                    color="primary"
+                                    :readonly="!isEditing"
+                                    @update:model-value="
+                                        field['onChange']($event)
+                                    "
+                                />
+                            </VeeField>
+                        </v-col>
+                        <v-col cols="12" md="3">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="checkOutReminderMinutesBefore"
+                            >
+                                <div class="mb-2">
+                                    {{
+                                        $t(
+                                            "system_config.check_out_reminder_minutes_before",
+                                        )
+                                    }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-text-field
+                                    v-bind="field"
+                                    :error-messages="errorMessage"
+                                    type="number"
+                                    variant="outlined"
+                                    :readonly="!isEditing"
+                                    persistent-placeholder
+                                />
+                            </VeeField>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
         </VeeForm>
     </div>
 </template>

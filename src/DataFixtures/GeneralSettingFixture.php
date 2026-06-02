@@ -4,10 +4,16 @@ namespace App\DataFixtures;
 
 use App\Entity\GeneralSetting;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class GeneralSettingFixture extends Fixture
+class GeneralSettingFixture extends Fixture implements FixtureGroupInterface
 {
+    public static function getGroups(): array
+    {
+        return ["general-setting"];
+    }
+
     public function load(ObjectManager $manager): void
     {
         $data = [
@@ -46,13 +52,105 @@ class GeneralSettingFixture extends Fixture
                 "gia_tri" => "0",
                 "mo_ta" => "Thời gian làm việc (0: không, 1: có)",
             ],
+            [
+                "ten_cau_hinh" => "CHECK_IN_GRACE_MINUTES",
+                "gia_tri" => "15",
+                "mo_ta" => "Cho phép vào trễ không tính trễ (phút)",
+            ],
+            [
+                "ten_cau_hinh" => "LATE_LIMIT_MINUTES",
+                "gia_tri" => "120",
+                "mo_ta" => "Thời gian trễ tối đa (phút)",
+            ],
+            [
+                "ten_cau_hinh" => "CHECK_IN_EARLIEST_MINUTES",
+                "gia_tri" => "60",
+                "mo_ta" => "Cho phép chấm công sớm tối đa (phút)",
+            ],
+            [
+                "ten_cau_hinh" => "CHECK_OUT_GRACE_MINUTES",
+                "gia_tri" => "15",
+                "mo_ta" => "Cho phép ra sớm không bị tính về sớm (phút)",
+            ],
+            [
+                "ten_cau_hinh" => "CHECK_OUT_LATEST_MINUTES",
+                "gia_tri" => "120",
+                "mo_ta" => "Cho phép chấm công muộn tối đa (phút)",
+            ],
+            [
+                "ten_cau_hinh" => "LATITUDE",
+                "gia_tri" => "0",
+                "mo_ta" => "Vĩ độ (độ)",
+            ],
+            [
+                "ten_cau_hinh" => "LONGITUDE",
+                "gia_tri" => "0",
+                "mo_ta" => "Kinh độ (độ)",
+            ],
+            [
+                "ten_cau_hinh" => "RADIUS_METERS",
+                "gia_tri" => "100",
+                "mo_ta" => "Bán kính hợp lệ (mét)",
+            ],
+            [
+                "ten_cau_hinh" => "ADDRESS_DISPLAY",
+                "gia_tri" => "",
+                "mo_ta" => "Địa chỉ hiển thị",
+            ],
+            [
+                "ten_cau_hinh" => "IP_ADDRESS",
+                "gia_tri" => "",
+                "mo_ta" => "Địa chỉ IP hợp lệ",
+            ],
+            [
+                "ten_cau_hinh" => "QR_TTL_SECONDS",
+                "gia_tri" => "30",
+                "mo_ta" => "Thời gian hết hạn mã QR (giây)",
+            ],
+            [
+                "ten_cau_hinh" => "PHOTO_RETENTION_DAYS",
+                "gia_tri" => "90",
+                "mo_ta" => "Thời hạn lưu trữ ảnh chấm công (ngày)",
+            ],
+            [
+                "ten_cau_hinh" => "MAX_DEVICES_PER_EMPLOYEE",
+                "gia_tri" => "2",
+                "mo_ta" =>
+                    "Số thiết bị chấm công tối đa cho mỗi nhân viên (thiết bị)",
+            ],
+            [
+                "ten_cau_hinh" => "SAME_DEVICE_MAX_EMPLOYEES",
+                "gia_tri" => "1",
+                "mo_ta" =>
+                    "Số nhân viên tối đa chấm công cùng thiết bị (nhân viên)",
+            ],
+            [
+                "ten_cau_hinh" => "REMIND_MISSING_CHECK_IN",
+                "gia_tri" => "0",
+                "mo_ta" => "Nhắc nhở đến giờ chấm công vào (0: không, 1: có)",
+            ],
+            [
+                "ten_cau_hinh" => "REMIND_MISSING_CHECK_OUT",
+                "gia_tri" => "0",
+                "mo_ta" => "Nhắc nhở đến giờ chấm công ra (0: không, 1: có)",
+            ],
+            [
+                "ten_cau_hinh" => "CHECK_IN_REMINDER_MINUTES_BEFORE",
+                "gia_tri" => "10",
+                "mo_ta" => "Nhắc nhở chấm công vào trước (phút)",
+            ],
+            [
+                "ten_cau_hinh" => "CHECK_OUT_REMINDER_MINUTES_BEFORE",
+                "gia_tri" => "10",
+                "mo_ta" => "Nhắc nhở chấm công ra trước (phút)",
+            ],
         ];
 
         foreach ($data as $item) {
             $cauhinh = new GeneralSetting();
-            $cauhinh->setTenCauHinh($item['ten_cau_hinh']);
-            $cauhinh->setGiaTri($item['gia_tri']);
-            $cauhinh->setMoTa($item['mo_ta']);
+            $cauhinh->setTenCauHinh($item["ten_cau_hinh"]);
+            $cauhinh->setGiaTri($item["gia_tri"]);
+            $cauhinh->setMoTa($item["mo_ta"]);
             $manager->persist($cauhinh);
         }
 

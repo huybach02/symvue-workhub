@@ -25,6 +25,7 @@ final class Constanst
         ],
         "Thứ 5" => [
             "DAY_OF_WEEK" => 4,
+            "GIO_BAT_DAU" => "08:00",
             "GIO_KET_THUC" => "17:00",
             "GHI_CHU" => "",
         ],
