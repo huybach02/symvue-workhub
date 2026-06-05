@@ -8,6 +8,18 @@
         >
             Gửi thông báo test
         </v-btn>
+
+        <v-btn
+            color="success"
+            :loading="isSending"
+            prepend-icon="mdi-qrcode"
+            to="/qr-attendance"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="ml-2"
+        >
+            Hiển thị QR chấm công
+        </v-btn>
     </v-container>
 </template>
 

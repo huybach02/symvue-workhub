@@ -1,92 +1,93 @@
 {
-  "base": {
-    "confirm": "Confirm",
-    "cancel": "Cancel",
-    "save": "Save",
-    "back": "Back",
-    "edit": "Edit",
-    "delete": "Delete",
-    "status": "Status",
-    "created_at": "Created at",
-    "updated_at": "Updated at",
-    "no_data": "No matching data found",
-    "enter": "Enter",
-    "export_excel": "Export excel",
-    "import_excel": "Import excel",
-    "dowload_template_import_excel": "Dowload template import excel",
-    "upload": "Upload",
-    "error_detail": "Error detail import",
-    "view": "View",
-    "note": "Note:",
-    "yesterday": "Yesterday",
-    "today": "Today",
-    "mobile_alert": "This feature is not available on mobile. Please use on desktop.",
-    "selected": "Selected",
-    "select_all": "Select all",
-    "deselect_all": "Deselect all",
-    "empty_state": "Empty",
-    "not_available": "Not available"
-  },
-  "title": {
-    "create": "Create",
-    "update": "Update"
-  },
-  "button": {
-    "create": "Create",
-    "update": "Update",
-    "delete": "Delete",
-    "cancel": "Cancel",
-    "save": "Save",
-    "back": "Back",
-    "close": "Close",
-    "remove": "Remove",
-    "restore_default": "Restore default"
-  },
-  "sidebar": {
-    "home": "Home",
-    "user_management": "User Management",
-    "role_management": "Role Management",
-    "permission_management": "Permission Management",
-    "system_config": "System Config",
-    "system_config_general": "General Config",
-    "system_config_working_time": "Working Time",
-    "user_management_user": "User",
-    "lich_su_import": "Import history",
-    "bo_phan": "Departments",
-    "thong_bao": "Notification",
-    "work_schedule": "Work Schedule",
-    "request": "Requests"
-  },
-  "gender": {
-    "male": "Male",
-    "female": "Female"
-  },
-  "status": {
-    "active": "Active",
-    "inactive": "Inactive",
-    "success": "Success",
-    "error": "Error"
-  },
-  "thong-bao": {
-    "title": "Notification",
-    "read_all": "Read all",
-    "no_notification": "No notifications",
-    "total": "Total",
-    "unread": "Unread",
-    "read": "Read"
-  },
-  "calendar":{
-    "today": "Today",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month",
-    "normal_day": "Normal day",
-    "weekend": "Weekend",
-    "holiday": "Holiday",
-    "personnel": "Personnel",
-    "noShifts": "No shifts today",
-    "assigned": "Assigned personnel",
-    "clickShiftToAssign": "Click to assign personnel",
-    "assignPersonnel": "Assign personnel to shift"
-  }
+    "base": {
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "save": "Save",
+        "back": "Back",
+        "edit": "Edit",
+        "delete": "Delete",
+        "status": "Status",
+        "created_at": "Created at",
+        "updated_at": "Updated at",
+        "no_data": "No matching data found",
+        "enter": "Enter",
+        "export_excel": "Export excel",
+        "import_excel": "Import excel",
+        "dowload_template_import_excel": "Dowload template import excel",
+        "upload": "Upload",
+        "error_detail": "Error detail import",
+        "view": "View",
+        "note": "Note:",
+        "yesterday": "Yesterday",
+        "today": "Today",
+        "mobile_alert": "This feature is not available on mobile. Please use on desktop.",
+        "selected": "Selected",
+        "select_all": "Select all",
+        "deselect_all": "Deselect all",
+        "empty_state": "Empty",
+        "not_available": "Not available"
+    },
+    "title": {
+        "create": "Create",
+        "update": "Update"
+    },
+    "button": {
+        "create": "Create",
+        "update": "Update",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "save": "Save",
+        "back": "Back",
+        "close": "Close",
+        "remove": "Remove",
+        "restore_default": "Restore default"
+    },
+    "sidebar": {
+        "home": "Home",
+        "user_management": "User Management",
+        "role_management": "Role Management",
+        "permission_management": "Permission Management",
+        "system_config": "System Config",
+        "system_config_general": "General Config",
+        "system_config_working_time": "Working Time",
+        "user_management_user": "User",
+        "lich_su_import": "Import history",
+        "bo_phan": "Departments",
+        "thong_bao": "Notification",
+        "work_schedule": "Work Schedule",
+        "request": "Requests",
+        "attendance": "Attendance"
+    },
+    "gender": {
+        "male": "Male",
+        "female": "Female"
+    },
+    "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "success": "Success",
+        "error": "Error"
+    },
+    "thong-bao": {
+        "title": "Notification",
+        "read_all": "Read all",
+        "no_notification": "No notifications",
+        "total": "Total",
+        "unread": "Unread",
+        "read": "Read"
+    },
+    "calendar": {
+        "today": "Today",
+        "day": "Day",
+        "week": "Week",
+        "month": "Month",
+        "normal_day": "Normal day",
+        "weekend": "Weekend",
+        "holiday": "Holiday",
+        "personnel": "Personnel",
+        "noShifts": "No shifts today",
+        "assigned": "Assigned personnel",
+        "clickShiftToAssign": "Click to assign personnel",
+        "assignPersonnel": "Assign personnel to shift"
+    }
 }

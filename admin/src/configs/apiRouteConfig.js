@@ -26,4 +26,6 @@ export const API_ROUTES_CONFIG = {
     message: "/message",
     presence: "/presence",
     workSchedules: "/work-schedules",
+    attendance: "/attendance",
+    attendanceQr: "/attendance/qr-attendance",
 };

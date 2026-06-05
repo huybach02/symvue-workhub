@@ -172,6 +172,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
     #[ORM\OneToMany(targetEntity: WorkShiftAssignment::class, mappedBy: 'member')]
     private Collection $workShiftAssignments;
 
+    /**
+     * @var Collection<int, Attendance>
+     */
+    #[ORM\OneToMany(targetEntity: Attendance::class, mappedBy: 'employee')]
+    private Collection $attendances;
+
     public function __construct()
     {
         $this->folders = new ArrayCollection();
@@ -184,6 +190,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
         $this->fixedScheduleGroups = new ArrayCollection();
         $this->fixedScheduleOverrides = new ArrayCollection();
         $this->workShiftAssignments = new ArrayCollection();
+        $this->attendances = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -846,6 +853,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
             // set the owning side to null (unless already changed)
             if ($workShiftAssignment->getMember() === $this) {
                 $workShiftAssignment->setMember(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Attendance>
+     */
+    public function getAttendances(): Collection
+    {
+        return $this->attendances;
+    }
+
+    public function addAttendance(Attendance $attendance): static
+    {
+        if (!$this->attendances->contains($attendance)) {
+            $this->attendances->add($attendance);
+            $attendance->setEmployee($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAttendance(Attendance $attendance): static
+    {
+        if ($this->attendances->removeElement($attendance)) {
+            // set the owning side to null (unless already changed)
+            if ($attendance->getEmployee() === $this) {
+                $attendance->setEmployee(null);
             }
         }
 

@@ -14,4 +14,6 @@ export const NAME_ROUTES_CONFIG = {
     notifications: "system.notifications",
     workSchedules: "system.workSchedules",
     requests: "system.requests",
+    attendance: "system.attendance",
+    qrAttendance: "system.qrAttendance",
 };

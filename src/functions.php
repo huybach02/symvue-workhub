@@ -380,3 +380,18 @@ if (!function_exists('canViewRequest')) {
         return $result;
     }
 }
+
+if (!function_exists('generateQRCodeAttendance')) {
+    function generateQRCodeAttendance(): string
+    {
+        // Format QR code attendance: dd/mm/yyyy-HH:mm:ss-random
+        $randomString = bin2hex(random_bytes(10));
+        $qrCode = sprintf(
+            '%s-%s-%s',
+            date('d/m/Y'),
+            date('H:i:s'),
+            $randomString,
+        );
+        return $qrCode;
+    }
+}

@@ -8,6 +8,7 @@ return [
         'https://app.com/message/{+path}',
         'https://app.com/presence',
         'https://app.com/request/{+path}',
+        'https://app.com/attendance/{+path}',
     ],
     "topics" => [
         "test" => "https://app.com/test",
@@ -16,5 +17,6 @@ return [
         "message" => "https://app.com/message/:userId",
         "presence" => "https://app.com/presence",
         "request" => "https://app.com/request/:userId",
+        "attendance" => "https://app.com/attendance/:channel",
     ]
 ];

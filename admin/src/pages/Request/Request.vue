@@ -27,7 +27,6 @@
                             class="ml-4"
                             @click="reloadApprovalTable"
                         >
-                            {{ $t("button.update") }}
                         </v-btn>
                     </div>
 

@@ -11,6 +11,7 @@ import department from "./modules/department";
 import importHistory from "./modules/importHistory";
 import notification from "./modules/notification";
 import request from "./modules/request";
+import attendance from "./modules/attendance";
 
 const store = createStore({
     state() {
@@ -40,7 +41,8 @@ const store = createStore({
         importHistory,
         notification,
         request,
-    },
+            attendance,
+},
 });
 
 export default store;

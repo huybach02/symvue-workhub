@@ -26,7 +26,8 @@ class PermissionListener
         private readonly Security $security,
         private readonly DepartmentService $departmentService,
         private readonly PermissionCheckerService $permissionCheckerService,
-    ) {}
+    ) {
+    }
 
     protected $excludedRoutes = [
         'api/auth/me',
@@ -37,7 +38,7 @@ class PermissionListener
     ];
 
     // Các từ khóa trong path sẽ được bỏ qua kiểm tra quyền
-    protected array $excludedKeywords = ['select', 'import', 'export', 'template-import', 'media', 'conversation', 'message', 'presence', 'request-types'];
+    protected array $excludedKeywords = ['select', 'import', 'export', 'template-import', 'media', 'conversation', 'message', 'presence', 'request-types', 'qr-attendance'];
 
     public function onKernelRequest(RequestEvent $event): void
     {
@@ -46,7 +47,7 @@ class PermissionListener
         }
 
         $request = $event->getRequest();
-        $path    = $request->getPathInfo();
+        $path = $request->getPathInfo();
 
         $user = $this->security->getUser();
 

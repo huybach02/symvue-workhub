@@ -35,7 +35,6 @@
                             prepend-icon="mdi-refresh"
                             @click="reloadCurrentQuery"
                         >
-                            {{ $t("button.update") }}
                         </v-btn>
                         <v-btn
                             v-if="permission?.create"

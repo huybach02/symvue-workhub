@@ -83,8 +83,7 @@ export const routes = [
             {
                 path: "working-times",
                 name: NAME_ROUTES_CONFIG.workingTimes,
-                component: () =>
-                    import("../pages/WorkingTime/WorkingTime.vue"),
+                component: () => import("../pages/WorkingTime/WorkingTime.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
@@ -142,10 +141,11 @@ export const routes = [
                         ).icon || "",
                 },
             },
-                    {
+            {
                 path: "notifications",
                 name: NAME_ROUTES_CONFIG.notifications,
-                component: () => import("../pages/Notification/Notification.vue"),
+                component: () =>
+                    import("../pages/Notification/Notification.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
@@ -160,7 +160,8 @@ export const routes = [
             {
                 path: "work-schedules",
                 name: NAME_ROUTES_CONFIG.workSchedules,
-                component: () => import("../pages/WorkSchedule/WorkSchedule.vue"),
+                component: () =>
+                    import("../pages/WorkSchedule/WorkSchedule.vue"),
                 meta: {
                     title:
                         functionHelper.findMenuItemByValue(
@@ -187,6 +188,26 @@ export const routes = [
                         ).icon || "",
                 },
             },
-],
+            {
+                path: "attendance",
+                name: NAME_ROUTES_CONFIG.attendance,
+                component: () => import("../pages/Attendance/Attendance.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.attendance,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.attendance,
+                        ).icon || "",
+                },
+            },
+        ],
+    },
+    {
+        path: "/qr-attendance",
+        name: NAME_ROUTES_CONFIG.qrAttendance,
+        component: () => import("../pages/QRAttendance.vue"),
     },
 ];

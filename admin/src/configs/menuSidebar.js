@@ -79,4 +79,10 @@ export const menuSidebar = [
         value: NAME_ROUTES_CONFIG.requests,
         to: { name: NAME_ROUTES_CONFIG.requests },
     },
+    {
+        title: i18n.global.t("sidebar.attendance"),
+        icon: "mdi-account-check-outline",
+        value: NAME_ROUTES_CONFIG.attendance,
+        to: { name: NAME_ROUTES_CONFIG.attendance },
+    },
 ];
