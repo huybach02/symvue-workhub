@@ -13,6 +13,15 @@
                         QR chấm công
                     </v-card-title>
 
+                    <v-alert
+                        v-if="accessError"
+                        type="error"
+                        variant="tonal"
+                        class="mx-8 mt-4"
+                    >
+                        {{ accessError }}
+                    </v-alert>
+
                     <v-card-text class="pa-8 flex-grow-1 d-flex align-center">
                         <v-row justify="center" align="center" class="ga-8">
                             <v-col
@@ -77,28 +86,39 @@
 </template>
 
 <script>
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
+import axios from "axios";
 import QRCode from "qrcode";
-import axiosInstance from "@/configs/axios";
-import { EventSourcePolyfill } from "event-source-polyfill";
 
-const ATTENDANCE_TOPIC = "https://app.com/attendance/:channel";
+const RELOAD_GUARD_KEY = "qr-attendance-reload-guard";
+const QR_ATTENDANCE_ACCESS_KEY = "qr-attendance-display-access";
+const QR_ATTENDANCE_HARD_RELOAD_KEY = "qr-attendance-hard-reload-key";
+const RELOAD_LIMIT = 10;
+const RELOAD_WINDOW_MS = 5 * 60 * 1000;
+const RELOAD_DELAY_MS = 2000;
+const publicQrAxios = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api",
+    timeout: 10000,
+    headers: {
+        "Content-Type": "application/json",
+    },
+});
 
 export default {
     name: "AttendanceQrDisplay",
 
     data() {
         return {
-            loading: true,
+            loading: false,
             qrToken: null,
             expiresAtMs: null,
             totalDurationMs: 30000,
             serverClientOffset: 0,
             remainingMs: 0,
             timer: null,
-            channel: null,
-            eventSource: null,
-            connectionStatus: "connecting",
-            hasRequestedInitialQr: false,
+            reloadTimeout: null,
+            qrDisplayAccessToken: null,
+            accessError: null,
         };
     },
 
@@ -120,130 +140,123 @@ export default {
     },
 
     mounted() {
-        this.channel = this.createChannel();
-        this.connectMercure();
+        this.qrDisplayAccessToken = this.resolveQrDisplayAccessToken();
+
+        if (!this.qrDisplayAccessToken) {
+            this.accessError =
+                "Trang QR chấm công này cần được mở từ màn hình quản trị.";
+            return;
+        }
+
+        this.generateQr();
     },
 
     beforeUnmount() {
         this.clearTimer();
-        if (this.eventSource) {
-            this.eventSource.close();
-            this.eventSource = null;
-        }
+        this.clearReloadTimeout();
     },
 
     methods: {
-        createChannel() {
-            if (window.crypto?.randomUUID) {
-                return window.crypto.randomUUID();
+        resolveQrDisplayAccessToken() {
+            const accessTokenFromQuery = this.$route.query.access;
+            const accessToken =
+                typeof accessTokenFromQuery === "string"
+                    ? accessTokenFromQuery
+                    : sessionStorage.getItem(QR_ATTENDANCE_ACCESS_KEY);
+
+            if (!accessToken) {
+                return null;
             }
 
-            return `attendance-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+            sessionStorage.setItem(QR_ATTENDANCE_ACCESS_KEY, accessToken);
+
+            if (typeof accessTokenFromQuery === "string") {
+                this.$router.replace({
+                    path: this.$route.path,
+                    query: {},
+                });
+            }
+
+            return accessToken;
         },
 
-        connectMercure() {
-            const mercureToken = localStorage.getItem("mercure_token");
-
-            if (!mercureToken) {
-                this.connectionStatus = "error";
+        async generateQr() {
+            if (!this.qrDisplayAccessToken) {
                 return;
             }
 
-            const url = new URL(import.meta.env.VITE_MERCURE_URL);
-            url.searchParams.append(
-                "topic",
-                ATTENDANCE_TOPIC.replace(":channel", this.channel),
-            );
-
-            this.eventSource = new EventSourcePolyfill(url, {
-                headers: {
-                    Authorization: "Bearer " + mercureToken,
-                },
-            });
-
-            this.eventSource.onopen = () => {
-                this.connectionStatus = "connected";
-
-                if (this.hasRequestedInitialQr) {
-                    return;
-                }
-
-                this.hasRequestedInitialQr = true;
-                this.requestQrGeneration();
-            };
-
-            this.eventSource.onmessage = (event) => {
-                if (!event?.data) {
-                    return;
-                }
-
-                try {
-                    const data = JSON.parse(event.data);
-                    this.handleMercureMessage(data);
-                } catch (error) {
-                    console.error("Mercure attendance payload invalid:", error);
-                }
-            };
-
-            this.eventSource.onerror = (error) => {
-                console.error("Mercure attendance error:", error);
-                this.connectionStatus = "error";
-            };
-        },
-
-        async requestQrGeneration() {
             this.loading = true;
+            this.accessError = null;
 
             try {
-                const response = await axiosInstance.get(
-                    "/attendance/qr-attendance",
+                const requestStartedAt = Date.now();
+
+                const response = await publicQrAxios.get(
+                    API_ROUTES_CONFIG.attendanceQr,
                     {
                         params: {
-                            channel: this.channel,
+                            access: this.qrDisplayAccessToken,
                         },
                     },
                 );
+                const responseReceivedAt = Date.now();
 
-                if (!response?.success) {
+                const payload = response?.data?.data ?? response?.data;
+
+                if (!payload) {
                     throw new Error("Invalid response");
                 }
+
+                const {
+                    token,
+                    serverTime,
+                    expiresAt,
+                    serverTimeMs,
+                    expiresAtMs,
+                    isHardReload,
+                    hardReloadKey,
+                } = payload;
+
+                if (this.shouldHardReload(isHardReload, hardReloadKey)) {
+                    window.location.reload();
+                    return;
+                }
+
+                this.qrToken = token;
+                this.expiresAtMs =
+                    Number(expiresAtMs) || new Date(expiresAt).getTime();
+
+                const resolvedServerTimeMs =
+                    Number(serverTimeMs) || new Date(serverTime).getTime();
+                const clientEstimatedAt =
+                    (requestStartedAt + responseReceivedAt) / 2;
+                this.serverClientOffset =
+                    resolvedServerTimeMs - clientEstimatedAt;
+                this.totalDurationMs = Math.max(
+                    1,
+                    this.expiresAtMs - resolvedServerTimeMs,
+                );
+                this.remainingMs = Math.max(
+                    0,
+                    this.expiresAtMs - (Date.now() + this.serverClientOffset),
+                );
+                this.resetReloadGuard();
+
+                await this.renderQr(token);
+
+                this.startCountdown();
             } catch (error) {
-                console.error("Failed to request QR:", error);
+                console.error("Failed to generate QR:", error);
+                if ([400, 401, 403].includes(error?.response?.status)) {
+                    this.accessError =
+                        "Quyen truy cap trang QR cham cong da het han hoac khong hop le.";
+                    this.resetReloadGuard();
+                    return;
+                }
+                this.retryByReload();
+            } finally {
                 this.loading = false;
             }
-        },
-
-        handleMercureMessage(data) {
-            if (
-                data?.type !== "attendance_qr" ||
-                data?.channel !== this.channel
-            ) {
-                return;
-            }
-
-            this.applyQrPayload(data);
-        },
-
-        async applyQrPayload(payload) {
-            const clientReceivedAt = Date.now();
-            const { token, serverTime, expiresAt, serverTimeMs, expiresAtMs } =
-                payload;
-
-            this.qrToken = token;
-            this.expiresAtMs =
-                Number(expiresAtMs) || new Date(expiresAt).getTime();
-
-            const resolvedServerTimeMs =
-                Number(serverTimeMs) || new Date(serverTime).getTime();
-            this.serverClientOffset = resolvedServerTimeMs - clientReceivedAt;
-            this.totalDurationMs = Math.max(
-                1,
-                this.expiresAtMs - resolvedServerTimeMs,
-            );
-
-            await this.renderQr(token);
-            this.startCountdown();
-            this.loading = false;
         },
 
         async renderQr(token) {
@@ -266,7 +279,7 @@ export default {
 
                 if (this.remainingMs <= 0) {
                     this.clearTimer();
-                    this.requestQrGeneration();
+                    this.generateQr();
                 }
             }, 250);
         },
@@ -276,6 +289,91 @@ export default {
                 clearInterval(this.timer);
                 this.timer = null;
             }
+        },
+
+        clearReloadTimeout() {
+            if (this.reloadTimeout) {
+                clearTimeout(this.reloadTimeout);
+                this.reloadTimeout = null;
+            }
+        },
+
+        resetReloadGuard() {
+            sessionStorage.removeItem(RELOAD_GUARD_KEY);
+            this.clearReloadTimeout();
+        },
+
+        shouldHardReload(isHardReload, hardReloadKey) {
+            if (!isHardReload) {
+                return false;
+            }
+
+            const resolvedKey =
+                typeof hardReloadKey === "string" && hardReloadKey
+                    ? hardReloadKey
+                    : new Date().toISOString().slice(0, 10);
+
+            if (
+                sessionStorage.getItem(QR_ATTENDANCE_HARD_RELOAD_KEY) ===
+                resolvedKey
+            ) {
+                return false;
+            }
+
+            sessionStorage.setItem(
+                QR_ATTENDANCE_HARD_RELOAD_KEY,
+                resolvedKey,
+            );
+
+            return true;
+        },
+
+        retryByReload() {
+            this.clearReloadTimeout();
+
+            const now = Date.now();
+            const savedGuard = sessionStorage.getItem(RELOAD_GUARD_KEY);
+            let guard = { count: 0, firstAttemptAt: 0 };
+
+            if (savedGuard) {
+                try {
+                    const parsed = JSON.parse(savedGuard);
+                    guard = {
+                        count: Number(parsed?.count) || 0,
+                        firstAttemptAt: Number(parsed?.firstAttemptAt) || 0,
+                    };
+                } catch {
+                    // Bo qua du lieu guard loi va bat dau lai.
+                }
+            }
+
+            if (
+                !guard.firstAttemptAt ||
+                now - guard.firstAttemptAt > RELOAD_WINDOW_MS
+            ) {
+                guard = {
+                    count: 0,
+                    firstAttemptAt: now,
+                };
+            }
+
+            const nextState = {
+                count: guard.count + 1,
+                firstAttemptAt: guard.firstAttemptAt,
+            };
+
+            if (nextState.count > RELOAD_LIMIT) {
+                console.error(
+                    "[QRAttendance] Da vuot qua gioi han tu reload, dung lai de tranh lap vo tan.",
+                );
+                return;
+            }
+
+            sessionStorage.setItem(RELOAD_GUARD_KEY, JSON.stringify(nextState));
+
+            this.reloadTimeout = window.setTimeout(() => {
+                window.location.reload();
+            }, RELOAD_DELAY_MS);
         },
     },
 };

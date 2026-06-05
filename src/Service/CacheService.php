@@ -19,7 +19,7 @@ class CacheService
         private readonly Client $redis,
     ) {}
 
-    public function set(string $key, mixed $value, int $ttlSeconds): void
+    public function set(string $key, mixed $value, int $ttlSeconds, bool $persistToDatabase = true): void
     {
         try {
             $encodedValue = $this->encodeValue($value);
@@ -28,6 +28,10 @@ class CacheService
             $cacheItem->set($value);
             $cacheItem->expiresAfter($ttlSeconds);
             $this->cache->save($cacheItem);
+
+            if (!$persistToDatabase) {
+                return;
+            }
 
             $cachePersist = $this->cachePersistRepository->findOneBy(['key' => $key]);
 

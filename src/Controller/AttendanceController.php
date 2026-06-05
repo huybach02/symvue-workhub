@@ -19,17 +19,37 @@ final class AttendanceController extends AbstractController
     ) {
     }
 
+    #[Route('/attendance/qr-display-access', methods: ['GET'])]
+    public function createQrDisplayAccess(): JsonResponse
+    {
+        try {
+            $data = $this->attendanceService->createQrDisplayAccess();
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/attendance/qr-display-access/revoke', methods: ['POST'])]
+    public function revokeQrDisplayAccess(): JsonResponse
+    {
+        try {
+            $this->attendanceService->revokeQrDisplayAccess();
+            return CustomResponse::success([], 'Đã thu hồi quyền truy cập trang QR chấm công.');
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
     #[Route('/attendance/qr-attendance', methods: ['GET'])]
     public function getQrAttendance(Request $request): JsonResponse
     {
         try {
-            $channel = (string) $request->query->get('channel', '');
-
-            $this->attendanceService->getQrAttendance($channel);
-
-            return CustomResponse::success([
-                'channel' => $channel,
-            ]);
+            $accessToken = (string) $request->query->get('access', '');
+            $data = $this->attendanceService->getQrAttendance($accessToken);
+            return CustomResponse::success($data);
+        } catch (\InvalidArgumentException $th) {
+            return CustomResponse::error($th->getMessage(), [], 403);
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }

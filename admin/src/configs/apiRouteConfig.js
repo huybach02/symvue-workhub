@@ -27,5 +27,6 @@ export const API_ROUTES_CONFIG = {
     presence: "/presence",
     workSchedules: "/work-schedules",
     attendance: "/attendance",
+    attendanceQrDisplayAccess: "/attendance/qr-display-access",
     attendanceQr: "/attendance/qr-attendance",
 };

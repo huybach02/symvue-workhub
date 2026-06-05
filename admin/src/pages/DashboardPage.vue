@@ -11,11 +11,9 @@
 
         <v-btn
             color="success"
-            :loading="isSending"
+            :loading="isOpeningQr"
             prepend-icon="mdi-qrcode"
-            to="/qr-attendance"
-            target="_blank"
-            rel="noopener noreferrer"
+            @click="openQrAttendance"
             class="ml-2"
         >
             Hiển thị QR chấm công
@@ -24,12 +22,14 @@
 </template>
 
 <script>
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import axiosInstance from "@/configs/axios";
 
 export default {
     data() {
         return {
             isSending: false,
+            isOpeningQr: false,
         };
     },
     methods: {
@@ -42,6 +42,46 @@ export default {
                 console.error("[Mercure] Lỗi khi gửi thông báo:", error);
             } finally {
                 this.isSending = false;
+            }
+        },
+        async openQrAttendance() {
+            this.isOpeningQr = true;
+            const qrWindow = window.open("about:blank", "_blank");
+
+            try {
+                const response = await axiosInstance.get(
+                    API_ROUTES_CONFIG.attendanceQrDisplayAccess,
+                );
+                const token = response?.data?.token || response?.token;
+
+                if (!token) {
+                    throw new Error("Missing QR display access token");
+                }
+
+                const route = this.$router.resolve({
+                    path: "/qr-attendance",
+                    query: {
+                        access: token,
+                    },
+                });
+                const absoluteUrl = new URL(
+                    route.href,
+                    window.location.origin,
+                ).toString();
+
+                if (qrWindow) {
+                    qrWindow.opener = null;
+                    qrWindow.location.replace(absoluteUrl);
+                } else {
+                    window.open(absoluteUrl, "_blank", "noopener,noreferrer");
+                }
+            } catch (error) {
+                if (qrWindow) {
+                    qrWindow.close();
+                }
+                console.error("Không thể mở trang QR chấm công:", error);
+            } finally {
+                this.isOpeningQr = false;
             }
         },
     },
