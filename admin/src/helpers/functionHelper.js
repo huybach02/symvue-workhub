@@ -188,4 +188,42 @@ export const functionHelper = {
 
         return colors[eventType] || "primary";
     },
+    fetchCurrentLocation() {
+        if (!navigator.geolocation) {
+            return Promise.reject(
+                new Error(
+                    i18n.global.t("system_config.geolocation_not_supported"),
+                ),
+            );
+        }
+
+        return new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    resolve({
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        accuracy: position.coords.accuracy,
+                    });
+                },
+                (err) => {
+                    const messages = {
+                        1: i18n.global.t(
+                            "system_config.geolocation_permission_denied",
+                        ),
+                        2: i18n.global.t(
+                            "system_config.geolocation_unavailable",
+                        ),
+                        3: i18n.global.t("system_config.geolocation_timeout"),
+                    };
+                    reject(new Error(messages[err.code] || err.message));
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0,
+                },
+            );
+        });
+    },
 };

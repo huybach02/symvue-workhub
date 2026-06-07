@@ -60,7 +60,14 @@
         "group_time_setting": "Thời gian chấm công",
         "group_location_setting": "Vị trí & Kết nối",
         "group_device_setting": "Thiết bị & Bảo mật",
-        "group_reminder_setting": "Nhắc nhở chấm công"
+        "group_reminder_setting": "Nhắc nhở chấm công",
+        "get_current_location": "Lấy vị trí hiện tại",
+        "geolocation_not_supported": "Trình duyệt không hỗ trợ lấy vị trí",
+        "geolocation_permission_denied": "Bạn đã từ chối cấp quyền truy cập vị trí",
+        "geolocation_unavailable": "Không xác định được vị trí hiện tại",
+        "geolocation_timeout": "Quá thời gian chờ lấy vị trí",
+        "get_current_ip": "Lấy địa chỉ IP hiện tại",
+        "detect_ip_failed": "Không thể lấy địa chỉ IP: {message}"
     },
     "thoi_gian_lam_viec": {
         "fulltime": "Thời gian cố định",

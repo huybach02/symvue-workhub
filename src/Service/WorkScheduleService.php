@@ -73,6 +73,45 @@ class WorkScheduleService
         return $holidayRanges;
     }
 
+    public function getWorkingScheduleForUserOnDate(
+        User $user,
+        ?\DateTimeInterface $date = null,
+    ): array {
+        $workDate = $date
+            ? \DateTimeImmutable::createFromInterface($date)->setTime(0, 0)
+            : new \DateTimeImmutable("today");
+
+        $workType = $user->getHinhThucLamViec();
+        $basePayload = [
+            "date" => $workDate->format("Y-m-d"),
+            "workType" => $workType,
+            "isWorkingDay" => false,
+            "source" => null,
+            "schedules" => [],
+        ];
+
+        if ($this->hasApprovedLeaveOnDate($user, $workDate)) {
+            return [
+                ...$basePayload,
+                "source" => "leave_schedule",
+            ];
+        }
+
+        return match ($workType) {
+            Constanst::HINH_THUC_LAM_VIEC["FULL_TIME"] => $this->resolveFulltimeScheduleForDate(
+                $user,
+                $workDate,
+                $basePayload,
+            ),
+            Constanst::HINH_THUC_LAM_VIEC["PART_TIME"] => $this->resolveParttimeScheduleForDate(
+                $user,
+                $workDate,
+                $basePayload,
+            ),
+            default => $basePayload,
+        };
+    }
+
     public function getFulltime(int $departmentId): array
     {
         $members = array_map(
@@ -513,6 +552,167 @@ class WorkScheduleService
             $holidayDates[$holiday->getDate()->format("Y-m-d")] = true;
         }
         return $holidayDates;
+    }
+
+    private function hasApprovedLeaveOnDate(
+        User $user,
+        \DateTimeInterface $date,
+    ): bool {
+        $leaveSchedules = $this->leaveScheduleRepository->findBy([
+            "member" => $user,
+            "status" => RequestConstant::STATUS_APPROVED,
+        ]);
+
+        $dateKey = $date->format("Y-m-d");
+
+        foreach ($leaveSchedules as $leaveSchedule) {
+            $startDate = $leaveSchedule->getStartDatetime()?->format("Y-m-d");
+            $endDate = $leaveSchedule->getEndDatetime()?->format("Y-m-d");
+
+            if (!$startDate || !$endDate) {
+                continue;
+            }
+
+            if ($dateKey >= $startDate && $dateKey <= $endDate) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function resolveFulltimeScheduleForDate(
+        User $user,
+        \DateTimeImmutable $workDate,
+        array $basePayload,
+    ): array {
+        $overrides = $this->fixedScheduleOverrideRepository->findOverlappingOverrides(
+            $user,
+            $workDate,
+            $workDate,
+        );
+
+        if ($overrides !== []) {
+            $override = $overrides[0];
+
+            return [
+                ...$basePayload,
+                "isWorkingDay" => true,
+                "source" => "fixed_schedule_override",
+                "schedules" => [[
+                    "startTime" => $override->getStartTime()?->format("H:i"),
+                    "endTime" => $override->getEndTime()?->format("H:i"),
+                ]],
+            ];
+        }
+
+        $isHoliday = $this->holidayScheduleRepository->findOneBy([
+            "date" => \DateTime::createFromInterface($workDate),
+            "status" => true,
+        ]);
+        if ($isHoliday) {
+            return $basePayload;
+        }
+
+        $group = $this->fixedScheduleGroupRepository->findOneBy([
+            "member" => $user,
+            "type" => "fulltime",
+        ]);
+
+        if (
+            !$group ||
+            !$group->getStartDate() ||
+            !$group->getEndDate()
+        ) {
+            return $basePayload;
+        }
+
+        $dateKey = $workDate->format("Y-m-d");
+        $groupStartDate = $group->getStartDate()->format("Y-m-d");
+        $groupEndDate = $group->getEndDate()->format("Y-m-d");
+
+        if ($dateKey < $groupStartDate || $dateKey > $groupEndDate) {
+            return $basePayload;
+        }
+
+        $dayOfWeek = (int) $workDate->format("N");
+        foreach ($group->getFixedSchedules() as $schedule) {
+            if (
+                $schedule->getDayOfWeek() !== $dayOfWeek ||
+                !$schedule->getStartTime() ||
+                !$schedule->getEndTime()
+            ) {
+                continue;
+            }
+
+            return [
+                ...$basePayload,
+                "isWorkingDay" => true,
+                "source" => "fixed_schedule",
+                "schedules" => [[
+                    "startTime" => $schedule->getStartTime()->format("H:i"),
+                    "endTime" => $schedule->getEndTime()->format("H:i"),
+                ]],
+            ];
+        }
+
+        return $basePayload;
+    }
+
+    private function resolveParttimeScheduleForDate(
+        User $user,
+        \DateTimeImmutable $workDate,
+        array $basePayload,
+    ): array {
+        $assignments = $this->workShiftAssignmentRepository->findBy([
+            "member" => $user,
+            "date" => \DateTime::createFromInterface($workDate),
+        ]);
+
+        if ($assignments === []) {
+            return $basePayload;
+        }
+
+        $schedules = [];
+
+        foreach ($assignments as $assignment) {
+            $workShift = $assignment->getWorkShift();
+            if (
+                !$workShift ||
+                !$workShift->isStatus() ||
+                !$workShift->getGioBatDau() ||
+                !$workShift->getGioKetThuc()
+            ) {
+                continue;
+            }
+
+            $schedules[] = [
+                "workShiftId" => $workShift->getId(),
+                "workingTimeId" => $workShift->getThoiGianLamViec()?->getId(),
+                "startTime" => formatTimeString($workShift->getGioBatDau()),
+                "endTime" => formatTimeString($workShift->getGioKetThuc()),
+                "note" => $workShift->getGhiChu() ?? "",
+            ];
+        }
+
+        usort(
+            $schedules,
+            fn(array $left, array $right): int => strcmp(
+                $left["startTime"],
+                $right["startTime"],
+            ),
+        );
+
+        if ($schedules === []) {
+            return $basePayload;
+        }
+
+        return [
+            ...$basePayload,
+            "isWorkingDay" => true,
+            "source" => "work_shift_assignment",
+            "schedules" => array_values($schedules),
+        ];
     }
 
     private function buildEventsFromFixedScheduleGroup(FixedScheduleGroup $group, array $holidayDates = []): array

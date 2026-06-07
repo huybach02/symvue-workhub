@@ -18,14 +18,20 @@
         >
             Hiển thị QR chấm công
         </v-btn>
+
+        <AttendanceQRScan />
     </v-container>
 </template>
 
 <script>
+import AttendanceQRScan from "@/components/AttendanceQRScan.vue";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import axiosInstance from "@/configs/axios";
 
 export default {
+    components: {
+        AttendanceQRScan,
+    },
     data() {
         return {
             isSending: false,

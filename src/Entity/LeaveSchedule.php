@@ -113,4 +113,17 @@ class LeaveSchedule
 
         return $this;
     }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'member' => $this->member->jsonSerialize(),
+            'type' => $this->type,
+            'startDatetime' => $this->startDatetime->format('Y-m-d H:i:s'),
+            'endDatetime' => $this->endDatetime->format('Y-m-d H:i:s'),
+            'status' => $this->status,
+            'reason' => $this->reason,
+        ];
+    }
 }

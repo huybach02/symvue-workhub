@@ -309,7 +309,10 @@ export default {
                 return;
             }
 
-            await this.fetchDepartmentPositions({ departmentId });
+            await this.fetchDepartmentPositions({
+                departmentId,
+                force: true,
+            });
         },
         async handleDepartmentChange(
             value,

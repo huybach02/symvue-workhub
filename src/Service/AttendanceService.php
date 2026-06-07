@@ -1,18 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Class\FilterWithPagination;
 use App\DTO\AttendanceDTO;
 use App\Entity\Attendance;
+use App\Entity\User;
 use App\Repository\AttendanceRepository;
 use App\Repository\GeneralSettingRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class AttendanceService
 {
     private const QR_DISPLAY_ACCESS_PREFIX = 'attendance.qr.display.';
     private const QR_DISPLAY_ACCESS_CURRENT_KEY = 'attendance.qr.display.current';
+    private const QR_TOKEN_CACHE_PREFIX = 'attendance.qr.token.';
     private const QR_DISPLAY_ACCESS_TTL_SECONDS = 157680000; // 5 years
     private const QR_HARD_RELOAD_WINDOWS = [
         [
@@ -27,75 +32,76 @@ class AttendanceService
         private readonly EntityManagerInterface $entityManager,
         private readonly GeneralSettingRepository $cauHinhChungRepository,
         private readonly CacheService $cacheService,
+        private readonly WorkScheduleService $workScheduleService,
     ) {
     }
 
-    public function findAll(array $params): array
-    {
-        $qb = $this->attendanceRepository->createQueryBuilder('e');
+    // public function findAll(array $params): array
+    // {
+    //     $qb = $this->attendanceRepository->createQueryBuilder('e');
 
-        $result = FilterWithPagination::findWithPagination($qb, $params, 'e');
+    //     $result = FilterWithPagination::findWithPagination($qb, $params, 'e');
 
-        // Map collection to JSON
-        $result['collection'] = array_map(
-            fn(Attendance $item) => $item->jsonSerialize(),
-            $result['collection']
-        );
+    //     // Map collection to JSON
+    //     $result['collection'] = array_map(
+    //         fn(Attendance $item) => $item->jsonSerialize(),
+    //         $result['collection']
+    //     );
 
-        return $result;
-    }
+    //     return $result;
+    // }
 
-    public function findById(int $id): array
-    {
-        $item = $this->attendanceRepository->find($id);
+    // public function findById(int $id): array
+    // {
+    //     $item = $this->attendanceRepository->find($id);
 
-        if (!$item) {
-            throw new \Exception(t('error.not_found'));
-        }
+    //     if (!$item) {
+    //         throw new \Exception(t('error.not_found'));
+    //     }
 
-        return $item->jsonSerialize();
-    }
+    //     return $item->jsonSerialize();
+    // }
 
-    public function create(AttendanceDTO $dto): array
-    {
-        $item = new Attendance();
+    // public function create(AttendanceDTO $dto): array
+    // {
+    //     $item = new Attendance();
 
-        // TODO: Map DTO properties to entity
-        // Example: $item->setName($dto->name);
+    //     // TODO: Map DTO properties to entity
+    //     // Example: $item->setName($dto->name);
 
-        $this->entityManager->persist($item);
-        $this->entityManager->flush();
+    //     $this->entityManager->persist($item);
+    //     $this->entityManager->flush();
 
-        return $item->jsonSerialize();
-    }
+    //     return $item->jsonSerialize();
+    // }
 
-    public function update(int $id, AttendanceDTO $dto): array
-    {
-        $item = $this->attendanceRepository->find($id);
+    // public function update(int $id, AttendanceDTO $dto): array
+    // {
+    //     $item = $this->attendanceRepository->find($id);
 
-        if (!$item) {
-            throw new \Exception(t('error.not_found'));
-        }
+    //     if (!$item) {
+    //         throw new \Exception(t('error.not_found'));
+    //     }
 
-        // TODO: Map DTO properties to entity
-        // Example: $item->setName($dto->name);
+    //     // TODO: Map DTO properties to entity
+    //     // Example: $item->setName($dto->name);
 
-        $this->entityManager->flush();
+    //     $this->entityManager->flush();
 
-        return $item->jsonSerialize();
-    }
+    //     return $item->jsonSerialize();
+    // }
 
-    public function delete(int $id): void
-    {
-        $item = $this->attendanceRepository->find($id);
+    // public function delete(int $id): void
+    // {
+    //     $item = $this->attendanceRepository->find($id);
 
-        if (!$item) {
-            throw new \Exception(t('error.not_found'));
-        }
+    //     if (!$item) {
+    //         throw new \Exception(t('error.not_found'));
+    //     }
 
-        $this->entityManager->remove($item);
-        $this->entityManager->flush();
-    }
+    //     $this->entityManager->remove($item);
+    //     $this->entityManager->flush();
+    // }
 
     public function createQrDisplayAccess(): array
     {
@@ -168,7 +174,12 @@ class AttendanceService
         $token = generateQRCodeAttendance();
         // QR attendance chi can song trong Redis/cache trong thoi gian ngan,
         // khong can persist xuong DB moi lan rotate de tranh tang tai khong can thiet.
-        $this->cacheService->set($token, $token, $qrTtlSeconds, false);
+        $this->cacheService->set(
+            $this->buildQrTokenCacheKey($token),
+            $token,
+            $qrTtlSeconds,
+            false,
+        );
 
         $serverTime = new \DateTime();
         $expiresAt = (clone $serverTime)->modify(
@@ -217,5 +228,70 @@ class AttendanceService
         }
 
         return null;
+    }
+
+    public function verifyAttendance(Request $request, AttendanceDTO $attendanceDTO, User $currentUser): bool
+    {
+        $configs = $this->cauHinhChungRepository->getAllConfig();
+
+        // 1. Verify qr code từ dto
+        $qrCode = $attendanceDTO->qrCode;
+        $qrCodeFromCache = $this->cacheService->get(
+            $this->buildQrTokenCacheKey((string) $qrCode),
+        );
+        if ($qrCodeFromCache === null) {
+            throw new \Exception(t("error.qr_code_invalid"));
+        }
+
+        // 2. Check IP address
+        $ipAddress = $request->getClientIp();
+        $allowedIpAddresses = $this->parseAllowedIpAddresses(
+            $configs['IP_ADDRESS'] ?? null,
+        );
+
+        if ($ipAddress === null || !in_array($ipAddress, $allowedIpAddresses, true)) {
+            throw new \Exception(t("error.ip_address_invalid"));
+        }
+
+        // 3. Check location
+        assertAttendanceLocationWithinConfiguredRadius(
+            $attendanceDTO->latitude,
+            $attendanceDTO->longitude,
+            $configs
+        );
+
+        $now = new \DateTimeImmutable();
+        $workingSchedule = $this->workScheduleService->getWorkingScheduleForUserOnDate(
+            $currentUser,
+            $now,
+        );
+
+        if (!$workingSchedule["isWorkingDay"]) {
+            throw new \Exception("Hôm nay bạn không có lịch làm việc.");
+        }
+
+        return true;
+    }
+
+    private function buildQrTokenCacheKey(string $token): string
+    {
+        return self::QR_TOKEN_CACHE_PREFIX . hash('sha256', $token);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function parseAllowedIpAddresses(null|string|array $value): array
+    {
+        if (is_array($value)) {
+            $values = $value;
+        } else {
+            $values = preg_split('/[\s,;]+/', (string) $value) ?: [];
+        }
+
+        return array_values(array_filter(array_map(
+            static fn (mixed $item): string => trim((string) $item),
+            $values,
+        )));
     }
 }

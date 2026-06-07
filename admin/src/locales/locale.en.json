@@ -59,7 +59,14 @@
         "group_time_setting": "Check-in/out time",
         "group_location_setting": "Location & Connection",
         "group_device_setting": "Device & Security",
-        "group_reminder_setting": "Reminders"
+        "group_reminder_setting": "Reminders",
+        "get_current_location": "Get current location",
+        "geolocation_not_supported": "Geolocation is not supported by this browser",
+        "geolocation_permission_denied": "You denied the request for geolocation",
+        "geolocation_unavailable": "Location information is unavailable",
+        "geolocation_timeout": "The request to get user location timed out",
+        "get_current_ip": "Get current IP address",
+        "detect_ip_failed": "Failed to detect IP address: {message}"
     },
     "thoi_gian_lam_viec": {
         "fulltime": "Fixed time",

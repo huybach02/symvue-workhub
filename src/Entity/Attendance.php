@@ -77,6 +77,10 @@ class Attendance
     #[ORM\Column(nullable: true)]
     private ?int $earlyLeaveMinute = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: "SET NULL")]
+    private ?WorkShiftAssignment $workShiftAssignment = null;
+
     /**
      * @var Collection<int, AttendanceLog>
      */
@@ -238,6 +242,19 @@ class Attendance
         return $this;
     }
 
+    public function getWorkShiftAssignment(): ?WorkShiftAssignment
+    {
+        return $this->workShiftAssignment;
+    }
+
+    public function setWorkShiftAssignment(
+        ?WorkShiftAssignment $workShiftAssignment,
+    ): static {
+        $this->workShiftAssignment = $workShiftAssignment;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, AttendanceLog>
      */
@@ -284,6 +301,7 @@ class Attendance
             "photoPath" => $this->photoPath,
             "lateMinute" => $this->lateMinute,
             "earlyLeaveMinute" => $this->earlyLeaveMinute,
+            "workShiftAssignment" => $this->workShiftAssignment?->getId(),
             "attendanceLogs" => $this->attendanceLogs,
         ];
     }

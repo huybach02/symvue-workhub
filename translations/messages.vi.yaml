@@ -39,6 +39,12 @@ error:
     user_already_member: "Người dùng đã là thành viên của bộ phận này. Vui lòng chọn lại"
     bo_phan_has_position: "Phòng ban/Bộ phận %name% (Mã: %ma_bo_phan%) có tồn tại chức vụ. Vui lòng xóa hết chức vụ trước khi xóa Phòng ban/Bộ phận"
     cannot_delete_work_shift: "Không thể xóa ca làm việc đã bắt đầu hoặc đã qua"
+    qr_code_invalid: "QR code không hợp lệ"
+    ip_address_invalid: "IP address không hợp lệ"
+    location_missing: "Thiếu thông tin vị trí chấm công"
+    location_invalid: "Tọa độ chấm công không hợp lệ"
+    attendance_location_config_invalid: "Cấu hình vị trí chấm công không hợp lệ"
+    location_out_of_range: "Bạn đang ở ngoài khu vực chấm công cho phép. Khoảng cách hiện tại: %distance%m, bán kính cho phép: %radius%m"
 permission:
     actions:
         index: "Xem danh sách"

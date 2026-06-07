@@ -7,21 +7,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 class AttendanceDTO
 {
     public function __construct(
-        // TODO: Thêm các properties tương ứng với Entity
-        // Example với validation groups:
-        
-        // Field bắt buộc cho cả create và update
-        #[Assert\NotBlank(groups: ['create', 'update'])]
-        #[Assert\Length(min: 3, max: 255, groups: ['create', 'update'])]
-        public readonly ?string $name = null,
-        
-        // Field chỉ bắt buộc khi create, optional khi update
-        #[Assert\NotBlank(groups: ['create'])]
-        #[Assert\Email(groups: ['create', 'update'])]
-        public readonly ?string $email = null,
-        
-        // Field optional cho cả create và update
-        #[Assert\Length(max: 500, groups: ['create', 'update'])]
-        public readonly ?string $description = null,
-    ) {}
+        #[Assert\NotBlank(groups: ["create", "update"])]
+        #[Assert\Length(min: 3, max: 255, groups: ["create", "update"])]
+        public readonly ?string $qrCode = null,
+
+        #[Assert\NotBlank(groups: ["create"])]
+        public readonly ?float $latitude = null,
+
+        #[Assert\NotBlank(groups: ["create"])]
+        public readonly ?float $longitude = null,
+
+        #[Assert\Length(max: 500, groups: ["create", "update"])]
+        public readonly ?float $accuracy = null,
+    ) {
+    }
 }

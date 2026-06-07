@@ -175,6 +175,7 @@ export default {
 
             const positionOptions = await this.fetchDepartmentPositions({
                 departmentId,
+                force: true,
             });
 
             if (resetPosition) {

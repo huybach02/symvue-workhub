@@ -1,6 +1,7 @@
 <?php
 
 use App\Class\Request\RequestConstant;
+use App\DTO\AttendanceDTO;
 use App\Entity\Request;
 use App\Entity\User;
 use App\Class\TranslationHelper;
@@ -296,6 +297,96 @@ if (!function_exists('getPermissionSuffixesByPrefix')) {
     }
 }
 
+if (!function_exists('assertAttendanceLocationWithinConfiguredRadius')) {
+    function assertAttendanceLocationWithinConfiguredRadius(
+        $latitude,
+        $longitude,
+        array $configs,
+    ): void {
+        if (
+            !isValidAttendanceLatitude($latitude) ||
+            !isValidAttendanceLongitude($longitude)
+        ) {
+            throw new \Exception(t('error.location_invalid'));
+        }
+
+        $configuredLatitude = getAttendanceRequiredFloatConfig($configs, 'LATITUDE');
+        $configuredLongitude = getAttendanceRequiredFloatConfig($configs, 'LONGITUDE');
+        $radiusMetres = getAttendanceRequiredFloatConfig($configs, 'RADIUS_METERS');
+
+        if (
+            !isValidAttendanceLatitude($configuredLatitude) ||
+            !isValidAttendanceLongitude($configuredLongitude) ||
+            $radiusMetres <= 0
+        ) {
+            throw new \Exception(t('error.attendance_location_config_invalid'));
+        }
+
+        $distanceMetres = calculateAttendanceDistanceMetres(
+            $configuredLatitude,
+            $configuredLongitude,
+            $latitude,
+            $longitude,
+        );
+
+        if ($distanceMetres > $radiusMetres) {
+            throw new \Exception(t('error.location_out_of_range', [
+                '%distance%' => (string) round($distanceMetres, 2),
+                '%radius%' => (string) round($radiusMetres, 2),
+            ]));
+        }
+    }
+}
+
+if (!function_exists('getAttendanceRequiredFloatConfig')) {
+    function getAttendanceRequiredFloatConfig(array $configs, string $key): float
+    {
+        if (!isset($configs[$key]) || !is_numeric($configs[$key])) {
+            throw new \Exception(t('error.attendance_location_config_invalid'));
+        }
+
+        return (float) $configs[$key];
+    }
+}
+
+if (!function_exists('isValidAttendanceLatitude')) {
+    function isValidAttendanceLatitude(float $latitude): bool
+    {
+        return $latitude >= -90 && $latitude <= 90;
+    }
+}
+
+if (!function_exists('isValidAttendanceLongitude')) {
+    function isValidAttendanceLongitude(float $longitude): bool
+    {
+        return $longitude >= -180 && $longitude <= 180;
+    }
+}
+
+if (!function_exists('calculateAttendanceDistanceMetres')) {
+    function calculateAttendanceDistanceMetres(
+        float $fromLatitude,
+        float $fromLongitude,
+        float $toLatitude,
+        float $toLongitude,
+    ): float {
+        $earthRadiusMetres = 6371000;
+        $latitudeDelta = deg2rad($toLatitude - $fromLatitude);
+        $longitudeDelta = deg2rad($toLongitude - $fromLongitude);
+
+        $fromLatitudeRadians = deg2rad($fromLatitude);
+        $toLatitudeRadians = deg2rad($toLatitude);
+
+        $a = sin($latitudeDelta / 2) ** 2
+            + cos($fromLatitudeRadians) * cos($toLatitudeRadians)
+            * sin($longitudeDelta / 2) ** 2;
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadiusMetres * $c;
+    }
+}
+
 if (!function_exists('uploadFile')) {
     function uploadFile(UploadedFile $file, string $folder, string $baseUrl = '', string $prefix = 'media')
     {
@@ -389,7 +480,7 @@ if (!function_exists('generateQRCodeAttendance')) {
         $qrCode = sprintf(
             '%s-%s-%s',
             date('d/m/Y'),
-            date('H:i:s'),
+            date('H\\hi\\ms\\s'),
             $randomString,
         );
         return $qrCode;

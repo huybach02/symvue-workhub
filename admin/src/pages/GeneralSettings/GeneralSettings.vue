@@ -395,14 +395,38 @@
                                     {{ $t("system_config.latitude") }}
                                     <span class="text-red"> * </span>
                                 </div>
-                                <v-text-field
-                                    v-bind="field"
-                                    :error-messages="errorMessage"
-                                    type="number"
-                                    variant="outlined"
-                                    :readonly="!isEditing"
-                                    persistent-placeholder
-                                />
+                                <div class="d-flex align-center ga-2">
+                                    <v-text-field
+                                        v-bind="field"
+                                        :error-messages="errorMessage"
+                                        type="number"
+                                        variant="outlined"
+                                        :readonly="!isEditing"
+                                        persistent-placeholder
+                                        class="flex-grow-1"
+                                    />
+                                    <v-btn
+                                        icon
+                                        variant="tonal"
+                                        color="primary"
+                                        class="mb-5"
+                                        :loading="locating"
+                                        :disabled="!isEditing"
+                                        @click="getCurrentLocation"
+                                    >
+                                        <v-icon icon="mdi-crosshairs-gps" />
+                                        <v-tooltip
+                                            activator="parent"
+                                            location="top"
+                                        >
+                                            {{
+                                                $t(
+                                                    "system_config.get_current_location",
+                                                )
+                                            }}
+                                        </v-tooltip>
+                                    </v-btn>
+                                </div>
                             </VeeField>
                         </v-col>
                         <v-col cols="12" md="3">
@@ -414,14 +438,38 @@
                                     {{ $t("system_config.longitude") }}
                                     <span class="text-red"> * </span>
                                 </div>
-                                <v-text-field
-                                    v-bind="field"
-                                    :error-messages="errorMessage"
-                                    type="number"
-                                    variant="outlined"
-                                    :readonly="!isEditing"
-                                    persistent-placeholder
-                                />
+                                <div class="d-flex align-center ga-2">
+                                    <v-text-field
+                                        v-bind="field"
+                                        :error-messages="errorMessage"
+                                        type="number"
+                                        variant="outlined"
+                                        :readonly="!isEditing"
+                                        persistent-placeholder
+                                        class="flex-grow-1"
+                                    />
+                                    <v-btn
+                                        icon
+                                        variant="tonal"
+                                        color="primary"
+                                        class="mb-5"
+                                        :loading="locating"
+                                        :disabled="!isEditing"
+                                        @click="getCurrentLocation"
+                                    >
+                                        <v-icon icon="mdi-crosshairs-gps" />
+                                        <v-tooltip
+                                            activator="parent"
+                                            location="top"
+                                        >
+                                            {{
+                                                $t(
+                                                    "system_config.get_current_location",
+                                                )
+                                            }}
+                                        </v-tooltip>
+                                    </v-btn>
+                                </div>
                             </VeeField>
                         </v-col>
                         <v-col cols="12" md="3">
@@ -470,13 +518,37 @@
                                     {{ $t("system_config.ip_address") }}
                                     <span class="text-red"> * </span>
                                 </div>
-                                <v-text-field
-                                    v-bind="field"
-                                    :error-messages="errorMessage"
-                                    variant="outlined"
-                                    :readonly="!isEditing"
-                                    persistent-placeholder
-                                />
+                                <div class="d-flex align-center ga-2">
+                                    <v-text-field
+                                        v-bind="field"
+                                        :error-messages="errorMessage"
+                                        variant="outlined"
+                                        :readonly="!isEditing"
+                                        persistent-placeholder
+                                        class="flex-grow-1"
+                                    />
+                                    <v-btn
+                                        icon
+                                        variant="tonal"
+                                        color="primary"
+                                        class="mb-5"
+                                        :loading="detectingIp"
+                                        :disabled="!isEditing"
+                                        @click="detectIpAddress"
+                                    >
+                                        <v-icon icon="mdi-ip-network" />
+                                        <v-tooltip
+                                            activator="parent"
+                                            location="top"
+                                        >
+                                            {{
+                                                $t(
+                                                    "system_config.get_current_ip",
+                                                )
+                                            }}
+                                        </v-tooltip>
+                                    </v-btn>
+                                </div>
                             </VeeField>
                         </v-col>
                     </v-row>
@@ -696,6 +768,7 @@ import { usePermission } from "@/hooks/usePermission";
 import { cauHinhChungSchema } from "@/utils/schemas/cauHinhChung";
 import { Field, Form } from "vee-validate";
 import { mapActions, mapGetters } from "vuex";
+import { toast } from "@/main";
 
 export default {
     components: {
@@ -706,6 +779,8 @@ export default {
         return {
             isEditing: false,
             cauHinhChungSchema,
+            locating: false,
+            detectingIp: false,
         };
     },
     computed: {
@@ -738,6 +813,65 @@ export default {
 
             if (this.$refs.formRef) {
                 this.$refs.formRef.resetForm();
+            }
+        },
+        getCurrentLocation() {
+            if (!navigator.geolocation) {
+                toast.error(this.$t("system_config.geolocation_not_supported"));
+                return;
+            }
+
+            this.locating = true;
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    const form = this.$refs.formRef;
+                    if (form) {
+                        form.setFieldValue("latitude", latitude);
+                        form.setFieldValue("longitude", longitude);
+                    }
+                    this.locating = false;
+                },
+                (err) => {
+                    this.locating = false;
+                    const messages = {
+                        1: this.$t(
+                            "system_config.geolocation_permission_denied",
+                        ),
+                        2: this.$t("system_config.geolocation_unavailable"),
+                        3: this.$t("system_config.geolocation_timeout"),
+                    };
+                    toast.error(messages[err.code] || err.message);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0,
+                },
+            );
+        },
+        async detectIpAddress() {
+            this.detectingIp = true;
+            try {
+                const response = await fetch(
+                    "https://api.ipify.org?format=json",
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const data = await response.json();
+                const form = this.$refs.formRef;
+                if (form && data.ip) {
+                    form.setFieldValue("ipAddress", data.ip);
+                }
+            } catch (err) {
+                toast.error(
+                    this.$t("system_config.detect_ip_failed", {
+                        message: err.message,
+                    }),
+                );
+            } finally {
+                this.detectingIp = false;
             }
         },
     },

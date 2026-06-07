@@ -11,6 +11,8 @@ services:
             APP_ENV: prod
             MERCURE_URL: http://mercure/.well-known/mercure
             MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-https://novatify-mercure.huybach02.io.vn/.well-known/mercure}
+            SYMFONY_TRUSTED_PROXIES: ${SYMFONY_TRUSTED_PROXIES:-127.0.0.1,REMOTE_ADDR,private_ranges}
+            SYMFONY_TRUSTED_HEADERS: ${SYMFONY_TRUSTED_HEADERS:-x-forwarded-for,x-forwarded-host,x-forwarded-proto,x-forwarded-port}
         volumes:
             - symfony_var:/var/www/html/var
             - symfony_uploads:/var/www/html/public/uploads
