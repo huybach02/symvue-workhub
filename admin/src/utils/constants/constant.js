@@ -43,13 +43,5 @@ export const constant = {
             value: "PART_TIME",
             text: i18n.global.t("bo_phan.employmentType.partTime"),
         },
-        {
-            value: "INTERN",
-            text: i18n.global.t("bo_phan.employmentType.intern"),
-        },
-        {
-            value: "CONTRACTOR",
-            text: i18n.global.t("bo_phan.employmentType.contractor"),
-        },
     ],
 };

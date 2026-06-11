@@ -13,7 +13,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserFixture extends Fixture implements FixtureGroupInterface
 {
-    private const int NUMBER_OF_USERS = 100;
+    private const NUMBER_OF_USERS = 100;
 
     public function __construct(
         private readonly UserPasswordHasherInterface $passwordHasher

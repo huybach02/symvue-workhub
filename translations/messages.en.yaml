@@ -45,6 +45,12 @@ error:
     location_invalid: "Attendance coordinates are invalid"
     attendance_location_config_invalid: "Attendance location configuration is invalid"
     location_out_of_range: "You are outside the allowed attendance area. Current distance: %distance%m, allowed radius: %radius%m"
+    not_in_working_schedule: "You are not in the working schedule"
+    too_early_to_check_in: "It's too early to check in."
+    too_early_to_check_out: "It's too early to check out."
+    too_late_to_check_in: "It's too late to check in. The system will automatically calculate the late time."
+    too_late_to_check_out: "It's too late to check out."
+    late_limit_exceeded: "You have exceeded the late limit for check out"
 permission:
     actions:
         index: "View list"
@@ -111,3 +117,7 @@ request:
         rejected_body: "%approverName% rejected your request. Reason: %reason%"
         approved_body: "%approverName% approved your request"
         note_suffix: "Note: %comment%"
+attendance_error:
+    early_check_in: "You have not checked in yet."
+    late: "You have checked in late by %time% minute(s)"
+    absent: "You have checked in absent. The system will record absent."

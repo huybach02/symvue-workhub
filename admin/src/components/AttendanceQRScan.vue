@@ -103,7 +103,6 @@ export default {
             scanResult: null,
             location: null,
             errorMessage: null,
-            // Tạo id duy nhất cho div reader để tránh xung đột khi mount nhiều instance
             readerId: "qr-reader-" + Date.now(),
             html5QrCode: null,
             isProcessingScan: false,
@@ -132,10 +131,24 @@ export default {
             this.isVerifying = false;
             this.canRetryScan = false;
         },
+
+        requestLocationPermission() {
+            if (!navigator.geolocation) {
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                () => {},
+                () => {},
+                { timeout: 5000 },
+            );
+        },
         async startScanner() {
             if (!this.dialog || this.isProcessingScan || this.isVerifying) {
                 return;
             }
+
+            this.requestLocationPermission();
 
             // Khởi tạo instance scanner và bật camera (ưu tiên camera sau)
             try {

@@ -38,14 +38,20 @@ class Attendance
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $workDate = null;
 
-    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
-    private ?\DateTime $time = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $timeAttendance = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $workScheduleStartTime = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $workScheduleEndTime = null;
 
     #[
         ORM\Column(
             length: 255,
             nullable: true,
-            options: ["comment" => "on_time,late,early_leave"],
+            options: ["comment" => "scheduled,on_time,late,early_leave,absent"],
         ),
     ]
     private ?string $status = null;
@@ -133,14 +139,38 @@ class Attendance
         return $this;
     }
 
-    public function getTime(): ?\DateTime
+    public function getTime(): ?string
     {
-        return $this->time;
+        return $this->timeAttendance;
     }
 
-    public function setTime(?\DateTime $time): static
+    public function setTimeAttendance(?string $timeAttendance): static
     {
-        $this->time = $time;
+        $this->timeAttendance = $timeAttendance;
+
+        return $this;
+    }
+
+    public function getWorkScheduleStartTime(): ?string
+    {
+        return $this->workScheduleStartTime;
+    }
+
+    public function setWorkScheduleStartTime(?string $workScheduleStartTime): static
+    {
+        $this->workScheduleStartTime = $workScheduleStartTime;
+
+        return $this;
+    }
+
+    public function getWorkScheduleEndTime(): ?string
+    {
+        return $this->workScheduleEndTime;
+    }
+
+    public function setWorkScheduleEndTime(?string $workScheduleEndTime): static
+    {
+        $this->workScheduleEndTime = $workScheduleEndTime;
 
         return $this;
     }
@@ -292,7 +322,9 @@ class Attendance
             "employee" => $this->employee,
             "attendanceType" => $this->attendanceType,
             "workDate" => $this->workDate,
-            "time" => $this->time,
+            "timeAttendance" => $this->timeAttendance,
+            "workScheduleStartTime" => $this->workScheduleStartTime,
+            "workScheduleEndTime" => $this->workScheduleEndTime,
             "status" => $this->status,
             "validationStatus" => $this->validationStatus,
             "workType" => $this->workType,

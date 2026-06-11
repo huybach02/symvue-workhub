@@ -45,6 +45,12 @@ error:
     location_invalid: "Tọa độ chấm công không hợp lệ"
     attendance_location_config_invalid: "Cấu hình vị trí chấm công không hợp lệ"
     location_out_of_range: "Bạn đang ở ngoài khu vực chấm công cho phép. Khoảng cách hiện tại: %distance%m, bán kính cho phép: %radius%m"
+    not_in_working_schedule: "Bạn không nằm trong khung giờ làm việc"
+    too_early_to_check_in: "Bạn chưa đến giờ chấm công vào."
+    too_early_to_check_out: "Bạn chưa đến giờ chấm công ra."
+    too_late_to_check_in: "Bạn đã quá giờ chấm công vào. Hệ thống sẽ tự động tính vắng."
+    too_late_to_check_out: "Bạn đã quá giờ chấm công ra."
+    late_limit_exceeded: "Bạn đã quá hạn chấm công"
 permission:
     actions:
         index: "Xem danh sách"
@@ -111,3 +117,7 @@ request:
         rejected_body: "%approverName% đã từ chối đề xuất của bạn. Lý do: %reason%"
         approved_body: "%approverName% đã duyệt đề xuất của bạn"
         note_suffix: "Ghi chú: %comment%"
+attendance_error:
+    early_check_in: "Bạn chưa đến giờ chấm công vào."
+    late: "Bạn đã chấm công vào trễ %time% phút"
+    absent: "Bạn đã chấm công quá thời gian cho phép. Hệ thống sẽ ghi nhận vắng"

@@ -368,13 +368,12 @@
         "leave_schedule": "Nghỉ phép",
         "holiday_schedule": "Nghỉ lễ/tết",
         "add_override_schedule": "Thêm lịch thay thế",
+        "delete_override_schedule": "Xóa lịch làm việc",
         "please_select_time_and_members": "Vui lòng chọn thời gian và thành viên",
         "add_fulltime_schedule": "Thêm lịch làm việc cố định",
         "danh_sach_nhan_su": "Danh sách nhân sự",
         "chon_nhan_su_ap_dung": "Chọn nhân sự áp dụng",
-        "nhan_su": "Nhân sự",
-        "them_lich_thay_the": "Thêm lịch thay thế",
-        "xoa_lich_lam_viec": "Xóa lịch làm việc"
+        "nhan_su": "Nhân sự"
     },
     "request": {
         "title": "Đề xuất",

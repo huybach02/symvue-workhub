@@ -135,7 +135,7 @@ class AttendanceLog
         return $this->longtitude;
     }
 
-    public function setLongtitude(string $longtitude): static
+    public function setLongtitude(?string $longtitude): static
     {
         $this->longtitude = $longtitude;
 

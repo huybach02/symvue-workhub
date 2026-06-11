@@ -15,6 +15,23 @@ if (!function_exists('t')) {
     }
 }
 
+if (!function_exists('appEnv')) {
+    function appEnv(string $key, mixed $default = null): mixed
+    {
+        if (array_key_exists($key, $_ENV)) {
+            return $_ENV[$key];
+        }
+
+        if (array_key_exists($key, $_SERVER)) {
+            return $_SERVER[$key];
+        }
+
+        $value = getenv($key);
+
+        return $value === false ? $default : $value;
+    }
+}
+
 if (!function_exists('isAdmin')) {
     function isAdmin($user)
     {
@@ -335,6 +352,40 @@ if (!function_exists('assertAttendanceLocationWithinConfiguredRadius')) {
                 '%radius%' => (string) round($radiusMetres, 2),
             ]));
         }
+    }
+}
+
+/**
+ * Parse ngày + giờ thành DateTimeImmutable 
+ *
+ * Input:
+ * - $baseDate: 2026-06-11 00:00:00
+ * - $time: "08:30" hoặc "08:30:15"
+ *
+ * Output:
+ * - 2026-06-11 08:30:00
+ * - 2026-06-11 08:30:15
+ *
+ */
+if (!function_exists('parseAttendanceDateTime')) {
+    function parseAttendanceDateTime(
+        \DateTimeImmutable $baseDate,
+        string $time,
+    ): ?\DateTimeImmutable {
+        $formats = ['Y-m-d H:i:s', 'Y-m-d H:i'];
+
+        foreach ($formats as $format) {
+            $dateTime = \DateTimeImmutable::createFromFormat(
+                $format,
+                $baseDate->format('Y-m-d') . ' ' . $time,
+            );
+
+            if ($dateTime instanceof \DateTimeImmutable) {
+                return $dateTime;
+            }
+        }
+
+        return null;
     }
 }
 

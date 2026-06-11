@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Class\CheckWorkScheduleOfUser;
 use App\Class\FilterWithPagination;
+use App\Class\ValidationStatus;
 use App\DTO\AttendanceDTO;
 use App\Entity\Attendance;
 use App\Entity\User;
+use App\Repository\AttendanceLogRepository;
 use App\Repository\AttendanceRepository;
 use App\Repository\GeneralSettingRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,6 +21,12 @@ class AttendanceService
     private const QR_DISPLAY_ACCESS_PREFIX = 'attendance.qr.display.';
     private const QR_DISPLAY_ACCESS_CURRENT_KEY = 'attendance.qr.display.current';
     private const QR_TOKEN_CACHE_PREFIX = 'attendance.qr.token.';
+    private const LOG_REASON_QR_CODE_VALID = 'qr_code_valid';
+    private const LOG_REASON_QR_CODE_INVALID = 'qr_code_invalid';
+    private const LOG_REASON_IP_ADDRESS_VALID = 'ip_address_valid';
+    private const LOG_REASON_IP_ADDRESS_INVALID = 'ip_address_invalid';
+    private const LOG_REASON_LOCATION_VALID = 'location_valid';
+    private const LOG_REASON_LOCATION_INVALID = 'location_invalid';
     private const QR_DISPLAY_ACCESS_TTL_SECONDS = 157680000; // 5 years
     private const QR_HARD_RELOAD_WINDOWS = [
         [
@@ -33,8 +42,9 @@ class AttendanceService
         private readonly GeneralSettingRepository $cauHinhChungRepository,
         private readonly CacheService $cacheService,
         private readonly WorkScheduleService $workScheduleService,
-    ) {
-    }
+        private readonly CheckWorkScheduleOfUser $checkWorkScheduleOfUser,
+        private readonly AttendanceLogRepository $attendanceLogRepository,
+    ) {}
 
     // public function findAll(array $params): array
     // {
@@ -233,6 +243,9 @@ class AttendanceService
     public function verifyAttendance(Request $request, AttendanceDTO $attendanceDTO, User $currentUser): bool
     {
         $configs = $this->cauHinhChungRepository->getAllConfig();
+        $now = new \DateTimeImmutable();
+        $attendanceInfo = $this->buildAttendanceInfo($request, $attendanceDTO);
+        $attendance = $this->resolveAttendanceForLog($now, $currentUser, $configs);
 
         // 1. Verify qr code từ dto
         $qrCode = $attendanceDTO->qrCode;
@@ -240,35 +253,76 @@ class AttendanceService
             $this->buildQrTokenCacheKey((string) $qrCode),
         );
         if ($qrCodeFromCache === null) {
+            $this->createValidationLog(
+                attendance: $attendance,
+                attendanceInfo: $attendanceInfo,
+                validationStatus: ValidationStatus::Invalid->value,
+                validationReason: self::LOG_REASON_QR_CODE_INVALID,
+            );
             throw new \Exception(t("error.qr_code_invalid"));
         }
+        $this->createValidationLog(
+            attendance: $attendance,
+            attendanceInfo: $attendanceInfo,
+            validationStatus: ValidationStatus::Valid->value,
+            validationReason: self::LOG_REASON_QR_CODE_VALID,
+        );
 
         // 2. Check IP address
-        $ipAddress = $request->getClientIp();
-        $allowedIpAddresses = $this->parseAllowedIpAddresses(
-            $configs['IP_ADDRESS'] ?? null,
-        );
+        // Kiểm tra env APP_ENV có là dev hay không
+        $ipAddress = $attendanceInfo['ipAddress'];
+        if (appEnv('APP_ENV') !== 'dev') {
+            $allowedIpAddresses = $this->parseAllowedIpAddresses(
+                $configs['IP_ADDRESS'] ?? null,
+            );
 
-        if ($ipAddress === null || !in_array($ipAddress, $allowedIpAddresses, true)) {
-            throw new \Exception(t("error.ip_address_invalid"));
+            if ($ipAddress === null || !in_array($ipAddress, $allowedIpAddresses, true)) {
+                $this->createValidationLog(
+                    attendance: $attendance,
+                    attendanceInfo: $attendanceInfo,
+                    validationStatus: ValidationStatus::Invalid->value,
+                    validationReason: self::LOG_REASON_IP_ADDRESS_INVALID,
+                );
+                throw new \Exception(t("error.ip_address_invalid"));
+            }
         }
+        $this->createValidationLog(
+            attendance: $attendance,
+            attendanceInfo: $attendanceInfo,
+            validationStatus: ValidationStatus::Valid->value,
+            validationReason: self::LOG_REASON_IP_ADDRESS_VALID,
+        );
 
         // 3. Check location
-        assertAttendanceLocationWithinConfiguredRadius(
-            $attendanceDTO->latitude,
-            $attendanceDTO->longitude,
-            $configs
-        );
+        try {
+            assertAttendanceLocationWithinConfiguredRadius(
+                $attendanceDTO->latitude,
+                $attendanceDTO->longitude,
+                $configs
+            );
+        } catch (\Exception $exception) {
+            $this->createValidationLog(
+                attendance: $attendance,
+                attendanceInfo: $attendanceInfo,
+                validationStatus: ValidationStatus::Invalid->value,
+                validationReason: self::LOG_REASON_LOCATION_INVALID,
+            );
 
-        $now = new \DateTimeImmutable();
-        $workingSchedule = $this->workScheduleService->getWorkingScheduleForUserOnDate(
-            $currentUser,
-            $now,
-        );
-
-        if (!$workingSchedule["isWorkingDay"]) {
-            throw new \Exception("Hôm nay bạn không có lịch làm việc.");
+            throw $exception;
         }
+        $this->createValidationLog(
+            attendance: $attendance,
+            attendanceInfo: $attendanceInfo,
+            validationStatus: ValidationStatus::Valid->value,
+            validationReason: self::LOG_REASON_LOCATION_VALID,
+        );
+
+        // 4. Check working schedule
+        $this->checkWorkScheduleOfUser->checkWorkingScheduleOfUser(
+            $now,
+            $currentUser,
+            $attendanceInfo,
+        );
 
         return true;
     }
@@ -290,8 +344,57 @@ class AttendanceService
         }
 
         return array_values(array_filter(array_map(
-            static fn (mixed $item): string => trim((string) $item),
+            static fn(mixed $item): string => trim((string) $item),
             $values,
         )));
+    }
+
+    private function buildAttendanceInfo(Request $request, AttendanceDTO $attendanceDTO): array
+    {
+        return [
+            "ipAddress" => $request->getClientIp(),
+            "latitude" => $attendanceDTO->latitude !== null ? (string) $attendanceDTO->latitude : null,
+            "longtitude" => $attendanceDTO->longitude !== null ? (string) $attendanceDTO->longitude : null,
+            "gpsAccuracyMeter" => $attendanceDTO->accuracy !== null ? (int) $attendanceDTO->accuracy : null,
+            "deviceId" => $request->headers->get('Device-Id') ? (int) $request->headers->get('Device-Id') : null,
+            "qrToken" => $attendanceDTO->qrCode,
+        ];
+    }
+
+    private function resolveAttendanceForLog(
+        \DateTimeImmutable $now,
+        User $currentUser,
+        array $configs,
+    ): ?Attendance
+    {
+        $attendances = $this->attendanceRepository->findAttendancesByWorkDateAndEmployee(
+            $now,
+            $currentUser,
+        );
+
+        return $this->checkWorkScheduleOfUser->resolveAttendanceRecordByNow(
+            $attendances,
+            $now,
+            $configs,
+        );
+    }
+
+    private function createValidationLog(
+        ?Attendance $attendance,
+        array $attendanceInfo,
+        string $validationStatus,
+        string $validationReason,
+    ): void {
+        $this->attendanceLogRepository->createAttendanceLog(
+            attendance: $attendance,
+            ipAddress: $attendanceInfo['ipAddress'],
+            latitude: $attendanceInfo['latitude'],
+            longtitude: $attendanceInfo['longtitude'],
+            gpsAccuracyMeter: $attendanceInfo['gpsAccuracyMeter'],
+            deviceId: $attendanceInfo['deviceId'],
+            qrToken: $attendanceInfo['qrToken'],
+            validationStatus: $validationStatus,
+            validationReason: $validationReason,
+        );
     }
 }

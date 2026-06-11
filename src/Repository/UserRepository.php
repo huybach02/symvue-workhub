@@ -107,6 +107,19 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getOneOrNullResult();
     }
 
+    /**
+     * @return User[]
+     */
+    public function findActiveUsers(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.deletedAt IS NULL')
+            ->andWhere('u.status = 1')
+            ->orderBy('u.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    public function findOneBySomeField($value): ?User
     //    {
     //        return $this->createQueryBuilder('u')

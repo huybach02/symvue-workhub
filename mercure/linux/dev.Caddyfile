@@ -19,6 +19,9 @@
 	encode zstd gzip
 
 	mercure {
+		transport bolt {
+			path mercure.db
+		}
 		# Publisher JWT key
 		publisher_jwt {env.MERCURE_PUBLISHER_JWT_KEY} {env.MERCURE_PUBLISHER_JWT_ALG}
 		# Subscriber JWT key

@@ -282,3 +282,32 @@ final class Constanst
         '#3E2723'
     ];
 }
+
+enum WorkType: string
+{
+    case FullTime = 'FULL_TIME';
+    case PartTime = 'PART_TIME';
+}
+
+enum StatusAttendance: string
+{
+    case Scheduled = 'scheduled';
+    case OnTime = 'on_time';
+    case Late = 'late';
+    case EarlyLeave = 'early_leave';
+    case Absent = 'absent';
+    case EarlyCheckIn = 'early_check_in';
+    case LateCheckOut = 'late_check_out';
+}
+
+enum AttendanceType: string
+{
+    case CheckIn = 'check_in';
+    case CheckOut = 'check_out';
+}
+
+enum ValidationStatus: string
+{
+    case Valid = 'valid';
+    case Invalid = 'invalid';
+}

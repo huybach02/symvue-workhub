@@ -2,7 +2,10 @@
 
 namespace App\Repository;
 
+use App\Class\AttendanceType;
+use App\Class\StatusAttendance;
 use App\Entity\Attendance;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -14,6 +17,61 @@ class AttendanceRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Attendance::class);
+    }
+
+    /**
+     * @return Attendance[]
+     */
+    public function findByWorkDate(\DateTimeInterface $workDate): array
+    {
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.employee', 'e')
+            ->addSelect('e')
+            ->leftJoin('a.workShiftAssignment', 'wsa')
+            ->addSelect('wsa')
+            ->andWhere('a.deletedAt IS NULL')
+            ->andWhere('a.workDate = :workDate')
+            ->setParameter('workDate', $workDate->format('Y-m-d'))
+            ->orderBy('a.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAttendancesByWorkDateAndEmployee(
+        \DateTimeInterface $workDate,
+        User $employee,
+    ): array {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.workDate = :workDate')
+            ->setParameter('workDate', $workDate->format('Y-m-d'))
+            ->andWhere('a.employee = :employee')
+            ->setParameter('employee', $employee)
+            ->andWhere('a.deletedAt IS NULL')
+            ->orderBy('a.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Attendance[]
+     */
+    public function findScheduledCheckInAttendancesForAbsentSync(
+        \DateTimeInterface $fromDate,
+        \DateTimeInterface $toDate,
+    ): array {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.deletedAt IS NULL')
+            ->andWhere('a.status = :status')
+            ->setParameter('status', StatusAttendance::Scheduled->value)
+            ->andWhere('a.attendanceType = :attendanceType')
+            ->setParameter('attendanceType', AttendanceType::CheckIn->value)
+            ->andWhere('a.workDate BETWEEN :fromDate AND :toDate')
+            ->setParameter('fromDate', $fromDate->format('Y-m-d'))
+            ->setParameter('toDate', $toDate->format('Y-m-d'))
+            ->orderBy('a.workDate', 'ASC')
+            ->addOrderBy('a.id', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     //    /**
