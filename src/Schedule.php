@@ -37,14 +37,14 @@ class Schedule implements ScheduleProviderInterface
                 '0 0 * * *',
                 new RunCommandMessage('app:clear-cache-persist-in-database')
             ))
-            // Create attendance data mỗi ngày lúc 12h30
+            // Create attendance data mỗi ngày lúc 00:01
             ->add(RecurringMessage::cron(
-                '01 0 * * * *',
+                '1 0 * * *',
                 new RunCommandMessage('app:attendance:create-attendance-data-every-day')
             ))
             // Đồng bộ absent cho attendance mỗi 5 phút
             ->add(RecurringMessage::cron(
-                '0 */5 * * * *',
+                '*/5 * * * *',
                 new RunCommandMessage('app:attendance:sync-absent-status')
             ))
             // Rebuild cache user permissions mỗi phút
