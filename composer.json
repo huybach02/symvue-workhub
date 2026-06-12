@@ -71,7 +71,8 @@
             "App\\": "src/"
         },
         "files": [
-            "src/functions.php"
+            "src/functions.php",
+            "src/Class/Constanst.php"
         ]
     },
     "autoload-dev": {
