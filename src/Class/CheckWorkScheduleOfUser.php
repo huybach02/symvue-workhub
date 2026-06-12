@@ -52,6 +52,19 @@ class CheckWorkScheduleOfUser
         );
 
         if (!$attendanceRecord) {
+            $absentCheckInAttendance = $this->resolveAbsentCheckInRecordByNow(
+                $attendances,
+                $now,
+                $generalSetting,
+            );
+
+            if ($absentCheckInAttendance instanceof Attendance) {
+                $this->throwMessageAttendanceInvalid(
+                    StatusAttendance::Absent->value,
+                    attendance: $absentCheckInAttendance,
+                );
+            }
+
             throw new \Exception(t('error.not_in_working_schedule'));
         }
 
@@ -135,7 +148,10 @@ class CheckWorkScheduleOfUser
                 validationReason: StatusAttendance::EarlyCheckIn->value,
             );
 
-            $this->throwMessageAttendanceInvalid(StatusAttendance::EarlyCheckIn->value);
+            $this->throwMessageAttendanceInvalid(
+                StatusAttendance::EarlyCheckIn->value,
+                attendance: $attendance,
+            );
         }
 
         // Case 2: Chấm công trong khoảng thời gian tính trễ
@@ -184,7 +200,11 @@ class CheckWorkScheduleOfUser
             $interval = $now->diff($checkInGraceStartTime);
             $timeLateFromGrace = $interval->h * 60 + $interval->i;
 
-            $this->throwMessageAttendanceInvalid(StatusAttendance::Late->value, (string) $timeLateFromGrace);
+            $this->throwMessageAttendanceInvalid(
+                StatusAttendance::Late->value,
+                (string) $timeLateFromGrace,
+                $attendance,
+            );
         }
 
         // Case 3: Chấm công sau thời gian tính trễ => Vắng
@@ -206,7 +226,10 @@ class CheckWorkScheduleOfUser
         $this->markRelatedCheckOutAsAbsent($attendance);
         $this->entityManager->flush();
 
-        $this->throwMessageAttendanceInvalid(StatusAttendance::Absent->value);
+        $this->throwMessageAttendanceInvalid(
+            StatusAttendance::Absent->value,
+            attendance: $attendance,
+        );
     }
 
     private function verifyTimeCheckOut(
@@ -245,7 +268,11 @@ class CheckWorkScheduleOfUser
                 validationReason: StatusAttendance::EarlyLeave->value,
             );
 
-            throw new \Exception(t('error.too_early_to_check_out'));
+            throw new \Exception(sprintf(
+                '%s (%s)',
+                t('error.too_early_to_check_out'),
+                $this->formatAttendanceLabel($attendance),
+            ));
         }
 
         // Case 2: Chấm công trong khoảng thời gian cho phép chấm công ra
@@ -291,7 +318,11 @@ class CheckWorkScheduleOfUser
         $interval = $now->diff($checkOutGraceEndTime);
         $timeLateFromLimit = $interval->h * 60 + $interval->i;
 
-        $this->throwMessageAttendanceInvalid(StatusAttendance::LateCheckOut->value, $timeLateFromLimit);
+        $this->throwMessageAttendanceInvalid(
+            StatusAttendance::LateCheckOut->value,
+            $timeLateFromLimit,
+            $attendance,
+        );
     }
 
     public function getAttendanceRecordToVerify(Attendance $attendance): ?Attendance
@@ -361,6 +392,55 @@ class CheckWorkScheduleOfUser
             static function (array $left, array $right): int {
                 return [$left['phaseRank'], $left['distanceToWindow'], $left['typePriority'], $left['anchorDistance'], $left['attendanceId']]
                     <=> [$right['phaseRank'], $right['distanceToWindow'], $right['typePriority'], $right['anchorDistance'], $right['attendanceId']];
+            },
+        );
+
+        return $candidates[0]['attendance'];
+    }
+
+    /**
+     * @param Attendance[] $attendances
+     */
+    private function resolveAbsentCheckInRecordByNow(
+        array $attendances,
+        DateTimeImmutable $now,
+        array $generalSetting,
+    ): ?Attendance {
+        $candidates = [];
+
+        foreach ($attendances as $attendance) {
+            if (
+                $attendance->getAttendanceType() !== AttendanceType::CheckIn->value ||
+                $attendance->getStatus() !== StatusAttendance::Absent->value
+            ) {
+                continue;
+            }
+
+            $attendanceWindow = $this->buildAttendanceActionWindow(
+                $attendance,
+                $generalSetting,
+            );
+
+            if ($attendanceWindow === null || $now <= $attendanceWindow['windowEnd']) {
+                continue;
+            }
+
+            $candidates[] = [
+                'attendance' => $attendance,
+                'distanceFromWindowEnd' => $now->getTimestamp() - $attendanceWindow['windowEnd']->getTimestamp(),
+                'attendanceId' => $attendance->getId() ?? PHP_INT_MAX,
+            ];
+        }
+
+        if ($candidates === []) {
+            return null;
+        }
+
+        usort(
+            $candidates,
+            static function (array $left, array $right): int {
+                return [$left['distanceFromWindowEnd'], $left['attendanceId']]
+                    <=> [$right['distanceFromWindowEnd'], $right['attendanceId']];
             },
         );
 
@@ -529,8 +609,29 @@ class CheckWorkScheduleOfUser
 
         return array_replace($generalSetting, $configSnapshot);
     }
-    public function throwMessageAttendanceInvalid(string $code, string|int $timeMinutes = '')
+    public function throwMessageAttendanceInvalid(
+        string $code,
+        string|int $timeMinutes = '',
+        ?Attendance $attendance = null,
+    ): void {
+        $message = t("attendance_error.$code", ['%time%' => $timeMinutes]);
+
+        if ($attendance instanceof Attendance) {
+            $message = sprintf(
+                '%s (%s)',
+                $message,
+                $this->formatAttendanceLabel($attendance),
+            );
+        }
+
+        throw new \Exception($message);
+    }
+
+    private function formatAttendanceLabel(Attendance $attendance): string
     {
-        throw new \Exception(t("attendance_error.$code", ['%time%' => $timeMinutes]));
+        $startTime = $attendance->getWorkScheduleStartTime() ?? '--:--';
+        $endTime = $attendance->getWorkScheduleEndTime() ?? '--:--';
+
+        return sprintf('%s - %s', $startTime, $endTime);
     }
 }

@@ -11,6 +11,7 @@ RUN apk add --no-cache \
     libjpeg-turbo \
     libpng \
     libpq \
+    tzdata \
     libzip && \
     apk add --no-cache --virtual .build-deps \
     $PHPIZE_DEPS \
@@ -34,6 +35,9 @@ WORKDIR /var/www/html
 
 ENV APP_ENV=prod
 ENV APP_DEBUG=0
+ENV TZ=Asia/Ho_Chi_Minh
+
+RUN printf 'date.timezone=%s\n' "$TZ" > /usr/local/etc/php/conf.d/timezone.ini
 
 COPY composer.json composer.lock symfony.lock ./
 
