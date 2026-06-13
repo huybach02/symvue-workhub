@@ -19,8 +19,7 @@ final class AttendanceController extends AbstractController
 {
     public function __construct(
         private readonly AttendanceService $attendanceService,
-    ) {
-    }
+    ) {}
 
     #[Route("/attendance/qr-display-access", methods: ["GET"])]
     public function createQrDisplayAccess(): JsonResponse
@@ -80,80 +79,38 @@ final class AttendanceController extends AbstractController
         }
     }
 
-    // #[Route("/attendance", methods: ["GET"])]
-    // public function getAll(Request $request): JsonResponse
-    // {
-    //     $params = $request->query->all();
-    //     $params = validateFilterParams($params);
+    #[Route("/attendance", methods: ["GET"])]
+    public function getAll(Request $request): JsonResponse
+    {
+        $params = $request->query->all();
+        $params = validateFilterParams($params);
 
-    //     try {
-    //         $result = $this->attendanceService->findAll($params);
-    //         return CustomResponse::success([
-    //             "collection" => $result["collection"],
-    //             "total" => $result["total"],
-    //             "pagination" => [
-    //                 "current_page" => $result["current_page"],
-    //                 "last_page" => $result["last_page"],
-    //                 "from" => $result["from"],
-    //                 "to" => $result["to"],
-    //                 "total_current" => $result["total_current"],
-    //             ],
-    //         ]);
-    //     } catch (\Throwable $th) {
-    //         return CustomResponse::error($th->getMessage());
-    //     }
-    // }
+        try {
+            $result = $this->attendanceService->findAll($params);
+            return CustomResponse::success([
+                "collection" => $result["collection"],
+                "total" => $result["total"],
+                "pagination" => [
+                    "current_page" => $result["current_page"],
+                    "last_page" => $result["last_page"],
+                    "from" => $result["from"],
+                    "to" => $result["to"],
+                    "total_current" => $result["total_current"],
+                ],
+            ]);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
 
-    // #[Route("/attendance/{id}", methods: ["GET"], priority: -1)]
-    // public function getOne(int $id): JsonResponse
-    // {
-    //     try {
-    //         $data = $this->attendanceService->findById($id);
-    //         return CustomResponse::success($data);
-    //     } catch (\Throwable $th) {
-    //         return CustomResponse::error($th->getMessage());
-    //     }
-    // }
-
-    // #[Route("/attendance", methods: ["POST"])]
-    // public function create(
-    //     #[
-    //         MapRequestPayload(validationGroups: ["create"]),
-    //     ]
-    //     AttendanceDTO $attendanceDTO,
-    // ): JsonResponse {
-    //     try {
-    //         $data = $this->attendanceService->create($attendanceDTO);
-    //         return CustomResponse::success($data, t("success.created"));
-    //     } catch (\Throwable $th) {
-    //         return CustomResponse::error($th->getMessage());
-    //     }
-    // }
-
-    // #[Route("/attendance/{id}", methods: ["PUT"])]
-    // public function update(
-    //     int $id,
-    //     #[
-    //         MapRequestPayload(validationGroups: ["update"]),
-    //     ]
-    //     AttendanceDTO $attendanceDTO,
-    // ): JsonResponse {
-    //     try {
-    //         $data = $this->attendanceService->update($id, $attendanceDTO);
-    //         return CustomResponse::success($data, t("success.updated"));
-    //     } catch (\Throwable $th) {
-    //         return CustomResponse::error($th->getMessage());
-    //     }
-    // }
-
-    // #[Route("/attendance/{id}", methods: ["DELETE"])]
-    // public function delete(int $id): JsonResponse
-    // {
-    //     try {
-    //         $this->attendanceService->delete($id);
-    //         return CustomResponse::success([], t("success.deleted"));
-    //     } catch (\Throwable $th) {
-    //         return CustomResponse::error($th->getMessage());
-    //     }
-    // }
+    #[Route("/attendance/{id}", methods: ["GET"], priority: -1)]
+    public function getOne(int $id): JsonResponse
+    {
+        try {
+            $data = $this->attendanceService->findById($id);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
 }

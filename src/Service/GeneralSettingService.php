@@ -12,6 +12,7 @@ final class GeneralSettingService
     public function __construct(
         private readonly GeneralSettingRepository $cauHinhChungRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly CacheService $cacheService,
     ) {}
 
     public function findAll(): array
@@ -58,8 +59,10 @@ final class GeneralSettingService
             $cauHinhChungList = $this->cauHinhChungRepository->findAll();
 
             $cauHinhChungMap = [];
+            $cauHinhChungCacheData = [];
             foreach ($cauHinhChungList as $item) {
                 $cauHinhChungMap[$item->getTenCauHinh()] = $item;
+                $cauHinhChungCacheData[$item->getTenCauHinh()] = $item->getGiaTri();
             }
 
             foreach ($mapping as $dtoField => $tenCauHinh) {
@@ -75,9 +78,12 @@ final class GeneralSettingService
 
                 if (isset($cauHinhChungMap[$tenCauHinh])) {
                     $cauHinhChungMap[$tenCauHinh]->setGiaTri((string) $giaTri);
+                    $cauHinhChungCacheData[$tenCauHinh] = (string) $giaTri;
                 }
             }
             $this->entityManager->flush();
+
+            $this->cacheService->set(GeneralSettingRepository::CACHE_KEY, $cauHinhChungCacheData, 60 * 60 * 24 * 365 * 5, true);
         } catch (\Throwable $th) {
             throw $th;
         }

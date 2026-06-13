@@ -84,7 +84,7 @@ Hàm này xử lý phần nghiệp vụ chính:
 - Backend không còn lấy record `scheduled` đầu tiên nữa
 - Backend tự chọn record phù hợp nhất theo thời điểm hiện tại
 
-## 5. 5 hàm quan trọng trong quá trình resolve
+## 5. 6 hàm quan trọng trong quá trình resolve
 
 ### 5.1. `parseAttendanceDateTime()`
 
@@ -192,6 +192,57 @@ Nhiệm vụ:
 - Từ danh sách nhiều record `scheduled`, chọn ra record hợp lý nhất để xử lý tại thời điểm `now`
 
 Hàm này không chọn theo `id`, mà chọn theo `time window`.
+
+### 5.6. `resolveAbsentCheckInRecordByNow()`
+
+Nhiệm vụ:
+
+- Đây là hàm fallback
+- Chỉ chạy khi backend không resolve được record `scheduled` nào để xử lý
+- Dùng để kiểm tra xem user có đang chấm vào một ca `check_in` đã bị tính `absent` hay không
+
+Ý tưởng:
+
+- Chỉ lấy các record:
+  - `attendanceType = check_in`
+  - `status = absent`
+- Tính lại `attendanceWindow` của các record đó
+- Chỉ giữ những record mà `now` đã thật sự lớn hơn `windowEnd`
+- Nếu có nhiều record thì chọn record có `windowEnd` gần hiện tại nhất
+
+Mục đích:
+
+- Trả đúng message nghiệp vụ hơn
+- Thay vì báo lỗi chung như `not_in_working_schedule`
+
+Ví dụ:
+
+- Ca 1: `08:00 - 12:00`
+- Ca 2: `12:00 - 16:00`
+- Config:
+  - `CHECK_IN_EARLIEST_MINUTES = 30`
+  - `LATE_LIMIT_MINUTES = 60`
+
+Window `check_in`:
+
+- Ca 1: `07:30 -> 09:00`
+- Ca 2: `11:30 -> 13:00`
+
+Giả sử cron đã chạy và update:
+
+- `check_in` ca 1 = `absent`
+- `check_in` ca 2 = `absent`
+
+Nếu `now = 14:34`:
+
+- Ca 1 đã quá `windowEnd` 5 giờ 34 phút
+- Ca 2 đã quá `windowEnd` 1 giờ 34 phút
+
+Kết quả:
+
+- Hàm sẽ chọn `check_in` của Ca 2
+- Vì đây là ca `absent` gần hiện tại nhất
+- Sau đó backend sẽ throw đúng message `absent` cho ca đó
 
 ## 6. Thứ tự tiêu chí để chọn record
 

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\GeneralSetting;
+use App\Service\CacheService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -11,13 +12,24 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class GeneralSettingRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly CacheService $cacheService,
+    ) {
         parent::__construct($registry, GeneralSetting::class);
     }
 
+    public const CACHE_KEY = 'general_settings';
+
     public function getAllConfig()
     {
+        $cacheKey = self::CACHE_KEY;
+
+        $cachedData = $this->cacheService->get($cacheKey);
+        if ($cachedData !== null) {
+            return $cachedData;
+        }
+
         $data = [];
 
         $configs = $this->createQueryBuilder('c')
@@ -28,6 +40,9 @@ class GeneralSettingRepository extends ServiceEntityRepository
         foreach ($configs as $config) {
             $data[$config['tenCauHinh']] = $config['giaTri'];
         }
+
+        $this->cacheService->set($cacheKey, $data, 60 * 60 * 24 * 365 * 5, true);
+
         return $data;
     }
 

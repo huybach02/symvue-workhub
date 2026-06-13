@@ -428,6 +428,75 @@
     },
     "attendance": {
         "title": "Attendance",
+        "sections": {
+            "full_time": "Fixed working time",
+            "part_time": "Shift working time"
+        },
+        "filters": {
+            "work_date": "Attendance date",
+            "work_date_placeholder": "Select attendance date",
+            "employee_placeholder": "Search by employee name or code"
+        },
+        "labels": {
+            "check_in": "Check in",
+            "check_out": "Check out",
+            "shift_count": "{count} shifts",
+            "shift_schedule": "Shift {start} - {end}",
+            "view_log": "View log"
+        },
+        "employee": {
+            "unknown": "Unknown"
+        },
+        "logs": {
+            "title": "Attendance logs",
+            "count": "{count} logs",
+            "entry": "Log {index}",
+            "empty": "No attendance logs yet",
+            "sections": {
+                "common": "Common information",
+                "entries": "Log entries"
+            },
+            "labels": {
+                "log_id": "ID: {id}",
+                "gps_accuracy_meter": "GPS accuracy: {value} m",
+                "grouped_hint": "Shared values are grouped into the common section."
+            },
+            "fields": {
+                "validation_status": "Validation status",
+                "validation_reason": "Reason",
+                "qr_token": "Scanned QR",
+                "ip_address": "IP address",
+                "device_id": "Device ID",
+                "latitude": "Latitude",
+                "longtitude": "Longitude",
+                "gps_accuracy_meter": "GPS accuracy"
+            },
+            "validation_status": {
+                "valid": "Valid",
+                "invalid": "Invalid"
+            },
+            "validation_reasons": {
+                "qr_code_valid": "Valid QR code",
+                "qr_code_invalid": "Invalid QR code",
+                "ip_address_valid": "Valid IP address",
+                "ip_address_invalid": "Invalid IP address",
+                "location_valid": "Valid location",
+                "location_invalid": "Invalid location"
+            }
+        },
+        "status": {
+            "unknown": "No data",
+            "scheduled": "Not checked in yet",
+            "on_time": "On time",
+            "late": "Late",
+            "early_leave": "Left early",
+            "absent": "Absent",
+            "late_check_out": "Late check out",
+            "early_check_in": "Checked in too early"
+        },
+        "empty": {
+            "no_data": "No attendance data yet"
+        },
         "columns": {
             "id": "ID",
             "name": "Name"

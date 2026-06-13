@@ -3,6 +3,7 @@
 return [
     "subscribeTopics" => [
         "https://app.com/test",
+        'https://app.com/attendance',
         'https://app.com/thong-bao-he-thong',
         'https://app.com/thong-bao-ca-nhan/{+path}',
         'https://app.com/message/{+path}',
@@ -11,6 +12,7 @@ return [
     ],
     "topics" => [
         "test" => "https://app.com/test",
+        "attendance" => "https://app.com/attendance",
         "thong-bao-he-thong" => "https://app.com/thong-bao-he-thong",
         "thong-bao-ca-nhan" => "https://app.com/thong-bao-ca-nhan/:userId",
         "message" => "https://app.com/message/:userId",

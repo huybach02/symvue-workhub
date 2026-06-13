@@ -319,9 +319,9 @@ class Attendance
     {
         return [
             "id" => $this->id,
-            "employee" => $this->employee,
+            "employee" => $this->employee?->jsonSerialize(),
             "attendanceType" => $this->attendanceType,
-            "workDate" => $this->workDate,
+            "workDate" => $this->workDate?->format('Y-m-d'),
             "timeAttendance" => $this->timeAttendance,
             "workScheduleStartTime" => $this->workScheduleStartTime,
             "workScheduleEndTime" => $this->workScheduleEndTime,
@@ -334,7 +334,7 @@ class Attendance
             "lateMinute" => $this->lateMinute,
             "earlyLeaveMinute" => $this->earlyLeaveMinute,
             "workShiftAssignment" => $this->workShiftAssignment?->getId(),
-            "attendanceLogs" => $this->attendanceLogs,
+            "attendanceLogs" => $this->attendanceLogs->map(fn(AttendanceLog $log) => $log->jsonSerialize())->toArray(),
         ];
     }
 }

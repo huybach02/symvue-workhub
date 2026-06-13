@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Repository\AttendanceLogRepository;
 use App\Repository\AttendanceRepository;
 use App\Repository\GeneralSettingRepository;
+use App\Service\MercureService;
 use App\Service\WorkScheduleService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,6 +28,7 @@ class CheckWorkScheduleOfUser
         private readonly AttendanceRepository $attendanceRepository,
         private readonly AttendanceLogRepository $attendanceLogRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly MercureService $mercureService,
     ) {}
 
     public function checkWorkingScheduleOfUser(
@@ -115,7 +117,7 @@ class CheckWorkScheduleOfUser
         DateTimeImmutable $endTime,
         Attendance $attendance,
         array $attendanceInfo,
-    ): bool {
+    ) {
         $checkInEarliestMinutes = (int) ($generalSetting[self::CHECK_IN_EARLIEST_KEY] ?? 0);
         $checkInGraceMinutes = (int) ($generalSetting[self::CHECK_IN_GRACE_KEY] ?? 0);
         $lateLimitMinutes = (int) ($generalSetting[self::LATE_LIMIT_KEY] ?? 0);
@@ -175,6 +177,7 @@ class CheckWorkScheduleOfUser
                 $attendance->setValidationStatus(ValidationStatus::Valid->value);
                 $attendance->setTimeAttendance($now->format('H:i:s'));
                 $this->entityManager->flush();
+                $this->publishAttendanceRealtime($attendance);
 
                 return true;
             }
@@ -196,6 +199,7 @@ class CheckWorkScheduleOfUser
             $attendance->setValidationStatus(ValidationStatus::Invalid->value);
             $attendance->setTimeAttendance($now->format('H:i:s'));
             $this->entityManager->flush();
+            $this->publishAttendanceRealtime($attendance);
 
             $interval = $now->diff($checkInGraceStartTime);
             $timeLateFromGrace = $interval->h * 60 + $interval->i;
@@ -225,6 +229,12 @@ class CheckWorkScheduleOfUser
         $attendance->setTimeAttendance($now->format('H:i:s'));
         $this->markRelatedCheckOutAsAbsent($attendance);
         $this->entityManager->flush();
+        $this->publishAttendanceRealtime($attendance);
+
+        $relatedCheckOutAttendance = $this->findRelatedCheckOutAttendance($attendance);
+        if ($relatedCheckOutAttendance instanceof Attendance) {
+            $this->publishAttendanceRealtime($relatedCheckOutAttendance);
+        }
 
         $this->throwMessageAttendanceInvalid(
             StatusAttendance::Absent->value,
@@ -239,7 +249,7 @@ class CheckWorkScheduleOfUser
         DateTimeImmutable $endTime,
         Attendance $attendance,
         array $attendanceInfo,
-    ): bool {
+    ) {
         $checkOutGraceMinutes = (int) ($generalSetting[self::CHECK_OUT_GRACE_KEY] ?? 0);
         $checkOutLatestMinutes = (int) ($generalSetting[self::CHECK_OUT_LATEST_KEY] ?? 0);
 
@@ -293,6 +303,7 @@ class CheckWorkScheduleOfUser
             $attendance->setValidationStatus(ValidationStatus::Valid->value);
             $attendance->setTimeAttendance($now->format('H:i:s'));
             $this->entityManager->flush();
+            $this->publishAttendanceRealtime($attendance);
 
             return true;
         }
@@ -314,6 +325,7 @@ class CheckWorkScheduleOfUser
         $attendance->setValidationStatus(ValidationStatus::Invalid->value);
         $attendance->setTimeAttendance($now->format('H:i:s'));
         $this->entityManager->flush();
+        $this->publishAttendanceRealtime($attendance);
 
         $interval = $now->diff($checkOutGraceEndTime);
         $timeLateFromLimit = $interval->h * 60 + $interval->i;
@@ -467,32 +479,55 @@ class CheckWorkScheduleOfUser
         return $attendanceWindow['windowEnd'];
     }
 
+    /**
+     * @return Attendance[]
+     */
     public function markAttendanceAndRelatedCheckOutAsAbsent(
         Attendance $attendance,
-    ): int {
+    ): array {
         if ($attendance->getStatus() !== StatusAttendance::Scheduled->value) {
-            return 0;
+            return [];
         }
 
         $attendance->setStatus(StatusAttendance::Absent->value);
         $attendance->setValidationStatus(ValidationStatus::Invalid->value);
 
-        $updatedCount = 1;
+        $updatedAttendances = [$attendance];
 
-        if ($this->markRelatedCheckOutAsAbsent($attendance)) {
-            $updatedCount++;
+        $relatedCheckOutAttendance = $this->markRelatedCheckOutAsAbsent($attendance);
+        if ($relatedCheckOutAttendance instanceof Attendance) {
+            $updatedAttendances[] = $relatedCheckOutAttendance;
         }
 
-        return $updatedCount;
+        return $updatedAttendances;
     }
 
-    private function markRelatedCheckOutAsAbsent(Attendance $attendance): bool
+    private function markRelatedCheckOutAsAbsent(Attendance $attendance): ?Attendance
     {
         if ($attendance->getAttendanceType() !== AttendanceType::CheckIn->value) {
-            return false;
+            return null;
         }
 
-        $relatedCheckOutAttendance = $this->attendanceRepository->findOneBy([
+        $relatedCheckOutAttendance = $this->findRelatedCheckOutAttendance($attendance);
+
+        if (!$relatedCheckOutAttendance) {
+            return null;
+        }
+
+        if ($relatedCheckOutAttendance->getStatus() !== StatusAttendance::Scheduled->value) {
+            return null;
+        }
+
+        $relatedCheckOutAttendance->setStatus(StatusAttendance::Absent->value);
+        $relatedCheckOutAttendance->setValidationStatus(ValidationStatus::Invalid->value);
+
+        return $relatedCheckOutAttendance;
+    }
+
+    private function findRelatedCheckOutAttendance(
+        Attendance $attendance,
+    ): ?Attendance {
+        return $this->attendanceRepository->findOneBy([
             'employee' => $attendance->getEmployee(),
             'workDate' => $attendance->getWorkDate(),
             'attendanceType' => AttendanceType::CheckOut->value,
@@ -500,19 +535,6 @@ class CheckWorkScheduleOfUser
             'workScheduleEndTime' => $attendance->getWorkScheduleEndTime(),
             'workShiftAssignment' => $attendance->getWorkShiftAssignment(),
         ]);
-
-        if (!$relatedCheckOutAttendance) {
-            return false;
-        }
-
-        if ($relatedCheckOutAttendance->getStatus() !== StatusAttendance::Scheduled->value) {
-            return false;
-        }
-
-        $relatedCheckOutAttendance->setStatus(StatusAttendance::Absent->value);
-        $relatedCheckOutAttendance->setValidationStatus(ValidationStatus::Invalid->value);
-
-        return true;
     }
 
     private function resolveAttendanceDateRange(
@@ -625,6 +647,11 @@ class CheckWorkScheduleOfUser
         }
 
         throw new \Exception($message);
+    }
+
+    private function publishAttendanceRealtime(Attendance $attendance): void
+    {
+        $this->mercureService->attendance($attendance->jsonSerialize());
     }
 
     private function formatAttendanceLabel(Attendance $attendance): string

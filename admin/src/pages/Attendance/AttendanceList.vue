@@ -1,173 +1,326 @@
 <template>
-    <div class="table-wrapper">
-        <div
-            class="table-scroll-container"
-            :style="{ '--table-min-width': tableMinWidth + 'px' }"
+    <div>
+        <v-row>
+            <v-col cols="12">
+                <v-row align="center">
+                    <v-col cols="12" md="4" lg="3">
+                        <div class="text-body-2 font-weight-medium mb-1">
+                            {{ $t("attendance.filters.work_date") }}
+                        </div>
+                        <DatePicker
+                            :model-value="selectedWorkDate"
+                            density="compact"
+                            :placeholder="
+                                $t('attendance.filters.work_date_placeholder')
+                            "
+                            @update:model-value="handleWorkDateChange"
+                        />
+                    </v-col>
+                </v-row>
+            </v-col>
+
+        <v-col
+            v-for="section in attendanceSections"
+            :key="section.key"
+            cols="12"
+            md="6"
         >
-            <v-data-table
-                :items="items"
-                :headers="headers"
-                :sort-by="sortArray"
-                :items-per-page="-1"
-                hide-default-footer
-                :loading="loading"
-                @update:options="onOptions"
-            >
-                <template #headers="{ columns, isSorted, getSortIcon, toggleSort }">
-                    <tr>
-                        <th
-                            v-for="col in columns"
-                            :key="col.key"
-                            :style="{
-                                width: col.width ? col.width + 'px' : undefined,
-                                minWidth: col.minWidth
-                                    ? col.minWidth + 'px'
-                                    : undefined,
-                                maxWidth: col.maxWidth
-                                    ? col.maxWidth + 'px'
-                                    : undefined,
-                            }"
-                            class="v-data-table-header__th v-data-table-header-sticky"
-                        >
-                            <div
-                                class="d-flex align-center justify-space-between py-2"
-                            >
-                                <template v-if="!col.filterComponent">
-                                    <span class="v-data-table-header__content">{{
-                                        col.title
-                                    }}</span>
-                                </template>
-
-                                <component
-                                    :is="col.filterComponent"
-                                    v-else
-                                    :items="col.items"
-                                    :title="col.title"
-                                    class="flex-grow-1"
-                                    @update="(val) => onFilter(col.key, val)"
-                                />
-
-                                <v-icon
-                                    v-if="col.sortable !== false"
-                                    :icon="getSortIcon(col)"
-                                    :class="{
-                                        'v-data-table-header__sort-icon': true,
-                                        'v-data-table-header__sort-icon--active':
-                                            isSorted(col),
-                                    }"
-                                    size="small"
-                                    @click="() => toggleSort(col)"
-                                />
-                            </div>
-                        </th>
-                    </tr>
-                </template>
-
-                <template #[`item.action`]="{ item }">
-                    <div class="d-flex align-center justify-space-between ga-1">
-                        <v-tooltip
-                            v-if="permission?.show"
-                            :text="$t('button.update')" 
-                            location="top"
-                        >
-                            <template #activator="{ props: tooltipProps }">
-                                <CreateEditAttendance
-                                    v-bind="tooltipProps"
-                                    :path="path"
-                                    mode="update"
-                                    :item="item"
-                                    @reload="$emit('reload')"
-                                />
-                            </template>
-                        </v-tooltip>
-                        <v-tooltip 
-                            v-if="permission?.delete"
-                            :text="$t('button.delete')" 
-                            location="top"
-                        >
-                            <template #activator="{ props: tooltipProps }">
-                                <v-btn
-                                    v-bind="tooltipProps"
-                                    icon
-                                    size="small"
-                                    variant="outlined"
-                                    color="error"
-                                    @click="openDeleteDialog(item.id)"
-                                >
-                                    <v-icon>mdi-delete</v-icon>
-                                </v-btn>
-                            </template>
-                        </v-tooltip>
-                    </div>
-                </template>
-
-                <template #[`item.status`]="{ item }">
-                    <v-chip
-                        :color="item.status === 1 ? 'success' : 'error'"
-                        size="small"
-                    >
+            <v-card rounded="lg" height="100%" elevation="1">
+                <v-card-title class="d-flex align-center ga-2 py-3 px-4">
+                    <v-icon :icon="section.icon" color="primary" />
+                    <span class="text-subtitle-1 font-weight-bold">
+                        {{ $t(section.titleKey) }}
+                    </span>
+                    <v-spacer />
+                    <v-chip color="primary" size="small" variant="tonal">
                         {{
-                            item.status === 1
-                                ? $t("status_values.active")
-                                : $t("status_values.inactive")
+                            $t("attendance.labels.shift_count", {
+                                count: section.totalShifts,
+                            })
                         }}
                     </v-chip>
-                </template>
+                </v-card-title>
 
-                <template #no-data>
-                    <div class="pa-8 text-center">
-                        <v-icon
-                            icon="mdi-database-off-outline"
-                            size="large"
-                            color="grey-lighten-1"
+                <v-card-text class="pa-3">
+                    <div v-if="loading" class="d-flex justify-center py-8">
+                        <v-progress-circular
+                            indeterminate
+                            color="primary"
+                            size="28"
                         />
-                        <div class="text-grey-darken-1 mt-2">
-                            {{ $t("base.no_data") }}
-                        </div>
                     </div>
-                </template>
-            </v-data-table>
-        </div>
 
-        <!-- Custom Pagination -->
-        <FilterPagination
-            :total-items="totalItems"
-            :current-page="query.page"
-            :items-per-page="query.limit"
-            @update:page="onPageChange"
-            @update:items-per-page="onLimitChange"
-        />
-        <ConfirmDialog
-            v-model="showConfirmDelete"
-            :message="
-                $t('media_library.delete_confirm_message', {
-                    count: 1,
-                })
-            "
-            :loading="isDeleting"
-            @confirm="handleDelete"
-            @cancel="showConfirmDelete = false"
+                    <template v-else>
+                        <v-text-field
+                            :model-value="section.keyword"
+                            class="mb-3"
+                            clearable
+                            density="compact"
+                            hide-details
+                            :placeholder="
+                                $t('attendance.filters.employee_placeholder')
+                            "
+                            prepend-inner-icon="mdi-magnify"
+                            variant="outlined"
+                            @update:model-value="
+                                updateSectionKeyword(section.key, $event)
+                            "
+                        />
+
+                        <v-list
+                            v-if="section.groups.length > 0"
+                            bg-color="transparent"
+                            class="px-1 py-1 d-flex flex-column ga-2"
+                        >
+                            <v-card
+                                v-for="group in section.groups"
+                                :key="group.groupKey"
+                                rounded="lg"
+                                class="mx-1 mb-2"
+                                elevation="2"
+                            >
+                                <v-card-text class="pa-3">
+                                    <div class="d-flex align-start ga-2 mb-2">
+                                        <v-avatar
+                                            color="primary"
+                                            size="28"
+                                            variant="tonal"
+                                        >
+                                            <v-icon
+                                                icon="mdi-account-outline"
+                                            />
+                                        </v-avatar>
+
+                                        <div class="flex-grow-1">
+                                            <div
+                                                class="d-flex flex-wrap align-center ga-2"
+                                            >
+                                                <div
+                                                    class="text-body-1 font-weight-bold"
+                                                >
+                                                    {{ getEmployeeName(group) }}
+                                                </div>
+
+                                                <v-chip
+                                                    v-for="chip in getGroupHeaderChips(
+                                                        section.key,
+                                                        group,
+                                                    )"
+                                                    :key="chip.key"
+                                                    :color="chip.color"
+                                                    size="x-small"
+                                                    :variant="chip.variant"
+                                                >
+                                                    {{ chip.label }}
+                                                </v-chip>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <v-list
+                                        bg-color="transparent"
+                                        class="pa-0 d-flex flex-column ga-2"
+                                    >
+                                        <component
+                                            :is="section.shiftWrapperComponent"
+                                            v-for="shift in group.shifts"
+                                            :key="shift.shiftKey"
+                                            v-bind="section.shiftWrapperProps"
+                                        >
+                                            <v-card-text class="pa-3">
+                                                <div
+                                                    v-if="
+                                                        section.isPartTime ||
+                                                        group.shifts.length > 1
+                                                    "
+                                                    class="d-flex align-center ga-2 mb-2"
+                                                >
+                                                    <v-avatar
+                                                        color="primary"
+                                                        size="24"
+                                                        variant="tonal"
+                                                    >
+                                                        <v-icon
+                                                            icon="mdi-calendar-clock-outline"
+                                                            size="16"
+                                                        />
+                                                    </v-avatar>
+                                                    <div
+                                                        class="text-body-2 font-weight-medium"
+                                                    >
+                                                        {{
+                                                            getAttendanceShiftLabel(
+                                                                shift,
+                                                            )
+                                                        }}
+                                                    </div>
+                                                </div>
+
+                                                <v-row>
+                                                    <v-col
+                                                        v-for="action in attendanceActions"
+                                                        :key="`${shift.shiftKey}-${action.key}`"
+                                                        cols="12"
+                                                        md="6"
+                                                    >
+                                                        <v-card
+                                                            rounded="md"
+                                                            class="ma-1"
+                                                            variant="outlined"
+                                                        >
+                                                            <v-card-text
+                                                                class="pa-2"
+                                                            >
+                                                                <div
+                                                                    class="d-flex align-center ga-2"
+                                                                >
+                                                                    <v-avatar
+                                                                        :color="
+                                                                            action.color
+                                                                        "
+                                                                        size="22"
+                                                                        variant="tonal"
+                                                                    >
+                                                                        <v-icon
+                                                                            :icon="
+                                                                                action.icon
+                                                                            "
+                                                                            size="14"
+                                                                        />
+                                                                    </v-avatar>
+                                                                    <div
+                                                                        class="text-body-2 font-weight-medium"
+                                                                    >
+                                                                        {{
+                                                                            $t(
+                                                                                action.labelKey,
+                                                                            )
+                                                                        }}
+                                                                    </div>
+                                                                    <v-spacer />
+                                                                    <v-btn
+                                                                        size="x-small"
+                                                                        variant="tonal"
+                                                                        icon="mdi-history"
+                                                                        :aria-label="
+                                                                            $t(
+                                                                                'attendance.labels.view_log',
+                                                                            )
+                                                                        "
+                                                                        :title="
+                                                                            $t(
+                                                                                'attendance.labels.view_log',
+                                                                            )
+                                                                        "
+                                                                        @click="
+                                                                            viewAttendanceLog(
+                                                                                shift,
+                                                                                action,
+                                                                            )
+                                                                        "
+                                                                    />
+                                                                </div>
+
+                                                                <div
+                                                                    class="d-flex flex-wrap ga-1 mt-2"
+                                                                >
+                                                                    <v-chip
+                                                                        :color="
+                                                                            getAttendanceStatusColor(
+                                                                                getActionRecord(
+                                                                                    shift,
+                                                                                    action,
+                                                                                )
+                                                                                    ?.status,
+                                                                            )
+                                                                        "
+                                                                        size="x-small"
+                                                                        variant="tonal"
+                                                                    >
+                                                                        {{
+                                                                            getAttendanceStatusLabel(
+                                                                                getActionRecord(
+                                                                                    shift,
+                                                                                    action,
+                                                                                )
+                                                                                    ?.status,
+                                                                            )
+                                                                        }}
+                                                                    </v-chip>
+
+                                                                    <v-chip
+                                                                        v-if="
+                                                                            hasAttendanceTime(
+                                                                                getActionRecord(
+                                                                                    shift,
+                                                                                    action,
+                                                                                ),
+                                                                            )
+                                                                        "
+                                                                        size="x-small"
+                                                                        variant="outlined"
+                                                                    >
+                                                                        {{
+                                                                            getAttendanceTimeLabel(
+                                                                                getActionRecord(
+                                                                                    shift,
+                                                                                    action,
+                                                                                ),
+                                                                            )
+                                                                        }}
+                                                                    </v-chip>
+                                                                </div>
+                                                            </v-card-text>
+                                                        </v-card>
+                                                    </v-col>
+                                                </v-row>
+                                            </v-card-text>
+                                        </component>
+                                    </v-list>
+                                </v-card-text>
+                            </v-card>
+                        </v-list>
+
+                        <v-card v-else rounded="lg" elevation="1">
+                            <v-card-text
+                                class="py-8 text-center text-medium-emphasis"
+                            >
+                                {{ $t("attendance.empty.no_data") }}
+                            </v-card-text>
+                        </v-card>
+                    </template>
+                </v-card-text>
+            </v-card>
+        </v-col>
+        </v-row>
+
+        <AttendanceLogDialog
+            v-model="isAttendanceLogDialogOpen"
+            :logs="attendanceLogs"
+            :action-label="attendanceLogContext.actionLabel"
+            :employee-name="attendanceLogContext.employeeName"
+            :shift-label="attendanceLogContext.shiftLabel"
         />
     </div>
 </template>
 
 <script>
-import { markRaw } from "vue";
-import FilterText from "@/components/filters/FilterText.vue";
-import FilterSelect from "@/components/filters/FilterSelect.vue";
-import FilterDateRange from "@/components/filters/FilterDateRange.vue";
-import FilterPagination from "@/components/filters/FilterPagination.vue";
-import { useFilterPagination } from "@/hooks/useFilterPagination.js";
-import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import CreateEditAttendance from "./CreateEditAttendance.vue";
-import { mapActions, mapGetters } from "vuex";
+import dayjs from "dayjs";
+import DatePicker from "@/components/DatePicker.vue";
+import AttendanceLogDialog from "./components/AttendanceLogDialog.vue";
+import { mapGetters } from "vuex";
+import {
+    ATTENDANCE_SECTION_KEYS,
+    ATTENDANCE_TYPES,
+    ATTENDANCE_STATUS,
+    ATTENDANCE_UI,
+} from "@/utils/constants/constant";
 
 export default {
     name: "AttendanceList",
     components: {
-        FilterPagination,
-        ConfirmDialog,
-        CreateEditAttendance,
+        AttendanceLogDialog,
+        DatePicker,
     },
     props: {
         path: {
@@ -180,122 +333,477 @@ export default {
         },
     },
     emits: ["reload"],
-    setup(props, { emit }) {
-        // Sử dụng hook useFilterPagination
-        const {
-            query,
-            sortArray,
-            onOptions,
-            onPageChange,
-            onLimitChange,
-            onFilter,
-        } = useFilterPagination((queryData) => {
-            emit("reload", { ...queryData });
-        });
-
-        return {
-            query,
-            sortArray,
-            onOptions,
-            onPageChange,
-            onLimitChange,
-            onFilter,
-        };
-    },
     data() {
         return {
-            showConfirmDelete: false,
-            isDeleting: false,
-            deletingId: null,
-            headers: [
-                {
-                    key: "action",
-                    width: 85,
-                    minWidth: 85,
-                    maxWidth: 85,
-                    sortable: false,
-                },
-                {
-                    title: this.$t("attendance.columns.id"),
-                    key: "id",
-                    width: 50,
-                    filterComponent: markRaw(FilterText),
-                },
-                {
-                    title: this.$t("attendance.columns.name"),
-                    key: "name",
-                    width: 200,
-                    filterComponent: markRaw(FilterText),
-                },
-                {
-                    title: this.$t("base.status"),
-                    key: "status",
-                    width: 100,
-                    filterComponent: markRaw(FilterSelect),
-                    items: [
-                        {
-                            title: this.$t("status_values.active"),
-                            value: "1",
-                        },
-                        {
-                            title: this.$t("status_values.inactive"),
-                            value: "0",
-                        },
-                    ],
-                    value: (item) =>
-                        item.status === 1
-                            ? this.$t("status_values.active")
-                            : this.$t("status_values.inactive"),
-                },
-                {
-                    title: this.$t("base.created_at"),
-                    key: "createdAt",
-                    width: 150,
-                    filterComponent: markRaw(FilterDateRange),
-                },
-                {
-                    title: this.$t("base.updated_at"),
-                    key: "updatedAt",
-                    width: 150,
-                    filterComponent: markRaw(FilterDateRange),
-                },
-            ],
+            selectedWorkDate: dayjs().format("YYYY-MM-DD"),
+            searchKeywords: {
+                [ATTENDANCE_SECTION_KEYS.FULL_TIME]: "",
+                [ATTENDANCE_SECTION_KEYS.PART_TIME]: "",
+            },
+            attendanceRecords: [],
+            attendanceLogs: [],
+            isAttendanceLogDialogOpen: false,
+            attendanceLogContext: {
+                actionLabel: "",
+                employeeName: "",
+                shiftLabel: "",
+            },
         };
     },
     computed: {
-        ...mapGetters("attendance", ["items", "loading", "totalItems"]),
-        tableMinWidth() {
-            return this.headers.reduce((total, col) => {
-                return total + (col.width || col.minWidth || 0);
-            }, 0);
+        ...mapGetters("attendance", ["items", "loading"]),
+        attendanceActions() {
+            return ATTENDANCE_UI.actions;
+        },
+        visibleShiftRecords() {
+            return this.buildVisibleShiftRecords(this.attendanceRecords);
+        },
+        attendanceSections() {
+            return ATTENDANCE_UI.sections.map((config) =>
+                this.buildAttendanceSection(config),
+            );
         },
     },
-    methods: {
-        ...mapActions("attendance", ["deleteItem"]),
-        openDeleteDialog(id) {
-            this.deletingId = id;
-            this.showConfirmDelete = true;
+    watch: {
+        items: {
+            immediate: true,
+            handler(newItems) {
+                this.syncAttendanceRecords(newItems);
+            },
         },
-        async handleDelete() {
-            this.isDeleting = true;
-            await this.deleteItem(this.deletingId);
-            this.isDeleting = false;
-            this.showConfirmDelete = false;
-            this.deletingId = null;
-            this.$emit("reload");
+    },
+    mounted() {
+        window.addEventListener(
+            "attendance:updated",
+            this.handleAttendanceRealtimeMessage,
+        );
+        this.reloadAttendances();
+    },
+    beforeUnmount() {
+        window.removeEventListener(
+            "attendance:updated",
+            this.handleAttendanceRealtimeMessage,
+        );
+    },
+    methods: {
+        handleWorkDateChange(value) {
+            this.selectedWorkDate = value;
+            this.attendanceRecords = [];
+            this.reloadAttendances();
+        },
+        reloadAttendances() {
+            if (!this.selectedWorkDate) {
+                return ATTENDANCE_UI.defaultFilterParams;
+            }
+
+            this.$emit("reload", {
+                ...ATTENDANCE_UI.defaultFilterParams,
+                f: [
+                    {
+                        field: "workDate",
+                        operator: "equal",
+                        value: this.selectedWorkDate,
+                    },
+                ],
+            });
+        },
+        syncAttendanceRecords(records) {
+            this.attendanceRecords = this.normalizeAttendanceRecords(records);
+        },
+        normalizeAttendanceRecords(records) {
+            return (records ?? [])
+                .map((record) => this.normalizeAttendanceRecord(record))
+                .filter(Boolean);
+        },
+        normalizeAttendanceRecord(record, options = {}) {
+            if (!record || !record.attendanceType) {
+                return null;
+            }
+
+            return {
+                ...record,
+                workDate: this.formatWorkDate(record.workDate),
+                _sortValue:
+                    options.sortValue ??
+                    record._sortValue ??
+                    Number(record?.id ?? 0),
+            };
+        },
+        handleAttendanceRealtimeMessage(event) {
+            const record = this.extractAttendanceRealtimeRecord(event?.detail);
+
+            if (!record || !this.shouldHandleRealtimeRecord(record)) {
+                return;
+            }
+
+            this.upsertAttendanceRecord(record);
+        },
+        extractAttendanceRealtimeRecord(payload) {
+            const resolvedRecord =
+                payload?.attendance ??
+                payload?.record ??
+                payload?.data ??
+                payload;
+
+            return this.normalizeAttendanceRecord(resolvedRecord, {
+                sortValue: this.resolveRealtimeSortValue(payload),
+            });
+        },
+        shouldHandleRealtimeRecord(record) {
+            const workDate = this.formatWorkDate(record.workDate);
+
+            if (this.selectedWorkDate && workDate !== this.selectedWorkDate) {
+                return false;
+            }
+
+            return Object.values(ATTENDANCE_SECTION_KEYS).includes(
+                record.workType,
+            );
+        },
+        upsertAttendanceRecord(record) {
+            const nextRecords = [...this.attendanceRecords];
+            const recordIndex = nextRecords.findIndex(
+                (item) => Number(item.id) === Number(record.id),
+            );
+
+            if (recordIndex >= 0) {
+                nextRecords.splice(recordIndex, 1, record);
+                this.attendanceRecords = nextRecords;
+
+                return;
+            }
+
+            nextRecords.unshift(record);
+
+            this.attendanceRecords = nextRecords;
+        },
+        updateSectionKeyword(sectionKey, value) {
+            this.searchKeywords[sectionKey] = String(value ?? "");
+        },
+        getActionRecord(shift, action) {
+            return shift?.[action.recordKey] ?? null;
+        },
+        buildAttendanceSection(config) {
+            const keyword = this.searchKeywords[config.key] ?? "";
+            const groups = this.buildSectionGroups(config.key, keyword);
+            const isPartTime = config.key === ATTENDANCE_SECTION_KEYS.PART_TIME;
+
+            return {
+                ...config,
+                isPartTime,
+                keyword,
+                groups,
+                shiftWrapperComponent: isPartTime ? "v-card" : "div",
+                shiftWrapperProps: isPartTime
+                    ? ATTENDANCE_UI.shiftWrapperProps.partTime
+                    : undefined,
+                totalShifts: groups.reduce(
+                    (total, group) => total + group.shifts.length,
+                    0,
+                ),
+            };
+        },
+        buildVisibleShiftRecords(records) {
+            const shiftMap = {};
+
+            records.forEach((record) => {
+                const shiftKey = this.getShiftKey(record);
+                const shiftRecord =
+                    shiftMap[shiftKey] ??
+                    this.createShiftRecord(shiftKey, record);
+
+                this.assignAttendanceRecord(shiftRecord, record);
+                shiftRecord.sortValue = Math.max(
+                    shiftRecord.sortValue,
+                    Number(record._sortValue ?? Number(record?.id ?? 0)),
+                );
+                shiftRecord.hasVisibleStatus =
+                    shiftRecord.hasVisibleStatus ||
+                    this.hasVisibleAttendanceStatus(record.status);
+                shiftMap[shiftKey] = shiftRecord;
+            });
+
+            return Object.values(shiftMap)
+                .filter((shift) => shift.hasVisibleStatus)
+                .map((shift) => this.hydrateShiftRecords(shift))
+                .sort((firstShift, secondShift) =>
+                    this.compareShiftRecords(firstShift, secondShift),
+                );
+        },
+        buildSectionGroups(sectionKey, keyword) {
+            const shiftRecords = this.visibleShiftRecords.filter(
+                (shift) => shift.workType === sectionKey,
+            );
+            const filteredShiftRecords = this.filterShiftRecordsByKeyword(
+                shiftRecords,
+                keyword,
+            );
+            const groupMap = {};
+
+            filteredShiftRecords.forEach((shift) => {
+                const groupKey = this.getEmployeeGroupKey(shift);
+                const group =
+                    groupMap[groupKey] ??
+                    this.createShiftGroup(groupKey, shift);
+
+                group.sortValue = Math.max(group.sortValue, shift.sortValue);
+                group.shifts.push(shift);
+                groupMap[groupKey] = group;
+            });
+
+            return Object.values(groupMap)
+                .map((group) => ({
+                    ...group,
+                    shifts: [...group.shifts].sort((firstShift, secondShift) =>
+                        this.compareShiftOrder(firstShift, secondShift),
+                    ),
+                }))
+                .sort((firstGroup, secondGroup) =>
+                    this.compareGroupOrder(firstGroup, secondGroup),
+                );
+        },
+        filterShiftRecordsByKeyword(records, keyword) {
+            const normalizedKeyword = String(keyword ?? "")
+                .trim()
+                .toLowerCase();
+
+            if (!normalizedKeyword) {
+                return records;
+            }
+
+            return records.filter((record) =>
+                this.getEmployeeSearchText(record).includes(normalizedKeyword),
+            );
+        },
+        compareShiftRecords(firstShift, secondShift) {
+            return (
+                secondShift.sortValue - firstShift.sortValue ||
+                this.compareShiftOrder(firstShift, secondShift)
+            );
+        },
+        compareShiftOrder(firstShift, secondShift) {
+            return (
+                String(firstShift.workScheduleStartTime).localeCompare(
+                    String(secondShift.workScheduleStartTime),
+                ) ||
+                String(firstShift.workScheduleEndTime).localeCompare(
+                    String(secondShift.workScheduleEndTime),
+                ) ||
+                secondShift.sortValue - firstShift.sortValue
+            );
+        },
+        compareGroupOrder(firstGroup, secondGroup) {
+            return (
+                secondGroup.sortValue - firstGroup.sortValue ||
+                this.getEmployeeName(firstGroup).localeCompare(
+                    this.getEmployeeName(secondGroup),
+                )
+            );
+        },
+        getGroupHeaderChips(sectionKey, group) {
+            const chips = [];
+
+            if (
+                sectionKey === ATTENDANCE_SECTION_KEYS.FULL_TIME &&
+                group.shifts.length === 1
+            ) {
+                chips.push({
+                    key: "shift",
+                    label: this.getAttendanceShiftLabel(group.shifts[0]),
+                    variant: "outlined",
+                });
+            }
+
+            chips.push({
+                key: "work-date",
+                label: group.workDate || this.$t("base.not_available"),
+                variant: "text",
+            });
+
+            if (sectionKey === ATTENDANCE_SECTION_KEYS.PART_TIME) {
+                chips.push({
+                    key: "shift-count",
+                    label: this.$t("attendance.labels.shift_count", {
+                        count: group.shifts.length,
+                    }),
+                    variant: "tonal",
+                    color: "primary",
+                });
+            }
+
+            return chips;
+        },
+        createShiftRecord(shiftKey, record) {
+            return {
+                shiftKey,
+                employee: record.employee,
+                workDate: this.formatWorkDate(record.workDate),
+                workType: record.workType,
+                workScheduleStartTime: record.workScheduleStartTime,
+                workScheduleEndTime: record.workScheduleEndTime,
+                checkIn: null,
+                checkOut: null,
+                hasVisibleStatus: false,
+                sortValue: 0,
+            };
+        },
+        assignAttendanceRecord(shiftRecord, record) {
+            if (record.attendanceType === ATTENDANCE_TYPES.CHECK_IN) {
+                shiftRecord.checkIn = record;
+            }
+
+            if (record.attendanceType === ATTENDANCE_TYPES.CHECK_OUT) {
+                shiftRecord.checkOut = record;
+            }
+        },
+        hasVisibleAttendanceStatus(status) {
+            return Boolean(status && status !== ATTENDANCE_STATUS.SCHEDULED);
+        },
+        createShiftGroup(groupKey, shift) {
+            return {
+                groupKey,
+                employee: shift.employee,
+                workDate: shift.workDate,
+                workType: shift.workType,
+                sortValue: shift.sortValue,
+                shifts: [],
+            };
+        },
+        buildKey(parts) {
+            return parts.join("-");
+        },
+        getShiftKey(record) {
+            return this.buildKey([
+                record.employee?.id ?? "",
+                this.formatWorkDate(record.workDate),
+                record.workType ?? "",
+                record.workScheduleStartTime ?? "",
+                record.workScheduleEndTime ?? "",
+            ]);
+        },
+        getEmployeeGroupKey(shift) {
+            return this.buildKey([
+                shift.employee?.id ?? "",
+                shift.workDate ?? "",
+                shift.workType ?? "",
+            ]);
+        },
+        hydrateShiftRecords(shift) {
+            return {
+                ...shift,
+                checkIn:
+                    shift.checkIn ??
+                    this.createAttendancePlaceholder(
+                        ATTENDANCE_TYPES.CHECK_IN,
+                        shift,
+                    ),
+                checkOut:
+                    shift.checkOut ??
+                    this.createAttendancePlaceholder(
+                        ATTENDANCE_TYPES.CHECK_OUT,
+                        shift,
+                    ),
+            };
+        },
+        createAttendancePlaceholder(attendanceType, shift) {
+            return {
+                id: null,
+                employee: shift.employee,
+                attendanceType,
+                workDate: shift.workDate,
+                workType: shift.workType,
+                workScheduleStartTime: shift.workScheduleStartTime,
+                workScheduleEndTime: shift.workScheduleEndTime,
+                status: ATTENDANCE_STATUS.SCHEDULED,
+                timeAttendance: null,
+            };
+        },
+        resolveRealtimeSortValue(payload) {
+            const timestamp = Date.parse(payload?.timestamp ?? "");
+
+            if (!Number.isNaN(timestamp)) {
+                return timestamp;
+            }
+
+            return Date.now();
+        },
+        getEmployeeMeta(item) {
+            if (typeof item.employee === "string") {
+                return {
+                    name: item.employee,
+                    code: "",
+                };
+            }
+
+            return {
+                name: item.employee?.name ?? "",
+                code: item.employee?.maNhanVien ?? "",
+            };
+        },
+        getEmployeeName(item) {
+            const { name, code } = this.getEmployeeMeta(item);
+
+            if (!name) {
+                return this.$t("attendance.employee.unknown");
+            }
+
+            return code ? `${name} - ${code}` : name;
+        },
+        getEmployeeSearchText(item) {
+            const { name, code } = this.getEmployeeMeta(item);
+
+            return `${name} ${code}`.trim().toLowerCase();
+        },
+        getAttendanceShiftLabel(item) {
+            const startTime = item.workScheduleStartTime ?? "--:--";
+            const endTime = item.workScheduleEndTime ?? "--:--";
+
+            return this.$t("attendance.labels.shift_schedule", {
+                start: startTime,
+                end: endTime,
+            });
+        },
+        getAttendanceTimeLabel(item) {
+            return item?.timeAttendance || "";
+        },
+        hasAttendanceTime(item) {
+            return Boolean(item?.timeAttendance);
+        },
+        getAttendanceStatusLabel(status) {
+            return this.$t(
+                ATTENDANCE_UI.status.labels[status] ??
+                    "attendance.status.unknown",
+            );
+        },
+        getAttendanceStatusColor(status) {
+            return ATTENDANCE_UI.status.colors[status] ?? "grey";
+        },
+        formatWorkDate(workDate) {
+            if (!workDate) {
+                return "";
+            }
+
+            if (typeof workDate === "string") {
+                return workDate;
+            }
+
+            if (workDate?.date) {
+                return String(workDate.date).split(" ")[0];
+            }
+
+            return "";
+        },
+        viewAttendanceLog(shift, action) {
+            const attendanceRecord = this.getActionRecord(shift, action);
+
+            this.attendanceLogs = attendanceRecord?.attendanceLogs ?? [];
+            this.attendanceLogContext = {
+                actionLabel: this.$t(action.labelKey),
+                employeeName: this.getEmployeeName(shift),
+                shiftLabel: this.getAttendanceShiftLabel(shift),
+            };
+            this.isAttendanceLogDialogOpen = true;
         },
     },
 };
 </script>
-
-<style scoped>
-.table-scroll-container {
-    overflow-x: auto;
-    width: 100%;
-}
-
-.table-scroll-container :deep(.v-data-table),
-.table-scroll-container :deep(table) {
-    min-width: var(--table-min-width, 600px);
-}
-</style>

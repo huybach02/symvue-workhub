@@ -7,6 +7,7 @@ namespace App\Command;
 use App\Class\CheckWorkScheduleOfUser;
 use App\Repository\AttendanceRepository;
 use App\Repository\GeneralSettingRepository;
+use App\Service\MercureService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -25,6 +26,7 @@ class SyncAbsentAttendanceStatusCommand extends Command
         private readonly GeneralSettingRepository $generalSettingRepository,
         private readonly CheckWorkScheduleOfUser $checkWorkScheduleOfUser,
         private readonly EntityManagerInterface $entityManager,
+        private readonly MercureService $mercureService,
     ) {
         parent::__construct();
     }
@@ -39,6 +41,7 @@ class SyncAbsentAttendanceStatusCommand extends Command
             $now,
         );
         $updatedAttendanceCount = 0;
+        $updatedAttendances = [];
 
         foreach ($scheduledCheckInAttendances as $attendance) {
             $latestAllowedTime = $this->checkWorkScheduleOfUser->getCheckInLatestAllowedTime(
@@ -50,13 +53,22 @@ class SyncAbsentAttendanceStatusCommand extends Command
                 continue;
             }
 
-            $updatedAttendanceCount += $this->checkWorkScheduleOfUser->markAttendanceAndRelatedCheckOutAsAbsent(
+            $changedAttendances = $this->checkWorkScheduleOfUser->markAttendanceAndRelatedCheckOutAsAbsent(
                 $attendance,
             );
+
+            $updatedAttendanceCount += count($changedAttendances);
+            $updatedAttendances = [...$updatedAttendances, ...$changedAttendances];
         }
 
         if ($updatedAttendanceCount > 0) {
             $this->entityManager->flush();
+
+            foreach ($updatedAttendances as $updatedAttendance) {
+                $this->mercureService->attendance(
+                    $updatedAttendance->jsonSerialize(),
+                );
+            }
         }
 
         $io->success(sprintf(

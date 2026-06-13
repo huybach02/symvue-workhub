@@ -18,6 +18,30 @@ export MERCURE_SUBSCRIBER_JWT_KEY="071c26246473e3a27780cfddf6123f5df4116fb8fc6f1
 export SERVER_NAME=":9999"
 export CORS_ALLOWED_ORIGINS="*"
 
+cleanup_old_mercure() {
+    local pids
+
+    pids="$(pgrep -f "$MERCURE_BIN.*dev.Caddyfile|mercure run --config dev.Caddyfile" || true)"
+    pids="$(printf '%s\n' "$pids" | awk 'NF && $1 != '"$$"'')"
+
+    if [ -z "$pids" ]; then
+        return
+    fi
+
+    echo "Phat hien Mercure cu dang chay, tien hanh dung de tranh lock mercure.db..."
+    echo "PID se dung: $(echo "$pids" | xargs)"
+
+    kill $pids 2>/dev/null || true
+    sleep 1
+
+    pids="$(ps -o pid= -p $(echo "$pids" | xargs) 2>/dev/null | awk 'NF')"
+    if [ -n "$pids" ]; then
+        echo "Mercure cu chua dung han, force kill..."
+        kill -9 $pids 2>/dev/null || true
+        sleep 1
+    fi
+}
+
 if [ ! -x "$MERCURE_BIN" ]; then
     echo "Khong tim thay Mercure binary cho Linux tai: $MERCURE_BIN"
     echo
@@ -30,6 +54,7 @@ if [ ! -x "$MERCURE_BIN" ]; then
 fi
 
 cd "$MERCURE_DIR"
+cleanup_old_mercure
 
 if ./mercure --help 2>&1 | grep -q " run "; then
     if [ ! -f "$MERCURE_CONFIG" ]; then

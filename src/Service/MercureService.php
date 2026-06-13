@@ -311,4 +311,21 @@ class MercureService
             new ThongBaoBoPhanMessage($fromUserId, $departmentId, $title, $body, $code, $type, $createdAt, $link)
         );
     }
+
+    public function attendance(array $attendance): void
+    {
+        $payload = [
+            'type' => 'attendance',
+            'attendance' => $attendance,
+            'timestamp' => (new \DateTimeImmutable())->format(DATE_ATOM),
+        ];
+
+        $update = new Update(
+            $this->mercureConfig['topics']['attendance'],
+            json_encode($payload),
+            false,
+        );
+
+        $this->hub->publish($update);
+    }
 }

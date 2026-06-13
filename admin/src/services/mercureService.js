@@ -107,6 +107,13 @@ export const createMercureConnection = ({
         const currentUser = getCurrentUser();
 
         switch (data.type) {
+            case "attendance":
+                window.dispatchEvent(
+                    new CustomEvent("attendance:updated", {
+                        detail: data,
+                    }),
+                );
+                break;
             case "presence":
                 appStore.commit("chat/SET_USER_ONLINE", {
                     userId: data.userId,

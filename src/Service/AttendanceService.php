@@ -46,72 +46,38 @@ class AttendanceService
         private readonly AttendanceLogRepository $attendanceLogRepository,
     ) {}
 
-    // public function findAll(array $params): array
-    // {
-    //     $qb = $this->attendanceRepository->createQueryBuilder('e');
+    public function findAll(array $params): array
+    {
+        $qb = $this->attendanceRepository->createQueryBuilder('e');
 
-    //     $result = FilterWithPagination::findWithPagination($qb, $params, 'e');
+        if (($params['realtime_view'] ?? 0) == 1) {
+            $qb
+                ->andWhere('e.status IS NOT NULL')
+                ->andWhere('e.status != :scheduledStatus')
+                ->setParameter('scheduledStatus', 'scheduled');
+        }
 
-    //     // Map collection to JSON
-    //     $result['collection'] = array_map(
-    //         fn(Attendance $item) => $item->jsonSerialize(),
-    //         $result['collection']
-    //     );
+        $result = FilterWithPagination::findWithPagination($qb, $params, 'e');
 
-    //     return $result;
-    // }
+        // Map collection to JSON
+        $result['collection'] = array_map(
+            fn(Attendance $item) => $item->jsonSerialize(),
+            $result['collection']
+        );
 
-    // public function findById(int $id): array
-    // {
-    //     $item = $this->attendanceRepository->find($id);
+        return $result;
+    }
 
-    //     if (!$item) {
-    //         throw new \Exception(t('error.not_found'));
-    //     }
+    public function findById(int $id): array
+    {
+        $item = $this->attendanceRepository->find($id);
 
-    //     return $item->jsonSerialize();
-    // }
+        if (!$item) {
+            throw new \Exception(t('error.not_found'));
+        }
 
-    // public function create(AttendanceDTO $dto): array
-    // {
-    //     $item = new Attendance();
-
-    //     // TODO: Map DTO properties to entity
-    //     // Example: $item->setName($dto->name);
-
-    //     $this->entityManager->persist($item);
-    //     $this->entityManager->flush();
-
-    //     return $item->jsonSerialize();
-    // }
-
-    // public function update(int $id, AttendanceDTO $dto): array
-    // {
-    //     $item = $this->attendanceRepository->find($id);
-
-    //     if (!$item) {
-    //         throw new \Exception(t('error.not_found'));
-    //     }
-
-    //     // TODO: Map DTO properties to entity
-    //     // Example: $item->setName($dto->name);
-
-    //     $this->entityManager->flush();
-
-    //     return $item->jsonSerialize();
-    // }
-
-    // public function delete(int $id): void
-    // {
-    //     $item = $this->attendanceRepository->find($id);
-
-    //     if (!$item) {
-    //         throw new \Exception(t('error.not_found'));
-    //     }
-
-    //     $this->entityManager->remove($item);
-    //     $this->entityManager->flush();
-    // }
+        return $item->jsonSerialize();
+    }
 
     public function createQrDisplayAccess(): array
     {
@@ -365,8 +331,7 @@ class AttendanceService
         \DateTimeImmutable $now,
         User $currentUser,
         array $configs,
-    ): ?Attendance
-    {
+    ): ?Attendance {
         $attendances = $this->attendanceRepository->findAttendancesByWorkDateAndEmployee(
             $now,
             $currentUser,

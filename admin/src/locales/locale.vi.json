@@ -431,6 +431,75 @@
     },
     "attendance": {
         "title": "Chấm công",
+        "sections": {
+            "full_time": "Thời gian làm việc cố định",
+            "part_time": "Thời gian làm việc theo ca"
+        },
+        "filters": {
+            "work_date": "Ngày chấm công",
+            "work_date_placeholder": "Chọn ngày chấm công",
+            "employee_placeholder": "Tìm theo tên hoặc mã nhân viên"
+        },
+        "labels": {
+            "check_in": "Chấm công vào",
+            "check_out": "Chấm công ra",
+            "shift_count": "{count} ca",
+            "shift_schedule": "Ca {start} - {end}",
+            "view_log": "Xem log"
+        },
+        "employee": {
+            "unknown": "Không xác định"
+        },
+        "logs": {
+            "title": "Nhật ký chấm công",
+            "count": "{count} log",
+            "entry": "Log {index}",
+            "empty": "Chưa có log chấm công",
+            "sections": {
+                "common": "Thông tin chung",
+                "entries": "Danh sách log"
+            },
+            "labels": {
+                "log_id": "ID: {id}",
+                "gps_accuracy_meter": "Sai số GPS: {value} m",
+                "grouped_hint": "Các thông tin trùng nhau đã được gom vào phần dùng chung."
+            },
+            "fields": {
+                "validation_status": "Trạng thái xác thực",
+                "validation_reason": "Lý do",
+                "qr_token": "QR đã quét",
+                "ip_address": "Địa chỉ IP",
+                "device_id": "Device ID",
+                "latitude": "Vĩ độ",
+                "longtitude": "Kinh độ",
+                "gps_accuracy_meter": "Sai số GPS"
+            },
+            "validation_status": {
+                "valid": "Hợp lệ",
+                "invalid": "Không hợp lệ"
+            },
+            "validation_reasons": {
+                "qr_code_valid": "QR hợp lệ",
+                "qr_code_invalid": "QR không hợp lệ",
+                "ip_address_valid": "IP hợp lệ",
+                "ip_address_invalid": "IP không hợp lệ",
+                "location_valid": "Vị trí hợp lệ",
+                "location_invalid": "Vị trí không hợp lệ"
+            }
+        },
+        "status": {
+            "unknown": "Không có dữ liệu",
+            "scheduled": "Chưa chấm công",
+            "on_time": "Đúng giờ",
+            "late": "Đi trễ",
+            "early_leave": "Về sớm",
+            "absent": "Vắng",
+            "late_check_out": "Chấm công ra muộn",
+            "early_check_in": "Chấm công vào quá sớm"
+        },
+        "empty": {
+            "no_data": "Chưa có dữ liệu chấm công"
+        },
         "columns": {
             "id": "ID",
             "name": "Tên"
