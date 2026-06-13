@@ -264,6 +264,43 @@ class CheckWorkScheduleOfUser
             sprintf('+%d minutes', $checkOutLatestMinutes),
         );
 
+        $relatedCheckInAttendance = $this->findRelatedCheckInAttendance($attendance);
+        if (!$relatedCheckInAttendance instanceof Attendance) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $relatedCheckInLatestAllowedTime = $this->getCheckInLatestAllowedTime(
+            $relatedCheckInAttendance,
+            $generalSetting,
+        );
+
+        if (
+            $relatedCheckInAttendance->getStatus() === StatusAttendance::Scheduled->value
+            && $relatedCheckInLatestAllowedTime instanceof DateTimeImmutable
+            && $now > $relatedCheckInLatestAllowedTime
+        ) {
+            $updatedAttendances = $this->markAttendanceAndRelatedCheckOutAsAbsent(
+                $relatedCheckInAttendance,
+            );
+            $this->entityManager->flush();
+
+            foreach ($updatedAttendances as $updatedAttendance) {
+                $this->publishAttendanceRealtime($updatedAttendance);
+            }
+
+            throw new \Exception(t('attendance_error.absent'));
+        }
+
+        if ($relatedCheckInAttendance->getStatus() === StatusAttendance::Absent->value) {
+            $attendance->setStatus(StatusAttendance::Absent->value);
+            $attendance->setValidationStatus(ValidationStatus::Invalid->value);
+            $attendance->setTimeAttendance($now->format('H:i:s'));
+            $this->entityManager->flush();
+            $this->publishAttendanceRealtime($attendance);
+
+            throw new \Exception(t('attendance_error.absent'));
+        }
+
         // Case 1: Chấm công sớm hơn thời gian bắt đầu cho phép chấm công ra
         if ($now < $checkOutGraceEndTime) {
             $this->attendanceLogRepository->createAttendanceLog(
@@ -498,6 +535,7 @@ class CheckWorkScheduleOfUser
      */
     public function markAttendanceAndRelatedCheckOutAsAbsent(
         Attendance $attendance,
+        ?DateTimeImmutable $now = null,
     ): array {
         if ($attendance->getStatus() !== StatusAttendance::Scheduled->value) {
             return [];
@@ -505,10 +543,13 @@ class CheckWorkScheduleOfUser
 
         $attendance->setStatus(StatusAttendance::Absent->value);
         $attendance->setValidationStatus(ValidationStatus::Invalid->value);
+        if ($now instanceof DateTimeImmutable) {
+            $attendance->setTimeAttendance($now->format('H:i:s'));
+        }
 
         $updatedAttendances = [$attendance];
 
-        $relatedCheckOutAttendance = $this->markRelatedCheckOutAsAbsent($attendance);
+        $relatedCheckOutAttendance = $this->markRelatedCheckOutAsAbsent($attendance, $now);
         if ($relatedCheckOutAttendance instanceof Attendance) {
             $updatedAttendances[] = $relatedCheckOutAttendance;
         }
@@ -516,8 +557,10 @@ class CheckWorkScheduleOfUser
         return $updatedAttendances;
     }
 
-    private function markRelatedCheckOutAsAbsent(Attendance $attendance): ?Attendance
-    {
+    private function markRelatedCheckOutAsAbsent(
+        Attendance $attendance,
+        ?DateTimeImmutable $now = null,
+    ): ?Attendance {
         if ($attendance->getAttendanceType() !== AttendanceType::CheckIn->value) {
             return null;
         }
@@ -534,6 +577,9 @@ class CheckWorkScheduleOfUser
 
         $relatedCheckOutAttendance->setStatus(StatusAttendance::Absent->value);
         $relatedCheckOutAttendance->setValidationStatus(ValidationStatus::Invalid->value);
+        if ($now instanceof DateTimeImmutable) {
+            $relatedCheckOutAttendance->setTimeAttendance($now->format('H:i:s'));
+        }
 
         return $relatedCheckOutAttendance;
     }
@@ -541,10 +587,29 @@ class CheckWorkScheduleOfUser
     private function findRelatedCheckOutAttendance(
         Attendance $attendance,
     ): ?Attendance {
+        return $this->findRelatedAttendanceByType(
+            $attendance,
+            AttendanceType::CheckOut->value,
+        );
+    }
+
+    private function findRelatedCheckInAttendance(
+        Attendance $attendance,
+    ): ?Attendance {
+        return $this->findRelatedAttendanceByType(
+            $attendance,
+            AttendanceType::CheckIn->value,
+        );
+    }
+
+    private function findRelatedAttendanceByType(
+        Attendance $attendance,
+        string $attendanceType,
+    ): ?Attendance {
         return $this->attendanceRepository->findOneBy([
             'employee' => $attendance->getEmployee(),
             'workDate' => $attendance->getWorkDate(),
-            'attendanceType' => AttendanceType::CheckOut->value,
+            'attendanceType' => $attendanceType,
             'workScheduleStartTime' => $attendance->getWorkScheduleStartTime(),
             'workScheduleEndTime' => $attendance->getWorkScheduleEndTime(),
             'workShiftAssignment' => $attendance->getWorkShiftAssignment(),

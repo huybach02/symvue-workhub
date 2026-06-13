@@ -1,25 +1,36 @@
 <template>
-    <v-container class="py-8">
-        <v-btn
-            color="primary"
-            :loading="isSending"
-            prepend-icon="mdi-bell-ring"
-            @click="sendTestNotification"
-        >
-            Gửi thông báo test
-        </v-btn>
+    <v-container class="">
+        <v-row class="ga-0">
+            <v-col cols="12" md="4">
+                <v-card elevation="3">
+                    <v-card-item>
+                        <v-card-title>
+                            {{ $t("dashboard.attendance_qr.title") }}
+                        </v-card-title>
+                        <v-card-subtitle>
+                            {{ $t("dashboard.attendance_qr.subtitle") }}
+                        </v-card-subtitle>
+                    </v-card-item>
 
-        <v-btn
-            color="success"
-            :loading="isOpeningQr"
-            prepend-icon="mdi-qrcode"
-            @click="openQrAttendance"
-            class="ml-2"
-        >
-            Hiển thị QR chấm công
-        </v-btn>
+                    <v-divider />
 
-        <AttendanceQRScan />
+                    <v-card-text>
+                        <v-btn
+                            v-if="isAdmin"
+                            color="success"
+                            :loading="isOpeningQr"
+                            prepend-icon="mdi-qrcode"
+                            class="mb-4"
+                            @click="openQrAttendance"
+                        >
+                            {{ $t("dashboard.actions.show_attendance_qr") }}
+                        </v-btn>
+
+                        <AttendanceQRScan />
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
     </v-container>
 </template>
 
@@ -27,6 +38,7 @@
 import AttendanceQRScan from "@/components/AttendanceQRScan.vue";
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import axiosInstance from "@/configs/axios";
+import { mapGetters } from "vuex";
 
 export default {
     components: {
@@ -34,22 +46,13 @@ export default {
     },
     data() {
         return {
-            isSending: false,
             isOpeningQr: false,
         };
     },
+    computed: {
+        ...mapGetters("auth", ["isAdmin"]),
+    },
     methods: {
-        async sendTestNotification() {
-            this.isSending = true;
-            try {
-                const res = await axiosInstance.get("/mercure/test");
-                console.log("[Mercure] API publish response:", res);
-            } catch (error) {
-                console.error("[Mercure] Lỗi khi gửi thông báo:", error);
-            } finally {
-                this.isSending = false;
-            }
-        },
         async openQrAttendance() {
             this.isOpeningQr = true;
             const qrWindow = window.open("about:blank", "_blank");
@@ -85,7 +88,7 @@ export default {
                 if (qrWindow) {
                     qrWindow.close();
                 }
-                console.error("Không thể mở trang QR chấm công:", error);
+                console.error(this.$t("dashboard.logs.open_qr_error"), error);
             } finally {
                 this.isOpeningQr = false;
             }
@@ -93,9 +96,3 @@ export default {
     },
 };
 </script>
-
-<style scoped>
-.status-row {
-    gap: 4px;
-}
-</style>

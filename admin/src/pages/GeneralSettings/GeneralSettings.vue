@@ -65,6 +65,32 @@
             <v-sheet
                 color="primary"
                 theme="dark"
+                class="pa-3 mb-5 rounded d-flex align-center ga-2"
+                elevation="1"
+            >
+                <v-icon icon="mdi-clock-outline" size="22" />
+                <p class="text-h6 font-weight-bold ma-0">
+                    {{ $t("system_config.notification_test") }}
+                </p>
+            </v-sheet>
+            <v-row>
+                <v-col cols="12">
+                    <v-btn
+                        color="primary"
+                        :loading="isSending"
+                        prepend-icon="mdi-bell-ring"
+                        @click="sendTestNotification"
+                    >
+                        {{ $t("dashboard.actions.send_test_notification") }}
+                    </v-btn>
+                </v-col>
+            </v-row>
+
+            <v-divider class="my-5" />
+
+            <v-sheet
+                color="primary"
+                theme="dark"
                 class="pa-3 mb-5 rounded d-flex align-center ga-2 section-title"
                 elevation="1"
             >
@@ -769,6 +795,7 @@ import { cauHinhChungSchema } from "@/utils/schemas/cauHinhChung";
 import { Field, Form } from "vee-validate";
 import { mapActions, mapGetters } from "vuex";
 import { toast } from "@/main";
+import axiosInstance from "@/configs/axios";
 
 export default {
     components: {
@@ -781,6 +808,7 @@ export default {
             cauHinhChungSchema,
             locating: false,
             detectingIp: false,
+            isSending: false,
         };
     },
     computed: {
@@ -800,6 +828,20 @@ export default {
         ...mapActions("generalSettings", ["fetchSettings", "updateSettings"]),
         async getAll() {
             await this.fetchSettings();
+        },
+        async sendTestNotification() {
+            this.isSending = true;
+            try {
+                const res = await axiosInstance.get("/mercure/test");
+                console.log("[Mercure] API publish response:", res);
+            } catch (error) {
+                console.error(
+                    this.$t("dashboard.logs.send_notification_error"),
+                    error,
+                );
+            } finally {
+                this.isSending = false;
+            }
         },
         async onSubmit(values) {
             const response = await this.updateSettings(values);

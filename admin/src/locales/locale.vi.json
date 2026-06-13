@@ -24,6 +24,20 @@
         "en": "English",
         "vi": "Tiếng Việt"
     },
+    "dashboard": {
+        "actions": {
+            "send_test_notification": "Gửi thông báo test",
+            "show_attendance_qr": "Hiển thị QR chấm công"
+        },
+        "attendance_qr": {
+            "title": "Chấm công QR",
+            "subtitle": "Mở camera để quét mã và xác thực vị trí chấm công."
+        },
+        "logs": {
+            "send_notification_error": "[Mercure] Lỗi khi gửi thông báo:",
+            "open_qr_error": "Không thể mở trang QR chấm công:"
+        }
+    },
     "system_config": {
         "login_fail_setting": "Thiết lập khi đăng nhập sai thông tin",
         "max_login_fail": "Số lần đăng nhập sai tối đa",
@@ -67,7 +81,8 @@
         "geolocation_unavailable": "Không xác định được vị trí hiện tại",
         "geolocation_timeout": "Quá thời gian chờ lấy vị trí",
         "get_current_ip": "Lấy địa chỉ IP hiện tại",
-        "detect_ip_failed": "Không thể lấy địa chỉ IP: {message}"
+        "detect_ip_failed": "Không thể lấy địa chỉ IP: {message}",
+        "notification_test": "Test thông báo của hệ thống"
     },
     "thoi_gian_lam_viec": {
         "fulltime": "Thời gian cố định",
@@ -503,6 +518,56 @@
         "columns": {
             "id": "ID",
             "name": "Tên"
+        },
+        "qr_scan": {
+            "open_button": "Mở quét QR",
+            "title": "Quét QR Attendance",
+            "subtitle": "Cấp quyền rồi đưa mã QR vào khung quét.",
+            "grant_button": "Cấp quyền",
+            "start_scanner": "Bật máy quét",
+            "retry_button": "Quét lại",
+            "close_button": "Đóng",
+            "permissions": {
+                "camera": "Camera",
+                "location": "Vị trí"
+            },
+            "status": {
+                "verifying": "Đang xác thực",
+                "processing": "Đang lấy vị trí",
+                "scanning": "Đang quét",
+                "ready": "Sẵn sàng",
+                "waiting_permission": "Chờ cấp quyền"
+            },
+            "messages": {
+                "verifying": "Đang xác thực chấm công",
+                "processing": "Đang lấy vị trí hiện tại",
+                "need_permissions": "Cần cấp quyền camera và vị trí",
+                "scanner_inactive": "Máy quét chưa được bật"
+            },
+            "permission_status": {
+                "granted": "Đã cấp",
+                "prompt": "Chưa cấp",
+                "denied": "Từ chối",
+                "unsupported": "Không hỗ trợ",
+                "unknown": "Chưa rõ"
+            },
+            "permission_text": {
+                "granted": "Quyền đã sẵn sàng.",
+                "prompt": "Cần cấp quyền để sử dụng.",
+                "denied": "Trình duyệt đang từ chối quyền.",
+                "unsupported": "Thiết bị không hỗ trợ.",
+                "unknown": "Không đọc được trạng thái hiện tại."
+            },
+            "success": {
+                "with_address": "Đã chấm công thành công tại {address}.",
+                "default": "Đã chấm công thành công."
+            },
+            "errors": {
+                "camera_access": "Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập.",
+                "scanner_start": "Không thể khởi động máy quét. Vui lòng kiểm tra lại quyền camera.",
+                "location_after_scan": "Quét thành công nhưng không lấy được vị trí: {message}",
+                "verify_failed": "Chấm công thất bại. Vui lòng bấm Quét lại để thử lại."
+            }
         }
     }
 }

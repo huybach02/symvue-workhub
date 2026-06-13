@@ -11,6 +11,7 @@ const getters = {
     currentUser: (state) => state.user,
     isAuthenticated: (state) => state.isAuthenticated,
     dataLogin: (state) => state.dataLogin,
+    isAdmin: (state) => state.user?.roles?.includes("ROLE_ADMIN"),
 };
 
 const mutations = {

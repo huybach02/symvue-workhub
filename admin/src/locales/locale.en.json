@@ -24,6 +24,20 @@
         "en": "English",
         "vi": "Vietnamese"
     },
+    "dashboard": {
+        "actions": {
+            "send_test_notification": "Send test notification",
+            "show_attendance_qr": "Show attendance QR"
+        },
+        "attendance_qr": {
+            "title": "QR Attendance",
+            "subtitle": "Open the camera to scan the code and verify attendance location."
+        },
+        "logs": {
+            "send_notification_error": "[Mercure] Failed to send notification:",
+            "open_qr_error": "Unable to open attendance QR page:"
+        }
+    },
     "system_config": {
         "login_fail_setting": "Login fail setting",
         "max_login_fail": "Max login fail",
@@ -66,7 +80,8 @@
         "geolocation_unavailable": "Location information is unavailable",
         "geolocation_timeout": "The request to get user location timed out",
         "get_current_ip": "Get current IP address",
-        "detect_ip_failed": "Failed to detect IP address: {message}"
+        "detect_ip_failed": "Failed to detect IP address: {message}",
+        "notification_test": "System notification test "
     },
     "thoi_gian_lam_viec": {
         "fulltime": "Fixed time",
@@ -500,6 +515,56 @@
         "columns": {
             "id": "ID",
             "name": "Name"
+        },
+        "qr_scan": {
+            "open_button": "Open QR scanner",
+            "title": "QR Attendance Scan",
+            "subtitle": "Grant permissions and place the QR code in the scanner frame.",
+            "grant_button": "Grant",
+            "start_scanner": "Start scanner",
+            "retry_button": "Scan again",
+            "close_button": "Close",
+            "permissions": {
+                "camera": "Camera",
+                "location": "Location"
+            },
+            "status": {
+                "verifying": "Verifying",
+                "processing": "Getting location",
+                "scanning": "Scanning",
+                "ready": "Ready",
+                "waiting_permission": "Waiting for permission"
+            },
+            "messages": {
+                "verifying": "Verifying attendance",
+                "processing": "Getting current location",
+                "need_permissions": "Camera and location permissions are required",
+                "scanner_inactive": "Scanner is not started yet"
+            },
+            "permission_status": {
+                "granted": "Granted",
+                "prompt": "Not granted",
+                "denied": "Denied",
+                "unsupported": "Unsupported",
+                "unknown": "Unknown"
+            },
+            "permission_text": {
+                "granted": "Permission is ready.",
+                "prompt": "Permission is required to continue.",
+                "denied": "The browser is denying this permission.",
+                "unsupported": "This device is not supported.",
+                "unknown": "Current permission state cannot be detected."
+            },
+            "success": {
+                "with_address": "Attendance recorded successfully at {address}.",
+                "default": "Attendance recorded successfully."
+            },
+            "errors": {
+                "camera_access": "Camera access is unavailable. Please check browser permissions.",
+                "scanner_start": "Cannot start the scanner. Please check camera permission again.",
+                "location_after_scan": "QR scanned successfully but location could not be retrieved: {message}",
+                "verify_failed": "Attendance failed. Please tap scan again to retry."
+            }
         }
     }
 }

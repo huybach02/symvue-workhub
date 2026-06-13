@@ -1,68 +1,191 @@
 <template>
     <div>
-        <h1>Attendance QR Scan</h1>
-
         <v-btn
             color="primary"
             prepend-icon="mdi-qrcode-scan"
             @click="openDialog"
         >
-            Mở quét QR
+            {{ $t("attendance.qr_scan.open_button") }}
         </v-btn>
 
         <v-dialog
             v-model="dialog"
-            max-width="500"
+            max-width="560"
             persistent
-            @after-enter="startScanner"
-            @after-leave="stopScanner"
+            @after-enter="handleDialogOpened"
+            @after-leave="handleDialogClosed"
         >
-            <v-card>
-                <v-card-title class="text-h6">
-                    Quét QR Attendance
+            <v-card rounded="xl">
+                <v-card-title class="d-flex align-center justify-space-between">
+                    <div>
+                        <div class="text-title-1">
+                            {{ $t("attendance.qr_scan.title") }}
+                        </div>
+                        <div class="text-body-2 text-medium-emphasis">
+                            {{ $t("attendance.qr_scan.subtitle") }}
+                        </div>
+                    </div>
+
+                    <v-chip size="small" variant="tonal" :color="statusColor">
+                        {{ statusLabel }}
+                    </v-chip>
                 </v-card-title>
 
                 <v-divider />
 
                 <v-card-text class="pa-4">
-                    <div :id="readerId" class="qr-reader" />
+                    <v-list density="comfortable">
+                        <v-list-item
+                            :title="$t('attendance.qr_scan.permissions.camera')"
+                            :subtitle="permissionText(cameraPermission)"
+                        >
+                            <template #append>
+                                <div class="d-flex align-center ga-2">
+                                    <v-chip
+                                        size="small"
+                                        variant="tonal"
+                                        :color="
+                                            permissionColor(cameraPermission)
+                                        "
+                                    >
+                                        {{ permissionLabel(cameraPermission) }}
+                                    </v-chip>
 
-                    <div
-                        v-if="isVerifying"
-                        class="d-flex align-center justify-center mt-3"
-                    >
-                        <v-progress-circular
-                            indeterminate
-                            color="primary"
-                            size="24"
-                            class="mr-2"
-                        />
-                        <span>Đang xác thực attendance...</span>
-                    </div>
+                                    <v-btn
+                                        v-if="
+                                            canRequestPermission(
+                                                cameraPermission,
+                                            )
+                                        "
+                                        size="small"
+                                        variant="text"
+                                        color="primary"
+                                        :loading="requestingCamera"
+                                        @click="requestCameraPermission"
+                                    >
+                                        {{
+                                            $t(
+                                                "attendance.qr_scan.grant_button",
+                                            )
+                                        }}
+                                    </v-btn>
+                                </div>
+                            </template>
+                        </v-list-item>
+
+                        <v-list-item
+                            :title="
+                                $t('attendance.qr_scan.permissions.location')
+                            "
+                            :subtitle="permissionText(locationPermission)"
+                        >
+                            <template #append>
+                                <div class="d-flex align-center ga-2">
+                                    <v-chip
+                                        size="small"
+                                        variant="tonal"
+                                        :color="
+                                            permissionColor(locationPermission)
+                                        "
+                                    >
+                                        {{
+                                            permissionLabel(locationPermission)
+                                        }}
+                                    </v-chip>
+
+                                    <v-btn
+                                        v-if="
+                                            canRequestPermission(
+                                                locationPermission,
+                                            )
+                                        "
+                                        size="small"
+                                        variant="text"
+                                        color="primary"
+                                        :loading="requestingLocation"
+                                        @click="requestLocationPermission"
+                                    >
+                                        {{
+                                            $t(
+                                                "attendance.qr_scan.grant_button",
+                                            )
+                                        }}
+                                    </v-btn>
+                                </div>
+                            </template>
+                        </v-list-item>
+                    </v-list>
+
+                    <v-responsive :aspect-ratio="4 / 3" class="mt-3">
+                        <v-sheet
+                            rounded="xl"
+                            color="grey-darken-4"
+                            class="position-relative overflow-hidden fill-height"
+                        >
+                            <div :id="readerId" />
+
+                            <v-overlay
+                                :model-value="!scannerActive"
+                                contained
+                                persistent
+                                class="align-center justify-center"
+                            >
+                                <div class="text-center px-6">
+                                    <v-progress-circular
+                                        v-if="processing || verifying"
+                                        indeterminate
+                                        color="primary"
+                                    />
+
+                                    <v-icon
+                                        v-else
+                                        icon="mdi-qrcode-scan"
+                                        size="48"
+                                        color="grey-lighten-1"
+                                    />
+
+                                    <div
+                                        class="text-subtitle-1 text-white mt-4"
+                                    >
+                                        {{ scannerMessage }}
+                                    </div>
+
+                                    <v-btn
+                                        v-if="
+                                            canStartScanner &&
+                                            !processing &&
+                                            !verifying
+                                        "
+                                        class="mt-4"
+                                        color="primary"
+                                        prepend-icon="mdi-camera"
+                                        @click="startScanner"
+                                    >
+                                        {{
+                                            $t(
+                                                "attendance.qr_scan.start_scanner",
+                                            )
+                                        }}
+                                    </v-btn>
+                                </div>
+                            </v-overlay>
+                        </v-sheet>
+                    </v-responsive>
 
                     <v-alert
-                        v-if="scanResult"
+                        v-if="successMessage"
                         type="success"
-                        class="mt-3"
                         variant="tonal"
-                        border="start"
+                        class="mt-4"
                     >
-                        Kết quả: <strong>{{ scanResult }}</strong>
-                        <div v-if="location" class="mt-1">
-                            Vị trí:
-                            <strong>
-                                {{ location.latitude }},
-                                {{ location.longitude }}
-                            </strong>
-                        </div>
+                        {{ successMessage }}
                     </v-alert>
 
                     <v-alert
                         v-if="errorMessage"
                         type="error"
-                        class="mt-3"
                         variant="tonal"
-                        border="start"
+                        class="mt-4"
                     >
                         {{ errorMessage }}
                     </v-alert>
@@ -71,18 +194,20 @@
                 <v-divider />
 
                 <v-card-actions>
-                    <v-spacer />
                     <v-btn
-                        v-if="canRetryScan"
-                        color="primary"
                         variant="tonal"
-                        :disabled="isVerifying"
+                        color="primary"
+                        prepend-icon="mdi-refresh"
+                        :disabled="processing || verifying || !canStartScanner"
                         @click="retryScan"
                     >
-                        Quét lại
+                        {{ $t("attendance.qr_scan.retry_button") }}
                     </v-btn>
-                    <v-btn color="error" variant="text" @click="closeDialog">
-                        Đóng
+
+                    <v-spacer />
+
+                    <v-btn variant="text" color="error" @click="closeDialog">
+                        {{ $t("attendance.qr_scan.close_button") }}
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -100,175 +225,420 @@ export default {
     data() {
         return {
             dialog: false,
-            scanResult: null,
-            location: null,
-            errorMessage: null,
             readerId: "qr-reader-" + Date.now(),
             html5QrCode: null,
-            isProcessingScan: false,
-            isVerifying: false,
-            canRetryScan: false,
+            scannerActive: false,
+            processing: false,
+            verifying: false,
+            requestingCamera: false,
+            requestingLocation: false,
+            cameraPermission: "unknown",
+            locationPermission: "unknown",
+            location: null,
+            successMessage: null,
+            errorMessage: null,
         };
     },
+
+    computed: {
+        addressDisplay() {
+            return (
+                this.$store.state.generalSettings?.initialValues
+                    ?.addressDisplay || ""
+            );
+        },
+
+        canStartScanner() {
+            return (
+                this.cameraPermission === "granted" &&
+                this.locationPermission === "granted"
+            );
+        },
+
+        statusLabel() {
+            if (this.verifying) {
+                return this.$t("attendance.qr_scan.status.verifying");
+            }
+
+            if (this.processing) {
+                return this.$t("attendance.qr_scan.status.processing");
+            }
+
+            if (this.scannerActive) {
+                return this.$t("attendance.qr_scan.status.scanning");
+            }
+
+            return this.canStartScanner
+                ? this.$t("attendance.qr_scan.status.ready")
+                : this.$t("attendance.qr_scan.status.waiting_permission");
+        },
+
+        statusColor() {
+            if (this.verifying || this.processing) {
+                return "info";
+            }
+
+            if (this.scannerActive || this.canStartScanner) {
+                return "success";
+            }
+
+            return "warning";
+        },
+
+        scannerMessage() {
+            if (this.verifying) {
+                return this.$t("attendance.qr_scan.messages.verifying");
+            }
+
+            if (this.processing) {
+                return this.$t("attendance.qr_scan.messages.processing");
+            }
+
+            if (!this.canStartScanner) {
+                return this.$t("attendance.qr_scan.messages.need_permissions");
+            }
+
+            return this.$t("attendance.qr_scan.messages.scanner_inactive");
+        },
+    },
+
     beforeUnmount() {
-        // Đảm bảo giải phóng camera khi component bị huỷ
         this.stopScanner();
     },
+
     methods: {
-        openDialog() {
-            // Reset trạng thái mỗi lần mở dialog để quét mới
-            this.resetScanState();
+        async openDialog() {
+            this.resetState();
             this.dialog = true;
+            await this.ensureGeneralSettingsLoaded();
+            await this.syncPermissions();
+            await this.autoRequestPermissions();
         },
+
         closeDialog() {
             this.dialog = false;
         },
-        resetScanState() {
-            this.scanResult = null;
-            this.location = null;
-            this.errorMessage = null;
-            this.isProcessingScan = false;
-            this.isVerifying = false;
-            this.canRetryScan = false;
+
+        async handleDialogOpened() {
+            await this.syncPermissions();
+            await this.startScannerIfReady();
         },
 
-        requestLocationPermission() {
-            if (!navigator.geolocation) {
+        async handleDialogClosed() {
+            await this.stopScanner();
+        },
+
+        resetState() {
+            this.location = null;
+            this.successMessage = null;
+            this.errorMessage = null;
+            this.processing = false;
+            this.verifying = false;
+        },
+
+        async ensureGeneralSettingsLoaded() {
+            if (this.$store.state.generalSettings?.dataLoaded) {
                 return;
             }
 
-            navigator.geolocation.getCurrentPosition(
-                () => {},
-                () => {},
-                { timeout: 5000 },
+            await this.$store.dispatch("generalSettings/fetchSettings");
+        },
+
+        async syncPermissions() {
+            this.cameraPermission = await this.getPermissionStatus(
+                "camera",
+                Boolean(navigator.mediaDevices?.getUserMedia),
+            );
+            this.locationPermission = await this.getPermissionStatus(
+                "geolocation",
+                Boolean(navigator.geolocation),
             );
         },
-        async startScanner() {
-            if (!this.dialog || this.isProcessingScan || this.isVerifying) {
+
+        async autoRequestPermissions() {
+            if (
+                this.locationPermission !== "granted" &&
+                this.locationPermission !== "unsupported"
+            ) {
+                await this.requestLocationPermission();
+            }
+
+            if (
+                this.cameraPermission !== "granted" &&
+                this.cameraPermission !== "unsupported"
+            ) {
+                await this.requestCameraPermission();
+            }
+        },
+
+        async getPermissionStatus(name, supported) {
+            if (!supported) {
+                return "unsupported";
+            }
+
+            if (!navigator.permissions?.query) {
+                return "unknown";
+            }
+
+            try {
+                const result = await navigator.permissions.query({ name });
+                return result.state || "unknown";
+            } catch (error) {
+                return "unknown";
+            }
+        },
+
+        permissionLabel(status) {
+            const labels = {
+                granted: this.$t(
+                    "attendance.qr_scan.permission_status.granted",
+                ),
+                prompt: this.$t("attendance.qr_scan.permission_status.prompt"),
+                denied: this.$t("attendance.qr_scan.permission_status.denied"),
+                unsupported: this.$t(
+                    "attendance.qr_scan.permission_status.unsupported",
+                ),
+                unknown: this.$t(
+                    "attendance.qr_scan.permission_status.unknown",
+                ),
+            };
+
+            return (
+                labels[status] ||
+                this.$t("attendance.qr_scan.permission_status.unknown")
+            );
+        },
+
+        permissionText(status) {
+            const labels = {
+                granted: this.$t("attendance.qr_scan.permission_text.granted"),
+                prompt: this.$t("attendance.qr_scan.permission_text.prompt"),
+                denied: this.$t("attendance.qr_scan.permission_text.denied"),
+                unsupported: this.$t(
+                    "attendance.qr_scan.permission_text.unsupported",
+                ),
+                unknown: this.$t("attendance.qr_scan.permission_text.unknown"),
+            };
+
+            return (
+                labels[status] ||
+                this.$t("attendance.qr_scan.permission_text.unknown")
+            );
+        },
+
+        permissionColor(status) {
+            const colors = {
+                granted: "success",
+                prompt: "warning",
+                denied: "error",
+                unsupported: "grey",
+                unknown: "grey",
+            };
+
+            return colors[status] || "grey";
+        },
+
+        canRequestPermission(status) {
+            return status !== "granted" && status !== "unsupported";
+        },
+
+        async requestCameraPermission() {
+            if (!navigator.mediaDevices?.getUserMedia) {
+                this.cameraPermission = "unsupported";
                 return;
             }
 
-            this.requestLocationPermission();
+            this.requestingCamera = true;
+            this.errorMessage = null;
 
-            // Khởi tạo instance scanner và bật camera (ưu tiên camera sau)
             try {
-                if (this.html5QrCode) {
-                    await this.stopScanner();
-                }
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "environment" },
+                });
 
+                stream.getTracks().forEach((track) => track.stop());
+                this.cameraPermission = "granted";
+            } catch (error) {
+                this.cameraPermission = "denied";
+                this.errorMessage = this.$t(
+                    "attendance.qr_scan.errors.camera_access",
+                );
+            } finally {
+                this.requestingCamera = false;
+                await this.syncPermissions();
+                await this.startScannerIfReady();
+            }
+        },
+
+        async requestLocationPermission() {
+            if (!navigator.geolocation) {
+                this.locationPermission = "unsupported";
+                return;
+            }
+
+            this.requestingLocation = true;
+            this.errorMessage = null;
+
+            try {
+                this.location = await functionHelper.fetchCurrentLocation();
+                this.locationPermission = "granted";
+            } catch (error) {
+                this.locationPermission = "denied";
+                this.errorMessage = error.message;
+            } finally {
+                this.requestingLocation = false;
+                await this.syncPermissions();
+                await this.startScannerIfReady();
+            }
+        },
+
+        async startScannerIfReady() {
+            if (!this.dialog || !this.canStartScanner || this.scannerActive) {
+                return;
+            }
+
+            await this.startScanner();
+        },
+
+        async startScanner() {
+            if (
+                !this.dialog ||
+                !this.canStartScanner ||
+                this.scannerActive ||
+                this.processing ||
+                this.verifying
+            ) {
+                return;
+            }
+
+            try {
+                await this.stopScanner();
+                this.errorMessage = null;
                 this.html5QrCode = new Html5Qrcode(this.readerId);
                 await this.html5QrCode.start(
                     { facingMode: "environment" },
-                    { fps: 10, qrbox: { width: 250, height: 250 } },
+                    {
+                        fps: 10,
+                        qrbox: (viewfinderWidth, viewfinderHeight) => {
+                            const minEdge = Math.min(
+                                viewfinderWidth,
+                                viewfinderHeight,
+                            );
+                            const size = Math.max(
+                                80,
+                                Math.min(
+                                    250,
+                                    Math.floor(minEdge * 0.7),
+                                    minEdge - 24,
+                                ),
+                            );
+
+                            return {
+                                width: size,
+                                height: size,
+                            };
+                        },
+                    },
                     this.onScanSuccess,
-                    this.onScanFailure,
+                    () => {},
                 );
-            } catch (err) {
-                // Trường hợp thiết bị không có camera hoặc người dùng từ chối quyền truy cập
-                this.errorMessage =
-                    "Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập.";
-                this.canRetryScan = true;
-                console.error("Lỗi khởi động camera:", err);
+                this.scannerActive = true;
+            } catch (error) {
+                this.errorMessage = this.$t(
+                    "attendance.qr_scan.errors.scanner_start",
+                );
             }
         },
+
         async stopScanner() {
-            // Tắt camera và clear DOM reader để tránh đèn LED camera vẫn sáng sau khi đóng
             if (!this.html5QrCode) {
+                this.scannerActive = false;
                 return;
             }
 
             try {
-                // isScanning là boolean property; phải stop() trước khi clear() nếu scanner đang chạy
                 if (this.html5QrCode.isScanning) {
                     await this.html5QrCode.stop();
                 }
                 this.html5QrCode.clear();
-            } catch (err) {
-                console.error("Lỗi khi dừng scanner:", err);
+            } catch (error) {
+                console.error("Lỗi khi dừng scanner:", error);
             } finally {
                 this.html5QrCode = null;
+                this.scannerActive = false;
             }
         },
+
         async onScanSuccess(decodedText) {
-            if (this.isProcessingScan || this.isVerifying) {
+            if (this.processing || this.verifying) {
                 return;
             }
 
-            this.isProcessingScan = true;
-            this.canRetryScan = false;
+            this.processing = true;
+            this.successMessage = null;
             this.errorMessage = null;
-            this.scanResult = decodedText;
 
             await this.stopScanner();
 
             try {
-                // Lấy vị trí hiện tại của user ngay tại thời điểm quét thành công
-                const coords = await functionHelper.fetchCurrentLocation();
-                this.location = coords;
+                this.location = await functionHelper.fetchCurrentLocation();
 
-                await this.handleVerifyAttendance(
+                await this.verifyAttendance(
                     decodedText,
-                    coords.latitude,
-                    coords.longitude,
-                    coords.accuracy,
+                    this.location.latitude,
+                    this.location.longitude,
+                    this.location.accuracy,
                 );
-            } catch (err) {
-                this.location = null;
-                this.errorMessage = `Quét thành công nhưng không lấy được vị trí: ${err.message}`;
-                this.canRetryScan = true;
-                console.error("Lỗi lấy vị trí:", err);
+            } catch (error) {
+                this.errorMessage = this.$t(
+                    "attendance.qr_scan.errors.location_after_scan",
+                    {
+                        message: error.message,
+                    },
+                );
             } finally {
-                this.isProcessingScan = false;
+                this.processing = false;
             }
         },
-        onScanFailure() {
-            // Mỗi frame không chứa QR đều sinh lỗi decode, bỏ qua để tránh log rác
-        },
+
         async retryScan() {
-            this.resetScanState();
-            await this.startScanner();
+            this.resetState();
+            await this.syncPermissions();
+            await this.startScannerIfReady();
         },
-        async handleVerifyAttendance(
-            decodedText,
-            latitude,
-            longitude,
-            accuracy,
-        ) {
-            this.isVerifying = true;
+
+        async verifyAttendance(qrCode, latitude, longitude, accuracy) {
+            this.verifying = true;
 
             try {
                 const res = await postData(
-                    API_ROUTES_CONFIG.attendance + "/verify",
+                    `${API_ROUTES_CONFIG.attendance}/verify`,
                     {
-                        qrCode: decodedText,
+                        qrCode,
                         latitude,
                         longitude,
                         accuracy,
                     },
+                    () => {},
+                    true,
                 );
 
                 if (!res) {
-                    this.errorMessage =
-                        "Chấm công thất bại. Vui lòng bấm Quét lại để thử lại.";
-                    this.canRetryScan = true;
+                    this.errorMessage = this.$t(
+                        "attendance.qr_scan.errors.verify_failed",
+                    );
                     return;
                 }
 
-                this.canRetryScan = false;
+                this.successMessage = this.addressDisplay
+                    ? this.$t("attendance.qr_scan.success.with_address", {
+                          address: this.addressDisplay,
+                      })
+                    : this.$t("attendance.qr_scan.success.default");
             } finally {
-                this.isVerifying = false;
+                this.verifying = false;
             }
         },
     },
 };
 </script>
-
-<style scoped>
-.qr-reader {
-    width: 100%;
-    min-height: 300px;
-    border-radius: 8px;
-    overflow: hidden;
-    background-color: #000;
-}
-</style>
