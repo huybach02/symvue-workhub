@@ -9,10 +9,18 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class GeneralSettingService
 {
+    private const REMINDER_CONFIG_NAMES = [
+        'REMIND_MISSING_CHECK_IN',
+        'REMIND_MISSING_CHECK_OUT',
+        'CHECK_IN_REMINDER_MINUTES_BEFORE',
+        'CHECK_OUT_REMINDER_MINUTES_BEFORE',
+    ];
+
     public function __construct(
         private readonly GeneralSettingRepository $cauHinhChungRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly CacheService $cacheService,
+        private readonly AttendanceReminderService $attendanceReminderService,
     ) {}
 
     public function findAll(): array
@@ -28,6 +36,7 @@ final class GeneralSettingService
     public function update(GeneralSettingDTO $cauHinhChungDTO): void
     {
         try {
+            $shouldRecalculateFutureReminderAttendances = false;
             $mapping = [
                 'soLanDangNhapSai' => 'SO_LAN_DANG_NHAP_SAI_TOI_DA',
                 'thoiGianTamKhoaTaiKhoan' => 'THOI_GIAN_KHOA_TAI_KHOAN',
@@ -77,6 +86,13 @@ final class GeneralSettingService
                 }
 
                 if (isset($cauHinhChungMap[$tenCauHinh])) {
+                    if (
+                        in_array($tenCauHinh, self::REMINDER_CONFIG_NAMES, true) &&
+                        ($cauHinhChungCacheData[$tenCauHinh] ?? null) !== (string) $giaTri
+                    ) {
+                        $shouldRecalculateFutureReminderAttendances = true;
+                    }
+
                     $cauHinhChungMap[$tenCauHinh]->setGiaTri((string) $giaTri);
                     $cauHinhChungCacheData[$tenCauHinh] = (string) $giaTri;
                 }
@@ -84,6 +100,17 @@ final class GeneralSettingService
             $this->entityManager->flush();
 
             $this->cacheService->set(GeneralSettingRepository::CACHE_KEY, $cauHinhChungCacheData, 60 * 60 * 24 * 365 * 5, true);
+
+            if ($shouldRecalculateFutureReminderAttendances) {
+                $updatedCount = $this->attendanceReminderService
+                    ->recalculateFutureScheduledReminderAttendances(
+                        $cauHinhChungCacheData,
+                    );
+
+                if ($updatedCount > 0) {
+                    $this->entityManager->flush();
+                }
+            }
         } catch (\Throwable $th) {
             throw $th;
         }

@@ -479,6 +479,20 @@ class CheckWorkScheduleOfUser
         return $attendanceWindow['windowEnd'];
     }
 
+    public function isWithinAttendanceSchedule(
+        Attendance $attendance,
+        DateTimeImmutable $now,
+    ): bool {
+        $attendanceDateRange = $this->resolveAttendanceDateRange($attendance);
+
+        if ($attendanceDateRange === null) {
+            return false;
+        }
+
+        return $now >= $attendanceDateRange['startTime']
+            && $now <= $attendanceDateRange['endTime'];
+    }
+
     /**
      * @return Attendance[]
      */

@@ -15,6 +15,7 @@ class RequestHandleApprovedService
     public function __construct(
         private readonly LeaveScheduleRepository $leaveScheduleRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly WorkScheduleService $workScheduleService,
     ) {
     }
 
@@ -49,6 +50,15 @@ class RequestHandleApprovedService
         $leaveSchedule->setUpdatedBy($request->getCurrentApprover()?->getId());
 
         $this->entityManager->flush();
+
+        $requester = $request->getRequester();
+        if ($requester) {
+            $this->workScheduleService->resyncFutureScheduledAttendancesForUser(
+                $requester,
+                $start,
+                $end,
+            );
+        }
 
         $request->setTargetRefType('leave_schedule');
         $request->setTargetRefId($leaveSchedule->getId());

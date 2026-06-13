@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Class\Constanst;
 use App\Class\CustomResponse;
+use App\Entity\FixedSchedule;
 use App\DTO\WorkShiftDTO;
 use App\DTO\WorkShiftStatusDTO;
 use App\DTO\WorkingTimeDTO;
@@ -21,6 +22,7 @@ class WorkingTimeService
         private readonly WorkShiftRepository $caLamViecRepository,
         private readonly FixedScheduleRepository $fixedScheduleRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly WorkScheduleService $workScheduleService,
     ) {}
 
     public function findAll(): array
@@ -52,12 +54,18 @@ class WorkingTimeService
         $thoiGianLamViec->setGioBatDau($thoiGianLamViecDTO->gioBatDau);
         $thoiGianLamViec->setGioKetThuc($thoiGianLamViecDTO->gioKetThuc);
         $thoiGianLamViec->setGhiChu($thoiGianLamViecDTO->ghiChu);
+        $updatedFixedSchedules = [];
 
         if ($thoiGianLamViecDTO->applyToExistingSchedules) {
-            $this->updateExistingFulltimeSchedules($thoiGianLamViec);
+            $updatedFixedSchedules = $this->updateExistingFulltimeSchedules($thoiGianLamViec);
         }
 
         $this->entityManager->flush();
+
+        if ($updatedFixedSchedules !== []) {
+            $this->resyncFutureFulltimeAttendances($updatedFixedSchedules);
+            $this->entityManager->flush();
+        }
 
         return $thoiGianLamViec->jsonSerialize();
     }
@@ -151,6 +159,8 @@ class WorkingTimeService
         $caLamViec->setGhiChu($caLamViecDTO->ghiChu);
 
         $this->entityManager->flush();
+        $this->resyncFutureParttimeAttendancesForShift($caLamViec);
+        $this->entityManager->flush();
 
         return $caLamViec->jsonSerialize();
     }
@@ -180,17 +190,22 @@ class WorkingTimeService
 
         $caLamViec->setStatus($dto->status);
         $this->entityManager->flush();
+        $this->resyncFutureParttimeAttendancesForShift($caLamViec);
+        $this->entityManager->flush();
 
         return $caLamViec->jsonSerialize();
     }
 
+    /**
+     * @return FixedSchedule[]
+     */
     private function updateExistingFulltimeSchedules(
         WorkingTime $thoiGianLamViec,
-    ): void {
+    ): array {
         $dayOfWeek = $thoiGianLamViec->getDayOfWeek();
 
         if (!$dayOfWeek) {
-            return;
+            return [];
         }
 
         $startTime = \DateTime::createFromFormat(
@@ -219,6 +234,75 @@ class WorkingTimeService
         foreach ($fixedSchedules as $fixedSchedule) {
             $fixedSchedule->setStartTime(clone $startTime);
             $fixedSchedule->setEndTime(clone $endTime);
+        }
+
+        return $fixedSchedules;
+    }
+
+    /**
+     * @param FixedSchedule[] $fixedSchedules
+     */
+    private function resyncFutureFulltimeAttendances(array $fixedSchedules): void
+    {
+        $groupMap = [];
+
+        foreach ($fixedSchedules as $fixedSchedule) {
+            $group = $fixedSchedule->getFixedScheduleGroup();
+            $member = $group?->getMember();
+            $startDate = $group?->getStartDate();
+            $endDate = $group?->getEndDate();
+
+            if (!$group || !$member || !$startDate || !$endDate) {
+                continue;
+            }
+
+            $groupMap[$group->getId() ?? spl_object_id($group)] = [
+                'member' => $member,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+            ];
+        }
+
+        foreach ($groupMap as $groupData) {
+            $this->workScheduleService->resyncFutureScheduledAttendancesForUser(
+                $groupData['member'],
+                $groupData['startDate'],
+                $groupData['endDate'],
+            );
+        }
+    }
+
+    private function resyncFutureParttimeAttendancesForShift(
+        WorkShift $workShift,
+    ): void {
+        $today = new \DateTimeImmutable('today');
+        $futureAssignments = [];
+
+        foreach ($workShift->getWorkShiftAssignments() as $assignment) {
+            $member = $assignment->getMember();
+            $date = $assignment->getDate();
+
+            if (!$member || !$date) {
+                continue;
+            }
+
+            $assignmentDate = \DateTimeImmutable::createFromInterface($date)->setTime(0, 0);
+            if ($assignmentDate < $today) {
+                continue;
+            }
+
+            $futureAssignments[$member->getId() . '|' . $assignmentDate->format('Y-m-d')] = [
+                'member' => $member,
+                'date' => $assignmentDate,
+            ];
+        }
+
+        foreach ($futureAssignments as $assignmentData) {
+            $this->workScheduleService->resyncFutureScheduledAttendancesForUser(
+                $assignmentData['member'],
+                $assignmentData['date'],
+                $assignmentData['date'],
+            );
         }
     }
 }

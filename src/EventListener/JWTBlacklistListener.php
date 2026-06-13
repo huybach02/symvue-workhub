@@ -3,6 +3,7 @@
 namespace App\EventListener;
 
 use App\Class\Constanst;
+use App\Repository\UserRepository;
 use App\Service\AuthService;
 use App\Service\CacheService;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTDecodedEvent;
@@ -17,7 +18,8 @@ class JWTBlacklistListener
     public function __construct(
         private readonly CacheService $cacheService,
         private readonly RequestStack $requestStack,
-        private readonly AuthService $authService
+        private readonly AuthService $authService,
+        private readonly UserRepository $userRepository,
     ) {}
 
     public function onJWTDecoded(JWTDecodedEvent $event): void
@@ -42,9 +44,24 @@ class JWTBlacklistListener
             $event->markAsInvalid();
         }
 
+        $payload = $event->getPayload();
+        $email = $payload['username'] ?? null;
+
+        if (!$email) {
+            $event->markAsInvalid();
+            return;
+        }
+
+        $currentUser = $this->userRepository->findOneBy(['email' => $email]);
+
+        if (!$currentUser) {
+            $event->markAsInvalid();
+            return;
+        }
+
         $currentDay = Constanst::CONVERT_DATE_TIME[now()->format('l')];
         $currentTime = now()->format('H:i');
-        if (!$this->authService->checkIsTimeWork($currentTime, $currentDay)) {
+        if (!$this->authService->checkIsTimeWork($currentTime, $currentDay, $currentUser)) {
             $event->markAsInvalid();
         }
     }

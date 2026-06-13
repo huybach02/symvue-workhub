@@ -47,6 +47,11 @@ class Schedule implements ScheduleProviderInterface
                 '*/5 * * * *',
                 new RunCommandMessage('app:attendance:sync-absent-status')
             ))
+            // Gửi nhắc nhở chấm công mỗi phút
+            ->add(RecurringMessage::cron(
+                '* * * * *',
+                new RunCommandMessage('app:attendance:send-reminders')
+            ))
             // Rebuild cache user permissions mỗi phút
             // ->add(RecurringMessage::cron(
             //     '* * * * *',

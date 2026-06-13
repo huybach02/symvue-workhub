@@ -2,18 +2,28 @@
 
 namespace App\EventSubscriber;
 
+use App\Class\CacheKey;
+use App\Class\TranslationHelper;
+use App\Entity\User;
+use App\Service\CacheService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use App\Class\TranslationHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LocaleSubscriber implements EventSubscriberInterface
 {
+    private const USER_LOCALE_TTL = 31536000;
+
     private string $defaultLocale;
 
-    public function __construct(private TranslatorInterface $translator, string $defaultLocale = 'en')
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private readonly Security $security,
+        private readonly CacheService $cacheService,
+        string $defaultLocale = 'vi'
+    ) {
         $this->defaultLocale = $defaultLocale;
     }
 
@@ -34,10 +44,27 @@ class LocaleSubscriber implements EventSubscriberInterface
         TranslationHelper::setTranslator($this->translator);
     }
 
+    public function cacheUserLocale(RequestEvent $event): void
+    {
+        $user = $this->security->getUser();
+
+        if ($user instanceof User && $user->getId()) {
+            $this->cacheService->set(
+                sprintf(CacheKey::USER_LOCALE, $user->getId()),
+                $event->getRequest()->getLocale(),
+                self::USER_LOCALE_TTL,
+                false,
+            );
+        }
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::REQUEST => [['onKernelRequest', 20]], // Chạy sớm trước các xử lý khác
+            KernelEvents::REQUEST => [
+                ['onKernelRequest', 20],
+                ['cacheUserLocale', 0],
+            ],
         ];
     }
 }

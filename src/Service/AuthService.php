@@ -2,8 +2,12 @@
 
 namespace App\Service;
 
+use App\Class\CheckWorkScheduleOfUser;
 use App\Class\Constanst;
+use App\Class\StatusAttendance;
 use App\Entity\LoginDevice;
+use App\Entity\User;
+use App\Repository\AttendanceRepository;
 use App\Repository\GeneralSettingRepository;
 use App\Repository\LoginDeviceRepository;
 use App\Repository\WorkingTimeRepository;
@@ -22,7 +26,11 @@ class AuthService
         private MailService $mailService,
         private EntityManagerInterface $entityManager,
         private LoginDeviceRepository $thietBiDangNhapRepository,
-        private UserPasswordHasherInterface $passwordHasher
+        private UserPasswordHasherInterface $passwordHasher,
+        private AttendanceRepository $attendanceRepository,
+        private AttendanceReminderService $attendanceReminderService,
+        private CheckWorkScheduleOfUser $checkWorkScheduleOfUser,
+        private WorkScheduleService $workScheduleService,
     ) {}
 
     public function handleLoginAttempts($attemptsKey, $lockoutKey)
@@ -55,22 +63,50 @@ class AuthService
         return "";
     }
 
-    public function checkIsTimeWork($currentTime, $currentDay)
+    public function checkIsTimeWork(string $currentTime, string $currentDay, User $currentUser): bool
     {
-        $cauHinhChung = $this->cauHinhChungRepository->getAllConfig();
-        if ($cauHinhChung['CHECK_THOI_GIAN_LAM_VIEC'] == Constanst::CHECK_THOI_GIAN_LAM_VIEC['KICH_HOAT']) {
-            $thoiGianLamViec = $this->thoiGianLamViecRepository->findOneBy(['thu' => $currentDay]);
-            if ($thoiGianLamViec) {
-                $gioBatDau = $thoiGianLamViec->getGioBatDau();
-                $gioKetThuc = $thoiGianLamViec->getGioKetThuc();
-
-                if ($currentTime < $gioBatDau || $currentTime > $gioKetThuc) {
-                    return false;
-                }
-            }
+        if (isAdmin($currentUser)) {
             return true;
         }
-        return true;
+
+        $now = new \DateTimeImmutable();
+        $cauHinhChung = $this->cauHinhChungRepository->getAllConfig();
+
+        if ($cauHinhChung['CHECK_THOI_GIAN_LAM_VIEC'] != Constanst::CHECK_THOI_GIAN_LAM_VIEC['KICH_HOAT']) {
+            return true;
+        }
+
+        $workingSchedule = $this->workScheduleService->getWorkingScheduleForUserOnDate(
+            $currentUser,
+            $now,
+        );
+
+        if (
+            !($workingSchedule['isWorkingDay'] ?? false)
+            || empty($workingSchedule['schedules'])
+        ) {
+            return false;
+        }
+
+        $attendances = $this->attendanceRepository->findAttendancesByWorkDateAndEmployee(
+            $now,
+            $currentUser,
+        );
+
+        if (empty($attendances)) {
+            throw new \Exception(t('error.not_in_working_schedule'));
+        }
+
+        foreach ($attendances as $attendance) {
+            if (
+                $attendance->getStatus() !== StatusAttendance::Absent->value
+                && $this->checkWorkScheduleOfUser->isWithinAttendanceSchedule($attendance, $now)
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function generateOtp(): string

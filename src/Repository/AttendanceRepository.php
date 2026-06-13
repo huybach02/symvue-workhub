@@ -74,6 +74,72 @@ class AttendanceRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return Attendance[]
+     */
+    public function findFutureScheduledAttendancesForReminderRecalculate(
+        \DateTimeInterface $fromDate,
+    ): array {
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.employee', 'e')
+            ->addSelect('e')
+            ->andWhere('a.deletedAt IS NULL')
+            ->andWhere('a.status = :status')
+            ->andWhere('a.remindedAt IS NULL')
+            ->andWhere('a.workDate >= :fromDate')
+            ->setParameter('status', StatusAttendance::Scheduled->value)
+            ->setParameter('fromDate', $fromDate->format('Y-m-d'))
+            ->orderBy('a.workDate', 'ASC')
+            ->addOrderBy('a.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Attendance[]
+     */
+    public function findDueReminderAttendances(
+        \DateTimeInterface $now,
+    ): array {
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.employee', 'e')
+            ->addSelect('e')
+            ->andWhere('a.deletedAt IS NULL')
+            ->andWhere('a.status = :status')
+            ->andWhere('a.reminderAt IS NOT NULL')
+            ->andWhere('a.remindedAt IS NULL')
+            ->andWhere('a.reminderAt <= :now')
+            ->setParameter('status', StatusAttendance::Scheduled->value)
+            ->setParameter('now', $now)
+            ->orderBy('a.reminderAt', 'ASC')
+            ->addOrderBy('a.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Attendance[]
+     */
+    public function findScheduledAttendancesByUserAndDateRange(
+        User $user,
+        \DateTimeInterface $fromDate,
+        \DateTimeInterface $toDate,
+    ): array {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.deletedAt IS NULL')
+            ->andWhere('a.employee = :employee')
+            ->andWhere('a.status = :status')
+            ->andWhere('a.workDate BETWEEN :fromDate AND :toDate')
+            ->setParameter('employee', $user)
+            ->setParameter('status', StatusAttendance::Scheduled->value)
+            ->setParameter('fromDate', $fromDate->format('Y-m-d'))
+            ->setParameter('toDate', $toDate->format('Y-m-d'))
+            ->orderBy('a.workDate', 'ASC')
+            ->addOrderBy('a.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Attendance[] Returns an array of Attendance objects
     //     */

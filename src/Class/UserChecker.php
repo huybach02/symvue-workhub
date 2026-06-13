@@ -39,7 +39,7 @@ class UserChecker implements UserCheckerInterface
         // // 2. Kiểm tra giờ làm việc
         $currentDay = Constanst::CONVERT_DATE_TIME[now()->format('l')];
         $currentTime = now()->format('H:i');
-        if (!$this->authService->checkIsTimeWork($currentTime, $currentDay)) {
+        if (!$this->authService->checkIsTimeWork($currentTime, $currentDay, $user)) {
             throw new CustomUserMessageAccountStatusException(t('auth.time_work'));
         }
 

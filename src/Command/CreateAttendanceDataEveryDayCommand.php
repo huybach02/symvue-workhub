@@ -8,9 +8,8 @@ use App\Entity\Attendance;
 use App\Entity\User;
 use App\Entity\WorkShiftAssignment;
 use App\Repository\AttendanceRepository;
-use App\Repository\GeneralSettingRepository;
 use App\Repository\UserRepository;
-use App\Repository\WorkShiftAssignmentRepository;
+use App\Service\AttendanceReminderService;
 use App\Service\WorkScheduleService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -25,21 +24,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class CreateAttendanceDataEveryDayCommand extends Command
 {
-    private const CONFIG_SNAPSHOT_KEYS = [
-        'CHECK_IN_GRACE_MINUTES',
-        'LATE_LIMIT_MINUTES',
-        'CHECK_IN_EARLIEST_MINUTES',
-        'CHECK_OUT_GRACE_MINUTES',
-        'CHECK_OUT_LATEST_MINUTES',
-    ];
-
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly UserRepository $userRepository,
         private readonly AttendanceRepository $attendanceRepository,
         private readonly WorkScheduleService $workScheduleService,
-        private readonly WorkShiftAssignmentRepository $workShiftAssignmentRepository,
-        private readonly GeneralSettingRepository $generalSettingRepository,
+        private readonly AttendanceReminderService $attendanceReminderService,
     ) {
         parent::__construct();
     }
@@ -56,7 +46,7 @@ class CreateAttendanceDataEveryDayCommand extends Command
             $users = $this->userRepository->findActiveUsers();
             $existingAttendances = $this->attendanceRepository->findByWorkDate($workDate);
             $existingAttendanceMap = $this->buildExistingAttendanceMap($existingAttendances);
-            $configSnapshot = $this->buildConfigSnapshot();
+            $configSnapshot = $this->workScheduleService->buildAttendanceConfigSnapshot();
             $createdCount = 0;
 
             foreach ($users as $user) {
@@ -72,7 +62,7 @@ class CreateAttendanceDataEveryDayCommand extends Command
                     continue;
                 }
 
-                $assignmentByWorkShiftId = $this->buildAssignmentMapForUser($user, $workDate);
+                $assignmentByWorkShiftId = $this->workScheduleService->buildAttendanceAssignmentMapForUser($user, $workDate);
 
                 foreach ($workingSchedule['schedules'] as $schedule) {
                     $workShiftAssignment = null;
@@ -157,29 +147,6 @@ class CreateAttendanceDataEveryDayCommand extends Command
     }
 
     /**
-     * @return array<int, WorkShiftAssignment>
-     */
-    private function buildAssignmentMapForUser(User $user, \DateTimeInterface $workDate): array
-    {
-        $assignments = $this->workShiftAssignmentRepository->findBy([
-            'member' => $user,
-            'date' => $workDate,
-        ]);
-        $assignmentMap = [];
-
-        foreach ($assignments as $assignment) {
-            $workShiftId = $assignment->getWorkShift()?->getId();
-            if (!$workShiftId) {
-                continue;
-            }
-
-            $assignmentMap[$workShiftId] = $assignment;
-        }
-
-        return $assignmentMap;
-    }
-
-    /**
      * @param array<string, mixed> $workingSchedule
      * @param array<string, mixed> $schedule
      * @param array<string, mixed> $configSnapshot
@@ -219,30 +186,16 @@ class CreateAttendanceDataEveryDayCommand extends Command
         $attendance->setConfigSnapshot($configSnapshot);
         $attendance->setWorkScheduleSnapshot($workingSchedule);
         $attendance->setWorkShiftAssignment($workShiftAssignment);
+        $this->attendanceReminderService->syncReminderForAttendance(
+            $attendance,
+            $configSnapshot,
+            true,
+        );
 
         $this->entityManager->persist($attendance);
         $existingAttendanceMap[$attendanceKey] = true;
 
         return 1;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function buildConfigSnapshot(): array
-    {
-        $configs = $this->generalSettingRepository->getAllConfig();
-        $snapshot = [];
-
-        foreach (self::CONFIG_SNAPSHOT_KEYS as $key) {
-            if (!array_key_exists($key, $configs)) {
-                continue;
-            }
-
-            $snapshot[$key] = $configs[$key];
-        }
-
-        return $snapshot;
     }
 
     private function buildAttendanceKey(

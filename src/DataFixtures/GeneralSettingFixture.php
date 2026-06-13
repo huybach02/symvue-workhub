@@ -49,7 +49,7 @@ class GeneralSettingFixture extends Fixture implements FixtureGroupInterface
             ],
             [
                 "ten_cau_hinh" => "CHECK_THOI_GIAN_LAM_VIEC",
-                "gia_tri" => "0",
+                "gia_tri" => "1",
                 "mo_ta" => "Thời gian làm việc (0: không, 1: có)",
             ],
             [
@@ -116,13 +116,13 @@ class GeneralSettingFixture extends Fixture implements FixtureGroupInterface
                 "ten_cau_hinh" => "MAX_DEVICES_PER_EMPLOYEE",
                 "gia_tri" => "2",
                 "mo_ta" =>
-                    "Số thiết bị chấm công tối đa cho mỗi nhân viên (thiết bị)",
+                "Số thiết bị chấm công tối đa cho mỗi nhân viên (thiết bị)",
             ],
             [
                 "ten_cau_hinh" => "SAME_DEVICE_MAX_EMPLOYEES",
                 "gia_tri" => "1",
                 "mo_ta" =>
-                    "Số nhân viên tối đa chấm công cùng thiết bị (nhân viên)",
+                "Số nhân viên tối đa chấm công cùng thiết bị (nhân viên)",
             ],
             [
                 "ten_cau_hinh" => "REMIND_MISSING_CHECK_IN",

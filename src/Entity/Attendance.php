@@ -47,6 +47,12 @@ class Attendance
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $workScheduleEndTime = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $reminderAt = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $remindedAt = null;
+
     #[
         ORM\Column(
             length: 255,
@@ -171,6 +177,30 @@ class Attendance
     public function setWorkScheduleEndTime(?string $workScheduleEndTime): static
     {
         $this->workScheduleEndTime = $workScheduleEndTime;
+
+        return $this;
+    }
+
+    public function getReminderAt(): ?\DateTimeInterface
+    {
+        return $this->reminderAt;
+    }
+
+    public function setReminderAt(?\DateTimeInterface $reminderAt): static
+    {
+        $this->reminderAt = $reminderAt;
+
+        return $this;
+    }
+
+    public function getRemindedAt(): ?\DateTimeInterface
+    {
+        return $this->remindedAt;
+    }
+
+    public function setRemindedAt(?\DateTimeInterface $remindedAt): static
+    {
+        $this->remindedAt = $remindedAt;
 
         return $this;
     }
@@ -325,6 +355,8 @@ class Attendance
             "timeAttendance" => $this->timeAttendance,
             "workScheduleStartTime" => $this->workScheduleStartTime,
             "workScheduleEndTime" => $this->workScheduleEndTime,
+            "reminderAt" => $this->reminderAt?->format(DATE_ATOM),
+            "remindedAt" => $this->remindedAt?->format(DATE_ATOM),
             "status" => $this->status,
             "validationStatus" => $this->validationStatus,
             "workType" => $this->workType,

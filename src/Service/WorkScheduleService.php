@@ -2,12 +2,14 @@
 
 namespace App\Service;
 
+use App\Class\AttendanceType;
 use App\Class\Constanst;
 use App\Class\FilterWithPagination;
 use App\Class\Request\RequestConstant;
 use App\DTO\WorkScheduleDTO;
 use App\DTO\WorkScheduleFulltimeDTO;
 use App\DTO\WorkScheduleFulltimeOverrideDTO;
+use App\Entity\Attendance;
 use App\Entity\Example;
 use App\Entity\FixedSchedule;
 use App\Entity\FixedScheduleGroup;
@@ -16,8 +18,10 @@ use App\Entity\HolidaySchedule;
 use App\Entity\LeaveSchedule;
 use App\Entity\User;
 use App\Repository\ExampleRepository;
+use App\Repository\AttendanceRepository;
 use App\Repository\FixedScheduleGroupRepository;
 use App\Repository\FixedScheduleOverrideRepository;
+use App\Repository\GeneralSettingRepository;
 use App\Repository\HolidayScheduleRepository;
 use App\Repository\LeaveScheduleRepository;
 use App\Repository\UserRepository;
@@ -41,6 +45,9 @@ class WorkScheduleService
         private readonly DepartmentService $departmentService,
         private readonly WorkShiftAssignmentRepository $workShiftAssignmentRepository,
         private readonly WorkShiftRepository $workShiftRepository,
+        private readonly AttendanceRepository $attendanceRepository,
+        private readonly GeneralSettingRepository $generalSettingRepository,
+        private readonly AttendanceReminderService $attendanceReminderService,
     ) {}
 
     public function getHolidaySchedule(): array
@@ -263,6 +270,16 @@ class WorkScheduleService
 
         $this->entityManager->flush();
 
+        foreach ($users as $user) {
+            $this->resyncFutureScheduledAttendancesForUser(
+                $user,
+                new \DateTime($dto->startDate),
+                new \DateTime($dto->endDate),
+            );
+        }
+
+        $this->entityManager->flush();
+
         return array_map(
             fn(FixedScheduleGroup $group) => $group->jsonSerialize(),
             $createdGroups,
@@ -280,6 +297,10 @@ class WorkScheduleService
             throw new \Exception(t('error.not_found'));
         }
 
+        $member = $fixedScheduleGroup->getMember();
+        $resyncStartDate = $fixedScheduleGroup->getStartDate();
+        $resyncEndDate = $fixedScheduleGroup->getEndDate();
+
         $fixedSchedules = $fixedScheduleGroup->getFixedSchedules();
 
         foreach ($fixedSchedules as $fixedSchedule) {
@@ -291,6 +312,15 @@ class WorkScheduleService
         $this->fixedScheduleOverrideRepository->clearOverridesByUser($userId);
 
         $this->entityManager->flush();
+
+        if ($member && $resyncStartDate && $resyncEndDate) {
+            $this->resyncFutureScheduledAttendancesForUser(
+                $member,
+                $resyncStartDate,
+                $resyncEndDate,
+            );
+            $this->entityManager->flush();
+        }
 
         return $fixedScheduleGroup->jsonSerialize();
     }
@@ -399,6 +429,13 @@ class WorkScheduleService
             $createdOverrides[] = $override;
         }
 
+        $this->entityManager->flush();
+
+        $this->resyncFutureScheduledAttendancesForUser(
+            $user,
+            new \DateTime($dto->startDate),
+            new \DateTime($dto->endDate),
+        );
         $this->entityManager->flush();
 
         // Trả về danh sách các override đã tạo
@@ -1115,11 +1152,15 @@ class WorkScheduleService
             throw new \Exception("Ca làm việc đã ngưng hoạt động");
         }
 
+        $affectedUsers = [];
+
         foreach ($dto->userIds as $userId) {
             $user = $this->userRepository->find($userId);
             if (!$user) {
                 throw new \Exception("User không tồn tại");
             }
+
+            $affectedUsers[$user->getId()] = $user;
 
             $workShiftAssign = $this->workShiftAssignmentRepository->findOneBy(["member" => $user, "workShift" => $workShift]);
             if ($workShiftAssign) {
@@ -1131,6 +1172,16 @@ class WorkScheduleService
             $workShiftAssign->setWorkShift($workShift);
             $workShiftAssign->setDate(new \DateTime($dto->date));
             $this->entityManager->persist($workShiftAssign);
+        }
+
+        $this->entityManager->flush();
+
+        foreach ($affectedUsers as $affectedUser) {
+            $this->resyncFutureScheduledAttendancesForUser(
+                $affectedUser,
+                new \DateTime($dto->date),
+                new \DateTime($dto->date),
+            );
         }
 
         $this->entityManager->flush();
@@ -1155,6 +1206,8 @@ class WorkScheduleService
             throw new \Exception(t("error.not_found"));
         }
 
+        $member = $workShiftAssign->getMember();
+
         $shiftStartDateTime = \DateTime::createFromFormat(
             'Y-m-d H:i',
             sprintf('%s %s', $dateWorkShift->format('Y-m-d'), substr($startTime, 0, 5)),
@@ -1172,6 +1225,200 @@ class WorkScheduleService
         $this->entityManager->remove($workShiftAssign);
         $this->entityManager->flush();
 
+        if ($member) {
+            $this->resyncFutureScheduledAttendancesForUser(
+                $member,
+                $dateWorkShift,
+                $dateWorkShift,
+            );
+            $this->entityManager->flush();
+        }
+
         return true;
+    }
+
+    public function resyncFutureScheduledAttendancesForUser(
+        User $user,
+        \DateTimeInterface $fromDate,
+        \DateTimeInterface $toDate,
+    ): void {
+        $now = new \DateTimeImmutable();
+        $today = new \DateTimeImmutable('today');
+        $resolvedFromDate = \DateTimeImmutable::createFromInterface($fromDate)->setTime(0, 0);
+        $resolvedToDate = \DateTimeImmutable::createFromInterface($toDate)->setTime(0, 0);
+
+        if ($resolvedFromDate < $today) {
+            $resolvedFromDate = $today;
+        }
+
+        if ($resolvedFromDate > $resolvedToDate) {
+            return;
+        }
+
+        $existingAttendances = $this->attendanceRepository
+            ->findScheduledAttendancesByUserAndDateRange(
+                $user,
+                \DateTime::createFromImmutable($resolvedFromDate),
+                \DateTime::createFromImmutable($resolvedToDate),
+            );
+
+        foreach ($existingAttendances as $attendance) {
+            $actionDateTime = $this->attendanceReminderService
+                ->getScheduledActionDateTime($attendance);
+
+            if ($actionDateTime && $actionDateTime <= $now) {
+                continue;
+            }
+
+            $this->entityManager->remove($attendance);
+        }
+
+        $configSnapshot = $this->buildAttendanceConfigSnapshot();
+        $currentDate = $resolvedFromDate;
+
+        while ($currentDate <= $resolvedToDate) {
+            $workDate = \DateTime::createFromImmutable($currentDate);
+            $workingSchedule = $this->getWorkingScheduleForUserOnDate(
+                $user,
+                $currentDate,
+            );
+
+            if (
+                !($workingSchedule['isWorkingDay'] ?? false) ||
+                empty($workingSchedule['schedules'])
+            ) {
+                $currentDate = $currentDate->modify('+1 day');
+                continue;
+            }
+
+            $assignmentByWorkShiftId = $this->buildAttendanceAssignmentMapForUser(
+                $user,
+                $workDate,
+            );
+
+            foreach ($workingSchedule['schedules'] as $schedule) {
+                $workShiftAssignment = null;
+                $workShiftId = (int) ($schedule['workShiftId'] ?? 0);
+
+                if ($workShiftId > 0) {
+                    $workShiftAssignment = $assignmentByWorkShiftId[$workShiftId] ?? null;
+                }
+
+                $this->createScheduledAttendance(
+                    $user,
+                    $workDate,
+                    (string) ($workingSchedule['workType'] ?? ''),
+                    AttendanceType::CheckIn->value,
+                    $workingSchedule,
+                    $schedule,
+                    $workShiftAssignment,
+                    $configSnapshot,
+                    $now,
+                );
+
+                $this->createScheduledAttendance(
+                    $user,
+                    $workDate,
+                    (string) ($workingSchedule['workType'] ?? ''),
+                    AttendanceType::CheckOut->value,
+                    $workingSchedule,
+                    $schedule,
+                    $workShiftAssignment,
+                    $configSnapshot,
+                    $now,
+                );
+            }
+
+            $currentDate = $currentDate->modify('+1 day');
+        }
+    }
+
+    /**
+     * @return array<int, WorkShiftAssignment>
+     */
+    public function buildAttendanceAssignmentMapForUser(
+        User $user,
+        \DateTimeInterface $workDate,
+    ): array {
+        $assignments = $this->workShiftAssignmentRepository->findBy([
+            'member' => $user,
+            'date' => $workDate,
+        ]);
+        $assignmentMap = [];
+
+        foreach ($assignments as $assignment) {
+            $workShiftId = $assignment->getWorkShift()?->getId();
+            if (!$workShiftId) {
+                continue;
+            }
+
+            $assignmentMap[$workShiftId] = $assignment;
+        }
+
+        return $assignmentMap;
+    }
+
+    /**
+     * @param array<string, mixed> $workingSchedule
+     * @param array<string, mixed> $schedule
+     * @param array<string, mixed> $configSnapshot
+     */
+    private function createScheduledAttendance(
+        User $user,
+        \DateTimeInterface $workDate,
+        string $workType,
+        string $attendanceType,
+        array $workingSchedule,
+        array $schedule,
+        ?WorkShiftAssignment $workShiftAssignment,
+        array $configSnapshot,
+        ?\DateTimeImmutable $now = null,
+    ): void {
+        $attendance = new Attendance();
+        $attendance->setEmployee($user);
+        $attendance->setAttendanceType($attendanceType);
+        $attendance->setWorkDate(
+            \DateTime::createFromFormat('Y-m-d', $workDate->format('Y-m-d')) ?: null,
+        );
+        $attendance->setWorkScheduleStartTime($schedule['startTime'] ?? null);
+        $attendance->setWorkScheduleEndTime($schedule['endTime'] ?? null);
+        $attendance->setStatus('scheduled');
+        $attendance->setWorkType($workType);
+        $attendance->setConfigSnapshot($configSnapshot);
+        $attendance->setWorkScheduleSnapshot($workingSchedule);
+        $attendance->setWorkShiftAssignment($workShiftAssignment);
+
+        $actionDateTime = $this->attendanceReminderService
+            ->getScheduledActionDateTime($attendance);
+        if ($now && $actionDateTime && $actionDateTime <= $now) {
+            return;
+        }
+
+        $this->attendanceReminderService->syncReminderForAttendance(
+            $attendance,
+            $configSnapshot,
+            true,
+        );
+
+        $this->entityManager->persist($attendance);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function buildAttendanceConfigSnapshot(): array
+    {
+        $configs = $this->generalSettingRepository->getAllConfig();
+        $snapshot = [];
+
+        foreach (AttendanceReminderService::ATTENDANCE_CONFIG_SNAPSHOT_KEYS as $key) {
+            if (!array_key_exists($key, $configs)) {
+                continue;
+            }
+
+            $snapshot[$key] = $configs[$key];
+        }
+
+        return $snapshot;
     }
 }
