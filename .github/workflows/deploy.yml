@@ -40,13 +40,29 @@ jobs:
                       git reset --hard origin/main
 
                       echo "[2/10] Build Docker images"
-                      docker compose --env-file .env.prod.local build --no-cache
+                      docker compose --env-file .env.prod.local build
 
                       echo "[3/10] Recreate application services"
                       docker compose --env-file .env.prod.local up -d --force-recreate be-php be-nginx fe-nginx mercure messenger scheduler npm
 
                       echo "[4/10] Run database migrations"
-                      docker compose --env-file .env.prod.local exec -T be-php php bin/console doctrine:migrations:migrate --no-interaction --env=prod
+                      migration_success=0
+                      for attempt in 1 2 3 4 5; do
+                        if docker compose --env-file .env.prod.local exec -T be-php php bin/console doctrine:migrations:migrate --no-interaction --env=prod; then
+                          migration_success=1
+                          break
+                        fi
+
+                        if [ "$attempt" -lt 5 ]; then
+                          echo "Migration failed, retrying in 10 seconds... ($attempt/5)"
+                          sleep 10
+                        fi
+                      done
+
+                      if [ "$migration_success" -ne 1 ]; then
+                        echo "Migration failed after 5 attempts."
+                        exit 1
+                      fi
 
                       echo "[5/10] Clear Symfony cache"
                       docker compose --env-file .env.prod.local exec -T be-php php bin/console cache:clear --env=prod --no-debug
@@ -65,7 +81,7 @@ jobs:
                       docker compose --env-file .env.prod.local logs --tail=50 messenger
 
                       echo "[10/10] Clean unused Docker resources"
-                      docker image prune -af
-                      docker builder prune -af
+                      docker image prune -f
+                      docker builder prune -f --filter "until=168h"
 
                       echo "====> Deploy completed successfully."
