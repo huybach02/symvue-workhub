@@ -56,7 +56,8 @@
         "thong_bao": "Quản lý thông báo",
         "work_schedule": "Lịch làm việc",
         "request": "Đề xuất",
-        "attendance": "Chấm công"
+        "attendance": "Chấm công",
+        "branch": "Chi nhánh"
     },
     "gender": {
         "male": "Nam",

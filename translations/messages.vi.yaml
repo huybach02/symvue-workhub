@@ -23,6 +23,7 @@ error:
     exists: "Dữ liệu đã tồn tại"
     file_not_found: "Không tìm thấy file"
     param_invalid: "Tham số không hợp lệ"
+    cannot_delete_record: "Không được phép xóa bản ghi này."
     imported_with_errors: "Import không thành công với %count% bản ghi lỗi. Vui lòng kiểm tra lại file import hoặc đến trang Lịch sử import để xem chi tiết"
     quan_ly_bo_phan_exist: "%name% đã là quản lý của bộ phận %bo_phan%"
     bo_phan_exist: "Phòng ban/Bộ phận %name% với mã %ma_bo_phan% đã tồn tại"

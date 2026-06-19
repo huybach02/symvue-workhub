@@ -10,15 +10,7 @@ Chạy và XÓA sạch dữ liệu cũ
 php bin/console doctrine:fixtures:load
 
 Chạy và giữ lại dữ liệu cũ
-php bin/console doctrine:fixtures:load --append
-
-Chạy chỉ một nhóm Fixture cụ thể
-Thêm interface FixtureGroupInterface vào class Fixture.
-Implement method getGroups() trả về ['group_name']
-php bin/console doctrine:fixtures:load --group=group_name
-
-php bin/console make:fixture CategoryFixtures
-
+php bin/console doctrine:fixtures:load --group=main-branch-and-warehouse --append -n
 
 Chạy worker để xử lý message (ví dụ: gửi email)
 php bin/console messenger:consume async --memory-limit=128M -vv

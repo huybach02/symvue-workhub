@@ -16,4 +16,5 @@ export const NAME_ROUTES_CONFIG = {
     requests: "system.requests",
     attendance: "system.attendance",
     qrAttendance: "system.qrAttendance",
+    branch: "system.branch",
 };

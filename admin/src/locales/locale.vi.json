@@ -569,5 +569,16 @@
                 "verify_failed": "Chấm công thất bại. Vui lòng bấm Quét lại để thử lại."
             }
         }
+    },
+    "branch": {
+        "title": "Chi nhánh",
+        "columns": {
+            "id": "ID",
+            "name": "Tên",
+            "code": "Mã",
+            "phone": "Số điện thoại",
+            "email": "Email",
+            "address": "Địa chỉ"
+        }
     }
 }

@@ -31,9 +31,15 @@ export const menuSidebar = [
             {
                 title: i18n.global.t("sidebar.bo_phan"),
                 key: "departments",
-                icon: "mdi-account-multiple-outline",
+                icon: "mdi-domain",
                 value: NAME_ROUTES_CONFIG.department,
                 to: { name: NAME_ROUTES_CONFIG.department },
+            },
+            {
+                title: i18n.global.t("sidebar.branch"),
+                icon: "mdi-store-outline",
+                value: NAME_ROUTES_CONFIG.branch,
+                to: { name: NAME_ROUTES_CONFIG.branch },
             },
         ],
     },

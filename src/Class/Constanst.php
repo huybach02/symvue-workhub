@@ -311,3 +311,9 @@ enum ValidationStatus: string
     case Valid = 'valid';
     case Invalid = 'invalid';
 }
+
+enum WarehouseType: string
+{
+    case Main = 'main';
+    case Branch = 'branch';
+}

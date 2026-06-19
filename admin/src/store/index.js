@@ -12,6 +12,7 @@ import importHistory from "./modules/importHistory";
 import notification from "./modules/notification";
 import request from "./modules/request";
 import attendance from "./modules/attendance";
+import branch from "./modules/branch";
 
 const store = createStore({
     state() {
@@ -42,6 +43,7 @@ const store = createStore({
         notification,
         request,
             attendance,
+        branch,
 },
 });
 

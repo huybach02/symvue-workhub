@@ -15,7 +15,7 @@
             @after-enter="handleDialogOpened"
             @after-leave="handleDialogClosed"
         >
-            <v-card rounded="xl">
+            <v-card>
                 <v-card-title class="d-flex align-center justify-space-between">
                     <div>
                         <div class="text-title-1">

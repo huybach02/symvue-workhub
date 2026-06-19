@@ -203,7 +203,22 @@ export const routes = [
                         ).icon || "",
                 },
             },
-        ],
+                    {
+                path: "branch",
+                name: NAME_ROUTES_CONFIG.branch,
+                component: () => import("../pages/Branch/Branch.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.branch,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.branch,
+                        ).icon || "",
+                },
+            },
+],
     },
     {
         path: "/qr-attendance",

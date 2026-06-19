@@ -566,5 +566,16 @@
                 "verify_failed": "Attendance failed. Please tap scan again to retry."
             }
         }
+    },
+    "branch": {
+        "title": "Branch",
+        "columns": {
+            "id": "ID",
+            "name": "Name",
+            "code": "Code",
+            "phone": "Phone",
+            "email": "Email",
+            "address": "Address"
+        }
     }
 }

@@ -56,7 +56,8 @@
         "thong_bao": "Notification",
         "work_schedule": "Work Schedule",
         "request": "Requests",
-        "attendance": "Attendance"
+        "attendance": "Attendance",
+        "branch": "Branch"
     },
     "gender": {
         "male": "Male",
