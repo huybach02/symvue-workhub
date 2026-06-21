@@ -75,9 +75,9 @@ class UserService
 
         $password = generateRandomString(10);
 
-        $checkMaNhanVien = $this->userRepository->findOneBy([
-            "maNhanVien" => $dto->maNhanVien,
-        ]);
+        $checkMaNhanVien = $dto->maNhanVien
+            ? $this->userRepository->findActiveByMaNhanVien($dto->maNhanVien)
+            : null;
 
         if ($checkMaNhanVien) {
             throw new \Exception(

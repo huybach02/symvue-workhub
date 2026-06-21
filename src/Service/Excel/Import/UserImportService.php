@@ -85,7 +85,7 @@ class UserImportService
                 $dto = $validationResult['dto'];
 
                 // Kiểm tra Email đã tồn tại chưa
-                if ($this->userRepository->findOneBy(['email' => $dto->email])) {
+                if ($this->userRepository->findActiveByEmail($dto->email)) {
                     $errorCount++;
                     $errorDetails[] = [
                         'row' => $i + 1,
@@ -96,7 +96,7 @@ class UserImportService
                 }
 
                 // Kiểm tra mã nhân viên đã tồn tại chưa
-                if ($dto->maNhanVien && $this->userRepository->findOneBy(['maNhanVien' => $dto->maNhanVien])) {
+                if ($dto->maNhanVien && $this->userRepository->findActiveByMaNhanVien($dto->maNhanVien)) {
                     $errorCount++;
                     $errorDetails[] = [
                         'row' => $i + 1,

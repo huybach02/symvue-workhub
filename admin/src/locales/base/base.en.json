@@ -57,7 +57,9 @@
         "work_schedule": "Work Schedule",
         "request": "Requests",
         "attendance": "Attendance",
-        "branch": "Branch"
+        "branch": "Branch",
+        "goods_management": "Goods Management",
+        "category": "Goods Category"
     },
     "gender": {
         "male": "Male",

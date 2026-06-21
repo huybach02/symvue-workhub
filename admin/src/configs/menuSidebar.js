@@ -58,6 +58,19 @@ export const menuSidebar = [
         ],
     },
     {
+        title: i18n.global.t("sidebar.goods_management"),
+        icon: "mdi-cube",
+        value: NAME_ROUTES_CONFIG.goodsManagement,
+        children: [
+            {
+                title: i18n.global.t("sidebar.category"),
+                icon: "mdi-format-list-bulleted",
+                value: NAME_ROUTES_CONFIG.category,
+                to: { name: NAME_ROUTES_CONFIG.category },
+            },
+        ],
+    },
+    {
         title: i18n.global.t("sidebar.lich_su_import"),
         key: "import-history",
         icon: "mdi-history",
@@ -81,13 +94,13 @@ export const menuSidebar = [
     {
         title: i18n.global.t("sidebar.request"),
         key: "requests",
-        icon: "mdi-file-document-edit-outline",
+        icon: "mdi-file-document-edit",
         value: NAME_ROUTES_CONFIG.requests,
         to: { name: NAME_ROUTES_CONFIG.requests },
     },
     {
         title: i18n.global.t("sidebar.attendance"),
-        icon: "mdi-account-check-outline",
+        icon: "mdi-account-check",
         value: NAME_ROUTES_CONFIG.attendance,
         to: { name: NAME_ROUTES_CONFIG.attendance },
     },

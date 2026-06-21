@@ -57,7 +57,9 @@
         "work_schedule": "Lịch làm việc",
         "request": "Đề xuất",
         "attendance": "Chấm công",
-        "branch": "Chi nhánh"
+        "branch": "Chi nhánh",
+        "goods_management": "Quản lý hàng hóa",
+        "category": "Danh mục hàng hóa"
     },
     "gender": {
         "male": "Nam",

@@ -580,5 +580,21 @@
             "email": "Email",
             "address": "Địa chỉ"
         }
+    },
+    "category": {
+        "title": "Danh mục",
+        "columns": {
+            "id": "ID",
+            "name": "Tên"
+        },
+        "tabs": {
+            "ingredient": "Danh mục nguyên liệu",
+            "finished_product": "Danh mục thành phẩm",
+            "business_product": "Danh mục sản phẩm kinh doanh"
+        },
+        "parent_category": "Danh mục cha",
+        "select_parent_category": "Chọn danh mục cha",
+        "search_placeholder": "Tìm danh mục",
+        "no_parent_category": "Không có danh mục cha"
     }
 }

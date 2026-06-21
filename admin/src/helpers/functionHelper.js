@@ -104,6 +104,13 @@ export const functionHelper = {
         const digits = String(value ?? "").replace(/[^\d]/g, "");
         return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".") || "--";
     },
+    normalizeText(value) {
+        return String(value ?? "")
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/đ/g, "d");
+    },
     getParttimeScheduleFetchRange(date = dayjs(), beforeMonths = 2, afterMonths = 2) {
         const baseDate = dayjs(date);
 

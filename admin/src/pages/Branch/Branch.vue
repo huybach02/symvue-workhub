@@ -4,12 +4,12 @@
             <v-col cols="12" md="5">
                 <div class="d-flex ga-2">
                     <ExportDataExcel v-if="permission?.export" :path="path" />
-                    <!-- <ImportDataExcel
+                    <ImportDataExcel
                         v-if="permission?.import"
                         :path="path"
                         :note="``"
                         @reload="getDanhSach"
-                    /> -->
+                    />
                 </div>
             </v-col>
             <v-col cols="12" md="7">

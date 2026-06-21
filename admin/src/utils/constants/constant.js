@@ -109,6 +109,11 @@ export const constant = {
         { value: "warning", key: "thong_bao.options.type.warning" },
         { value: "error", key: "thong_bao.options.type.error" },
     ],
+    CATEGORY_TABS: [
+        { value: "ingredient", key: "category.tabs.ingredient" },
+        { value: "finished_product", key: "category.tabs.finished_product" },
+        { value: "business_product", key: "category.tabs.business_product" },
+    ],
     MAX_IMAGE_UPLOAD: 10,
     MAX_FILE_UPLOAD: 10,
     CURRENCY_OPTIONS: [

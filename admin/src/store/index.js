@@ -13,6 +13,7 @@ import notification from "./modules/notification";
 import request from "./modules/request";
 import attendance from "./modules/attendance";
 import branch from "./modules/branch";
+import category from "./modules/category";
 
 const store = createStore({
     state() {
@@ -44,6 +45,7 @@ const store = createStore({
         request,
             attendance,
         branch,
+        category,
 },
 });
 

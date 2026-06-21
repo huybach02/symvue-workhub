@@ -30,4 +30,5 @@ export const API_ROUTES_CONFIG = {
     attendanceQrDisplayAccess: "/attendance/qr-display-access",
     attendanceQr: "/attendance/qr-attendance",
     branch: "/branch",
+    category: "/category",
 };

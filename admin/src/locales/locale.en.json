@@ -577,5 +577,21 @@
             "email": "Email",
             "address": "Address"
         }
+    },
+    "category": {
+        "title": "Category",
+        "columns": {
+            "id": "ID",
+            "name": "Name"
+        },
+        "tabs": {
+            "ingredient": "Ingredient category",
+            "finished_product": "Finished product category",
+            "business_product": "Business product category"
+        },
+        "parent_category": "Parent category",
+        "select_parent_category": "Select parent category",
+        "search_placeholder": "Search categories",
+        "no_parent_category": "No parent category"
     }
 }

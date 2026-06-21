@@ -218,6 +218,21 @@ export const routes = [
                         ).icon || "",
                 },
             },
+            {
+                path: "category",
+                name: NAME_ROUTES_CONFIG.category,
+                component: () => import("../pages/Category/Category.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.category,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.category,
+                        ).icon || "",
+                },
+            },
 ],
     },
     {

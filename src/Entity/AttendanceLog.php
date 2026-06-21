@@ -7,8 +7,10 @@ use App\Traits\ModifierTrait;
 use App\Traits\SoftDeleteableTrait;
 use App\Traits\TimestampableTrait;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: AttendanceLogRepository::class)]
+#[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
 class AttendanceLog
 {
     use TimestampableTrait;
