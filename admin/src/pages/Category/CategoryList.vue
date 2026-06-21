@@ -25,14 +25,14 @@
             :edge-scroll-trigger-margin="80"
             :edge-scroll-speed="12"
             :default-folded="true"
-            dragging-node-position-mode="mouse"
+            :dragging-node-position-mode="draggingNodePositionMode"
             @drop-change="onDropChange"
         >
             <template #default="{ node, tree }">
                 <div class="category-row">
-                    <v-icon class="drag-handle mr-2" size="24">
-                        mdi-drag
-                    </v-icon>
+                    <span class="drag-handle mr-2">
+                        <v-icon size="24">mdi-drag</v-icon>
+                    </span>
 
                     <v-btn
                         v-if="hasChildren(node)"
@@ -62,6 +62,7 @@
                     </div>
 
                     <v-chip
+                        v-if="!isMobile"
                         size="x-small"
                         :color="node.isActive ? 'success' : 'grey'"
                         variant="tonal"
@@ -69,6 +70,19 @@
                     >
                         {{ node.isActive ? $t("status_values.active") : $t("status_values.inactive") }}
                     </v-chip>
+
+                    <v-icon
+                        v-else
+                        :color="node.isActive ? 'success' : 'error'"
+                        size="18"
+                        class="category-status-icon mr-2"
+                    >
+                        {{
+                            node.isActive
+                                ? "mdi-check-circle"
+                                : "mdi-close-circle"
+                        }}
+                    </v-icon>
 
                     <div class="d-flex align-center justify-space-between ga-1">
                         <v-tooltip
@@ -176,6 +190,12 @@ export default {
 
     computed: {
         ...mapGetters("category", ["loading", "totalItems"]),
+        isMobile() {
+            return this.$vuetify.display.mobile;
+        },
+        draggingNodePositionMode() {
+            return this.isMobile ? "top_left_corner" : "mouse";
+        },
     },
 
     watch: {
@@ -328,19 +348,29 @@ export default {
 .category-title {
     flex: 1;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: normal;
+    word-break: break-word;
 }
 
 .drag-handle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
     cursor: grab;
     touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
     user-select: none;
 }
 
 .drag-handle:active {
     cursor: grabbing;
+}
+
+.category-status-icon {
+    flex: 0 0 auto;
+    filter: saturate(1.35);
 }
 
 .empty-toggle {
@@ -360,5 +390,18 @@ export default {
 .category-tree :deep(.tree-node-outer.dragging-node) .category-row {
     background-color: rgb(var(--v-theme-surface));
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+}
+
+@media (max-width: 600px) {
+    .category-row {
+        align-items: flex-start;
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    .category-title {
+        line-height: 1.35;
+        padding-top: 2px;
+    }
 }
 </style>

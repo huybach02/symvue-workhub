@@ -267,7 +267,7 @@ class CategoryService
             $conn->executeStatement("SELECT pg_advisory_xact_lock(hashtext('category_tree'))");
             $this->rebuildTreePaths($conn);
 
-            $oldParentId = $category !== null ? (int) $category->getParentId() : null;
+            $oldParentId = $category->getParent()?->getId();
             $newParentId = $dto->parentId;
             $parent = null;
 
