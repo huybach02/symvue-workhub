@@ -11,6 +11,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: WarehouseRepository::class)]
+#[ORM\Table(name: 'warehouse')]
+#[ORM\UniqueConstraint(
+    name: 'UNIQ_WAREHOUSE_CODE',
+    fields: ['code'],
+    options: ['where' => 'deleted_at IS NULL']
+)]
 #[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
 class Warehouse
 {

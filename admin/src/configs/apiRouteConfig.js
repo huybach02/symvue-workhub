@@ -31,4 +31,5 @@ export const API_ROUTES_CONFIG = {
     attendanceQr: "/attendance/qr-attendance",
     branch: "/branch",
     category: "/category",
+    unit: "/unit",
 };

@@ -77,7 +77,7 @@
                                     v-bind="tooltipProps"
                                     :path="path"
                                     :item="item"
-                                    @reload="$emit('reload')"
+                                    @reload="$emit('reload', { ...query })"
                                 />
                             </template>
                         </v-tooltip>
@@ -91,7 +91,7 @@
                                     v-bind="tooltipProps"
                                     :path="path"
                                     :item="item"
-                                    @reload="$emit('reload')"
+                                    @reload="$emit('reload', { ...query })"
                                 />
                             </template>
                         </v-tooltip>
@@ -106,7 +106,7 @@
                                     :path="path"
                                     mode="update"
                                     :item="item"
-                                    @reload="$emit('reload')"
+                                    @reload="$emit('reload', { ...query })"
                                 />
                             </template>
                         </v-tooltip>
@@ -363,7 +363,7 @@ export default {
             this.isDeleting = false;
             this.showConfirmDelete = false;
             this.deletingId = null;
-            this.$emit("reload");
+            this.$emit("reload", { ...this.query });
         },
     },
 };
@@ -372,6 +372,7 @@ export default {
 <style scoped>
 .table-scroll-container {
     overflow-x: auto;
+    overflow-y: hidden;
     width: 100%;
 }
 

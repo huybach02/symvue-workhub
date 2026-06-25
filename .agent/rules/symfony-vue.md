@@ -444,6 +444,33 @@ Example:
 
 ---
 
+# Minimal Implementation & Anti Over-engineering
+
+Before adding new code, always check whether the existing codebase already has:
+- similar Service
+- similar DTO
+- similar Repository method
+- similar Vuex module
+- similar API service
+- similar Vuetify component
+- similar validation schema
+- similar helper/utility
+
+Prefer reusing existing patterns over creating new abstractions.
+
+Implement the smallest safe change that satisfies the requirement.
+
+Avoid changing unrelated files.
+
+Avoid large refactors during feature implementation unless explicitly requested.
+
+When proposing an implementation, mention:
+- what existing code/pattern will be reused
+- what files need to change
+- what will intentionally NOT be added to avoid over-engineering
+
+---
+
 # Stack Summary Keyword
 
 When asked for stack summary, ALWAYS include:

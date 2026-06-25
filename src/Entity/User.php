@@ -25,6 +25,11 @@ use Gedmo\Mapping\Annotation as Gedmo;
     fields: ['maNhanVien'],
     options: ['where' => 'deleted_at IS NULL'] // Chỉ unique khi chưa bị xóa
 )]
+#[ORM\UniqueConstraint(
+    name: 'UNIQ_USER_PHONE',
+    fields: ['phone'],
+    options: ['where' => 'deleted_at IS NULL'] // Chỉ unique khi chưa bị xóa
+)]
 #[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, ImageableInterface
 {
@@ -36,7 +41,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180)]
+    #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
     /**

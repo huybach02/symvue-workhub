@@ -59,7 +59,8 @@
         "attendance": "Attendance",
         "branch": "Branch",
         "goods_management": "Goods Management",
-        "category": "Goods Category"
+        "category": "Goods Category",
+        "unit": "Unit"
     },
     "gender": {
         "male": "Male",

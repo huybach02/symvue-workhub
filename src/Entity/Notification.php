@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
 #[ORM\Table(name: 'notification')]
+#[ORM\Index(columns: ['to_id'], name: 'idx_notification_to_id')]
+#[ORM\Index(columns: ['to_id', 'seen'], name: 'idx_notification_to_id_seen')]
 class Notification
 {
     #[ORM\Id]

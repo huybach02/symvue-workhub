@@ -13,6 +13,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: AttendanceRepository::class)]
+#[ORM\Table(name: 'attendance')]
+#[ORM\Index(columns: ['employee_id', 'work_date'], name: 'idx_attendance_employee_date')]
 #[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
 class Attendance
 {

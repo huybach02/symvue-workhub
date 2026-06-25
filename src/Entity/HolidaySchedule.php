@@ -19,7 +19,7 @@ class HolidaySchedule
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, unique: true, nullable: true)]
     private ?string $code = null;
 
     #[ORM\Column(length: 255, nullable: true)]

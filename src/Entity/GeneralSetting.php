@@ -17,7 +17,7 @@ class GeneralSetting
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $tenCauHinh = null;
 
     #[ORM\Column(length: 255)]

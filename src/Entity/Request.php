@@ -14,6 +14,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RequestRepository::class)]
 #[ORM\Table(name: 'request')]
+#[ORM\Index(columns: ['status'], name: 'idx_request_status')]
+#[ORM\Index(columns: ['type'], name: 'idx_request_type')]
 class Request
 {
     use TimestampableTrait;

@@ -11,6 +11,12 @@ use Doctrine\Common\Collections\Collection;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
+#[ORM\Table(name: 'category')]
+#[ORM\UniqueConstraint(
+    name: 'UNIQ_CATEGORY_SLUG',
+    fields: ['slug'],
+    options: ['where' => 'deleted_at IS NULL']
+)]
 #[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
 class Category
 {

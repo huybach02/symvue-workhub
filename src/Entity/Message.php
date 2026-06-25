@@ -14,7 +14,7 @@ class Message
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, unique: true, nullable: true)]
     private ?string $code = null;
 
     #[ORM\ManyToOne(inversedBy: 'messages')]

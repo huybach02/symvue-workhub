@@ -596,5 +596,14 @@
         "select_parent_category": "Chọn danh mục cha",
         "search_placeholder": "Tìm danh mục",
         "no_parent_category": "Không có danh mục cha"
+    },
+    "unit": {
+        "title": "Đơn vị tính",
+        "columns": {
+            "id": "ID",
+            "name": "Tên",
+            "code": "Mã",
+            "symbol": "Ký hiệu"
+        }
     }
 }

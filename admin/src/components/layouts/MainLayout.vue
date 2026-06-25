@@ -54,6 +54,14 @@ export default {
             return this.$vuetify.display.mobile;
         },
     },
+    watch: {
+        currentUser(newVal) {
+            if (newVal && newVal.id) {
+                this.connectMercure();
+                this.danhSachThongBao();
+            }
+        },
+    },
     created() {
         this.mercureConnection = createMercureConnection({
             getCurrentUser: () => this.currentUser,
@@ -62,14 +70,6 @@ export default {
             },
         });
         this.fetchDefaultPermissions();
-    },
-    watch: {
-        currentUser(newVal) {
-            if (newVal && newVal.id) {
-                this.connectMercure();
-                this.danhSachThongBao();
-            }
-        },
     },
     beforeUnmount() {
         this.mercureConnection?.disconnect();

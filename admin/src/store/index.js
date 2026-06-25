@@ -14,6 +14,7 @@ import request from "./modules/request";
 import attendance from "./modules/attendance";
 import branch from "./modules/branch";
 import category from "./modules/category";
+import unit from "./modules/unit";
 
 const store = createStore({
     state() {
@@ -46,6 +47,7 @@ const store = createStore({
             attendance,
         branch,
         category,
+        unit,
 },
 });
 

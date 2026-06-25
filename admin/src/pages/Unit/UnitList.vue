@@ -13,9 +13,7 @@
                 :loading="loading"
                 @update:options="onOptions"
             >
-                <template
-                    #headers="{ columns, isSorted, getSortIcon, toggleSort }"
-                >
+                <template #headers="{ columns, isSorted, getSortIcon, toggleSort }">
                     <tr>
                         <th
                             v-for="col in columns"
@@ -35,10 +33,9 @@
                                 class="d-flex align-center justify-space-between py-2"
                             >
                                 <template v-if="!col.filterComponent">
-                                    <span
-                                        class="v-data-table-header__content"
-                                        >{{ col.title }}</span
-                                    >
+                                    <span class="v-data-table-header__content">{{
+                                        col.title
+                                    }}</span>
                                 </template>
 
                                 <component
@@ -70,11 +67,11 @@
                     <div class="d-flex align-center justify-space-between ga-1">
                         <v-tooltip
                             v-if="permission?.show"
-                            :text="$t('button.update')"
+                            :text="$t('button.update')" 
                             location="top"
                         >
                             <template #activator="{ props: tooltipProps }">
-                                <CreateEditBranch
+                                <CreateEditUnit
                                     v-bind="tooltipProps"
                                     :path="path"
                                     mode="update"
@@ -83,9 +80,9 @@
                                 />
                             </template>
                         </v-tooltip>
-                        <v-tooltip
-                            v-if="permission?.delete && item.type !== 'main'"
-                            :text="$t('button.delete')"
+                        <v-tooltip 
+                            v-if="permission?.delete"
+                            :text="$t('button.delete')" 
                             location="top"
                         >
                             <template #activator="{ props: tooltipProps }">
@@ -162,15 +159,15 @@ import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import CreateEditBranch from "./CreateEditBranch.vue";
+import CreateEditUnit from "./CreateEditUnit.vue";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
-    name: "BranchList",
+    name: "UnitList",
     components: {
         FilterPagination,
         ConfirmDialog,
-        CreateEditBranch,
+        CreateEditUnit,
     },
     props: {
         path: {
@@ -213,51 +210,39 @@ export default {
             headers: [
                 {
                     key: "action",
-                    width: 100,
-                    minWidth: 100,
-                    maxWidth: 100,
+                    width: 70,
+                    minWidth: 70,
+                    maxWidth: 70,
                     sortable: false,
                 },
                 {
-                    title: this.$t("branch.columns.id"),
+                    title: this.$t("unit.columns.id"),
                     key: "id",
-                    width: 120,
+                    width: 80,
                     filterComponent: markRaw(FilterText),
                 },
                 {
-                    title: this.$t("branch.columns.code"),
-                    key: "code",
-                    width: 200,
-                    filterComponent: markRaw(FilterText),
-                },
-                {
-                    title: this.$t("branch.columns.name"),
+                    title: this.$t("unit.columns.name"),
                     key: "name",
                     width: 200,
                     filterComponent: markRaw(FilterText),
                 },
                 {
-                    title: this.$t("branch.columns.phone"),
-                    key: "phone",
-                    width: 200,
+                    title: this.$t("unit.columns.code"),
+                    key: "code",
+                    width: 120,
                     filterComponent: markRaw(FilterText),
                 },
                 {
-                    title: this.$t("branch.columns.email"),
-                    key: "email",
-                    width: 200,
-                    filterComponent: markRaw(FilterText),
-                },
-                {
-                    title: this.$t("branch.columns.address"),
-                    key: "address",
-                    width: 300,
+                    title: this.$t("unit.columns.symbol"),
+                    key: "symbol",
+                    width: 100,
                     filterComponent: markRaw(FilterText),
                 },
                 {
                     title: this.$t("base.status"),
                     key: "status",
-                    width: 200,
+                    width: 100,
                     filterComponent: markRaw(FilterSelect),
                     items: [
                         {
@@ -277,20 +262,20 @@ export default {
                 {
                     title: this.$t("base.created_at"),
                     key: "createdAt",
-                    width: 200,
+                    width: 150,
                     filterComponent: markRaw(FilterDateRange),
                 },
                 {
                     title: this.$t("base.updated_at"),
                     key: "updatedAt",
-                    width: 200,
+                    width: 150,
                     filterComponent: markRaw(FilterDateRange),
                 },
             ],
         };
     },
     computed: {
-        ...mapGetters("branch", ["items", "loading", "totalItems"]),
+        ...mapGetters("unit", ["items", "loading", "totalItems"]),
         tableMinWidth() {
             return this.headers.reduce((total, col) => {
                 return total + (col.width || col.minWidth || 0);
@@ -298,7 +283,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions("branch", ["deleteItem"]),
+        ...mapActions("unit", ["deleteItem"]),
         openDeleteDialog(id) {
             this.deletingId = id;
             this.showConfirmDelete = true;

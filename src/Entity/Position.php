@@ -13,6 +13,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: PositionRepository::class)]
+#[ORM\Table(name: '`position`')]
+#[ORM\UniqueConstraint(
+    name: 'UNIQ_POSITION_CODE',
+    fields: ['code'],
+    options: ['where' => 'deleted_at IS NULL']
+)]
 #[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
 class Position
 {

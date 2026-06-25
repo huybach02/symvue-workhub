@@ -79,7 +79,7 @@
                                     :path="path"
                                     mode="update"
                                     :item="item"
-                                    @reload="$emit('reload')"
+                                    @reload="$emit('reload', { ...query })"
                                 />
                             </template>
                         </v-tooltip>
@@ -324,7 +324,7 @@ export default {
             this.isDeleting = false;
             this.showConfirmDelete = false;
             this.deletingId = null;
-            this.$emit("reload");
+            this.$emit("reload", { ...this.query });
         },
     },
 };

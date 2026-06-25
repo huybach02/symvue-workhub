@@ -14,6 +14,11 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: DepartmentRepository::class)]
 #[ORM\Table(name: 'department')]
+#[ORM\UniqueConstraint(
+    name: 'UNIQ_DEPARTMENT_MA_BO_PHAN',
+    fields: ['maBoPhan'],
+    options: ['where' => 'deleted_at IS NULL']
+)]
 #[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
 class Department
 {

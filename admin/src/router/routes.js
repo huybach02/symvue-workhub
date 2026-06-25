@@ -233,6 +233,21 @@ export const routes = [
                         ).icon || "",
                 },
             },
+            {
+                path: "unit",
+                name: NAME_ROUTES_CONFIG.unit,
+                component: () => import("../pages/Unit/Unit.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.unit,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.unit,
+                        ).icon || "",
+                },
+            },
 ],
     },
     {
