@@ -60,7 +60,8 @@
         "branch": "Chi nhánh",
         "goods_management": "Quản lý hàng hóa",
         "category": "Danh mục hàng hóa",
-        "unit": "Đơn vị tính"
+        "unit": "Đơn vị tính",
+        "provider": "Nhà cung cấp"
     },
     "gender": {
         "male": "Nam",

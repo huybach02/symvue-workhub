@@ -210,9 +210,9 @@ export default {
             headers: [
                 {
                     key: "action",
-                    width: 85,
-                    minWidth: 85,
-                    maxWidth: 85,
+                    width: 110,
+                    minWidth: 110,
+                    maxWidth: 110,
                     sortable: false,
                 },
                 {

@@ -3,11 +3,11 @@
 namespace App\Controller;
 
 use App\Class\CustomResponse;
-use App\DTO\UnitDTO;
-use App\Service\UnitService;
-use App\Repository\UnitRepository;
-use App\Service\Excel\Export\UnitExportService;
-use App\Service\Excel\Import\UnitImportService;
+use App\DTO\ProviderDTO;
+use App\Service\ProviderService;
+use App\Repository\ProviderRepository;
+use App\Service\Excel\Export\ProviderExportService;
+use App\Service\Excel\Import\ProviderImportService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -15,23 +15,23 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final class UnitController extends AbstractController
+final class ProviderController extends AbstractController
 {
     public function __construct(
-        private readonly UnitService $unitService,
-        private readonly UnitRepository $unitRepository,
-        private readonly UnitExportService $unitExportService,
-        private readonly UnitImportService $unitImportService,
+        private readonly ProviderService $providerService,
+        private readonly ProviderRepository $providerRepository,
+        private readonly ProviderExportService $providerExportService,
+        private readonly ProviderImportService $providerImportService,
     ) {}
 
-    #[Route('/unit', methods: ['GET'])]
+    #[Route('/provider', methods: ['GET'])]
     public function getAll(Request $request): JsonResponse
     {
         $params = $request->query->all();
         $params = validateFilterParams($params);
 
         try {
-            $result = $this->unitService->findAll($params);
+            $result = $this->providerService->findAll($params);
             return CustomResponse::success([
                 'collection' => $result['collection'],
                 'total' => $result['total'],
@@ -48,65 +48,65 @@ final class UnitController extends AbstractController
         }
     }
 
-    #[Route('/unit/{id}', methods: ['GET'], priority: -1)]
+    #[Route('/provider/{id}', methods: ['GET'], priority: -1)]
     public function getOne(int $id): JsonResponse
     {
         try {
-            $data = $this->unitService->findById($id);
+            $data = $this->providerService->findById($id);
             return CustomResponse::success($data);
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
     }
 
-    #[Route('/unit', methods: ['POST'])]
+    #[Route('/provider', methods: ['POST'])]
     public function create(
-        #[MapRequestPayload(validationGroups: ['create'])] UnitDTO $unitDTO
+        #[MapRequestPayload(validationGroups: ['create'])] ProviderDTO $providerDTO
     ): JsonResponse {
         try {
-            $data = $this->unitService->create($unitDTO);
+            $data = $this->providerService->create($providerDTO);
             return CustomResponse::success($data, t('success.created'));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
     }
 
-    #[Route('/unit/{id}', methods: ['PUT'])]
+    #[Route('/provider/{id}', methods: ['PUT'])]
     public function update(
         int $id,
-        #[MapRequestPayload(validationGroups: ['update'])] UnitDTO $unitDTO
+        #[MapRequestPayload(validationGroups: ['update'])] ProviderDTO $providerDTO
     ): JsonResponse {
         try {
-            $data = $this->unitService->update($id, $unitDTO);
+            $data = $this->providerService->update($id, $providerDTO);
             return CustomResponse::success($data, t('success.updated'));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
     }
 
-    #[Route('/unit/{id}', methods: ['DELETE'])]
+    #[Route('/provider/{id}', methods: ['DELETE'])]
     public function delete(int $id): JsonResponse
     {
         try {
-            $this->unitService->delete($id);
+            $this->providerService->delete($id);
             return CustomResponse::success([], t('success.deleted'));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
     }
 
-    #[Route('/unit/export', methods: ['GET'])]
+    #[Route('/provider/export', methods: ['GET'])]
     public function export(): Response
     {
         try {
-            $data = $this->unitRepository->findAll();
-            return $this->unitExportService->export($data);
+            $data = $this->providerRepository->findAll();
+            return $this->providerExportService->export($data);
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
     }
 
-    #[Route('/unit/import', methods: ['POST'])]
+    #[Route('/provider/import', methods: ['POST'])]
     public function import(Request $request): JsonResponse
     {
         $file = $request->files->get('file');
@@ -115,7 +115,7 @@ final class UnitController extends AbstractController
         }
 
         try {
-            $errorCount = $this->unitImportService->import($file->getPathname(), $file->getClientOriginalName(), $this->getUser());
+            $errorCount = $this->providerImportService->import($file->getPathname(), $file->getClientOriginalName(), $this->getUser());
             if ($errorCount > 0) {
                 return CustomResponse::error(t('error.imported_with_errors', ['%count%' => $errorCount]));
             }
@@ -125,12 +125,12 @@ final class UnitController extends AbstractController
         }
     }
 
-    #[Route('/unit/template-import', methods: ['GET'])]
+    #[Route('/provider/template-import', methods: ['GET'])]
     public function downloadTemplate(
-        \App\Service\Excel\Template\UnitTemplateImportService $service
+        \App\Service\Excel\Template\ProviderTemplateImportService $service
     ): Response {
         try {
-            return $service->generateUnitTemplate();
+            return $service->generateProviderTemplate();
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }

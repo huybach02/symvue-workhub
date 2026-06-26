@@ -68,6 +68,18 @@ export const menuSidebar = [
                 value: NAME_ROUTES_CONFIG.category,
                 to: { name: NAME_ROUTES_CONFIG.category },
             },
+            {
+                title: i18n.global.t("sidebar.unit"),
+                icon: "mdi-scale",
+                value: NAME_ROUTES_CONFIG.unit,
+                to: { name: NAME_ROUTES_CONFIG.unit },
+            },
+            {
+                title: i18n.global.t("sidebar.provider"),
+                icon: "mdi-truck-delivery",
+                value: NAME_ROUTES_CONFIG.provider,
+                to: { name: NAME_ROUTES_CONFIG.provider },
+            },
         ],
     },
     {
@@ -103,11 +115,5 @@ export const menuSidebar = [
         icon: "mdi-account-check",
         value: NAME_ROUTES_CONFIG.attendance,
         to: { name: NAME_ROUTES_CONFIG.attendance },
-    },
-    {
-        title: i18n.global.t("sidebar.unit"),
-        icon: "mdi-view-dashboard",
-        value: NAME_ROUTES_CONFIG.unit,
-        to: { name: NAME_ROUTES_CONFIG.unit },
     },
 ];

@@ -60,7 +60,8 @@
         "branch": "Branch",
         "goods_management": "Goods Management",
         "category": "Goods Category",
-        "unit": "Unit"
+        "unit": "Unit",
+        "provider": "Provider"
     },
     "gender": {
         "male": "Male",

@@ -10,7 +10,7 @@ export function useFilterPagination(fetchCallback, initialQuery = {}) {
     // Khởi tạo query object với giá trị mặc định
     const query = ref({
         page: 1,
-        limit: 10,
+        limit: 20,
         sort_column: null,
         sort_direction: null,
         f: [],

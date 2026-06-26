@@ -602,5 +602,21 @@
             "code": "Code",
             "symbol": "Symbol"
         }
+    },
+    "provider": {
+        "title": "Provider",
+        "columns": {
+            "id": "ID",
+            "code": "Provider Code",
+            "name": "Provider Name",
+            "phone": "Phone Number",
+            "email": "Email",
+            "address": "Address",
+            "taxNumber": "Tax Number",
+            "bankName": "Bank Name",
+            "bankNumber": "Bank Account Number",
+            "note": "Note",
+            "status": "Status"
+        }
     }
 }

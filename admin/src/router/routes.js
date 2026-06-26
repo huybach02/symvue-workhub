@@ -248,6 +248,21 @@ export const routes = [
                         ).icon || "",
                 },
             },
+            {
+                path: "provider",
+                name: NAME_ROUTES_CONFIG.provider,
+                component: () => import("../pages/Provider/Provider.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.provider,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.provider,
+                        ).icon || "",
+                },
+            },
 ],
     },
     {

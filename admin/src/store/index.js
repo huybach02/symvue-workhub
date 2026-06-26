@@ -15,6 +15,7 @@ import attendance from "./modules/attendance";
 import branch from "./modules/branch";
 import category from "./modules/category";
 import unit from "./modules/unit";
+import provider from "./modules/provider";
 
 const store = createStore({
     state() {
@@ -48,6 +49,7 @@ const store = createStore({
         branch,
         category,
         unit,
+        provider,
 },
 });
 

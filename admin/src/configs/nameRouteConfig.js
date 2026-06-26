@@ -20,4 +20,5 @@ export const NAME_ROUTES_CONFIG = {
     goodsManagement: "system.goodsManagement",
     category: "system.category",
     unit: "system.unit",
+    provider: "system.provider",
 };

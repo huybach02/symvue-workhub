@@ -74,7 +74,7 @@
                             location="top"
                         >
                             <template #activator="{ props: tooltipProps }">
-                                <CreateEditUnit
+                                <CreateEditProvider
                                     v-bind="tooltipProps"
                                     :path="path"
                                     mode="update"
@@ -162,15 +162,15 @@ import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import CreateEditUnit from "./CreateEditUnit.vue";
+import CreateEditProvider from "./CreateEditProvider.vue";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
-    name: "UnitList",
+    name: "ProviderList",
     components: {
         FilterPagination,
         ConfirmDialog,
-        CreateEditUnit,
+        CreateEditProvider,
     },
     props: {
         path: {
@@ -210,55 +210,72 @@ export default {
             showConfirmDelete: false,
             isDeleting: false,
             deletingId: null,
-        };
-    },
-    computed: {
-        ...mapGetters("unit", ["items", "loading", "totalItems"]),
-        isMobile() {
-            return this.$vuetify.display.mobile;
-        },
-        tableMinWidth() {
-            return this.headers.reduce((total, col) => {
-                return total + (col.width || col.minWidth || 0);
-            }, 0);
-        },
-        headers() {
-            return [
+            headers: [
                 {
                     key: "action",
-                    width: this.isMobile ? 110 : 70,
-                    minWidth: this.isMobile ? 110 : 70,
-                    maxWidth: this.isMobile ? 110 : 70,
+                    width: 110,
+                    minWidth: 110,
+                    maxWidth: 110,
                     sortable: false,
                 },
                 {
-                    title: this.$t("unit.columns.id"),
+                    title: this.$t("provider.columns.id"),
                     key: "id",
                     width: 120,
                     filterComponent: markRaw(FilterText),
                 },
                 {
-                    title: this.$t("unit.columns.name"),
-                    key: "name",
+                    title: this.$t("provider.columns.code"),
+                    key: "code",
                     width: 200,
                     filterComponent: markRaw(FilterText),
                 },
                 {
-                    title: this.$t("unit.columns.code"),
-                    key: "code",
-                    width: 120,
+                    title: this.$t("provider.columns.name"),
+                    key: "name",
+                    width: 350,
                     filterComponent: markRaw(FilterText),
                 },
                 {
-                    title: this.$t("unit.columns.symbol"),
-                    key: "symbol",
-                    width: 100,
+                    title: this.$t("provider.columns.phone"),
+                    key: "phone",
+                    width: 160,
                     filterComponent: markRaw(FilterText),
                 },
                 {
-                    title: this.$t("base.status"),
+                    title: this.$t("provider.columns.email"),
+                    key: "email",
+                    width: 200,
+                    filterComponent: markRaw(FilterText),
+                },
+                {
+                    title: this.$t("provider.columns.address"),
+                    key: "address",
+                    width: 420,
+                    filterComponent: markRaw(FilterText),
+                },
+                {
+                    title: this.$t("provider.columns.taxNumber"),
+                    key: "taxNumber",
+                    width: 160,
+                    filterComponent: markRaw(FilterText),
+                },
+                {
+                    title: this.$t("provider.columns.bankName"),
+                    key: "bankName",
+                    width: 180,
+                    filterComponent: markRaw(FilterText),
+                },
+                {
+                    title: this.$t("provider.columns.bankNumber"),
+                    key: "bankNumber",
+                    width: 180,
+                    filterComponent: markRaw(FilterText),
+                },
+                {
+                    title: this.$t("provider.columns.status"),
                     key: "status",
-                    width: 100,
+                    width: 150,
                     filterComponent: markRaw(FilterSelect),
                     items: [
                         {
@@ -278,20 +295,28 @@ export default {
                 {
                     title: this.$t("base.created_at"),
                     key: "createdAt",
-                    width: 150,
+                    width: 180,
                     filterComponent: markRaw(FilterDateRange),
                 },
                 {
                     title: this.$t("base.updated_at"),
                     key: "updatedAt",
-                    width: 150,
+                    width: 180,
                     filterComponent: markRaw(FilterDateRange),
                 },
-            ];
+            ],
+        };
+    },
+    computed: {
+        ...mapGetters("provider", ["items", "loading", "totalItems"]),
+        tableMinWidth() {
+            return this.headers.reduce((total, col) => {
+                return total + (col.width || col.minWidth || 0);
+            }, 0);
         },
     },
     methods: {
-        ...mapActions("unit", ["deleteItem"]),
+        ...mapActions("provider", ["deleteItem"]),
         openDeleteDialog(id) {
             this.deletingId = id;
             this.showConfirmDelete = true;

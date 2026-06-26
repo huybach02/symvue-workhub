@@ -605,5 +605,21 @@
             "code": "Mã",
             "symbol": "Ký hiệu"
         }
+    },
+    "provider": {
+        "title": "Nhà cung cấp",
+        "columns": {
+            "id": "ID",
+            "code": "Mã nhà cung cấp",
+            "name": "Tên nhà cung cấp",
+            "phone": "Số điện thoại",
+            "email": "Email",
+            "address": "Địa chỉ",
+            "taxNumber": "Mã số thuế",
+            "bankName": "Tên ngân hàng",
+            "bankNumber": "Số tài khoản ngân hàng",
+            "note": "Ghi chú",
+            "status": "Trạng thái"
+        }
     }
 }

@@ -32,4 +32,5 @@ export const API_ROUTES_CONFIG = {
     branch: "/branch",
     category: "/category",
     unit: "/unit",
+    provider: "/provider",
 };

@@ -250,6 +250,8 @@ return [
             "show" => true,
             "edit" => true,
             "delete" => true,
+            "export" => true,
+            "import" => true,
             "showMenu" => true
         ],
         "actionLabel" => [
@@ -258,6 +260,31 @@ return [
             "show" => t("permission.actions.show"),
             "edit" => t("permission.actions.edit"),
             "delete" => t("permission.actions.delete"),
+            "export" => t("permission.actions.export"),
+            "import" => t("permission.actions.import"),
+            "showMenu" => t("permission.actions.showMenu"),
+        ],
+    ],
+    [
+        "name" => "provider",
+        "actions" => [
+            "index" => true,
+            "create" => true,
+            "show" => true,
+            "edit" => true,
+            "delete" => true,
+            "export" => true,
+            "import" => true,
+            "showMenu" => true
+        ],
+        "actionLabel" => [
+            "index" => t("permission.actions.index"),
+            "create" => t("permission.actions.create"),
+            "show" => t("permission.actions.show"),
+            "edit" => t("permission.actions.edit"),
+            "delete" => t("permission.actions.delete"),
+            "export" => t("permission.actions.export"),
+            "import" => t("permission.actions.import"),
             "showMenu" => t("permission.actions.showMenu"),
         ],
     ],
