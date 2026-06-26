@@ -263,6 +263,15 @@ export const routes = [
                         ).icon || "",
                 },
             },
+            {
+                path: "profile",
+                name: NAME_ROUTES_CONFIG.profile,
+                component: () => import("../pages/Profile/Profile.vue"),
+                meta: {
+                    title: i18n.global.t("auth.profile") || "Trang cá nhân",
+                    icon: "mdi-account",
+                },
+            },
 ],
     },
     {

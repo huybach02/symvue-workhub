@@ -18,7 +18,17 @@
         "otp_code": "OTP Code",
         "resend_otp": "Resend OTP",
         "back_to_login": "Back to login",
-        "change_password": "Change new password"
+        "change_password": "Change new password",
+        "current_password": "Current password",
+        "new_password": "New password",
+        "confirm_password": "Confirm new password",
+        "change_password_btn": "Change password",
+        "personal_info": "Personal information",
+        "security": "Security",
+        "save_changes": "Save changes",
+        "enter_current_password": "Enter current password",
+        "enter_new_password": "Enter new password (minimum 6 characters)",
+        "enter_confirm_password": "Confirm new password"
     },
     "language": {
         "en": "English",

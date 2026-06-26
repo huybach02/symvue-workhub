@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Class\Constanst;
 use App\Class\FilterWithPagination;
 use App\DTO\UserDTO;
+use App\DTO\ChangePasswordDTO;
 use App\DTO\UserPositionDTO;
 use App\DTO\UserPositionTempDTO;
 use App\Entity\Conversation;
@@ -723,5 +724,60 @@ class UserService
         }
 
         return $adminApprover;
+    }
+
+    public function updateProfile(User $user, UserDTO $dto): array
+    {
+        // Kiểm tra email trùng lặp nếu thay đổi email
+        if ($dto->email && $user->getEmail() !== $dto->email) {
+            $existingUser = $this->userRepository->findOneBy(['email' => $dto->email]);
+            if ($existingUser) {
+                throw new \Exception(t("error.email_exists", ["%email%" => $dto->email]));
+            }
+            $user->setEmail($dto->email);
+        }
+
+        $user->setName($dto->name);
+        $user->setGender($dto->gender);
+        $user->setBirthday($dto->birthday);
+        $user->setCmnd($dto->cmnd);
+        $user->setNgayCapCmnd($dto->ngayCapCmnd);
+        $user->setNoiCapCmnd($dto->noiCapCmnd);
+        $user->setPhone($dto->phone);
+        $user->setProvince($dto->province);
+        $user->setWard($dto->ward);
+        $user->setAddress($dto->address);
+
+        $this->entityManager->flush();
+
+        if ($dto->avatar) {
+            $this->imageRepository->removeImages($user);
+            $this->imageRepository->addOneImage($user, $dto->avatar, "avatar");
+        }
+
+        $data = $user->jsonSerialize();
+        $data["image"] = $this->imageRepository->getImages($user, "avatar");
+        $data["permissions"] = $this->boPhanService->getCachedUserPermissions($user->getId());
+        return $data;
+    }
+
+    public function changePassword(User $user, ChangePasswordDTO $dto): void
+    {
+        // Kiểm tra mật khẩu hiện tại
+        if (!$this->passwordHasher->isPasswordValid($user, $dto->currentPassword)) {
+            throw new \Exception(t("error.current_password_invalid"));
+        }
+
+        // Kiểm tra xác nhận mật khẩu
+        if ($dto->newPassword !== $dto->confirmPassword) {
+            throw new \Exception(t("error.password_confirm_not_match"));
+        }
+
+        // Cập nhật mật khẩu mới
+        $hashedPassword = $this->passwordHasher->hashPassword($user, $dto->newPassword);
+        $user->setPassword($hashedPassword);
+        $user->setIsFirstLogin(false);
+
+        $this->entityManager->flush();
     }
 }

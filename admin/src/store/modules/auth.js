@@ -1,3 +1,7 @@
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
+import { putData } from "@/services/bases/updateData";
+import { postData } from "@/services/bases/postData";
+
 const state = {
     user: null,
     isAuthenticated: false,
@@ -40,6 +44,21 @@ const actions = {
     // Action đăng xuất
     async logout({ commit }) {
         commit("CLEAR_AUTH_DATA");
+    },
+    async updateProfile({ commit, state }, { data, callback }) {
+        commit("setIsLoading", null, { root: true });
+        const resData = await putData(API_ROUTES_CONFIG.profile, null, data, callback);
+        if (resData) {
+            commit("SET_USER", { ...state.user, ...resData });
+        }
+        commit("unsetIsLoading", null, { root: true });
+        return resData;
+    },
+    async changePasswordProfile({ commit }, { data, callback }) {
+        commit("setIsLoading", null, { root: true });
+        const resData = await postData(API_ROUTES_CONFIG.changePasswordProfile, data, callback);
+        commit("unsetIsLoading", null, { root: true });
+        return resData;
     },
 };
 

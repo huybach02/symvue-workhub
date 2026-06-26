@@ -18,7 +18,17 @@
         "otp_code": "Mã OTP",
         "resend_otp": "Gửi lại mã OTP",
         "back_to_login": "Quay lại đăng nhập",
-        "change_password": "Cập nhật mật khẩu mới"
+        "change_password": "Cập nhật mật khẩu mới",
+        "current_password": "Mật khẩu hiện tại",
+        "new_password": "Mật khẩu mới",
+        "confirm_password": "Xác nhận mật khẩu mới",
+        "change_password_btn": "Đổi mật khẩu",
+        "personal_info": "Thông tin cá nhân",
+        "security": "Bảo mật",
+        "save_changes": "Lưu thay đổi",
+        "enter_current_password": "Nhập mật khẩu hiện tại",
+        "enter_new_password": "Nhập mật khẩu mới (tối thiểu 6 ký tự)",
+        "enter_confirm_password": "Nhập lại mật khẩu mới"
     },
     "language": {
         "en": "English",
