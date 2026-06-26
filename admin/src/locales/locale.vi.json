@@ -100,7 +100,10 @@
         "apply_scope": "Phạm vi áp dụng",
         "apply_existing_schedules": "Áp dụng cho các lịch làm việc đã có trên hệ thống (ghi đè các dữ liệu đã có)",
         "apply_new_schedules_only": "Chỉ áp dụng cho các lịch làm việc mới",
-        "apply_scope_required": "Vui lòng chọn phạm vi áp dụng"
+        "apply_scope_required": "Vui lòng chọn phạm vi áp dụng",
+        "overnight_next_day_suffix": "+1 ngày",
+        "overnight_continuation_until": "Tiếp diễn đến {time}",
+        "overnight_notice": "Ca qua đêm: bắt đầu hôm nay và kết thúc vào ngày hôm sau."
     },
     "ca_lam_viec": {
         "ten_ca": "Tên ca",

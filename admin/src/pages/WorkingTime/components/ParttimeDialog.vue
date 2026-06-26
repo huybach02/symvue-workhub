@@ -2,12 +2,15 @@
     <v-dialog v-model="dialog" max-width="600">
         <v-card
             prepend-icon="mdi-clock-outline"
-            :title="itemEdit ? $t('ca_lam_viec.edit') : $t('ca_lam_viec.create')"
+            :title="
+                itemEdit ? $t('ca_lam_viec.edit') : $t('ca_lam_viec.create')
+            "
         >
             <v-divider />
 
             <v-card-text>
                 <VeeForm
+                    v-slot="{ values }"
                     as="form"
                     :validation-schema="thoiGianLamViecSchema"
                     :initial-values="initialValues"
@@ -74,6 +77,25 @@
                                     @blur="handleBlur"
                                 />
                             </VeeField>
+                        </v-col>
+                        <v-col v-if="isOvernightValues(values)" cols="12">
+                            <v-alert
+                                type="info"
+                                variant="tonal"
+                                density="compact"
+                                icon="mdi-weather-night"
+                                class="overnight-alert"
+                            >
+                                {{
+                                    $t(
+                                        "thoi_gian_lam_viec.overnight_notice",
+                                    )
+                                }}
+                                <br />
+                                <strong>
+                                    ({{ formatOvernightRange(values) }})
+                                </strong>
+                            </v-alert>
                         </v-col>
                         <v-col v-if="itemEdit" cols="12">
                             <VeeField
@@ -189,6 +211,10 @@
 </template>
 
 <script>
+import {
+    formatTimeRangeFromValues,
+    isOvernightRange,
+} from "@/components/calendar/calendarShared";
 import TimePicker from "@/components/TimePicker.vue";
 import { toast } from "@/main";
 import { Form as VeeForm, Field as VeeField } from "vee-validate";
@@ -277,9 +303,21 @@ export default {
         },
     },
     methods: {
-        ...mapActions("workingTime", ["createParttimeShift", "updateParttimeShift"]),
+        ...mapActions("workingTime", [
+            "createParttimeShift",
+            "updateParttimeShift",
+        ]),
         onApplyScopeChange(handleChange, value) {
             handleChange(value);
+        },
+        isOvernightValues(values) {
+            return isOvernightRange(values?.gioBatDau, values?.gioKetThuc);
+        },
+        formatOvernightRange(values) {
+            return formatTimeRangeFromValues(
+                values?.gioBatDau,
+                values?.gioKetThuc,
+            );
         },
         async onSubmit(values) {
             if (
@@ -315,4 +353,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.overnight-alert {
+    margin-top: -8px;
+}
+</style>

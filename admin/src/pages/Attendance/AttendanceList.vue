@@ -307,6 +307,7 @@
 <script>
 import dayjs from "dayjs";
 import DatePicker from "@/components/DatePicker.vue";
+import { isOvernightRange } from "@/components/calendar/calendarShared";
 import AttendanceLogDialog from "./components/AttendanceLogDialog.vue";
 import { mapGetters } from "vuex";
 import {
@@ -757,10 +758,15 @@ export default {
         getAttendanceShiftLabel(item) {
             const startTime = item.workScheduleStartTime ?? "--:--";
             const endTime = item.workScheduleEndTime ?? "--:--";
+            const endTimeLabel = `${endTime}${
+                isOvernightRange(startTime, endTime)
+                    ? ` (${this.$t("thoi_gian_lam_viec.overnight_next_day_suffix")})`
+                    : ""
+            }`;
 
             return this.$t("attendance.labels.shift_schedule", {
                 start: startTime,
-                end: endTime,
+                end: endTimeLabel,
             });
         },
         getAttendanceTimeLabel(item) {

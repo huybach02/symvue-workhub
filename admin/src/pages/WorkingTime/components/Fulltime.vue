@@ -37,7 +37,16 @@
                     </td>
                     <td>{{ item.thu }}</td>
                     <td>{{ item.gioBatDau }}</td>
-                    <td>{{ item.gioKetThuc }}</td>
+                    <td>
+                        <v-icon
+                            v-if="isOvernight(item)"
+                            size="x-small"
+                            class="mr-1"
+                        >
+                            mdi-weather-night
+                        </v-icon>
+                        {{ formatEndTime(item) }}
+                    </td>
                     <td>{{ item.ghiChu || "--" }}</td>
                     <td>{{ item.updatedAt }}</td>
                 </tr>
@@ -53,6 +62,7 @@
 </template>
 
 <script>
+import { isOvernightRange } from "@/components/calendar/calendarShared";
 import FulltimeDialog from "./FulltimeDialog.vue";
 import { mapActions, mapGetters } from "vuex";
 
@@ -89,6 +99,16 @@ export default {
         handleEdit(item) {
             this.itemEdit = item;
             this.isOpenDialog = true;
+        },
+        isOvernight(item) {
+            return isOvernightRange(item.gioBatDau, item.gioKetThuc);
+        },
+        formatEndTime(item) {
+            return `${item.gioKetThuc}${
+                this.isOvernight(item)
+                    ? ` (${this.$t("thoi_gian_lam_viec.overnight_next_day_suffix")})`
+                    : ""
+            }`;
         },
     },
 };

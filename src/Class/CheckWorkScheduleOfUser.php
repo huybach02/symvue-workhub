@@ -38,7 +38,7 @@ class CheckWorkScheduleOfUser
     ): bool {
         $generalSetting = $this->generalSettingRepository->getAllConfig();
 
-        $attendances = $this->attendanceRepository->findAttendancesByWorkDateAndEmployee(
+        $attendances = $this->attendanceRepository->findAttendanceCandidatesByDateTimeAndEmployee(
             $now,
             $currentUser,
         );

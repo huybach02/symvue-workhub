@@ -126,6 +126,7 @@
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import { formatTimeRange } from "@/components/calendar/calendarShared";
 import { mapActions } from "vuex";
 
 dayjs.locale("vi");
@@ -174,7 +175,7 @@ export default {
                 return "";
             }
 
-            return `${this.selectedShift.startTime} - ${this.selectedShift.endTime}`;
+            return formatTimeRange(this.selectedShift);
         },
         shiftDateLabel() {
             if (!this.selectedShift?.date) {

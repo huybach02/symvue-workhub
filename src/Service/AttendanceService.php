@@ -332,7 +332,7 @@ class AttendanceService
         User $currentUser,
         array $configs,
     ): ?Attendance {
-        $attendances = $this->attendanceRepository->findAttendancesByWorkDateAndEmployee(
+        $attendances = $this->attendanceRepository->findAttendanceCandidatesByDateTimeAndEmployee(
             $now,
             $currentUser,
         );

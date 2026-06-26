@@ -81,13 +81,17 @@
 
                     <v-chip
                         v-for="event in getEvents(user.id, col.value)"
-                        :key="event.id"
+                        :key="getEventKey(event)"
                         :color="event.color"
                         size="small"
-                        class="ma-1 w-100 justify-center font-weight-bold"
+                        :class="[
+                            'ma-1 w-100 justify-center font-weight-bold calendar-segment-chip',
+                            getCalendarSegmentClass(event),
+                        ]"
                         variant="flat"
                     >
-                        {{ event.title }}
+                        <v-icon v-if="isOvernightEvent(event)" size="x-small" class="mr-1">mdi-weather-night</v-icon>
+                        {{ formatEventTitle(event) }}
                     </v-chip>
                 </div>
             </td>
@@ -144,10 +148,14 @@
                     <v-chip
                         :color="cell.event.color"
                         size="small"
-                        class="w-100 justify-center font-weight-bold day-mode-chip"
+                        :class="[
+                            'w-100 justify-center font-weight-bold day-mode-chip calendar-segment-chip',
+                            getCalendarSegmentClass(cell.event),
+                        ]"
                         variant="flat"
                     >
-                        {{ cell.event.title }}
+                        <v-icon v-if="isOvernightEvent(cell.event)" size="x-small" class="mr-1">mdi-weather-night</v-icon>
+                        {{ formatEventTitle(cell.event) }}
                     </v-chip>
                 </div>
             </td>
@@ -156,7 +164,13 @@
 </template>
 
 <script>
-import { buildDayModeCells } from "./calendarShared";
+import {
+    buildDayModeCells,
+    formatCalendarEventTitle,
+    getCalendarSegmentClass,
+    getCalendarEventsForDate,
+    isOvernightEvent,
+} from "./calendarShared";
 
 export default {
     name: "CalendarFulltimeBody",
@@ -197,25 +211,40 @@ export default {
             );
         },
         getDayModeEvents(userId) {
-            return this.events.filter(
-                (event) =>
-                    event.user_id === userId &&
-                    event.date === this.baseDate.format("YYYY-MM-DD") &&
-                    event.startTime &&
-                    event.endTime,
+            return getCalendarEventsForDate(
+                this.events.filter(
+                    (event) =>
+                        event.user_id === userId &&
+                        event.startTime &&
+                        event.endTime,
+                ),
+                this.baseDate.format("YYYY-MM-DD"),
             );
         },
         getDayModeRowCells(userId) {
             return buildDayModeCells(
                 this.getDayModeEvents(userId),
-                (event) => `${userId}-${event.id}`,
+                (event) => `${userId}-${this.getEventKey(event)}`,
             );
         },
         getEvents(userId, colValue) {
-            return this.events.filter(
-                (event) => event.user_id === userId && event.date === colValue,
+            return getCalendarEventsForDate(
+                this.events.filter((event) => event.user_id === userId),
+                colValue,
             );
         },
+        getEventKey(event) {
+            return `${event.id}-${event.calendarDate || event.date}-${event.calendarSegment || "event"}`;
+        },
+        formatEventTitle(event) {
+            if (event.startTime && event.endTime) {
+                return formatCalendarEventTitle(event);
+            }
+
+            return event.title || "";
+        },
+        getCalendarSegmentClass,
+        isOvernightEvent,
     },
 };
 </script>
@@ -230,5 +259,40 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.calendar-segment-chip {
+    position: relative;
+    overflow: hidden;
+}
+
+.calendar-chip-overnight-start {
+    border-top-right-radius: 6px !important;
+    border-bottom-right-radius: 6px !important;
+}
+
+.calendar-chip-continuation {
+    border-top-left-radius: 6px !important;
+    border-bottom-left-radius: 6px !important;
+}
+
+.calendar-chip-overnight-start::after,
+.calendar-chip-continuation::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: rgba(255, 255, 255, 0.75);
+}
+
+.calendar-chip-overnight-start::after {
+    right: 0;
+    box-shadow: -6px 0 12px rgba(255, 255, 255, 0.2);
+}
+
+.calendar-chip-continuation::before {
+    left: 0;
+    box-shadow: 6px 0 12px rgba(255, 255, 255, 0.2);
 }
 </style>

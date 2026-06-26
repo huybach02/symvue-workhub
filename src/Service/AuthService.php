@@ -76,6 +76,20 @@ class AuthService
             return true;
         }
 
+        $attendances = $this->attendanceRepository->findAttendanceCandidatesByDateTimeAndEmployee(
+            $now,
+            $currentUser,
+        );
+
+        foreach ($attendances as $attendance) {
+            if (
+                $attendance->getStatus() !== StatusAttendance::Absent->value
+                && $this->checkWorkScheduleOfUser->isWithinAttendanceSchedule($attendance, $now)
+            ) {
+                return true;
+            }
+        }
+
         $workingSchedule = $this->workScheduleService->getWorkingScheduleForUserOnDate(
             $currentUser,
             $now,
@@ -88,22 +102,8 @@ class AuthService
             return false;
         }
 
-        $attendances = $this->attendanceRepository->findAttendancesByWorkDateAndEmployee(
-            $now,
-            $currentUser,
-        );
-
         if (empty($attendances)) {
             throw new \Exception(t('error.not_in_working_schedule'));
-        }
-
-        foreach ($attendances as $attendance) {
-            if (
-                $attendance->getStatus() !== StatusAttendance::Absent->value
-                && $this->checkWorkScheduleOfUser->isWithinAttendanceSchedule($attendance, $now)
-            ) {
-                return true;
-            }
         }
 
         return false;

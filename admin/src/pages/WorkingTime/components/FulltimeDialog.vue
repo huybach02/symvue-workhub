@@ -9,6 +9,7 @@
             <v-card-text>
                 <VeeForm
                     v-if="dataLoaded"
+                    v-slot="{ values }"
                     as="form"
                     :validation-schema="thoiGianLamViecSchema"
                     :initial-values="initialValues"
@@ -81,6 +82,29 @@
                                     @blur="handleBlur"
                                 />
                             </VeeField>
+                        </v-col>
+                        <v-col
+                            v-if="isOvernightValues(values)"
+                            cols="12"
+                        >
+                            <v-alert
+                                type="info"
+                                variant="tonal"
+                                density="compact"
+                                icon="mdi-weather-night"
+                                class="overnight-alert"
+                            >
+                                {{
+                                    $t(
+                                        "thoi_gian_lam_viec.overnight_notice",
+                                    )
+                                }}
+                                <strong>
+                                    ({{
+                                        formatOvernightRange(values)
+                                    }})
+                                </strong>
+                            </v-alert>
                         </v-col>
                         <v-col cols="12">
                             <VeeField
@@ -202,6 +226,10 @@
 </template>
 
 <script>
+import {
+    formatTimeRangeFromValues,
+    isOvernightRange,
+} from "@/components/calendar/calendarShared";
 import TimePicker from "@/components/TimePicker.vue";
 import { toast } from "@/main";
 import { Form as VeeForm, Field as VeeField } from "vee-validate";
@@ -286,6 +314,15 @@ export default {
         onApplyScopeChange(handleChange, value) {
             handleChange(value);
         },
+        isOvernightValues(values) {
+            return isOvernightRange(values?.gioBatDau, values?.gioKetThuc);
+        },
+        formatOvernightRange(values) {
+            return formatTimeRangeFromValues(
+                values?.gioBatDau,
+                values?.gioKetThuc,
+            );
+        },
         async onSubmit(values) {
             if (
                 values.applyToExistingSchedules !== true &&
@@ -309,4 +346,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.overnight-alert {
+    margin-top: -8px;
+}
+</style>

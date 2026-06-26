@@ -55,6 +55,37 @@ class AttendanceRepository extends ServiceEntityRepository
     /**
      * @return Attendance[]
      */
+    public function findAttendanceCandidatesByDateTimeAndEmployee(
+        \DateTimeInterface $dateTime,
+        User $employee,
+    ): array {
+        $currentDate = \DateTimeImmutable::createFromInterface($dateTime);
+        $previousDate = $currentDate->modify('-1 day');
+
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.deletedAt IS NULL')
+            ->andWhere('a.employee = :employee')
+            ->andWhere('(
+                a.workDate = :currentDate
+                OR (
+                    a.workDate = :previousDate
+                    AND a.workScheduleStartTime IS NOT NULL
+                    AND a.workScheduleEndTime IS NOT NULL
+                    AND a.workScheduleEndTime <= a.workScheduleStartTime
+                )
+            )')
+            ->setParameter('employee', $employee)
+            ->setParameter('currentDate', $currentDate->format('Y-m-d'))
+            ->setParameter('previousDate', $previousDate->format('Y-m-d'))
+            ->orderBy('a.workDate', 'ASC')
+            ->addOrderBy('a.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Attendance[]
+     */
     public function findScheduledCheckInAttendancesForAbsentSync(
         \DateTimeInterface $fromDate,
         \DateTimeInterface $toDate,

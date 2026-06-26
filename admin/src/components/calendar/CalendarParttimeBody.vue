@@ -43,7 +43,7 @@
 
                     <v-tooltip
                         v-for="shift in getShiftsByDate(col.value)"
-                        :key="shift.id"
+                        :key="getShiftKey(shift)"
                         location="top"
                         :disabled="!getAllAssignedMemberNames(shift).length"
                     >
@@ -52,12 +52,16 @@
                                 v-bind="props"
                                 :color="shift.color || DEFAULT_SHIFT_COLOR"
                                 size="small"
-                                class="ma-1 w-100 parttime-chip"
+                                :class="[
+                                    'ma-1 w-100 parttime-chip calendar-segment-chip',
+                                    getCalendarSegmentClass(shift),
+                                ]"
                                 variant="flat"
                                 @click="$emit('shiftSelected', shift)"
                             >
                                 <div class="parttime-chip-content">
                                     <div class="parttime-chip-title">
+                                        <v-icon v-if="isOvernightEvent(shift)" size="x-small" class="mr-1">mdi-weather-night</v-icon>
                                         {{ formatShiftLabel(shift) }}
                                     </div>
                                     <div
@@ -121,7 +125,7 @@
     </tbody>
 
     <tbody v-else-if="dayModeShifts.length">
-        <tr v-for="shift in dayModeShifts" :key="shift.id">
+        <tr v-for="shift in dayModeShifts" :key="getShiftKey(shift)">
             <td
                 v-for="cell in getDayModeRowCells(shift)"
                 :key="cell.key"
@@ -140,12 +144,16 @@
                                 v-bind="props"
                                 :color="cell.event.color || DEFAULT_SHIFT_COLOR"
                                 size="small"
-                                class="w-100 day-mode-chip day-mode-shift-chip"
+                                :class="[
+                                    'w-100 day-mode-chip day-mode-shift-chip calendar-segment-chip',
+                                    getCalendarSegmentClass(cell.event),
+                                ]"
                                 variant="flat"
                                 @click="$emit('shiftSelected', cell.event)"
                             >
                                 <div class="parttime-chip-content">
                                     <div class="parttime-chip-title">
+                                        <v-icon v-if="isOvernightEvent(cell.event)" size="x-small" class="mr-1">mdi-weather-night</v-icon>
                                         {{ formatShiftLabel(cell.event) }}
                                     </div>
                                     <div
@@ -224,7 +232,13 @@
 </template>
 
 <script>
-import { buildDayModeCells, formatTimeRange } from "./calendarShared";
+import {
+    buildDayModeCells,
+    formatCalendarEventTitle,
+    getCalendarSegmentClass,
+    getCalendarEventsForDate,
+    isOvernightEvent,
+} from "./calendarShared";
 
 const DEFAULT_SHIFT_COLOR = "#2e7d32";
 
@@ -265,7 +279,7 @@ export default {
     },
     methods: {
         formatShiftLabel(shift) {
-            return `${shift.title}: ${formatTimeRange(shift)}`;
+            return `${shift.title}: ${formatCalendarEventTitle(shift)}`;
         },
         getVisibleAssignedMembers(shift) {
             return this.getAllAssignedMemberNames(shift).slice(0, 5);
@@ -282,15 +296,23 @@ export default {
             return assignedMembers.map((member) => member.name).filter(Boolean);
         },
         getShiftsByDate(date) {
-            return this.shifts
-                .filter((shift) => shift.date === date)
-                .sort((left, right) =>
-                    left.startTime.localeCompare(right.startTime),
-                );
+            return getCalendarEventsForDate(this.shifts, date).sort(
+                (left, right) =>
+                    (left.calendarStartTime || left.startTime).localeCompare(
+                        right.calendarStartTime || right.startTime,
+                    ),
+            );
         },
         getDayModeRowCells(shift) {
-            return buildDayModeCells([shift], (event) => event.id);
+            return buildDayModeCells([shift], (event) =>
+                this.getShiftKey(event),
+            );
         },
+        getShiftKey(shift) {
+            return `${shift.id}-${shift.calendarDate || shift.date}-${shift.calendarSegment || "shift"}`;
+        },
+        getCalendarSegmentClass,
+        isOvernightEvent,
     },
 };
 </script>
@@ -319,6 +341,41 @@ export default {
     justify-content: flex-start;
     padding: 7px 10px;
     border-radius: 18px;
+}
+
+.calendar-segment-chip {
+    position: relative;
+    overflow: hidden;
+}
+
+.calendar-chip-overnight-start {
+    border-top-right-radius: 6px !important;
+    border-bottom-right-radius: 6px !important;
+}
+
+.calendar-chip-continuation {
+    border-top-left-radius: 6px !important;
+    border-bottom-left-radius: 6px !important;
+}
+
+.calendar-chip-overnight-start::after,
+.calendar-chip-continuation::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: rgba(255, 255, 255, 0.75);
+}
+
+.calendar-chip-overnight-start::after {
+    right: 0;
+    box-shadow: -6px 0 12px rgba(255, 255, 255, 0.2);
+}
+
+.calendar-chip-continuation::before {
+    left: 0;
+    box-shadow: 6px 0 12px rgba(255, 255, 255, 0.2);
 }
 
 .parttime-chip-content {

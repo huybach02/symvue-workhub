@@ -99,7 +99,10 @@
         "apply_scope": "Apply scope",
         "apply_existing_schedules": "Apply to existing work schedules (overwrite existing data)",
         "apply_new_schedules_only": "Only apply to new work schedules",
-        "apply_scope_required": "Please select apply scope"
+        "apply_scope_required": "Please select apply scope",
+        "overnight_next_day_suffix": "+1 day",
+        "overnight_continuation_until": "Continues until {time}",
+        "overnight_notice": "Overnight shift: starts today and ends on the next day."
     },
     "ca_lam_viec": {
         "ten_ca": "Shift name",

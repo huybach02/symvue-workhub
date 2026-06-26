@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-row class="g-2">
-            <v-col v-for="item in data" :key="item.id" cols="12" md="3">
+            <v-col v-for="item in data" :key="item.id" cols="12" md="4">
                 <ParttimeCard
                     :permission="permission"
                     :thoi-gian-lam-viec="item"
