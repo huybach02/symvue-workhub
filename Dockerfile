@@ -41,7 +41,7 @@ RUN printf 'date.timezone=%s\n' "$TZ" > /usr/local/etc/php/conf.d/timezone.ini
 
 COPY composer.json composer.lock symfony.lock ./
 
-RUN composer install --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
+RUN composer install --prefer-source --no-dev --no-autoloader --no-scripts --no-progress
 
 COPY . .
 
