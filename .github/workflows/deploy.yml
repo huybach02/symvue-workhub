@@ -1,6 +1,7 @@
 name: Deploy to Production VPS
 
 on:
+    workflow_dispatch:
     push:
         branches:
             - main
@@ -23,9 +24,11 @@ jobs:
                   key: ${{ secrets.VPS_SSH_KEY }}
                   port: ${{ secrets.VPS_PORT || 22 }}
                   timeout: 60s
+                  command_timeout: 45m
                   script_stop: true
                   script: |
                       set -eu
+                      COMPOSE_FILES="-f docker-compose.yml -f docker-compose.vps.yml"
 
                       cd "${{ secrets.VPS_APP_DIR }}"
 
@@ -34,21 +37,32 @@ jobs:
                         exit 1
                       fi
 
+                      if [ ! -f docker-compose.vps.yml ]; then
+                        echo "docker-compose.vps.yml was not found on the server."
+                        exit 1
+                      fi
+
+                      if [ -n "$(git status --porcelain)" ]; then
+                        echo "The VPS working tree is dirty. Please clean it before deploying."
+                        git status --short
+                        exit 1
+                      fi
+
                       echo "[1/10] Update source code"
                       git fetch origin main
                       git checkout main
-                      git reset --hard origin/main
+                      git pull --ff-only origin main
 
                       echo "[2/10] Build Docker images"
-                      docker compose --env-file .env.prod.local build
+                      docker compose $COMPOSE_FILES --env-file .env.prod.local build
 
                       echo "[3/10] Recreate application services"
-                      docker compose --env-file .env.prod.local up -d --force-recreate be-php be-nginx fe-nginx mercure messenger scheduler npm
+                      docker compose $COMPOSE_FILES --env-file .env.prod.local up -d --force-recreate be-php be-nginx fe-nginx mercure messenger scheduler
 
                       echo "[4/10] Run database migrations"
                       migration_success=0
                       for attempt in 1 2 3 4 5; do
-                        if docker compose --env-file .env.prod.local exec -T be-php php bin/console doctrine:migrations:migrate --no-interaction --env=prod; then
+                        if docker compose $COMPOSE_FILES --env-file .env.prod.local exec -T be-php php bin/console doctrine:migrations:migrate --no-interaction --env=prod; then
                           migration_success=1
                           break
                         fi
@@ -65,20 +79,20 @@ jobs:
                       fi
 
                       echo "[5/10] Clear Symfony cache"
-                      docker compose --env-file .env.prod.local exec -T be-php php bin/console cache:clear --env=prod --no-debug
+                      docker compose $COMPOSE_FILES --env-file .env.prod.local exec -T be-php php bin/console cache:clear --env=prod --no-debug
 
                       echo "[6/10] Show service status"
-                      docker compose --env-file .env.prod.local ps
+                      docker compose $COMPOSE_FILES --env-file .env.prod.local ps
 
                       echo "[7/10] Verify backend health"
-                      docker compose --env-file .env.prod.local logs --tail=50 be-nginx
-                      docker compose --env-file .env.prod.local logs --tail=50 be-php
+                      docker compose $COMPOSE_FILES --env-file .env.prod.local logs --tail=50 be-nginx
+                      docker compose $COMPOSE_FILES --env-file .env.prod.local logs --tail=50 be-php
 
                       echo "[8/10] Verify scheduler service"
-                      docker compose --env-file .env.prod.local logs --tail=50 scheduler
+                      docker compose $COMPOSE_FILES --env-file .env.prod.local logs --tail=50 scheduler
 
                       echo "[9/10] Verify messenger service"
-                      docker compose --env-file .env.prod.local logs --tail=50 messenger
+                      docker compose $COMPOSE_FILES --env-file .env.prod.local logs --tail=50 messenger
 
                       echo "[10/10] Clean unused Docker resources"
                       docker image prune -f

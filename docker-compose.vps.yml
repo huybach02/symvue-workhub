@@ -1,0 +1,34 @@
+services:
+    be-php:
+        container_name: workhub_be_php
+
+    be-nginx:
+        container_name: workhub_be_nginx
+        networks:
+            - default
+            - edge
+
+    fe-nginx:
+        container_name: workhub_fe_nginx
+        networks:
+            - default
+            - edge
+
+    messenger:
+        container_name: workhub_messenger
+
+    scheduler:
+        container_name: workhub_scheduler
+
+    mercure:
+        container_name: workhub_mercure
+        environment:
+            MERCURE_EXTRA_DIRECTIVES: |
+                cors_origins https://workhub.huybach02.io.vn https://workhub-api.huybach02.io.vn https://workhub-mercure.huybach02.io.vn
+        networks:
+            - default
+            - edge
+
+networks:
+    edge:
+        external: true
