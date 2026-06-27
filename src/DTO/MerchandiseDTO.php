@@ -29,7 +29,7 @@ class MerchandiseDTO
 
         public readonly ?string $notes = null,
 
-        public readonly ?string $stockAlertQuantity = null,
+        public readonly ?int $stockAlertQuantity = 0,
 
         #[Assert\NotBlank(groups: ['create', 'update'])]
         #[Assert\Choice(choices: [0, 1], groups: ['create', 'update'])]

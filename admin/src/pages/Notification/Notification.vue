@@ -40,6 +40,7 @@ export default {
     data() {
         return {
             path: API_ROUTES_CONFIG.notifications,
+            lastParams: null,
         };
     },
     computed: {
@@ -50,7 +51,10 @@ export default {
     methods: {
         ...mapActions("notification", ["fetchNotifications"]),
         async getDanhSach(params) {
-            await this.fetchNotifications(params);
+            if (params && typeof params === "object" && !(params instanceof Event)) {
+                this.lastParams = params;
+            }
+            await this.fetchNotifications(this.lastParams || params);
         },
     },
 };

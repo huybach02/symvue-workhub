@@ -39,6 +39,7 @@ export default {
     data() {
         return {
             path: API_ROUTES_CONFIG.department,
+            lastParams: null,
         };
     },
     computed: {
@@ -49,7 +50,10 @@ export default {
     methods: {
         ...mapActions("department", ["fetchDepartments"]),
         async getDanhSach(params) {
-            await this.fetchDepartments(params);
+            if (params && typeof params === "object" && !(params instanceof Event)) {
+                this.lastParams = params;
+            }
+            await this.fetchDepartments(this.lastParams || params);
         },
     },
 };

@@ -54,6 +54,7 @@ export default {
     data() {
         return {
             path: API_ROUTES_CONFIG.provider,
+            lastParams: null,
         };
     },
     computed: {
@@ -64,7 +65,10 @@ export default {
     methods: {
         ...mapActions("provider", ["fetchItems"]),
         async getDanhSach(params) {
-            await this.fetchItems(params);
+            if (params && typeof params === "object" && !(params instanceof Event)) {
+                this.lastParams = params;
+            }
+            await this.fetchItems(this.lastParams || params);
         },
     },
 };

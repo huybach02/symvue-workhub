@@ -54,6 +54,7 @@ export default {
     data() {
         return {
             path: API_ROUTES_CONFIG.users,
+            lastParams: null,
         };
     },
     computed: {
@@ -64,7 +65,10 @@ export default {
     methods: {
         ...mapActions("user", ["fetchUsers"]),
         async getDanhSach(params) {
-            await this.fetchUsers(params);
+            if (params && typeof params === "object" && !(params instanceof Event)) {
+                this.lastParams = params;
+            }
+            await this.fetchUsers(this.lastParams || params);
         },
     },
 };
