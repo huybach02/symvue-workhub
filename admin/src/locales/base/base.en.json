@@ -61,7 +61,8 @@
         "goods_management": "Goods Management",
         "category": "Goods Category",
         "unit": "Unit",
-        "provider": "Provider"
+        "provider": "Provider",
+        "merchandise": "Merchandise"
     },
     "gender": {
         "male": "Male",

@@ -604,6 +604,7 @@
         },
         "parent_category": "Parent category",
         "select_parent_category": "Select parent category",
+        "select_category": "Select category",
         "search_placeholder": "Search categories",
         "no_parent_category": "No parent category"
     },
@@ -631,5 +632,26 @@
             "note": "Note",
             "status": "Status"
         }
-    }
+    },
+    "merchandise": {
+        "title": "Merchandise",
+        "finished_product": "Finished Product",
+        "ingredient": "Ingredient",
+        "tabs": {
+            "info": "General Information",
+            "unit": "Units",
+            "provider": "Providers"
+        },
+        "columns": {
+            "id": "ID",
+            "code": "Code",
+            "name": "Name",
+            "type": "Type",
+            "profit": "Profit (%)",
+            "description": "Description",
+            "notes": "Notes",
+            "stock_alert_quantity": "Stock Alert Qty",
+            "base_unit": "Base Unit"
+        }
+     }
 }

@@ -607,6 +607,7 @@
         },
         "parent_category": "Danh mục cha",
         "select_parent_category": "Chọn danh mục cha",
+        "select_category": "Chọn danh mục",
         "search_placeholder": "Tìm danh mục",
         "no_parent_category": "Không có danh mục cha"
     },
@@ -633,6 +634,27 @@
             "bankNumber": "Số tài khoản ngân hàng",
             "note": "Ghi chú",
             "status": "Trạng thái"
+        }
+    },
+    "merchandise": {
+        "title": "Hàng hóa",
+        "finished_product": "Thành phẩm",
+        "ingredient": "Nguyên liệu",
+        "tabs": {
+            "info": "Thông tin chung",
+            "unit": "Đơn vị tính",
+            "provider": "Nhà cung cấp"
+        },
+        "columns": {
+            "id": "ID",
+            "code": "Mã hàng hóa",
+            "name": "Tên hàng hóa",
+            "type": "Loại",
+            "profit": "Lợi nhuận (%)",
+            "description": "Mô tả",
+            "notes": "Ghi chú",
+            "stock_alert_quantity": "Số lượng cảnh báo",
+            "base_unit": "Đơn vị tính gốc"
         }
     }
 }

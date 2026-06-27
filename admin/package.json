@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@he-tree/vue3": "^1.2.9",
+    "@vueup/vue-quill": "^1.5.5",
     "axios": "^1.13.2",
     "dayjs": "^1.11.19",
     "emoji-mart-vue-fast": "^15.0.5",

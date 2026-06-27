@@ -96,6 +96,12 @@
     "remindMissingCheckIn": "Remind missing check-in",
     "remindMissingCheckOut": "Remind missing check-out",
     "checkInReminderMinutesBefore": "Check-in reminder minutes before",
-    "checkOutReminderMinutesBefore": "Check-out reminder minutes before"
+    "checkOutReminderMinutesBefore": "Check-out reminder minutes before",
+    "merchandise_code": "Code",
+    "merchandise_name": "Name",
+    "merchandise_profit": "Profit (%)",
+    "merchandise_stock_alert_quantity": "Stock Alert Qty",
+    "merchandise_description": "Description",
+    "merchandise_notes": "Notes"
   }
 }

@@ -100,6 +100,12 @@
     "remindMissingCheckIn": "Nhắc nhở đến giờ chấm công vào",
     "remindMissingCheckOut": "Nhắc nhở đến giờ chấm công ra",
     "checkInReminderMinutesBefore": "Nhắc nhở chấm công vào trước",
-    "checkOutReminderMinutesBefore": "Nhắc nhở chấm công ra trước"
+    "checkOutReminderMinutesBefore": "Nhắc nhở chấm công ra trước",
+    "merchandise_code": "Mã hàng hóa",
+    "merchandise_name": "Tên hàng hóa",
+    "merchandise_profit": "Lợi nhuận (%)",
+    "merchandise_stock_alert_quantity": "Số lượng cảnh báo",
+    "merchandise_description": "Mô tả",
+    "merchandise_notes": "Ghi chú"
   }
 }

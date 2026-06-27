@@ -22,4 +22,5 @@ export const NAME_ROUTES_CONFIG = {
     unit: "system.unit",
     provider: "system.provider",
     profile: "system.profile",
+    merchandise: "system.merchandise",
 };

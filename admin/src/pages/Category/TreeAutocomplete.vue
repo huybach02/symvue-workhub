@@ -80,6 +80,10 @@ export default {
             type: String,
             default: "__root__",
         },
+        hideRoot: {
+            type: Boolean,
+            default: false,
+        },
     },
 
     emits: ["update:modelValue", "blur"],
@@ -96,7 +100,12 @@ export default {
             return this.modelValue;
         },
         options() {
-            const rootLabel = this.rootLabel || this.$t("category.no_parent_category");
+            const list = this.flatten(this.items, 0, Boolean(this.search));
+            if (this.hideRoot) {
+                return list;
+            }
+            const rootLabel =
+                this.rootLabel || this.$t("category.no_parent_category");
             return [
                 {
                     id: this.rootValue,
@@ -104,7 +113,7 @@ export default {
                     level: 0,
                     hasChildren: false,
                 },
-                ...this.flatten(this.items, 0, Boolean(this.search)),
+                ...list,
             ];
         },
     },

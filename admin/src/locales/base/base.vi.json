@@ -61,7 +61,8 @@
         "goods_management": "Quản lý hàng hóa",
         "category": "Danh mục hàng hóa",
         "unit": "Đơn vị tính",
-        "provider": "Nhà cung cấp"
+        "provider": "Nhà cung cấp",
+        "merchandise": "Merchandise"
     },
     "gender": {
         "male": "Nam",

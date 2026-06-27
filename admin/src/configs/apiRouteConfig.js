@@ -35,4 +35,5 @@ export const API_ROUTES_CONFIG = {
     category: "/category",
     unit: "/unit",
     provider: "/provider",
+    merchandise: "/merchandise",
 };

@@ -116,4 +116,10 @@ export const menuSidebar = [
         value: NAME_ROUTES_CONFIG.attendance,
         to: { name: NAME_ROUTES_CONFIG.attendance },
     },
+    {
+        title: i18n.global.t("sidebar.merchandise"),
+        icon: "mdi-view-dashboard",
+        value: NAME_ROUTES_CONFIG.merchandise,
+        to: { name: NAME_ROUTES_CONFIG.merchandise },
+    },
 ];

@@ -272,6 +272,21 @@ export const routes = [
                     icon: "mdi-account",
                 },
             },
+            {
+                path: "merchandise",
+                name: NAME_ROUTES_CONFIG.merchandise,
+                component: () => import("../pages/Merchandise/Merchandise.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.merchandise,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.merchandise,
+                        ).icon || "",
+                },
+            },
 ],
     },
     {
