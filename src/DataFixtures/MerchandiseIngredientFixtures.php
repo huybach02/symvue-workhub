@@ -6,16 +6,28 @@ namespace App\DataFixtures;
 
 use App\Entity\Merchandise;
 use App\Entity\Category;
+use App\Service\MerchandiseService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class MerchandiseIngredientFixtures extends Fixture implements DependentFixtureInterface
+class MerchandiseIngredientFixtures extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
+    public function __construct(
+        private readonly MerchandiseService $merchandiseService,
+    ) {}
+
+    public static function getGroups(): array
+    {
+        return ['merchandise-ingredient'];
+    }
+
     public function getDependencies(): array
     {
         return [
             CategoryFixture::class,
+            UnitFixture::class,
         ];
     }
 
@@ -23,19 +35,100 @@ class MerchandiseIngredientFixtures extends Fixture implements DependentFixtureI
     {
         $categoryRepo = $manager->getRepository(Category::class);
         $merchandiseRepo = $manager->getRepository(Merchandise::class);
-
-        // Đảm bảo đơn vị Lốc (LOC) tồn tại
         $unitRepo = $manager->getRepository(\App\Entity\Unit::class);
-        $locUnit = $unitRepo->findOneBy(['code' => 'LOC']);
-        if (!$locUnit) {
-            $locUnit = new \App\Entity\Unit();
-            $locUnit->setName('Lốc');
-            $locUnit->setCode('LOC');
-            $locUnit->setSymbol('lốc');
-            $locUnit->setStatus(1);
-            $manager->persist($locUnit);
-            $manager->flush();
-        }
+
+        // Bản đồ cấu hình đơn vị theo danh mục hàng hóa
+        $unitConfigs = [
+            'mi-goi-nguyen-lieu' => [
+                'base_unit' => 'GOI',
+                'conversions' => [
+                    ['from_unit' => 'THUNG', 'from_value' => '1.00', 'to_unit' => 'GOI', 'to_value' => '30.00'],
+                ]
+            ],
+            'mi-udon-nguyen-lieu' => [
+                'base_unit' => 'GOI',
+                'conversions' => [
+                    ['from_unit' => 'THUNG', 'from_value' => '1.00', 'to_unit' => 'GOI', 'to_value' => '20.00'],
+                ]
+            ],
+            'cai-thao' => [
+                'base_unit' => 'G',
+                'conversions' => [
+                    ['from_unit' => 'THUNG', 'from_value' => '1.00', 'to_unit' => 'TUI', 'to_value' => '20.00'],
+                    ['from_unit' => 'TUI', 'from_value' => '1.00', 'to_unit' => 'G', 'to_value' => '500.00'],
+                ]
+            ],
+            'thit-bo' => [
+                'base_unit' => 'G',
+                'conversions' => [
+                    ['from_unit' => 'THUNG', 'from_value' => '1.00', 'to_unit' => 'KHAY', 'to_value' => '10.00'],
+                    ['from_unit' => 'KHAY', 'from_value' => '1.00', 'to_unit' => 'G', 'to_value' => '500.00'],
+                ]
+            ],
+            'thit-heo' => [
+                'base_unit' => 'G',
+                'conversions' => [
+                    ['from_unit' => 'THUNG', 'from_value' => '1.00', 'to_unit' => 'KHAY', 'to_value' => '10.00'],
+                    ['from_unit' => 'KHAY', 'from_value' => '1.00', 'to_unit' => 'G', 'to_value' => '500.00'],
+                ]
+            ],
+            'tom-tuoi' => [
+                'base_unit' => 'G',
+                'conversions' => [
+                    ['from_unit' => 'THUNG', 'from_value' => '1.00', 'to_unit' => 'KHAY', 'to_value' => '10.00'],
+                    ['from_unit' => 'KHAY', 'from_value' => '1.00', 'to_unit' => 'G', 'to_value' => '1000.00'],
+                ]
+            ],
+            'muc-tuoi' => [
+                'base_unit' => 'G',
+                'conversions' => [
+                    ['from_unit' => 'THUNG', 'from_value' => '1.00', 'to_unit' => 'KHAY', 'to_value' => '10.00'],
+                    ['from_unit' => 'KHAY', 'from_value' => '1.00', 'to_unit' => 'G', 'to_value' => '1000.00'],
+                ]
+            ],
+            'ca-vien' => [
+                'base_unit' => 'VIEN',
+                'conversions' => [
+                    ['from_unit' => 'THUNG', 'from_value' => '1.00', 'to_unit' => 'TUI', 'to_value' => '10.00'],
+                    ['from_unit' => 'TUI', 'from_value' => '1.00', 'to_unit' => 'VIEN', 'to_value' => '100.00'],
+                ]
+            ],
+            'gia-vi' => [
+                'base_unit' => 'G',
+                'conversions' => [
+                    ['from_unit' => 'THUNG', 'from_value' => '1.00', 'to_unit' => 'HOP', 'to_value' => '20.00'],
+                    ['from_unit' => 'HOP', 'from_value' => '1.00', 'to_unit' => 'G', 'to_value' => '500.00'],
+                ]
+            ],
+            'rau-an-kem' => [
+                'base_unit' => 'G',
+                'conversions' => [
+                    ['from_unit' => 'THUNG', 'from_value' => '1.00', 'to_unit' => 'TUI', 'to_value' => '20.00'],
+                    ['from_unit' => 'TUI', 'from_value' => '1.00', 'to_unit' => 'G', 'to_value' => '500.00'],
+                ]
+            ],
+            'sot-va-gia-vi-long' => [
+                'base_unit' => 'ML',
+                'conversions' => [
+                    ['from_unit' => 'THUNG', 'from_value' => '1.00', 'to_unit' => 'CHAI', 'to_value' => '12.00'],
+                    ['from_unit' => 'CHAI', 'from_value' => '1.00', 'to_unit' => 'ML', 'to_value' => '1000.00'],
+                ]
+            ],
+            'sua-va-nuoc-giai-khat' => [
+                'base_unit' => 'ML',
+                'conversions' => [
+                    ['from_unit' => 'THUNG', 'from_value' => '1.00', 'to_unit' => 'CHAI', 'to_value' => '24.00'],
+                    ['from_unit' => 'CHAI', 'from_value' => '1.00', 'to_unit' => 'ML', 'to_value' => '500.00'],
+                ]
+            ],
+            'sua-dac-va-sua-tuoi' => [
+                'base_unit' => 'ML',
+                'conversions' => [
+                    ['from_unit' => 'THUNG', 'from_value' => '1.00', 'to_unit' => 'HOP', 'to_value' => '48.00'],
+                    ['from_unit' => 'HOP', 'from_value' => '1.00', 'to_unit' => 'ML', 'to_value' => '380.00'],
+                ]
+            ],
+        ];
 
         $ingredients = [
             ['name' => 'Mì gói Koreno làm mì cay', 'category_slug' => 'mi-goi-nguyen-lieu'],
@@ -87,141 +180,32 @@ class MerchandiseIngredientFixtures extends Fixture implements DependentFixtureI
                 $merchandise->setCategory($category);
             }
 
-            $manager->persist($merchandise);
-        }
-
-        $manager->flush();
-
-        // 2. Tạo hoặc cập nhật các nguyên liệu làm đồ ăn có đơn vị lồng nhau
-        $nestedUnitIngredients = [
-            'ING-MIGOI' => [
-                'name' => 'Mì gói Koreno làm mì cay',
-                'profit' => '25.00',
-                'stockAlertQuantity' => '100.00',
-                'description' => '<p>Mì gói Koreno dai ngon chuyên dùng nấu mì cay cấp độ.</p>',
-                'notes' => 'Bảo quản nơi khô ráo, tránh ẩm ướt.',
-                'baseUnit' => 'GOI',
-                'category_slug' => 'mi-goi-nguyen-lieu',
-                'conversions' => [
-                    ['from' => 'LOC', 'to' => 'GOI', 'value' => '5.00'],
-                    ['from' => 'THUNG', 'to' => 'LOC', 'value' => '8.00'],
-                ]
-            ],
-            'ING-KIMCHI' => [
-                'name' => 'Kim chi cải thảo cắt khúc',
-                'profit' => '30.00',
-                'stockAlertQuantity' => '10000.00',
-                'description' => '<p>Kim chi cải thảo muối chua cay, cắt khúc vừa ăn dùng làm topping và nấu nước lẩu mì cay.</p>',
-                'notes' => 'Luôn bảo quản trong ngăn mát tủ lạnh.',
-                'baseUnit' => 'G',
-                'category_slug' => 'cai-thao',
-                'conversions' => [
-                    ['from' => 'TUI', 'to' => 'G', 'value' => '500.00'],
-                    ['from' => 'THUNG', 'to' => 'TUI', 'value' => '20.00'],
-                ]
-            ],
-            'ING-CAVIEN' => [
-                'name' => 'Cá viên thả lẩu mì cay',
-                'profit' => '20.00',
-                'stockAlertQuantity' => '500.00',
-                'description' => '<p>Cá viên chiên dai giòn dùng thả lẩu hoặc chiên bán kèm.</p>',
-                'notes' => 'Bảo quản tủ đông.',
-                'baseUnit' => 'VIEN',
-                'category_slug' => 'ca-vien',
-                'conversions' => [
-                    ['from' => 'GOI', 'to' => 'VIEN', 'value' => '100.00'],
-                    ['from' => 'THUNG', 'to' => 'GOI', 'value' => '10.00'],
-                ]
-            ],
-            'ING-NUOCMAM' => [
-                'name' => 'Nước mắm Nam Ngư',
-                'profit' => '15.00',
-                'stockAlertQuantity' => '5000.00',
-                'description' => '<p>Nước mắm hương cá hồi Nam Ngư dùng để làm nước chấm hoặc gia vị tẩm ướp đồ ăn.</p>',
-                'notes' => 'Bảo quản nơi khô ráo thoáng mát, đậy nắp kỹ sau khi dùng.',
-                'baseUnit' => 'ML',
-                'category_slug' => 'nuoc-mam-nguyen-lieu',
-                'conversions' => [
-                    ['from' => 'CHAI', 'to' => 'ML', 'value' => '900.00'],
-                    ['from' => 'LOC', 'to' => 'CHAI', 'value' => '6.00'],
-                    ['from' => 'THUNG', 'to' => 'LOC', 'value' => '4.00'],
-                ]
-            ],
-            'ING-NUOCTUONG' => [
-                'name' => 'Nước tương Chinsu tỏi ớt',
-                'profit' => '18.00',
-                'stockAlertQuantity' => '3000.00',
-                'description' => '<p>Nước tương Chinsu tỏi ớt thơm cay hảo hạng dùng làm nước sốt hoặc tẩm ướp mì trộn.</p>',
-                'notes' => 'Bảo quản mát sau khi mở nắp.',
-                'baseUnit' => 'ML',
-                'category_slug' => 'nuoc-tuong-nguyen-lieu',
-                'conversions' => [
-                    ['from' => 'CHAI', 'to' => 'ML', 'value' => '500.00'],
-                    ['from' => 'LOC', 'to' => 'CHAI', 'value' => '6.00'],
-                    ['from' => 'THUNG', 'to' => 'LOC', 'value' => '4.00'],
-                ]
-            ],
-        ];
-
-        // Tạo/cập nhật các thực thể Merchandise lồng nhau
-        $nestedMerchandise = [];
-        foreach ($nestedUnitIngredients as $code => $data) {
-            $merchandise = $merchandiseRepo->findOneBy(['code' => $code]) ?? new Merchandise();
-            $merchandise->setCode($code);
-            $merchandise->setName($data['name']);
-            $merchandise->setType('ingredient');
-            $merchandise->setProfit($data['profit']);
-            $merchandise->setStockAlertQuantity($data['stockAlertQuantity']);
-            $merchandise->setDescription($data['description']);
-            $merchandise->setNotes($data['notes']);
-            $merchandise->setStatus(1);
-
-            $baseUnit = $unitRepo->findOneBy(['code' => $data['baseUnit']]);
-            if ($baseUnit) {
-                $merchandise->setBaseUnit($baseUnit);
-            }
-
-            $category = $categoryRepo->findOneBy(['slug' => $data['category_slug'], 'type' => 'ingredient']);
-            if ($category) {
-                $merchandise->setCategory($category);
-            }
-
-            $manager->persist($merchandise);
-            $nestedMerchandise[$code] = $merchandise;
-        }
-
-        $manager->flush();
-
-        // Dọn dẹp quy đổi cũ trước khi thêm mới
-        $conversionRepo = $manager->getRepository(\App\Entity\MerchandiseUnitConversion::class);
-        $oldConversions = $conversionRepo->createQueryBuilder('c')
-            ->innerJoin('c.merchandise', 'm')
-            ->where('m.code IN (:codes)')
-            ->setParameter('codes', array_keys($nestedUnitIngredients))
-            ->getQuery()
-            ->getResult();
-        foreach ($oldConversions as $oldConv) {
-            $manager->remove($oldConv);
-        }
-        $manager->flush();
-
-        // Thêm các quy đổi đơn vị (Conversions) từ cấu hình
-        foreach ($nestedUnitIngredients as $code => $data) {
-            $merchandise = $nestedMerchandise[$code];
-            foreach ($data['conversions'] as $sortOrder => $convData) {
-                $fromUnit = $unitRepo->findOneBy(['code' => $convData['from']]);
-                $toUnit = $unitRepo->findOneBy(['code' => $convData['to']]);
-
-                if ($fromUnit && $toUnit) {
-                    $conversion = new \App\Entity\MerchandiseUnitConversion();
-                    $conversion->setMerchandise($merchandise);
-                    $conversion->setFromUnit($fromUnit);
-                    $conversion->setFromValue('1.00');
-                    $conversion->setToUnit($toUnit);
-                    $conversion->setToValue($convData['value']);
-                    $conversion->setSortOrder($sortOrder + 1);
-                    $manager->persist($conversion);
+            $config = $unitConfigs[$item['category_slug']] ?? null;
+            $baseUnit = null;
+            if ($config) {
+                $baseUnit = $unitRepo->findOneBy(['code' => $config['base_unit']]);
+                if ($baseUnit) {
+                    $merchandise->setBaseUnit($baseUnit);
                 }
+            }
+
+            $manager->persist($merchandise);
+
+            if ($config && $baseUnit) {
+                $conversionsData = [];
+                foreach ($config['conversions'] as $c) {
+                    $fromUnit = $unitRepo->findOneBy(['code' => $c['from_unit']]);
+                    $toUnit = $unitRepo->findOneBy(['code' => $c['to_unit']]);
+                    if ($fromUnit && $toUnit) {
+                        $conversionsData[] = [
+                            'fromUnitId' => $fromUnit->getId(),
+                            'fromValue' => $c['from_value'],
+                            'toUnitId' => $toUnit->getId(),
+                            'toValue' => $c['to_value'],
+                        ];
+                    }
+                }
+                $this->merchandiseService->saveConversionsAndUnits($merchandise, $conversionsData, $baseUnit->getId());
             }
         }
 

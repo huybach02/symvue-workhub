@@ -92,7 +92,8 @@
         "geolocation_timeout": "Quá thời gian chờ lấy vị trí",
         "get_current_ip": "Lấy địa chỉ IP hiện tại",
         "detect_ip_failed": "Không thể lấy địa chỉ IP: {message}",
-        "notification_test": "Test thông báo của hệ thống"
+        "notification_test": "Test thông báo của hệ thống",
+        "currency_setting": "Cấu hình Tiền tệ hệ thống"
     },
     "thoi_gian_lam_viec": {
         "fulltime": "Thời gian cố định",
@@ -640,6 +641,13 @@
         "title": "Hàng hóa",
         "finished_product": "Thành phẩm",
         "ingredient": "Nguyên liệu",
+        "conversions_config": "Cấu hình đơn vị quy đổi",
+        "no_conversions": "Chưa cấu hình đơn vị quy đổi nào.",
+        "provider_config": "Cấu hình Nhà cung cấp",
+        "provider_title_unselected": "Nhà cung cấp #{index} (Chưa chọn)",
+        "provider_title_default": "Nhà cung cấp #{index}",
+        "default_prices_config": "Thiết lập Giá mặc định theo từng đơn vị",
+        "no_providers": "Chưa có cấu hình nhà cung cấp nào.",
         "tabs": {
             "info": "Thông tin chung",
             "unit": "Đơn vị tính",
@@ -655,6 +663,15 @@
             "notes": "Ghi chú",
             "stock_alert_quantity": "Số lượng cảnh báo",
             "base_unit": "Đơn vị tính gốc"
+        },
+        "prices": {
+            "unit": "Đơn vị",
+            "original_price": "Giá gốc",
+            "discount_rate": "% Giảm",
+            "discount_amount": "Tiền giảm",
+            "price_after_discount": "Giá sau giảm",
+            "effective_from": "Hiệu lực từ",
+            "effective_to": "Hiệu lực đến"
         }
     }
 }

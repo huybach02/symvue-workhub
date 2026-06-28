@@ -48,6 +48,20 @@ final class UnitController extends AbstractController
         }
     }
 
+    #[Route('/unit/select', methods: ['GET'])]
+    public function getDataSelect(Request $request): JsonResponse
+    {
+        $params = $request->query->all();
+        $params = validateFilterParams($params);
+
+        try {
+            $data = $this->unitService->getDataSelect($params);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
     #[Route('/unit/{id}', methods: ['GET'], priority: -1)]
     public function getOne(int $id): JsonResponse
     {

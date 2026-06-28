@@ -63,6 +63,7 @@ final class GeneralSettingService
                 'remindMissingCheckOut' => 'REMIND_MISSING_CHECK_OUT',
                 'checkInReminderMinutesBefore' => 'CHECK_IN_REMINDER_MINUTES_BEFORE',
                 'checkOutReminderMinutesBefore' => 'CHECK_OUT_REMINDER_MINUTES_BEFORE',
+                'currency' => 'CURRENCY',
             ];
 
             $cauHinhChungList = $this->cauHinhChungRepository->findAll();

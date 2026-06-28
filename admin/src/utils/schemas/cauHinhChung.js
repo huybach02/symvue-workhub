@@ -111,4 +111,7 @@ export const cauHinhChungSchema = yup.object({
             min: 0,
         },
     ),
+    currency: buildStringRule(t("field.currency"), {
+        required: true,
+    }),
 });

@@ -10,4 +10,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.v-input--disabled .v-field__append-inner {
+    display: none !important;
+}
+</style>

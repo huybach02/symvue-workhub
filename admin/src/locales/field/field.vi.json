@@ -106,6 +106,16 @@
     "merchandise_profit": "Lợi nhuận (%)",
     "merchandise_stock_alert_quantity": "Số lượng cảnh báo",
     "merchandise_description": "Mô tả",
-    "merchandise_notes": "Ghi chú"
+    "merchandise_notes": "Ghi chú",
+    "quantity": "Số lượng",
+    "unit": "Đơn vị",
+    "base_unit": "Đơn vị tính cơ sở",
+    "select_base_unit": "Chọn đơn vị cơ sở",
+    "provider": "Nhà cung cấp",
+    "select_provider": "Chọn nhà cung cấp",
+    "default_purchase_unit": "Đơn vị mua hàng mặc định",
+    "select_purchase_unit": "Chọn đơn vị mua hàng mặc định",
+    "price": "Giá",
+    "currency": "Đơn vị tiền tệ"
   }
 }

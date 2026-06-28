@@ -39,4 +39,7 @@ export const merchandiseSchema = yup.object({
         max: 500,
     }),
     status: yup.number().required().oneOf([0, 1]),
+    baseUnitId: yup.mixed().nullable().notRequired(),
+    conversions: yup.array().nullable().notRequired(),
+    providers: yup.array().nullable().notRequired(),
 });

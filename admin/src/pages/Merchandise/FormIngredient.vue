@@ -7,6 +7,7 @@
             :validation-schema="validationSchema"
             :initial-values="initialValues"
             @submit="handleSubmit"
+            v-slot="{ values }"
         >
             <v-tabs v-model="activeTab" color="primary" class="mb-4">
                 <v-tab value="info">
@@ -26,11 +27,11 @@
                 </v-window-item>
 
                 <v-window-item value="unit">
-                    <!-- Tạm để trống -->
+                    <FormUnitInfo :item="item" />
                 </v-window-item>
 
                 <v-window-item value="provider">
-                    <!-- Tạm để trống -->
+                    <FormProviderInfo :item="item" :form-values="values" />
                 </v-window-item>
             </v-window>
 
@@ -60,6 +61,8 @@
 import { Form as VeeForm } from "vee-validate";
 import LoadingForm from "@/components/LoadingForm.vue";
 import FormGeneralInfo from "./components/FormGeneralInfo.vue";
+import FormUnitInfo from "./components/FormUnitInfo.vue";
+import FormProviderInfo from "./components/FormProviderInfo.vue";
 import { merchandiseSchema } from "@/utils/schemas/merchandise";
 
 export default {
@@ -67,6 +70,8 @@ export default {
     components: {
         LoadingForm,
         FormGeneralInfo,
+        FormUnitInfo,
+        FormProviderInfo,
         VeeForm,
     },
     props: {
@@ -97,6 +102,9 @@ export default {
                 description: "",
                 notes: "",
                 status: 1,
+                baseUnitId: null,
+                conversions: [],
+                providers: [],
             },
         };
     },

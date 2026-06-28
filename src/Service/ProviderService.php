@@ -99,4 +99,14 @@ class ProviderService
         $this->entityManager->remove($item);
         $this->entityManager->flush();
     }
+
+    public function getDataSelect(): array
+    {
+        $providers = $this->providerRepository->findBy(['status' => 1]);
+
+        return array_map(fn(Provider $provider) => [
+            'label' => $provider->getName(),
+            'value' => $provider->getId()
+        ], $providers);
+    }
 }

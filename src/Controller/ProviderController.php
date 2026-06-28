@@ -48,6 +48,17 @@ final class ProviderController extends AbstractController
         }
     }
 
+    #[Route('/provider/select', methods: ['GET'])]
+    public function select(): JsonResponse
+    {
+        try {
+            $data = $this->providerService->getDataSelect();
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
     #[Route('/provider/{id}', methods: ['GET'], priority: -1)]
     public function getOne(int $id): JsonResponse
     {

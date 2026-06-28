@@ -102,6 +102,16 @@
     "merchandise_profit": "Profit (%)",
     "merchandise_stock_alert_quantity": "Stock Alert Qty",
     "merchandise_description": "Description",
-    "merchandise_notes": "Notes"
+    "merchandise_notes": "Notes",
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "base_unit": "Base Unit",
+    "select_base_unit": "Select base unit",
+    "provider": "Provider",
+    "select_provider": "Select provider",
+    "default_purchase_unit": "Default purchase unit",
+    "select_purchase_unit": "Select default purchase unit",
+    "price": "Price",
+    "currency": "System Currency"
   }
 }

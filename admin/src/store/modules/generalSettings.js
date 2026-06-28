@@ -28,6 +28,7 @@ const defaultValues = {
     remindMissingCheckOut: false,
     checkInReminderMinutesBefore: 0,
     checkOutReminderMinutesBefore: 0,
+    currency: "VND",
 };
 
 const configMapping = {
@@ -56,6 +57,7 @@ const configMapping = {
     REMIND_MISSING_CHECK_OUT: "remindMissingCheckOut",
     CHECK_IN_REMINDER_MINUTES_BEFORE: "checkInReminderMinutesBefore",
     CHECK_OUT_REMINDER_MINUTES_BEFORE: "checkOutReminderMinutesBefore",
+    CURRENCY: "currency",
 };
 
 const booleanFields = [
@@ -65,7 +67,7 @@ const booleanFields = [
     "remindMissingCheckOut",
 ];
 
-const stringFields = ["addressDisplay", "ipAddress"];
+const stringFields = ["addressDisplay", "ipAddress", "currency"];
 
 const decimalFields = ["latitude", "longitude"];
 
@@ -107,6 +109,7 @@ const getters = {
     dataLoaded: (state) => state.dataLoaded,
     loading: (state) => state.loading,
     saving: (state) => state.saving,
+    currency: (state) => state.initialValues.currency || "VND",
 };
 
 const mutations = {

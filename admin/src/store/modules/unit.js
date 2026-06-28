@@ -1,5 +1,5 @@
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import { getDataById, getListData } from "@/services/bases/getData";
+import { getDataById, getListData, getDataSelect } from "@/services/bases/getData";
 import { deleteData } from "@/services/bases/deleteData";
 import { postData } from "@/services/bases/postData";
 import { putData } from "@/services/bases/updateData";
@@ -9,6 +9,7 @@ const state = {
     totalItems: 0,
     loading: false,
     detailsById: {},
+    options: [],
 };
 
 const getters = {
@@ -16,6 +17,7 @@ const getters = {
     totalItems: (state) => state.totalItems,
     loading: (state) => state.loading,
     itemById: (state) => (id) => state.detailsById[id] ?? null,
+    options: (state) => state.options,
 };
 
 const mutations = {
@@ -31,6 +33,9 @@ const mutations = {
             ...state.detailsById,
             [id]: data,
         };
+    },
+    SET_OPTIONS(state, value) {
+        state.options = value;
     },
 };
 
@@ -78,6 +83,11 @@ const actions = {
     },
     async deleteItem(_, id) {
         return deleteData(API_ROUTES_CONFIG.unit, id);
+    },
+    async fetchOptions({ commit }) {
+        const options = await getDataSelect(API_ROUTES_CONFIG.unit);
+        commit("SET_OPTIONS", options || []);
+        return options || [];
     },
 };
 

@@ -85,4 +85,21 @@ class UnitService
         $this->entityManager->remove($item);
         $this->entityManager->flush();
     }
+
+    public function getDataSelect(array $params): array
+    {
+        $qb = $this->unitRepository->createQueryBuilder('e')
+            ->andWhere('e.status = 1');
+
+        $result = FilterWithPagination::findWithPagination($qb, $params, 'e');
+
+        $result['collection'] = array_map(function (Unit $item) {
+            return [
+                'label' => $item->getName(),
+                'value' => $item->getId(),
+            ];
+        }, $result['collection']);
+
+        return $result['collection'];
+    }
 }

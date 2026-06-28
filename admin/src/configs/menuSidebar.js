@@ -80,6 +80,12 @@ export const menuSidebar = [
                 value: NAME_ROUTES_CONFIG.provider,
                 to: { name: NAME_ROUTES_CONFIG.provider },
             },
+            {
+                title: i18n.global.t("sidebar.merchandise"),
+                icon: "mdi-package-variant-closed",
+                value: NAME_ROUTES_CONFIG.merchandise,
+                to: { name: NAME_ROUTES_CONFIG.merchandise },
+            },
         ],
     },
     {
@@ -115,11 +121,5 @@ export const menuSidebar = [
         icon: "mdi-account-check",
         value: NAME_ROUTES_CONFIG.attendance,
         to: { name: NAME_ROUTES_CONFIG.attendance },
-    },
-    {
-        title: i18n.global.t("sidebar.merchandise"),
-        icon: "mdi-view-dashboard",
-        value: NAME_ROUTES_CONFIG.merchandise,
-        to: { name: NAME_ROUTES_CONFIG.merchandise },
     },
 ];

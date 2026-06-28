@@ -144,6 +144,11 @@ class GeneralSettingFixture extends Fixture implements FixtureGroupInterface
                 "gia_tri" => "10",
                 "mo_ta" => "Nhắc nhở chấm công ra trước (phút)",
             ],
+            [
+                "ten_cau_hinh" => "CURRENCY",
+                "gia_tri" => "VND",
+                "mo_ta" => "Đơn vị tiền tệ sử dụng trong hệ thống",
+            ],
         ];
 
         foreach ($data as $item) {

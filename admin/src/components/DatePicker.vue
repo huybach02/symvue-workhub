@@ -22,6 +22,7 @@
             <v-text-field
                 v-else
                 :model-value="displayValue"
+                class="w-100"
                 :placeholder="placeholder"
                 :error-messages="errorMessages"
                 :disabled="disabled"
@@ -29,7 +30,8 @@
                 :clearable="clearable && !!modelValue && !readonly"
                 :variant="variant"
                 :density="density"
-                prepend-inner-icon="mdi-calendar-blank-outline"
+                :hide-details="hideDetails"
+                append-inner-icon="mdi-calendar-blank-outline"
                 v-bind="activatorProps"
                 @click="handleActivatorClick"
                 @click:clear="clearValue"
@@ -39,13 +41,10 @@
 
         <v-card width="320" rounded="xl" elevation="12">
             <v-card-item class="pb-3">
-                <div
-                    class="text-overline text-medium-emphasis font-weight-bold"
-                >
-                    Date
-                </div>
-                <div class="text-h6 font-weight-bold">
-                    {{ headerTitle }}
+                <div class="d-flex align-center justify-space-between pt-2">
+                    <span class="text-subtitle-1 font-weight-bold">
+                        {{ headerTitle }}
+                    </span>
                 </div>
             </v-card-item>
 
@@ -123,6 +122,10 @@ export default {
         iconVariant: {
             type: String,
             default: "text",
+        },
+        hideDetails: {
+            type: [Boolean, String],
+            default: false,
         },
     },
     emits: ["update:model-value", "blur"],

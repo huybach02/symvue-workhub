@@ -91,7 +91,8 @@
         "geolocation_timeout": "The request to get user location timed out",
         "get_current_ip": "Get current IP address",
         "detect_ip_failed": "Failed to detect IP address: {message}",
-        "notification_test": "System notification test "
+        "notification_test": "System notification test ",
+        "currency_setting": "System Currency Setting"
     },
     "thoi_gian_lam_viec": {
         "fulltime": "Fixed time",
@@ -637,6 +638,13 @@
         "title": "Merchandise",
         "finished_product": "Finished Product",
         "ingredient": "Ingredient",
+        "conversions_config": "Unit Conversion Configuration",
+        "no_conversions": "No unit conversions configured yet.",
+        "provider_config": "Provider Configuration",
+        "provider_title_unselected": "Provider #{index} (Unselected)",
+        "provider_title_default": "Provider #{index}",
+        "default_prices_config": "Set Default Price by Unit",
+        "no_providers": "No providers configured yet.",
         "tabs": {
             "info": "General Information",
             "unit": "Units",
@@ -652,6 +660,15 @@
             "notes": "Notes",
             "stock_alert_quantity": "Stock Alert Qty",
             "base_unit": "Base Unit"
+        },
+        "prices": {
+            "unit": "Unit",
+            "original_price": "Original Price",
+            "discount_rate": "Discount Rate (%)",
+            "discount_amount": "Discount Amount",
+            "price_after_discount": "Price After Discount",
+            "effective_from": "Effective From",
+            "effective_to": "Effective To"
         }
      }
 }

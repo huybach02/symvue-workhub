@@ -784,6 +784,41 @@
                     </v-row>
                 </v-card-text>
             </v-card>
+
+            <v-divider class="my-5" />
+
+            <v-sheet
+                color="primary"
+                theme="dark"
+                class="pa-3 mb-5 rounded d-flex align-center ga-2"
+                elevation="1"
+            >
+                <v-icon icon="mdi-currency-usd" size="22" />
+                <p class="text-h6 font-weight-bold ma-0">
+                    {{ $t("system_config.currency_setting") || "Cấu hình Tiền tệ hệ thống" }}
+                </p>
+            </v-sheet>
+            <v-row class="mb-6">
+                <v-col cols="12" md="3">
+                    <VeeField
+                        v-slot="{ field, errorMessage }"
+                        name="currency"
+                    >
+                        <div class="mb-2">
+                            {{ $t("field.currency") }}
+                            <span class="text-red"> * </span>
+                        </div>
+                        <v-select
+                            v-bind="field"
+                            :error-messages="errorMessage"
+                            :items="currencies"
+                            variant="outlined"
+                            :readonly="!isEditing"
+                            persistent-placeholder
+                        />
+                    </VeeField>
+                </v-col>
+            </v-row>
         </VeeForm>
     </div>
 </template>
@@ -809,6 +844,13 @@ export default {
             locating: false,
             detectingIp: false,
             isSending: false,
+            currencies: [
+                { value: "VND", title: "VND (Đồng Việt Nam)" },
+                { value: "USD", title: "USD (Đô la Mỹ)" },
+                { value: "EUR", title: "EUR (Euro)" },
+                { value: "JPY", title: "JPY (Yên Nhật)" },
+                { value: "SGD", title: "SGD (Đô la Singapore)" },
+            ],
         };
     },
     computed: {

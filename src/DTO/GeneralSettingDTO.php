@@ -125,5 +125,9 @@ class GeneralSettingDTO
             Assert\GreaterThanOrEqual(value: 0),
         ]
         public readonly int $checkOutReminderMinutesBefore,
+
+        #[Assert\NotBlank(allowNull: true)]
+        #[Assert\Type(type: "string")]
+        public readonly ?string $currency = 'VND',
     ) {}
 }
