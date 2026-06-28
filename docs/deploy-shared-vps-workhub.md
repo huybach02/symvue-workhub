@@ -96,27 +96,27 @@ Tao `docker-compose.yml`:
 
 ```yaml
 services:
-  npm:
-    image: jc21/nginx-proxy-manager:latest
-    container_name: infra_npm
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "81:81"
-      - "443:443"
-    volumes:
-      - npm_data:/data
-      - npm_letsencrypt:/etc/letsencrypt
-    networks:
-      - edge
+    npm:
+        image: jc21/nginx-proxy-manager:latest
+        container_name: infra_npm
+        restart: unless-stopped
+        ports:
+            - "80:80"
+            - "81:81"
+            - "443:443"
+        volumes:
+            - npm_data:/data
+            - npm_letsencrypt:/etc/letsencrypt
+        networks:
+            - edge
 
 volumes:
-  npm_data:
-  npm_letsencrypt:
+    npm_data:
+    npm_letsencrypt:
 
 networks:
-  edge:
-    external: true
+    edge:
+        external: true
 ```
 
 Chay:
@@ -302,30 +302,6 @@ Trade-off:
 
 - Deploy se cham hon
 - Nhung on dinh hon voi case VPS nay
-
-### 7.2. Symfony validator loi `Unknown named parameter $message`
-
-File da gap:
-
-- `src/DTO/ChangePasswordDTO.php`
-
-Sai:
-
-```php
-#[Assert\Length(min: 6, message: "Mật khẩu mới phải có ít nhất 6 ký tự.")]
-```
-
-Dung:
-
-```php
-#[Assert\Length(min: 6, minMessage: "Mật khẩu mới phải có ít nhất 6 ký tự.")]
-```
-
-### 7.3. Warning `GeneralSettingDTO`
-
-Co warning do parameter optional dat truoc required trong constructor.
-
-Warning nay chua chan deploy, nhung nen sua sau de tranh log ban.
 
 ## 8. Cau hinh Nginx Proxy Manager
 
