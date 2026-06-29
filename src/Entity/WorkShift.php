@@ -112,8 +112,8 @@ class WorkShift
             'gioKetThuc' => $this->gioKetThuc,
             'ghiChu' => $this->ghiChu,
             'status' => $this->status,
-            'createdAt' => $this->createdAt,
-            'updatedAt' => $this->updatedAt,
+            'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
+            'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
             'createdBy' => $this->createdBy,
             'updatedBy' => $this->updatedBy,
         ];

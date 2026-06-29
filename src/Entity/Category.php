@@ -169,9 +169,9 @@ class Category
             'level' => $this->level,
             'position' => $this->position,
             'status' => $this->isActive ? 1 : 0,
-            'created_at' => $this->createdAt,
-            'updated_at' => $this->updatedAt,
-            'deleted_at' => $this->deletedAt,
+            'created_at' => $this->createdAt?->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updatedAt?->format('Y-m-d H:i:s'),
+            'deleted_at' => $this->deletedAt?->format('Y-m-d H:i:s'),
             'created_by' => $this->createdBy,
             'updated_by' => $this->updatedBy,
         ];
