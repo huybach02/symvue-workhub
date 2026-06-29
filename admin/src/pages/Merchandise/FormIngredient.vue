@@ -3,13 +3,18 @@
         <VeeForm
             v-if="mode === 'create' || (mode === 'update' && item)"
             ref="formRef"
+            v-slot="{ values, errors }"
             as="form"
             :validation-schema="validationSchema"
             :initial-values="initialValues"
             @submit="handleSubmit"
-            v-slot="{ values }"
         >
-            <v-tabs v-model="activeTab" color="primary" class="mb-4">
+            <v-tabs
+                v-model="activeTab"
+                color="primary"
+                class="mb-4"
+                style="pointer-events: none;"
+            >
                 <v-tab value="info">
                     {{ $t("merchandise.tabs.info") }}
                 </v-tab>
@@ -27,7 +32,7 @@
                 </v-window-item>
 
                 <v-window-item value="unit">
-                    <FormUnitInfo :item="item" />
+                    <FormUnitInfo :item="item" :show-errors="showUnitErrors" />
                 </v-window-item>
 
                 <v-window-item value="provider">
@@ -39,10 +44,15 @@
             <v-row class="mt-4">
                 <v-col cols="12">
                     <div class="d-flex justify-end ga-2">
-                        <v-btn color="grey" @click="handleCancel">
-                            {{ $t("button.cancel") }}
+                        <v-btn
+                            v-if="activeTab !== 'provider'"
+                            color="primary"
+                            @click="handleNextTab(values, errors)"
+                        >
+                            {{ $t("button.next") }}
                         </v-btn>
                         <v-btn
+                            v-else
                             color="primary"
                             type="submit"
                             :loading="this.$store.state.isLoading"
@@ -93,6 +103,7 @@ export default {
         return {
             activeTab: "info",
             validationSchema: merchandiseSchema,
+            showUnitErrors: false,
             initialValues: {
                 code: "",
                 name: "",
@@ -122,6 +133,9 @@ export default {
             deep: true,
             immediate: true,
         },
+        activeTab() {
+            this.showUnitErrors = false;
+        },
     },
     methods: {
         handleSubmit(values) {
@@ -129,6 +143,49 @@ export default {
         },
         handleCancel() {
             this.$emit("cancel");
+        },
+        isCurrentTabValid(values, errors) {
+            if (this.activeTab === "info") {
+                const hasCode = values.code && values.code.trim().length >= 3;
+                const hasName = values.name && values.name.trim().length >= 3;
+                const hasStatus = values.status === 0 || values.status === 1;
+                return !!(
+                    hasCode &&
+                    hasName &&
+                    hasStatus &&
+                    (!errors ||
+                        (!errors.code && !errors.name && !errors.status))
+                );
+            }
+            if (this.activeTab === "unit") {
+                const conversions = values.conversions || [];
+                if (conversions.length === 0) return false;
+                const allConversionsValid = conversions.every(
+                    (c) =>
+                        c.fromUnitId &&
+                        c.toUnitId &&
+                        c.fromValue > 0 &&
+                        c.toValue > 0,
+                );
+                return !!(allConversionsValid && values.baseUnitId);
+            }
+            return true;
+        },
+        async handleNextTab(values, errors) {
+            if (this.activeTab === "info") {
+                const { valid } = await this.$refs.formRef.validate();
+                if (!valid) {
+                    return;
+                }
+                this.activeTab = "unit";
+            } else if (this.activeTab === "unit") {
+                if (!this.isCurrentTabValid(values, errors)) {
+                    this.showUnitErrors = true;
+                    return;
+                }
+                this.showUnitErrors = false;
+                this.activeTab = "provider";
+            }
         },
     },
 };

@@ -4,11 +4,24 @@ namespace App\Service;
 
 use App\Class\FilterWithPagination;
 use App\DTO\MerchandiseDTO;
+use App\Entity\Category;
 use App\Entity\Merchandise;
+use App\Entity\MerchandiseProvider;
+use App\Entity\MerchandiseProviderPrice;
+use App\Entity\MerchandiseProviderUnit;
 use App\Entity\MerchandiseUnit;
 use App\Entity\MerchandiseUnitConversion;
+use App\Entity\Provider;
 use App\Entity\Unit;
+use App\Repository\CategoryRepository;
+use App\Repository\MerchandiseProviderPriceRepository;
+use App\Repository\MerchandiseProviderRepository;
+use App\Repository\MerchandiseProviderUnitRepository;
 use App\Repository\MerchandiseRepository;
+use App\Repository\MerchandiseUnitConversionRepository;
+use App\Repository\MerchandiseUnitRepository;
+use App\Repository\ProviderRepository;
+use App\Repository\UnitRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class MerchandiseService
@@ -16,6 +29,14 @@ class MerchandiseService
     public function __construct(
         private readonly MerchandiseRepository $merchandiseRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly CategoryRepository $categoryRepository,
+        private readonly UnitRepository $unitRepository,
+        private readonly MerchandiseUnitConversionRepository $merchandiseUnitConversionRepository,
+        private readonly MerchandiseUnitRepository $merchandiseUnitRepository,
+        private readonly MerchandiseProviderRepository $merchandiseProviderRepository,
+        private readonly MerchandiseProviderUnitRepository $merchandiseProviderUnitRepository,
+        private readonly MerchandiseProviderPriceRepository $merchandiseProviderPriceRepository,
+        private readonly ProviderRepository $providerRepository,
     ) {}
 
     public function findAll(array $params): array
@@ -75,14 +96,14 @@ class MerchandiseService
         $item->setStatus($dto->status);
 
         if ($dto->categoryId) {
-            $category = $this->entityManager->getRepository(\App\Entity\Category::class)->find($dto->categoryId);
+            $category = $this->categoryRepository->find($dto->categoryId);
             if ($category) {
                 $item->setCategory($category);
             }
         }
 
         if ($dto->baseUnitId) {
-            $baseUnit = $this->entityManager->getRepository(\App\Entity\Unit::class)->find($dto->baseUnitId);
+            $baseUnit = $this->unitRepository->find($dto->baseUnitId);
             if ($baseUnit) {
                 $item->setBaseUnit($baseUnit);
             }
@@ -127,7 +148,7 @@ class MerchandiseService
         $item->setStatus($dto->status);
 
         if ($dto->categoryId) {
-            $category = $this->entityManager->getRepository(\App\Entity\Category::class)->find($dto->categoryId);
+            $category = $this->categoryRepository->find($dto->categoryId);
             if ($category) {
                 $item->setCategory($category);
             } else {
@@ -138,7 +159,7 @@ class MerchandiseService
         }
 
         if ($dto->baseUnitId) {
-            $baseUnit = $this->entityManager->getRepository(\App\Entity\Unit::class)->find($dto->baseUnitId);
+            $baseUnit = $this->unitRepository->find($dto->baseUnitId);
             if ($baseUnit) {
                 $item->setBaseUnit($baseUnit);
             } else {
@@ -175,7 +196,7 @@ class MerchandiseService
 
     private function getConversionsData(int $merchandiseId): array
     {
-        $conversions = $this->entityManager->getRepository(MerchandiseUnitConversion::class)
+        $conversions = $this->merchandiseUnitConversionRepository
             ->findBy(['merchandise' => $merchandiseId], ['sortOrder' => 'ASC']);
 
         return array_map(fn(MerchandiseUnitConversion $c) => [
@@ -193,14 +214,14 @@ class MerchandiseService
     public function saveConversionsAndUnits(Merchandise $merchandise, ?array $conversionsData, ?int $baseUnitId): void
     {
         // 1. Xóa các MerchandiseUnitConversion cũ
-        $conversionRepo = $this->entityManager->getRepository(MerchandiseUnitConversion::class);
+        $conversionRepo = $this->merchandiseUnitConversionRepository;
         $oldConversions = $conversionRepo->findBy(['merchandise' => $merchandise]);
         foreach ($oldConversions as $oldC) {
             $this->entityManager->remove($oldC);
         }
 
         // 2. Xóa các MerchandiseUnit cũ
-        $merchandiseUnitRepo = $this->entityManager->getRepository(MerchandiseUnit::class);
+        $merchandiseUnitRepo = $this->merchandiseUnitRepository;
         $oldUnits = $merchandiseUnitRepo->findBy(['merchandise' => $merchandise]);
         foreach ($oldUnits as $oldU) {
             $this->entityManager->remove($oldU);
@@ -210,7 +231,7 @@ class MerchandiseService
             return;
         }
 
-        $unitRepo = $this->entityManager->getRepository(Unit::class);
+        $unitRepo = $this->unitRepository;
 
         // 3. Lưu các conversions mới
         $savedConversions = [];
@@ -307,7 +328,16 @@ class MerchandiseService
             ];
         }
 
-        usort($unitFactors, fn($a, $b) => $a['factor'] <=> $b['factor']);
+        // Sắp xếp base unit lên đầu tiên
+        usort($unitFactors, function ($a, $b) use ($baseUnitId) {
+            if ($a['id'] === $baseUnitId) {
+                return -1;
+            }
+            if ($b['id'] === $baseUnitId) {
+                return 1;
+            }
+            return $a['factor'] <=> $b['factor'];
+        });
 
         $levels = [];
         foreach ($unitFactors as $level => $uf) {
@@ -321,7 +351,7 @@ class MerchandiseService
             $factor = $uf['factor'];
             $level = $levels[$uId];
 
-            $mUnit = new \App\Entity\MerchandiseUnit();
+            $mUnit = new MerchandiseUnit();
             $mUnit->setMerchandise($merchandise);
             $mUnit->setUnit($unitObj);
             $mUnit->setFactorToBase(sprintf('%.4f', $factor));
@@ -345,12 +375,12 @@ class MerchandiseService
 
     private function getProvidersData(int $merchandiseId): array
     {
-        $providerRepo = $this->entityManager->getRepository(\App\Entity\MerchandiseProvider::class);
+        $providerRepo = $this->merchandiseProviderRepository;
         $mProviders = $providerRepo->findBy(['merchandise' => $merchandiseId]);
 
-        $mConversionRepo = $this->entityManager->getRepository(MerchandiseUnitConversion::class);
-        $mProviderUnitRepo = $this->entityManager->getRepository(\App\Entity\MerchandiseProviderUnit::class);
-        $mProviderPriceRepo = $this->entityManager->getRepository(\App\Entity\MerchandiseProviderPrice::class);
+        $mConversionRepo = $this->merchandiseUnitConversionRepository;
+        $mProviderUnitRepo = $this->merchandiseProviderUnitRepository;
+        $mProviderPriceRepo = $this->merchandiseProviderPriceRepository;
 
         // Lấy conversions gốc của Merchandise
         $baseConversions = $mConversionRepo->findBy(['merchandise' => $merchandiseId], ['sortOrder' => 'ASC']);
@@ -417,7 +447,6 @@ class MerchandiseService
                 'providerId' => $mp->getProvider()?->getId(),
                 'provider' => $mp->getProvider()?->jsonSerialize(),
                 'unitConfigMode' => $mp->getUnitConfigMode(),
-                'defaultPurchaseUnitId' => $mp->getDefaultPurchaseUnit()?->getId(),
                 'conversions' => $conversions,
                 'prices' => $prices,
             ];
@@ -428,12 +457,8 @@ class MerchandiseService
 
     public function saveProviders(Merchandise $merchandise, ?array $providersData): void
     {
-        $mProviderRepo = $this->entityManager->getRepository(\App\Entity\MerchandiseProvider::class);
-        $providerRepo = $this->entityManager->getRepository(\App\Entity\Provider::class);
-        $unitRepo = $this->entityManager->getRepository(Unit::class);
-
         // 1. Xóa các MerchandiseProvider cũ
-        $oldProviders = $mProviderRepo->findBy(['merchandise' => $merchandise]);
+        $oldProviders = $this->merchandiseProviderRepository->findBy(['merchandise' => $merchandise]);
         foreach ($oldProviders as $oldP) {
             $this->entityManager->remove($oldP);
         }
@@ -455,22 +480,15 @@ class MerchandiseService
                 continue;
             }
 
-            $providerObj = $providerRepo->find($pData['providerId']);
+            $providerObj = $this->providerRepository->find($pData['providerId']);
             if (!$providerObj) {
                 continue;
             }
 
-            $mProvider = new \App\Entity\MerchandiseProvider();
+            $mProvider = new MerchandiseProvider();
             $mProvider->setMerchandise($merchandise);
             $mProvider->setProvider($providerObj);
             $mProvider->setUnitConfigMode($pData['unitConfigMode'] ?? 'custom');
-
-            if (!empty($pData['defaultPurchaseUnitId'])) {
-                $purchaseUnit = $unitRepo->find($pData['defaultPurchaseUnitId']);
-                if ($purchaseUnit) {
-                    $mProvider->setDefaultPurchaseUnit($purchaseUnit);
-                }
-            }
 
             $this->entityManager->persist($mProvider);
 
@@ -489,8 +507,8 @@ class MerchandiseService
                         continue;
                     }
 
-                    $fromUnit = $unitRepo->find($c['fromUnitId']);
-                    $toUnit = $unitRepo->find($c['toUnitId']);
+                    $fromUnit = $this->unitRepository->find($c['fromUnitId']);
+                    $toUnit = $this->unitRepository->find($c['toUnitId']);
                     if (!$fromUnit || !$toUnit) {
                         continue;
                     }
@@ -565,7 +583,7 @@ class MerchandiseService
                     $factor = $uf['factor'];
                     $level = $levels[$uId];
 
-                    $mpUnit = new \App\Entity\MerchandiseProviderUnit();
+                    $mpUnit = new MerchandiseProviderUnit();
                     $mpUnit->setMerchandiseProvider($mProvider);
                     $mpUnit->setUnit($unitObj);
                     $mpUnit->setFactorToBase(sprintf('%.4f', $factor));
@@ -594,7 +612,7 @@ class MerchandiseService
                         continue;
                     }
 
-                    $unitObj = $unitRepo->find($priceItem['unitId']);
+                    $unitObj = $this->unitRepository->find($priceItem['unitId']);
                     if (!$unitObj) {
                         continue;
                     }
@@ -610,7 +628,7 @@ class MerchandiseService
                         $factorToBaseSnapshot = $savedProviderUnits[$uId]->getFactorToBase();
                     } else {
                         // Backup lấy từ MerchandiseUnit của Merchandise
-                        $mUnitRepo = $this->entityManager->getRepository(MerchandiseUnit::class);
+                        $mUnitRepo = $this->merchandiseUnitRepository;
                         $mUnit = $mUnitRepo->findOneBy(['merchandise' => $merchandise, 'unit' => $unitObj]);
                         if ($mUnit) {
                             $unitLabelSnapshot = $mUnit->getLabel();
@@ -618,7 +636,7 @@ class MerchandiseService
                         }
                     }
 
-                    $mPrice = new \App\Entity\MerchandiseProviderPrice();
+                    $mPrice = new MerchandiseProviderPrice();
                     $mPrice->setMerchandiseProvider($mProvider);
                     $mPrice->setUnit($unitObj);
                     $mPrice->setUnitLabelSnapshot($unitLabelSnapshot);

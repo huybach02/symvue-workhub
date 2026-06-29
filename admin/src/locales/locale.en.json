@@ -640,6 +640,8 @@
         "ingredient": "Ingredient",
         "conversions_config": "Unit Conversion Configuration",
         "no_conversions": "No unit conversions configured yet.",
+        "please_configure_valid_conversions": "Please configure base unit and conversions properly!",
+        "please_check_required_fields": "Please check the information and fill in all required fields!",
         "provider_config": "Provider Configuration",
         "provider_title_unselected": "Provider #{index} (Unselected)",
         "provider_title_default": "Provider #{index}",

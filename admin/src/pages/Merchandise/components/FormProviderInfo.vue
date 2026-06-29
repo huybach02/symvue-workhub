@@ -75,31 +75,7 @@
                                 />
                             </v-col>
 
-                            <!-- Chọn Đơn vị mua hàng mặc định -->
-                            <v-col cols="12" md="6" v-if="prov.providerId">
-                                <div class="mb-2">
-                                    {{
-                                        $t("field.default_purchase_unit") ||
-                                        "Đơn vị mua hàng mặc định"
-                                    }}
-                                </div>
-                                <v-select
-                                    v-model="prov.defaultPurchaseUnitId"
-                                    :items="getConfiguredUnits()"
-                                    item-title="label"
-                                    item-value="value"
-                                    variant="outlined"
-                                    density="compact"
-                                    clearable
-                                    :placeholder="
-                                        $t('field.select_purchase_unit') ||
-                                        'Chọn đơn vị mua hàng mặc định'
-                                    "
-                                    @update:model-value="
-                                        onChangeProviders(fieldProviders.value)
-                                    "
-                                />
-                            </v-col>
+
                         </v-row>
 
                         <!-- Tỉ lệ quy đổi đơn vị (Custom conversions) -->
@@ -448,7 +424,6 @@ export default {
             list.push({
                 providerId: null,
                 unitConfigMode: "custom",
-                defaultPurchaseUnitId: null,
                 conversions: [],
                 prices: [],
             });
@@ -621,7 +596,6 @@ export default {
             if (!providerItem.providerId) {
                 providerItem.conversions = [];
                 providerItem.prices = [];
-                providerItem.defaultPurchaseUnitId = null;
                 onChange(providers);
                 return;
             }
@@ -649,10 +623,6 @@ export default {
                     effectiveTo: oldPrice ? oldPrice.effectiveTo : null,
                 };
             });
-
-            providerItem.defaultPurchaseUnitId =
-                providerItem.defaultPurchaseUnitId ||
-                this.formValues.baseUnitId;
 
             onChange(providers);
         },
@@ -704,20 +674,10 @@ export default {
                     };
                 });
 
-                let defaultPurchaseUnitId = prov.defaultPurchaseUnitId;
-                if (
-                    !configuredUnits.some(
-                        (u) => u.value === defaultPurchaseUnitId,
-                    )
-                ) {
-                    defaultPurchaseUnitId = this.formValues.baseUnitId;
-                }
-
                 return {
                     ...prov,
                     conversions: updatedConversions,
                     prices: updatedPrices,
-                    defaultPurchaseUnitId,
                 };
             });
 

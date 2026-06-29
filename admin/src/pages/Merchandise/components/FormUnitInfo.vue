@@ -77,7 +77,7 @@
                                 "
                             />
 
-                            <v-row class="align-center pr-8 pt-2">
+                            <v-row class="align-start pr-8 pt-2">
                                 <v-col cols="12" sm="3">
                                     <div class="mb-2">
                                         {{ $t("field.quantity") }}
@@ -87,7 +87,8 @@
                                         type="number"
                                         variant="outlined"
                                         density="compact"
-                                        hide-details
+                                        hide-details="auto"
+                                        :error-messages="showErrors && (!conv.fromValue || conv.fromValue <= 0) ? $t('validation.mixed.required', { field: $t('field.quantity') }) : ''"
                                         @update:model-value="
                                             updateConversions(
                                                 fieldConversions.value,
@@ -112,7 +113,8 @@
                                         item-value="value"
                                         variant="outlined"
                                         density="compact"
-                                        hide-details
+                                        hide-details="auto"
+                                        :error-messages="showErrors && !conv.fromUnitId ? $t('validation.mixed.required', { field: $t('field.unit') }) : ''"
                                         @update:model-value="
                                             onUnitChanged(
                                                 fieldConversions.value,
@@ -139,7 +141,8 @@
                                         type="number"
                                         variant="outlined"
                                         density="compact"
-                                        hide-details
+                                        hide-details="auto"
+                                        :error-messages="showErrors && (!conv.toValue || conv.toValue <= 0) ? $t('validation.mixed.required', { field: $t('field.quantity') }) : ''"
                                         @update:model-value="
                                             updateConversions(
                                                 fieldConversions.value,
@@ -164,7 +167,8 @@
                                         item-value="value"
                                         variant="outlined"
                                         density="compact"
-                                        hide-details
+                                        hide-details="auto"
+                                        :error-messages="showErrors && !conv.toUnitId ? $t('validation.mixed.required', { field: $t('field.unit') }) : ''"
                                         @update:model-value="
                                             onUnitChanged(
                                                 fieldConversions.value,
@@ -187,7 +191,7 @@
                             <div class="mb-2">
                                 {{ $t("field.base_unit") }}
                             </div>
-                            <v-select
+                             <v-select
                                 :model-value="fieldBaseUnit.value"
                                 :items="configuredUnits(fieldConversions.value)"
                                 item-title="label"
@@ -195,6 +199,7 @@
                                 variant="outlined"
                                 density="compact"
                                 clearable
+                                :error-messages="showErrors && !fieldBaseUnit.value ? $t('validation.mixed.required', { field: $t('field.base_unit') }) : ''"
                                 :placeholder="
                                     $t('field.select_base_unit') ||
                                     'Chọn đơn vị cơ sở'
@@ -222,6 +227,10 @@ export default {
         item: {
             type: Object,
             default: null,
+        },
+        showErrors: {
+            type: Boolean,
+            default: false,
         },
     },
     computed: {

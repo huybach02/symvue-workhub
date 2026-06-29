@@ -643,6 +643,8 @@
         "ingredient": "Nguyên liệu",
         "conversions_config": "Cấu hình đơn vị quy đổi",
         "no_conversions": "Chưa cấu hình đơn vị quy đổi nào.",
+        "please_configure_valid_conversions": "Vui lòng cấu hình đầy đủ đơn vị cơ sở và quy đổi đơn vị!",
+        "please_check_required_fields": "Vui lòng kiểm tra và điền đầy đủ thông tin các trường bắt buộc!",
         "provider_config": "Cấu hình Nhà cung cấp",
         "provider_title_unselected": "Nhà cung cấp #{index} (Chưa chọn)",
         "provider_title_default": "Nhà cung cấp #{index}",

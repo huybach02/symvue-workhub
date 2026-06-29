@@ -40,7 +40,8 @@
         "back": "Quay lại",
         "close": "Đóng",
         "remove": "Xóa",
-        "restore_default": "Khôi phục mặc định"
+        "restore_default": "Khôi phục mặc định",
+        "next": "Tiếp theo"
     },
     "sidebar": {
         "home": "Trang chủ",

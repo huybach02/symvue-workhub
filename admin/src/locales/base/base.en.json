@@ -40,7 +40,8 @@
         "back": "Back",
         "close": "Close",
         "remove": "Remove",
-        "restore_default": "Restore default"
+        "restore_default": "Restore default",
+        "next": "Next"
     },
     "sidebar": {
         "home": "Home",
