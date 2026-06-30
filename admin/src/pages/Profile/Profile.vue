@@ -31,7 +31,7 @@
             </v-tab>
         </v-tabs>
 
-        <v-window v-model="tab">
+        <v-window v-model="tab" :touch="false">
             <!-- TAB 1: THÔNG TIN CÁ NHÂN -->
             <v-window-item value="info">
                 <VeeForm

@@ -39,6 +39,7 @@
             >
                 <div class="mb-2">
                     {{ $t("category.title") }}
+                    <span class="text-red"> * </span>
                 </div>
                 <TreeAutocomplete
                     :model-value="field.value"

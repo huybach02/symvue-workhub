@@ -20,7 +20,7 @@
                 </v-tab>
             </v-tabs>
 
-            <v-window v-model="activeTab">
+            <v-window v-model="activeTab" :touch="false">
                 <v-window-item value="info">
                     <FormGeneralInfo type="finished_product" :item="item" />
                 </v-window-item>

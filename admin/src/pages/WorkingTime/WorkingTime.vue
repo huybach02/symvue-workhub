@@ -18,7 +18,7 @@
                 </v-tab>
             </v-tabs>
 
-            <v-tabs-window v-model="tab" class="mt-5">
+            <v-tabs-window v-model="tab" class="mt-5" :touch="false">
                 <v-tabs-window-item value="one">
                     <Fulltime :permission="permission" />
                 </v-tabs-window-item>

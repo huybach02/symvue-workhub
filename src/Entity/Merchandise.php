@@ -63,6 +63,10 @@ class Merchandise
     #[ORM\JoinColumn(name: 'base_unit_id', referencedColumnName: 'id', nullable: true)]
     private ?Unit $baseUnit = null;
 
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false, 'comment' => 'Chỉ có 1 đơn vị tính'])]
+    private ?bool $isSingleUnit = false;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -178,6 +182,18 @@ class Merchandise
         return $this;
     }
 
+    public function isSingleUnit(): ?bool
+    {
+        return $this->isSingleUnit;
+    }
+
+    public function setIsSingleUnit(?bool $isSingleUnit): static
+    {
+        $this->isSingleUnit = $isSingleUnit;
+        return $this;
+    }
+
+
     public function jsonSerialize(): array
     {
         return [
@@ -194,6 +210,7 @@ class Merchandise
             'status' => $this->status,
             'baseUnitId' => $this->baseUnit?->getId(),
             'baseUnit' => $this->baseUnit?->jsonSerialize(),
+            'isSingleUnit' => $this->isSingleUnit,
             'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
             'deletedAt' => $this->deletedAt?->format('Y-m-d H:i:s'),

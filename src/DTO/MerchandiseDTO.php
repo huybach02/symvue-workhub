@@ -17,6 +17,8 @@ class MerchandiseDTO
         #[Assert\Length(min: 3, max: 255, groups: ['create', 'update'])]
         public readonly ?string $name = null,
 
+        #[Assert\NotNull(groups: ['create', 'update'])]
+        #[Assert\Type(type: 'integer', groups: ['create', 'update'])]
         public readonly ?int $categoryId = null,
 
         #[Assert\NotBlank(groups: ['create', 'update'])]
@@ -40,5 +42,7 @@ class MerchandiseDTO
         public readonly ?array $conversions = null,
 
         public readonly ?array $providers = null,
+
+        public readonly ?bool $isSingleUnit = false,
     ) {}
 }

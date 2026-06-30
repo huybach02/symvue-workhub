@@ -19,7 +19,10 @@ export const merchandiseSchema = yup.object({
         min: 3,
         max: 255,
     }),
-    categoryId: yup.mixed().nullable().notRequired(),
+    categoryId: buildNumberRule(t("category.title"), {
+        required: true,
+        integer: true,
+    }),
     profit: buildPercentageRule(t("field.merchandise_profit"), {
         required: false,
     }),

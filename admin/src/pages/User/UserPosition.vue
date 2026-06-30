@@ -37,7 +37,7 @@
                         </v-tab>
                     </v-tabs>
 
-                    <v-tabs-window v-model="tab" class="mt-4">
+                    <v-tabs-window v-model="tab" class="mt-4" :touch="false">
                         <v-tabs-window-item value="position">
                             <UserPositionAssignmentTab
                                 :item="item"

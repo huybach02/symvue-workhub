@@ -94,6 +94,7 @@ class MerchandiseService
         $item->setNotes($dto->notes);
         $item->setStockAlertQuantity($dto->stockAlertQuantity);
         $item->setStatus($dto->status);
+        $item->setIsSingleUnit((bool)$dto->isSingleUnit);
 
         if ($dto->categoryId) {
             $category = $this->categoryRepository->find($dto->categoryId);
@@ -146,6 +147,7 @@ class MerchandiseService
         $item->setNotes($dto->notes);
         $item->setStockAlertQuantity($dto->stockAlertQuantity);
         $item->setStatus($dto->status);
+        $item->setIsSingleUnit((bool)$dto->isSingleUnit);
 
         if ($dto->categoryId) {
             $category = $this->categoryRepository->find($dto->categoryId);
@@ -228,6 +230,19 @@ class MerchandiseService
         }
 
         if (empty($conversionsData)) {
+            if ($baseUnitId) {
+                $baseUnitEntity = $this->unitRepository->find($baseUnitId);
+                if ($baseUnitEntity) {
+                    $mUnit = new MerchandiseUnit();
+                    $mUnit->setMerchandise($merchandise);
+                    $mUnit->setUnit($baseUnitEntity);
+                    $mUnit->setFactorToBase('1.0000');
+                    $mUnit->setLevel(0);
+                    $mUnit->setIsBase(true);
+                    $mUnit->setLabel($baseUnitEntity->getName());
+                    $this->entityManager->persist($mUnit);
+                }
+            }
             return;
         }
 

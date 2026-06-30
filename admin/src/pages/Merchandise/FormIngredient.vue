@@ -26,7 +26,7 @@
                 </v-tab>
             </v-tabs>
 
-            <v-window v-model="activeTab">
+            <v-window v-model="activeTab" :touch="false">
                 <v-window-item value="info">
                     <FormGeneralInfo type="ingredient" :item="item" />
                 </v-window-item>
@@ -116,6 +116,7 @@ export default {
                 baseUnitId: null,
                 conversions: [],
                 providers: [],
+                isSingleUnit: false,
             },
         };
     },
@@ -158,6 +159,9 @@ export default {
                 );
             }
             if (this.activeTab === "unit") {
+                if (values.isSingleUnit) {
+                    return !!values.baseUnitId;
+                }
                 const conversions = values.conversions || [];
                 if (conversions.length === 0) return false;
                 const allConversionsValid = conversions.every(

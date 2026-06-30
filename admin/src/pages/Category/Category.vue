@@ -6,7 +6,7 @@
             </v-tab>
         </v-tabs>
 
-        <v-tabs-window v-model="tab">
+        <v-tabs-window v-model="tab" :touch="false">
             <v-tabs-window-item
                 v-for="item in tabs"
                 :key="item.value"

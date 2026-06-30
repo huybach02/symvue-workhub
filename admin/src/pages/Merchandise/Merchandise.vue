@@ -9,7 +9,7 @@
             </v-tab>
         </v-tabs>
 
-        <v-window v-model="tab">
+        <v-window v-model="tab" :touch="false">
             <v-window-item value="ingredient">
                 <div v-if="tab === 'ingredient'">
                     <v-row>
