@@ -13,7 +13,10 @@
                     <v-row>
                         <!-- Tên nhà cung cấp -->
                         <v-col cols="12" md="6">
-                            <VeeField v-slot="{ field, errorMessage, handleChange }" name="name">
+                            <VeeField
+                                v-slot="{ field, errorMessage, handleChange }"
+                                name="name"
+                            >
                                 <div class="mb-2">
                                     {{ $t("provider.columns.name") }}
                                     <span class="text-red"> * </span>
@@ -31,7 +34,10 @@
 
                         <!-- Mã nhà cung cấp -->
                         <v-col cols="12" md="6">
-                            <VeeField v-slot="{ field, errorMessage }" name="code">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="code"
+                            >
                                 <div class="mb-2">
                                     {{ $t("provider.columns.code") }}
                                     <span class="text-red"> * </span>
@@ -49,7 +55,10 @@
 
                         <!-- Số điện thoại -->
                         <v-col cols="12" md="4">
-                            <VeeField v-slot="{ field, errorMessage }" name="phone">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="phone"
+                            >
                                 <div class="mb-2">
                                     {{ $t("provider.columns.phone") }}
                                 </div>
@@ -65,7 +74,10 @@
 
                         <!-- Email -->
                         <v-col cols="12" md="4">
-                            <VeeField v-slot="{ field, errorMessage }" name="email">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="email"
+                            >
                                 <div class="mb-2">
                                     {{ $t("provider.columns.email") }}
                                 </div>
@@ -110,7 +122,10 @@
 
                         <!-- Địa chỉ -->
                         <v-col cols="12" md="12">
-                            <VeeField v-slot="{ field, errorMessage }" name="address">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="address"
+                            >
                                 <div class="mb-2">
                                     {{ $t("provider.columns.address") }}
                                 </div>
@@ -126,7 +141,10 @@
 
                         <!-- Mã số thuế -->
                         <v-col cols="12" md="4">
-                            <VeeField v-slot="{ field, errorMessage }" name="taxNumber">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="taxNumber"
+                            >
                                 <div class="mb-2">
                                     {{ $t("provider.columns.taxNumber") }}
                                 </div>
@@ -142,7 +160,10 @@
 
                         <!-- Tên ngân hàng -->
                         <v-col cols="12" md="4">
-                            <VeeField v-slot="{ field, errorMessage }" name="bankName">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="bankName"
+                            >
                                 <div class="mb-2">
                                     {{ $t("provider.columns.bankName") }}
                                 </div>
@@ -158,7 +179,10 @@
 
                         <!-- Số tài khoản -->
                         <v-col cols="12" md="4">
-                            <VeeField v-slot="{ field, errorMessage }" name="bankNumber">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="bankNumber"
+                            >
                                 <div class="mb-2">
                                     {{ $t("provider.columns.bankNumber") }}
                                 </div>
@@ -174,7 +198,10 @@
 
                         <!-- Ghi chú -->
                         <v-col cols="12" md="12">
-                            <VeeField v-slot="{ field, errorMessage }" name="note">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="note"
+                            >
                                 <div class="mb-2">
                                     {{ $t("provider.columns.note") }}
                                 </div>
@@ -189,23 +216,23 @@
                         </v-col>
                     </v-row>
                 </v-col>
-
-                <!-- Nút cancel và create/update -->
-                <v-col cols="12">
-                    <div class="d-flex justify-end ga-2">
-                        <v-btn color="grey" @click="handleCancel">
-                            {{ $t("button.cancel") }}
-                        </v-btn>
-                        <v-btn
-                            color="primary"
-                            type="submit"
-                            :loading="this.$store.state.isLoading"
-                        >
-                            {{ submitButtonText }}
-                        </v-btn>
-                    </div>
-                </v-col>
             </v-row>
+
+            <!-- Nút cancel và create/update -->
+            <div class="sticky-actions-bar">
+                <div class="d-flex justify-end ga-2">
+                    <v-btn color="grey" @click="handleCancel">
+                        {{ $t("button.cancel") }}
+                    </v-btn>
+                    <v-btn
+                        color="primary"
+                        type="submit"
+                        :loading="this.$store.state.isLoading"
+                    >
+                        {{ submitButtonText }}
+                    </v-btn>
+                </div>
+            </div>
         </VeeForm>
         <LoadingForm v-if="mode === 'update' && !item" :is-loading="true" />
     </div>

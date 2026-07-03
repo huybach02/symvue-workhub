@@ -3,7 +3,7 @@
         <VeeForm
             v-if="mode === 'create' || (mode === 'update' && item)"
             ref="formRef"
-            v-slot="{ values, errors }"
+            v-slot="{ values }"
             as="form"
             :validation-schema="validationSchema"
             :initial-values="initialValues"
@@ -13,7 +13,7 @@
                 v-model="activeTab"
                 color="primary"
                 class="mb-4"
-                style="pointer-events: none;"
+                style="pointer-events: none"
             >
                 <v-tab value="info">
                     {{ $t("merchandise.tabs.info") }}
@@ -41,27 +41,33 @@
             </v-window>
 
             <!-- Nút cancel và create/update -->
-            <v-row class="mt-4">
-                <v-col cols="12">
-                    <div class="d-flex justify-end ga-2">
-                        <v-btn
-                            v-if="activeTab !== 'provider'"
-                            color="primary"
-                            @click="handleNextTab(values, errors)"
-                        >
-                            {{ $t("button.next") }}
-                        </v-btn>
-                        <v-btn
-                            v-else
-                            color="primary"
-                            type="submit"
-                            :loading="this.$store.state.isLoading"
-                        >
-                            {{ submitButtonText }}
-                        </v-btn>
-                    </div>
-                </v-col>
-            </v-row>
+            <div class="sticky-actions-bar">
+                <div class="d-flex justify-end ga-2">
+                    <v-btn
+                        v-if="activeTab !== 'info'"
+                        color="grey"
+                        variant="outlined"
+                        @click="handlePrevTab"
+                    >
+                        {{ $t("base.back") || "Quay lại" }}
+                    </v-btn>
+                    <v-btn
+                        v-if="activeTab !== 'provider'"
+                        color="primary"
+                        @click="handleNextTab(values)"
+                    >
+                        {{ $t("button.next") }}
+                    </v-btn>
+                    <v-btn
+                        v-else
+                        color="primary"
+                        type="submit"
+                        :loading="this.$store.state.isLoading"
+                    >
+                        {{ submitButtonText }}
+                    </v-btn>
+                </div>
+            </div>
         </VeeForm>
         <LoadingForm v-if="mode === 'update' && !item" :is-loading="true" />
     </div>
@@ -131,7 +137,6 @@ export default {
                     });
                 }
             },
-            deep: true,
             immediate: true,
         },
         activeTab() {
@@ -145,19 +150,7 @@ export default {
         handleCancel() {
             this.$emit("cancel");
         },
-        isCurrentTabValid(values, errors) {
-            if (this.activeTab === "info") {
-                const hasCode = values.code && values.code.trim().length >= 3;
-                const hasName = values.name && values.name.trim().length >= 3;
-                const hasStatus = values.status === 0 || values.status === 1;
-                return !!(
-                    hasCode &&
-                    hasName &&
-                    hasStatus &&
-                    (!errors ||
-                        (!errors.code && !errors.name && !errors.status))
-                );
-            }
+        isCurrentTabValid(values) {
             if (this.activeTab === "unit") {
                 if (values.isSingleUnit) {
                     return !!values.baseUnitId;
@@ -175,20 +168,25 @@ export default {
             }
             return true;
         },
-        async handleNextTab(values, errors) {
+        async handleNextTab(values) {
             if (this.activeTab === "info") {
                 const { valid } = await this.$refs.formRef.validate();
-                if (!valid) {
-                    return;
-                }
+                if (!valid) return;
                 this.activeTab = "unit";
             } else if (this.activeTab === "unit") {
-                if (!this.isCurrentTabValid(values, errors)) {
+                if (!this.isCurrentTabValid(values)) {
                     this.showUnitErrors = true;
                     return;
                 }
                 this.showUnitErrors = false;
                 this.activeTab = "provider";
+            }
+        },
+        handlePrevTab() {
+            if (this.activeTab === "provider") {
+                this.activeTab = "unit";
+            } else if (this.activeTab === "unit") {
+                this.activeTab = "info";
             }
         },
     },

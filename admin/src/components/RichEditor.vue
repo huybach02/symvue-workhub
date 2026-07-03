@@ -1,7 +1,9 @@
 <template>
     <div
         class="rich-editor-input w-100"
-        :class="{ 'rich-editor-error': errorMessages && errorMessages.length > 0 }"
+        :class="{
+            'rich-editor-error': errorMessages && errorMessages.length > 0,
+        }"
     >
         <div class="rich-editor-container w-100">
             <div v-if="label" class="mb-2 rich-editor-label">
@@ -62,7 +64,6 @@ export default {
     },
     methods: {
         onContentChange(htmlContent) {
-            // Nếu editor trống hoàn toàn (ví dụ <p><br></p>), ta nên trả về chuỗi rỗng để validate required hoạt động đúng
             const isEmpty =
                 htmlContent === "<p><br></p>" || htmlContent.trim() === "";
             this.$emit("update:modelValue", isEmpty ? "" : htmlContent);

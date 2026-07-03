@@ -390,22 +390,17 @@ class MerchandiseService
 
     private function getProvidersData(int $merchandiseId): array
     {
-        $providerRepo = $this->merchandiseProviderRepository;
-        $mProviders = $providerRepo->findBy(['merchandise' => $merchandiseId]);
-
-        $mConversionRepo = $this->merchandiseUnitConversionRepository;
-        $mProviderUnitRepo = $this->merchandiseProviderUnitRepository;
-        $mProviderPriceRepo = $this->merchandiseProviderPriceRepository;
+        $mProviders = $this->merchandiseProviderRepository->findBy(['merchandise' => $merchandiseId]);
 
         // Lấy conversions gốc của Merchandise
-        $baseConversions = $mConversionRepo->findBy(['merchandise' => $merchandiseId], ['sortOrder' => 'ASC']);
+        $baseConversions = $this->merchandiseUnitConversionRepository->findBy(['merchandise' => $merchandiseId], ['sortOrder' => 'ASC']);
 
         $result = [];
         foreach ($mProviders as $mp) {
             $mpId = $mp->getId();
 
             // Lấy các units đã lưu cho provider này
-            $providerUnits = $mProviderUnitRepo->findBy(['merchandiseProvider' => $mpId]);
+            $providerUnits = $this->merchandiseProviderUnitRepository->findBy(['merchandiseProvider' => $mpId]);
             $providerUnitMap = [];
             foreach ($providerUnits as $pu) {
                 $providerUnitMap[$pu->getUnit()->getId()] = (float)$pu->getFactorToBase();
@@ -426,8 +421,8 @@ class MerchandiseService
                     $toFactor = $providerUnitMap[$toUnitId];
 
                     if ($fromFactor > 0 && $toFactor > 0) {
-                        $fromVal = 1.0;
-                        $toVal = $fromFactor / $toFactor;
+                        $fromVal = (float)$bc->getFromValue();
+                        $toVal = $fromVal * ($fromFactor / $toFactor);
                     }
                 }
 
@@ -444,7 +439,7 @@ class MerchandiseService
 
             // Lấy danh sách giá mặc định theo từng đơn vị của provider
             $prices = [];
-            $providerPrices = $mProviderPriceRepo->findBy(['merchandiseProvider' => $mpId]);
+            $providerPrices = $this->merchandiseProviderPriceRepository->findBy(['merchandiseProvider' => $mpId]);
             foreach ($providerPrices as $pp) {
                 $prices[] = [
                     'unitId' => $pp->getUnit()->getId(),
@@ -584,7 +579,15 @@ class MerchandiseService
                     ];
                 }
 
-                usort($unitFactors, fn($a, $b) => $a['factor'] <=> $b['factor']);
+                usort($unitFactors, function ($a, $b) use ($baseUnitId) {
+                    if ($a['id'] === $baseUnitId) {
+                        return -1;
+                    }
+                    if ($b['id'] === $baseUnitId) {
+                        return 1;
+                    }
+                    return $a['factor'] <=> $b['factor'];
+                });
 
                 $levels = [];
                 foreach ($unitFactors as $level => $uf) {
@@ -643,8 +646,7 @@ class MerchandiseService
                         $factorToBaseSnapshot = $savedProviderUnits[$uId]->getFactorToBase();
                     } else {
                         // Backup lấy từ MerchandiseUnit của Merchandise
-                        $mUnitRepo = $this->merchandiseUnitRepository;
-                        $mUnit = $mUnitRepo->findOneBy(['merchandise' => $merchandise, 'unit' => $unitObj]);
+                        $mUnit = $this->merchandiseUnitRepository->findOneBy(['merchandise' => $merchandise, 'unit' => $unitObj]);
                         if ($mUnit) {
                             $unitLabelSnapshot = $mUnit->getLabel();
                             $factorToBaseSnapshot = $mUnit->getFactorToBase();

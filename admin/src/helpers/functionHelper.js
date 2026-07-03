@@ -233,4 +233,125 @@ export const functionHelper = {
             );
         });
     },
+    previewCalculatedFactors(conversions, baseUnitId, units = []) {
+        if (!baseUnitId) return [];
+
+        const baseUnit = units.find((u) => u.value === baseUnitId);
+        if (!baseUnit) return [];
+
+        const adj = {};
+        const allUnitIds = new Set();
+        allUnitIds.add(baseUnitId);
+
+        const validConversions = (conversions || []).filter(
+            (c) =>
+                c.fromUnitId &&
+                c.toUnitId &&
+                c.fromValue > 0 &&
+                c.toValue > 0,
+        );
+
+        validConversions.forEach((c) => {
+            const fromId = c.fromUnitId;
+            const toId = c.toUnitId;
+            const fromVal = parseFloat(c.fromValue);
+            const toVal = parseFloat(c.toValue);
+            const ratio = toVal / fromVal;
+
+            if (!adj[fromId]) adj[fromId] = [];
+            if (!adj[toId]) adj[toId] = [];
+
+            adj[fromId].push({
+                node: toId,
+                ratio: ratio,
+                direction: "forward",
+            });
+            adj[toId].push({
+                node: fromId,
+                ratio: ratio,
+                direction: "backward",
+            });
+
+            allUnitIds.add(fromId);
+            allUnitIds.add(toId);
+        });
+
+        const factors = { [baseUnitId]: 1.0 };
+        const queue = [baseUnitId];
+        const visited = { [baseUnitId]: true };
+
+        while (queue.length > 0) {
+            const u = queue.shift();
+            const uFactor = factors[u];
+
+            const neighbors = adj[u] || [];
+            for (const edge of neighbors) {
+                const v = edge.node;
+                if (!visited[v]) {
+                    visited[v] = true;
+                    if (edge.direction === "forward") {
+                        factors[v] = uFactor / edge.ratio;
+                    } else {
+                        factors[v] = edge.ratio * uFactor;
+                    }
+                    queue.push(v);
+                }
+            }
+        }
+
+        const results = [];
+        allUnitIds.forEach((uId) => {
+            if (uId === baseUnitId) return;
+            const unitObj = units.find((u) => u.value === uId);
+            if (unitObj) {
+                const rawFactor = factors[uId];
+                results.push({
+                    id: uId,
+                    name: unitObj.label,
+                    factor: rawFactor,
+                    isBase: uId === baseUnitId,
+                });
+            }
+        });
+
+        results.sort((a, b) => {
+            if (a.factor === undefined) return 1;
+            if (b.factor === undefined) return -1;
+            return b.factor - a.factor;
+        });
+
+        return results;
+    },
+    getConnectedUnits(startNode, conversions) {
+        if (!startNode) return new Set();
+
+        const adj = {};
+        conversions.forEach((c) => {
+            if (c.fromUnitId && c.toUnitId && c.fromValue > 0 && c.toValue > 0) {
+                const u = String(c.fromUnitId);
+                const v = String(c.toUnitId);
+                if (!adj[u]) adj[u] = [];
+                if (!adj[v]) adj[v] = [];
+                adj[u].push(v);
+                adj[v].push(u);
+            }
+        });
+
+        const visited = new Set();
+        const queue = [String(startNode)];
+        visited.add(String(startNode));
+
+        while (queue.length > 0) {
+            const curr = queue.shift();
+            const neighbors = adj[curr] || [];
+            for (const neighbor of neighbors) {
+                if (!visited.has(neighbor)) {
+                    visited.add(neighbor);
+                    queue.push(neighbor);
+                }
+            }
+        }
+
+        return visited;
+    },
 };

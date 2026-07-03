@@ -35,22 +35,20 @@
             </v-window>
 
             <!-- Nút cancel và create/update -->
-            <v-row class="mt-4">
-                <v-col cols="12">
-                    <div class="d-flex justify-end ga-2">
-                        <v-btn color="grey" @click="handleCancel">
-                            {{ $t("button.cancel") }}
-                        </v-btn>
-                        <v-btn
-                            color="primary"
-                            type="submit"
-                            :loading="this.$store.state.isLoading"
-                        >
-                            {{ submitButtonText }}
-                        </v-btn>
-                    </div>
-                </v-col>
-            </v-row>
+            <div class="sticky-actions-bar">
+                <div class="d-flex justify-end ga-2">
+                    <v-btn color="grey" @click="handleCancel">
+                        {{ $t("button.cancel") }}
+                    </v-btn>
+                    <v-btn
+                        color="primary"
+                        type="submit"
+                        :loading="this.$store.state.isLoading"
+                    >
+                        {{ submitButtonText }}
+                    </v-btn>
+                </div>
+            </div>
         </VeeForm>
         <LoadingForm v-if="mode === 'update' && !item" :is-loading="true" />
     </div>
