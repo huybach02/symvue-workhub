@@ -21,6 +21,7 @@
                             item-value="value"
                             variant="outlined"
                             clearable
+                            hide-details
                             :loading="departmentsLoading"
                             :placeholder="`${$t('base.enter')} ${$t('field.bo_phan')}`"
                             class="department-input"

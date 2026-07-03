@@ -34,14 +34,12 @@
                     <label class="text-caption text-grey-darken-1 mb-1 d-block">
                         {{ $t("filter.date_range.from_date") }}
                     </label>
-                    <v-text-field
+                    <DatePicker
                         v-model="dateFrom"
-                        type="date"
                         density="compact"
                         variant="outlined"
                         hide-details
                         class="mb-2"
-                        clearable
                         @update:model-value="onDateFromChange"
                     />
                 </div>
@@ -50,13 +48,11 @@
                     <label class="text-caption text-grey-darken-1 mb-1 d-block">
                         {{ $t("filter.date_range.to_date") }}
                     </label>
-                    <v-text-field
+                    <DatePicker
                         v-model="dateTo"
-                        type="date"
                         density="compact"
                         variant="outlined"
                         hide-details
-                        clearable
                         @update:model-value="onDateChange"
                     />
                 </div>
@@ -67,13 +63,11 @@
                 <label class="text-caption text-grey-darken-1 mb-1 d-block">
                     {{ $t("filter.date_range.date") }}
                 </label>
-                <v-text-field
+                <DatePicker
                     v-model="dateSingle"
-                    type="date"
                     density="compact"
                     variant="outlined"
                     hide-details
-                    clearable
                     @update:model-value="onDateChange"
                 />
             </div>
@@ -82,8 +76,13 @@
 </template>
 
 <script>
+import DatePicker from "@/components/DatePicker.vue";
+
 export default {
     name: "FilterDateRange",
+    components: {
+        DatePicker,
+    },
     props: {
         value: {
             type: Object,

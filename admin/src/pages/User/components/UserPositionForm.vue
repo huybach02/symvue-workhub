@@ -126,61 +126,117 @@
             </v-col>
 
             <v-col cols="12" md="6">
-                <VeeField v-slot="{ field, errorMessage }" name="probationFrom">
+                <VeeField
+                    v-slot="{
+                        field,
+                        errorMessage,
+                        handleChange,
+                        handleBlur,
+                    }"
+                    name="probationFrom"
+                >
                     <div class="mb-2">
                         {{ $t("position.probation_from") }}
                         <span class="text-red"> * </span>
                     </div>
-                    <v-text-field
-                        v-bind="field"
+                    <DatePicker
+                        :model-value="field.value"
                         :error-messages="errorMessage"
-                        type="date"
-                        variant="outlined"
+                        :placeholder="`${$t('base.enter')} ${$t('position.probation_from')}`"
+                        @update:model-value="
+                            (value) => {
+                                handleChange(value);
+                                handleBlur();
+                            }
+                        "
+                        @blur="handleBlur"
                     />
                 </VeeField>
             </v-col>
 
             <v-col cols="12" md="6">
-                <VeeField v-slot="{ field, errorMessage }" name="probationTo">
+                <VeeField
+                    v-slot="{
+                        field,
+                        errorMessage,
+                        handleChange,
+                        handleBlur,
+                    }"
+                    name="probationTo"
+                >
                     <div class="mb-2">
                         {{ $t("position.probation_to") }}
                         <span class="text-red"> * </span>
                     </div>
-                    <v-text-field
-                        v-bind="field"
+                    <DatePicker
+                        :model-value="field.value"
                         :error-messages="errorMessage"
-                        type="date"
-                        variant="outlined"
+                        :placeholder="`${$t('base.enter')} ${$t('position.probation_to')}`"
+                        @update:model-value="
+                            (value) => {
+                                handleChange(value);
+                                handleBlur();
+                            }
+                        "
+                        @blur="handleBlur"
                     />
                 </VeeField>
             </v-col>
 
             <v-col cols="12" md="6">
-                <VeeField v-slot="{ field, errorMessage }" name="effectiveFrom">
+                <VeeField
+                    v-slot="{
+                        field,
+                        errorMessage,
+                        handleChange,
+                        handleBlur,
+                    }"
+                    name="effectiveFrom"
+                >
                     <div class="mb-2">
                         {{ $t("position.effective_from") }}
                         <span class="text-red"> * </span>
                     </div>
-                    <v-text-field
-                        v-bind="field"
+                    <DatePicker
+                        :model-value="field.value"
                         :error-messages="errorMessage"
-                        type="date"
-                        variant="outlined"
+                        :placeholder="`${$t('base.enter')} ${$t('position.effective_from')}`"
+                        @update:model-value="
+                            (value) => {
+                                handleChange(value);
+                                handleBlur();
+                            }
+                        "
+                        @blur="handleBlur"
                     />
                 </VeeField>
             </v-col>
 
             <v-col cols="12" md="6">
-                <VeeField v-slot="{ field, errorMessage }" name="effectiveTo">
+                <VeeField
+                    v-slot="{
+                        field,
+                        errorMessage,
+                        handleChange,
+                        handleBlur,
+                    }"
+                    name="effectiveTo"
+                >
                     <div class="mb-2">
                         {{ $t("position.effective_to") }}
                         <span class="text-red"> * </span>
                     </div>
-                    <v-text-field
-                        v-bind="field"
+                    <DatePicker
+                        :model-value="field.value"
                         :error-messages="errorMessage"
-                        type="date"
-                        variant="outlined"
+                        :placeholder="`${$t('base.enter')} ${$t('position.effective_to')}`"
+                        @update:model-value="
+                            (value) => {
+                                handleChange(value);
+                                handleBlur();
+                            }
+                        "
+                        @blur="handleBlur"
                     />
                 </VeeField>
             </v-col>
@@ -283,11 +339,13 @@
 import { Form as VeeForm, Field as VeeField } from "vee-validate";
 import { useFormatInputNumber } from "@/hooks/useFormatInputNumber";
 import { userPositionSchema } from "@/utils/schemas/userPosition";
+import DatePicker from "@/components/DatePicker.vue";
 
 export default {
     components: {
         VeeForm,
         VeeField,
+        DatePicker,
     },
     props: {
         item: {

@@ -26,7 +26,14 @@
         "deselect_all": "Bỏ chọn tất cả",
         "empty_state": "Trống",
         "not_available": "Không có",
-        "loading": "Đang tải"
+        "loading": "Đang tải",
+        "hour": "Giờ",
+        "minute": "Phút",
+        "now": "Hiện tại",
+        "apply": "Áp dụng",
+        "clear": "Xóa",
+        "select_time": "Chọn thời gian",
+        "select_date": "Chọn ngày"
     },
     "title": {
         "create": "Thêm mới",

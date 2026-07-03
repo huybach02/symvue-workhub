@@ -7,7 +7,7 @@
                         <v-avatar size="x-large">
                             <v-img
                                 alt="Logo"
-                                src="https://brandeps.com/logo-download/H/HTML5-Boilerplate-logo-01.png"
+                                :src="logoUrl"
                             />
                         </v-avatar>
                     </div>
@@ -37,6 +37,9 @@ export default {
         };
     },
     computed: {
+        logoUrl() {
+            return import.meta.env.VITE_LOGO_DEFAULT;
+        },
         title() {
             return this.$route.meta.title || this.$t("auth.login");
         },

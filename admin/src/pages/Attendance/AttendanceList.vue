@@ -3,13 +3,14 @@
         <v-row>
             <v-col cols="12">
                 <v-row align="center">
-                    <v-col cols="12" md="4" lg="3">
-                        <div class="text-body-2 font-weight-medium mb-1">
+                    <v-col cols="12" md="6" lg="4" class="d-flex align-center ga-3">
+                        <div class="text-body-1 font-weight-bold text-no-wrap">
                             {{ $t("attendance.filters.work_date") }}
                         </div>
                         <DatePicker
                             :model-value="selectedWorkDate"
                             density="compact"
+                            hide-details
                             :placeholder="
                                 $t('attendance.filters.work_date_placeholder')
                             "

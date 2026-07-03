@@ -9,7 +9,7 @@
         <template #activator="{ props: activatorProps }">
             <v-text-field
                 :model-value="displayValue"
-                :placeholder="placeholder"
+                :placeholder="displayPlaceholder"
                 :error-messages="errorMessages"
                 :disabled="disabled"
                 :readonly="true"
@@ -24,20 +24,7 @@
             />
         </template>
 
-        <v-card min-width="340" rounded="xl" elevation="12">
-            <v-card-item class="pb-3">
-                <div
-                    class="text-overline text-medium-emphasis font-weight-bold"
-                >
-                    Time
-                </div>
-                <div class="text-h6 font-weight-bold">
-                    {{ headerTitle }}
-                </div>
-            </v-card-item>
-
-            <v-divider />
-
+        <v-card min-width="340" rounded="0" elevation="12" class="pt-3">
             <v-card-text class="d-grid ga-4">
                 <v-text-field
                     :model-value="inputValue"
@@ -46,9 +33,10 @@
                     density="compact"
                     hide-details
                     maxlength="5"
+                    class="mb-4"
                     @update:model-value="updateInputValue"
                     @blur="applyInputValue"
-                    @keydown.enter.prevent="applyInputValue"
+                    @keydown.enter.prevent="applyAndClose"
                 />
 
                 <v-row dense>
@@ -56,9 +44,10 @@
                         <div
                             class="text-overline text-medium-emphasis font-weight-bold mb-2"
                         >
-                            Hour
+                            {{ $t('base.hour') }}
                         </div>
                         <v-sheet
+                            ref="hourSheet"
                             border
                             rounded="lg"
                             class="overflow-y-auto"
@@ -97,9 +86,10 @@
                         <div
                             class="text-overline text-medium-emphasis font-weight-bold mb-2"
                         >
-                            Minute
+                            {{ $t('base.minute') }}
                         </div>
                         <v-sheet
+                            ref="minuteSheet"
                             border
                             rounded="lg"
                             class="overflow-y-auto"
@@ -143,14 +133,14 @@
             >
                 <div>
                     <v-btn variant="text" color="error" @click="clearValue">
-                        Clear
+                        {{ $t('base.clear') }}
                     </v-btn>
                     <v-btn variant="text" color="info" @click="selectNow">
-                        Now
+                        {{ $t('base.now') }}
                     </v-btn>
                 </div>
                 <v-btn variant="text" color="primary" @click="applyAndClose">
-                    Apply
+                    {{ $t('base.apply') }}
                 </v-btn>
             </v-card-actions>
         </v-card>
@@ -213,8 +203,8 @@ export default {
         displayValue() {
             return this.modelValue || "";
         },
-        headerTitle() {
-            return this.modelValue || this.placeholder || "Select time";
+        displayPlaceholder() {
+            return this.placeholder || this.$t("base.select_time");
         },
         hours() {
             return Array.from({ length: 24 }, (_, index) =>
@@ -242,6 +232,9 @@ export default {
         menu(value) {
             if (value) {
                 this.syncFromModel();
+                this.$nextTick(() => {
+                    this.scrollToSelected();
+                });
                 return;
             }
 
@@ -249,6 +242,35 @@ export default {
         },
     },
     methods: {
+        scrollToSelected() {
+            const hourContainer =
+                this.$refs.hourSheet?.$el || this.$refs.hourSheet;
+            if (hourContainer) {
+                const activeHourItem = hourContainer.querySelector(
+                    ".v-list-item--active",
+                );
+                if (activeHourItem) {
+                    activeHourItem.scrollIntoView({
+                        block: "center",
+                        behavior: "auto",
+                    });
+                }
+            }
+
+            const minuteContainer =
+                this.$refs.minuteSheet?.$el || this.$refs.minuteSheet;
+            if (minuteContainer) {
+                const activeMinuteItem = minuteContainer.querySelector(
+                    ".v-list-item--active",
+                );
+                if (activeMinuteItem) {
+                    activeMinuteItem.scrollIntoView({
+                        block: "center",
+                        behavior: "auto",
+                    });
+                }
+            }
+        },
         handleActivatorClick(event) {
             if (this.readonly) {
                 event.preventDefault();

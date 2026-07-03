@@ -23,7 +23,7 @@
                 v-else
                 :model-value="displayValue"
                 class="w-100"
-                :placeholder="placeholder"
+                :placeholder="displayPlaceholder"
                 :error-messages="errorMessages"
                 :disabled="disabled"
                 :readonly="true"
@@ -39,37 +39,13 @@
             />
         </template>
 
-        <v-card width="320" rounded="xl" elevation="12">
-            <v-card-item class="pb-3">
-                <div class="d-flex align-center justify-space-between pt-2">
-                    <span class="text-subtitle-1 font-weight-bold">
-                        {{ headerTitle }}
-                    </span>
-                </div>
-            </v-card-item>
-
-            <v-divider />
-
-            <v-date-picker
-                :model-value="pickerValue"
-                color="primary"
-                hide-header
-                show-adjacent-months
-                width="320"
-                @update:model-value="handleDateSelect"
-            />
-
-            <v-divider />
-
-            <v-card-actions class="justify-end px-4 pb-4">
-                <v-btn variant="text" color="error" @click="clearValue">
-                    Clear
-                </v-btn>
-                <v-btn variant="text" color="primary" @click="selectToday">
-                    Today
-                </v-btn>
-            </v-card-actions>
-        </v-card>
+        <v-date-picker
+            :model-value="pickerValue"
+            color="primary"
+            rounded="0"
+            :locale="$i18n.locale"
+            @update:model-value="handleDateSelect"
+        />
     </v-menu>
 </template>
 
@@ -148,18 +124,8 @@ export default {
 
             return date.format("DD/MM/YYYY");
         },
-        headerTitle() {
-            if (!this.modelValue) {
-                return this.placeholder || "Select date";
-            }
-
-            const date = dayjs(this.modelValue);
-
-            if (!date.isValid()) {
-                return this.modelValue;
-            }
-
-            return date.format("dddd, DD MMM YYYY");
+        displayPlaceholder() {
+            return this.placeholder || this.$t("base.select_date");
         },
         pickerValue() {
             return this.normalizeDateValue(this.modelValue);
@@ -182,12 +148,6 @@ export default {
         },
         clearValue() {
             this.$emit("update:model-value", "");
-            this.menu = false;
-            this.emitBlur();
-        },
-        selectToday() {
-            const today = dayjs().format("YYYY-MM-DD");
-            this.$emit("update:model-value", today);
             this.menu = false;
             this.emitBlur();
         },

@@ -26,7 +26,14 @@
         "deselect_all": "Deselect all",
         "empty_state": "Empty",
         "not_available": "Not available",
-        "loading": "Loading"
+        "loading": "Loading",
+        "hour": "Hour",
+        "minute": "Minute",
+        "now": "Now",
+        "apply": "Apply",
+        "clear": "Clear",
+        "select_time": "Select time",
+        "select_date": "Select date"
     },
     "title": {
         "create": "Create",
