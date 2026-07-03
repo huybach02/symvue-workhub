@@ -572,3 +572,15 @@ if (!function_exists('generateCodeFromName')) {
         return strtoupper(str_replace(' ', '_', $normalized));
     }
 }
+
+if (!function_exists('formatDecimal')) {
+    function formatDecimal(?string $val): ?string
+    {
+        if ($val === null) {
+            return null;
+        }
+        $formatted = rtrim($val, '0');
+        $formatted = rtrim($formatted, '.');
+        return $formatted;
+    }
+}

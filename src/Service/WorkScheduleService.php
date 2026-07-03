@@ -383,9 +383,6 @@ class WorkScheduleService
     public function overrideFulltime(WorkScheduleFulltimeOverrideDTO $dto): array
     {
         $user = $this->userRepository->find($dto->userId);
-        if (!$user) {
-            throw new \Exception(t('error.not_found'));
-        }
 
         $newStartDate = new \DateTime($dto->startDate);
         $newEndDate = new \DateTime($dto->endDate);
@@ -1145,9 +1142,6 @@ class WorkScheduleService
     public function assignMemberParttimeShift(WorkScheduleParttimeAssignDTO $dto)
     {
         $workShift = $this->workShiftRepository->find($dto->workShiftId);
-        if (!$workShift) {
-            throw new \Exception("Ca làm việc không tồn tại");
-        }
         if (!$workShift->isStatus()) {
             throw new \Exception("Ca làm việc đã ngưng hoạt động");
         }
@@ -1156,9 +1150,6 @@ class WorkScheduleService
 
         foreach ($dto->userIds as $userId) {
             $user = $this->userRepository->find($userId);
-            if (!$user) {
-                throw new \Exception("User không tồn tại");
-            }
 
             $affectedUsers[$user->getId()] = $user;
 

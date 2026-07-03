@@ -657,10 +657,41 @@
         "provider_title_default": "Provider #{index}",
         "default_prices_config": "Set Default Price by Unit",
         "no_providers": "No providers configured yet.",
+        "finished_product_source": {
+            "supplier": "Import from supplier",
+            "supplier_desc": "Manage purchasing settings and default purchase prices from suppliers.",
+            "production": "Internal production",
+            "production_desc": "Manage the recipe of raw materials and waste rates to cook the finished product."
+        },
+        "recipe": {
+            "title": "Ingredient Recipe",
+            "output": "Output Finished Product",
+            "output_unit": "Product Unit",
+            "add_ingredient": "Add Ingredient",
+            "ingredient": "Ingredient",
+            "quantity": "Quantity",
+            "unit": "Unit",
+            "waste_rate": "Waste Rate (%)",
+            "notes": "Notes",
+            "preview": "Recipe Preview",
+            "preview_empty_desc": "Please enter ingredients to display the recipe diagram.",
+            "ingredient_code": "Code",
+            "waste_rate_label": "Waste",
+            "select_ingredient": "Select ingredient",
+            "select_unit": "Select unit",
+            "ingredient_required": "Ingredient is required",
+            "quantity_positive": "Quantity > 0",
+            "unit_required": "Unit is required",
+            "waste_rate_non_negative": "Waste rate >= 0",
+            "notes_placeholder": "Ingredient notes",
+            "empty_recipe_desc": "The recipe has no ingredients. Please add ingredients.",
+            "recipe_items_required": "Production recipe must have at least 1 ingredient line!"
+        },
         "tabs": {
             "info": "General Information",
             "unit": "Units",
-            "provider": "Providers"
+            "provider": "Providers",
+            "finished_product_source": "Product Source"
         },
         "columns": {
             "id": "ID",

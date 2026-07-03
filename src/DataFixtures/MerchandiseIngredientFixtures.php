@@ -158,6 +158,17 @@ class MerchandiseIngredientFixtures extends Fixture implements DependentFixtureI
             ['name' => 'Syrup hương Caramel', 'category_slug' => 'sua-va-nuoc-giai-khat'],
             ['name' => 'Trà đen Phúc Long', 'category_slug' => 'sua-va-nuoc-giai-khat'],
             ['name' => 'Mật ong hoa nhãn', 'category_slug' => 'gia-vi'],
+            ['name' => 'Thịt heo xay tươi', 'category_slug' => 'thit-heo'],
+            ['name' => 'Nước mắm Phú Quốc', 'category_slug' => 'sot-va-gia-vi-long'],
+            ['name' => 'Tiêu đen xay nhuyễn', 'category_slug' => 'gia-vi'],
+            ['name' => 'Ớt bột Hàn Quốc', 'category_slug' => 'gia-vi'],
+            ['name' => 'Hành lá tươi', 'category_slug' => 'rau-an-kem'],
+            ['name' => 'Thịt nạc vai bò', 'category_slug' => 'thit-bo'],
+            ['name' => 'Nước tương Chin-su', 'category_slug' => 'sot-va-gia-vi-long'],
+            ['name' => 'Nấm kim châm tươi', 'category_slug' => 'rau-an-kem'],
+            ['name' => 'Nước dùng xương đặc chế', 'category_slug' => 'sot-va-gia-vi-long'],
+            ['name' => 'Cải thìa tươi', 'category_slug' => 'rau-an-kem'],
+            ['name' => 'Cải thảo Đà Lạt tươi', 'category_slug' => 'cai-thao'],
         ];
 
         foreach ($ingredients as $index => $item) {

@@ -1,5 +1,5 @@
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import { getDataById, getListData } from "@/services/bases/getData";
+import { getDataById, getListData, getDataSelect } from "@/services/bases/getData";
 import { deleteData } from "@/services/bases/deleteData";
 import { postData } from "@/services/bases/postData";
 import { putData } from "@/services/bases/updateData";
@@ -75,6 +75,17 @@ const actions = {
     },
     async deleteItem(_, id) {
         return deleteData(API_ROUTES_CONFIG.merchandise, id);
+    },
+    async fetchIngredientsOptions() {
+        return getDataSelect(API_ROUTES_CONFIG.merchandise, {
+            f: [
+                {
+                    field: "type",
+                    operator: "equal",
+                    value: "ingredient",
+                },
+            ],
+        });
     },
 };
 

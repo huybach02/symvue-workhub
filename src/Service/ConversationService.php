@@ -146,9 +146,6 @@ class ConversationService
         $item->setType($dto->type);
 
         $user = $this->userRepository->find($dto->userId);
-        if (!$user) {
-            throw new \Exception(t('error.not_found'));
-        }
 
         $conversationUser = new ConversationUser();
         $conversationUser->setMember($user);

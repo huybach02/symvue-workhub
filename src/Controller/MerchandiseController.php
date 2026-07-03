@@ -42,6 +42,20 @@ final class MerchandiseController extends AbstractController
         }
     }
 
+    #[Route('/merchandise/select', methods: ['GET'])]
+    public function select(Request $request): JsonResponse
+    {
+        $params = $request->query->all();
+        $params = validateFilterParams($params);
+
+        try {
+            $data = $this->merchandiseService->getDataSelect($params);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
     #[Route('/merchandise/{id}', methods: ['GET'], priority: -1)]
     public function getOne(int $id): JsonResponse
     {

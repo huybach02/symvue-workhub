@@ -3,12 +3,15 @@
 namespace App\DTO;
 
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator\EntityExists;
+use App\Entity\User;
 
 class WorkScheduleFulltimeOverrideDTO
 {
     public function __construct(
         #[Assert\NotBlank(groups: ["create", "update"])]
         #[Assert\Type("integer", groups: ["create", "update"])]
+        #[EntityExists(entityClass: User::class, groups: ["create", "update"])]
         public readonly int $userId = 0,
 
         #[Assert\NotBlank(groups: ["create", "update"])]

@@ -139,6 +139,12 @@ export default {
                         this.mode === "create"
                             ? this.type
                             : this.item?.type || this.type,
+                    stockAlertQuantity: (values.stockAlertQuantity !== null && values.stockAlertQuantity !== undefined && values.stockAlertQuantity !== "")
+                        ? String(values.stockAlertQuantity)
+                        : null,
+                    profit: (values.profit !== null && values.profit !== undefined && values.profit !== "")
+                        ? String(values.profit)
+                        : null,
                 };
                 if (this.mode === "create") {
                     await this.createItem(payload);

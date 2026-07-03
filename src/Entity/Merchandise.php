@@ -66,6 +66,9 @@ class Merchandise
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false, 'comment' => 'Chỉ có 1 đơn vị tính'])]
     private ?bool $isSingleUnit = false;
 
+    #[ORM\Column(length: 50, nullable: true, options: ['comment' => 'Nguồn thành phẩm (supplier, production)'])]
+    private ?string $finishedProductSource = null;
+
 
     public function getId(): ?int
     {
@@ -193,6 +196,17 @@ class Merchandise
         return $this;
     }
 
+    public function getFinishedProductSource(): ?string
+    {
+        return $this->finishedProductSource;
+    }
+
+    public function setFinishedProductSource(?string $finishedProductSource): static
+    {
+        $this->finishedProductSource = $finishedProductSource;
+        return $this;
+    }
+
 
     public function jsonSerialize(): array
     {
@@ -211,6 +225,7 @@ class Merchandise
             'baseUnitId' => $this->baseUnit?->getId(),
             'baseUnit' => $this->baseUnit?->jsonSerialize(),
             'isSingleUnit' => $this->isSingleUnit,
+            'finishedProductSource' => $this->finishedProductSource,
             'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
             'deletedAt' => $this->deletedAt?->format('Y-m-d H:i:s'),

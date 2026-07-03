@@ -25,7 +25,8 @@
         "select_all": "Chọn tất cả",
         "deselect_all": "Bỏ chọn tất cả",
         "empty_state": "Trống",
-        "not_available": "Không có"
+        "not_available": "Không có",
+        "loading": "Đang tải"
     },
     "title": {
         "create": "Thêm mới",

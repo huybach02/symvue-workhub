@@ -25,7 +25,8 @@
         "select_all": "Select all",
         "deselect_all": "Deselect all",
         "empty_state": "Empty",
-        "not_available": "Not available"
+        "not_available": "Not available",
+        "loading": "Loading"
     },
     "title": {
         "create": "Create",

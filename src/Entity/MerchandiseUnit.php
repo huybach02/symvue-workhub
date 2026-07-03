@@ -125,7 +125,7 @@ class MerchandiseUnit
             'merchandise' => $this->merchandise?->jsonSerialize(),
             'unitId' => $this->unit?->getId(),
             'unit' => $this->unit?->jsonSerialize(),
-            'factorToBase' => $this->factorToBase,
+            'factorToBase' => formatDecimal($this->factorToBase),
             'level' => $this->level,
             'label' => $this->label,
             'isBase' => $this->isBase,

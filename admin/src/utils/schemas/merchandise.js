@@ -45,4 +45,6 @@ export const merchandiseSchema = yup.object({
     baseUnitId: yup.mixed().nullable().notRequired(),
     conversions: yup.array().nullable().notRequired(),
     providers: yup.array().nullable().notRequired(),
+    finishedProductSource: yup.string().nullable().notRequired(),
+    recipe: yup.object().nullable().notRequired(),
 });

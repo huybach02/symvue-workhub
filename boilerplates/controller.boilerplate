@@ -42,6 +42,20 @@ final class {{MODULE_NAME}}Controller extends AbstractController
         }
     }
 
+    #[Route('/{{MODULE_NAME_LOWER}}/select', methods: ['GET'])]
+    public function select(Request $request): JsonResponse
+    {
+        $params = $request->query->all();
+        $params = validateFilterParams($params);
+
+        try {
+            $data = $this->{{ENTITY_VAR}}Service->getDataSelect($params);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
     #[Route('/{{MODULE_NAME_LOWER}}/{id}', methods: ['GET'], priority: -1)]
     public function getOne(int $id): JsonResponse
     {

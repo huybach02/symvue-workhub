@@ -660,10 +660,41 @@
         "provider_title_default": "Nhà cung cấp #{index}",
         "default_prices_config": "Thiết lập Giá mặc định theo từng đơn vị",
         "no_providers": "Chưa có cấu hình nhà cung cấp nào.",
+        "finished_product_source": {
+            "supplier": "Nhập từ nhà cung cấp",
+            "supplier_desc": "Quản lý cấu hình nhập hàng và giá mua mặc định theo nhà cung cấp.",
+            "production": "Sản xuất nội bộ",
+            "production_desc": "Quản lý công thức định lượng nguyên vật liệu hao hụt để chế biến thành phẩm."
+        },
+        "recipe": {
+            "title": "Công thức nguyên liệu",
+            "output": "Thành phẩm đầu ra",
+            "output_unit": "Đơn vị thành phẩm",
+            "add_ingredient": "Thêm nguyên liệu",
+            "ingredient": "Nguyên liệu",
+            "quantity": "Định lượng",
+            "unit": "Đơn vị",
+            "waste_rate": "Hao hụt (%)",
+            "notes": "Ghi chú",
+            "preview": "Xem trước công thức chế biến",
+            "preview_empty_desc": "Vui lòng nhập đầy đủ nguyên liệu để hiển thị sơ đồ.",
+            "ingredient_code": "Mã",
+            "waste_rate_label": "Hao hụt",
+            "select_ingredient": "Chọn nguyên liệu",
+            "select_unit": "Chọn đơn vị",
+            "ingredient_required": "Bắt buộc chọn nguyên liệu",
+            "quantity_positive": "Định lượng > 0",
+            "unit_required": "Bắt buộc chọn đơn vị",
+            "waste_rate_non_negative": "Hao hụt >= 0",
+            "notes_placeholder": "Ghi chú nguyên liệu",
+            "empty_recipe_desc": "Công thức chưa có nguyên liệu nào. Vui lòng bấm thêm nguyên liệu.",
+            "recipe_items_required": "Công thức sản xuất phải có ít nhất 1 dòng nguyên liệu!"
+        },
         "tabs": {
             "info": "Thông tin chung",
             "unit": "Đơn vị tính",
-            "provider": "Nhà cung cấp"
+            "provider": "Nhà cung cấp",
+            "finished_product_source": "Nguồn thành phẩm"
         },
         "columns": {
             "id": "ID",

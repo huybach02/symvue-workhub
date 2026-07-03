@@ -30,6 +30,21 @@ class {{MODULE_NAME}}Service
         return $result;
     }
 
+    public function getDataSelect(array $params): array
+    {
+        $qb = $this->{{ENTITY_VAR}}Repository->createQueryBuilder('e')
+            ->andWhere('e.status = 1');
+
+        $result = FilterWithPagination::findWithPagination($qb, $params, 'e');
+
+        return array_map(function ({{ENTITY_NAME}} $item) {
+            return [
+                'label' => $item->getName(),
+                'value' => $item->getId(),
+            ];
+        }, $result['collection']);
+    }
+
     public function findById(int $id): array
     {
         $item = $this->{{ENTITY_VAR}}Repository->find($id);

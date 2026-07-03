@@ -561,16 +561,26 @@ export default {
             const sortedUnits = this.getSortedConfiguredUnits();
             const sorted = [];
             sortedUnits.forEach((unit) => {
-                const priceItem = prices.find((p) => p.unitId === unit.value);
-                if (priceItem) {
-                    const price = parseFloat(priceItem.price) || 0;
-                    const rate = parseFloat(priceItem.discountRate) || 0;
-                    const amount = parseFloat(priceItem.discountAmount) || 0;
-                    const discountFromRate = (price * rate) / 100;
-                    const finalPrice = Math.max(0, price - discountFromRate - amount);
-                    priceItem.priceAfterDiscount = finalPrice.toFixed(2);
-                    sorted.push(priceItem);
+                let priceItem = prices.find((p) => p.unitId === unit.value);
+                if (!priceItem) {
+                    priceItem = {
+                        unitId: unit.value,
+                        price: null,
+                        discountRate: "0.00",
+                        discountAmount: "0.00",
+                        priceAfterDiscount: null,
+                        effectiveFrom: null,
+                        effectiveTo: null,
+                    };
+                    prices.push(priceItem);
                 }
+                const price = parseFloat(priceItem.price) || 0;
+                const rate = parseFloat(priceItem.discountRate) || 0;
+                const amount = parseFloat(priceItem.discountAmount) || 0;
+                const discountFromRate = (price * rate) / 100;
+                const finalPrice = Math.max(0, price - discountFromRate - amount);
+                priceItem.priceAfterDiscount = finalPrice.toFixed(2);
+                sorted.push(priceItem);
             });
             return sorted;
         },
@@ -687,7 +697,7 @@ export default {
         getParentForm() {
             let parent = this.$parent;
             while (parent) {
-                if (parent.$options.name === "FormIngredient") {
+                if (parent.$options.name === "FormIngredient" || parent.$options.name === "FormFinishedProduct") {
                     return parent.$refs.formRef;
                 }
                 parent = parent.$parent;

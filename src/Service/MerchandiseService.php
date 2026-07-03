@@ -4,6 +4,8 @@ namespace App\Service;
 
 use App\Class\FilterWithPagination;
 use App\DTO\MerchandiseDTO;
+use App\DTO\RecipeDTO;
+use App\DTO\RecipeItemDTO;
 use App\Entity\Category;
 use App\Entity\Merchandise;
 use App\Entity\MerchandiseProvider;
@@ -23,6 +25,10 @@ use App\Repository\MerchandiseUnitRepository;
 use App\Repository\ProviderRepository;
 use App\Repository\UnitRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\MerchandiseRecipe;
+use App\Entity\MerchandiseRecipeItem;
+use App\Repository\MerchandiseRecipeRepository;
+use App\Repository\MerchandiseRecipeItemRepository;
 
 class MerchandiseService
 {
@@ -37,6 +43,8 @@ class MerchandiseService
         private readonly MerchandiseProviderUnitRepository $merchandiseProviderUnitRepository,
         private readonly MerchandiseProviderPriceRepository $merchandiseProviderPriceRepository,
         private readonly ProviderRepository $providerRepository,
+        private readonly MerchandiseRecipeRepository $merchandiseRecipeRepository,
+        private readonly MerchandiseRecipeItemRepository $merchandiseRecipeItemRepository,
     ) {}
 
     public function findAll(array $params): array
@@ -60,11 +68,47 @@ class MerchandiseService
 
         // Map collection to JSON
         $result['collection'] = array_map(
-            fn(Merchandise $item) => $item->jsonSerialize(),
+            function(Merchandise $item) {
+                $data = $item->jsonSerialize();
+                $data['conversions'] = $this->getConversionsData($item->getId());
+                return $data;
+            },
             $result['collection']
         );
 
         return $result;
+    }
+
+    public function getDataSelect(array $params): array
+    {
+        $qb = $this->merchandiseRepository->createQueryBuilder('e')
+            ->andWhere('e.status = 1');
+
+        $relationFields = [
+            'category' => [
+                'joinField' => 'e.category',
+                'alias' => 'cat',
+                'targetField' => 'name',
+            ],
+        ];
+
+        $result = FilterWithPagination::findWithPagination(
+            $qb,
+            $params,
+            'e',
+            $relationFields,
+        );
+
+        return array_map(function (Merchandise $item) {
+            return [
+                'id' => $item->getId(),
+                'code' => $item->getCode(),
+                'name' => $item->getName(),
+                'baseUnitId' => $item->getBaseUnit()?->getId(),
+                'isSingleUnit' => $item->isSingleUnit(),
+                'conversions' => $this->getConversionsData($item->getId()),
+            ];
+        }, $result['collection']);
     }
 
     public function findById(int $id): array
@@ -78,6 +122,7 @@ class MerchandiseService
         $data = $item->jsonSerialize();
         $data['conversions'] = $this->getConversionsData($id);
         $data['providers'] = $this->getProvidersData($id);
+        $data['recipe'] = $this->getRecipeData($id);
 
         return $data;
     }
@@ -97,17 +142,11 @@ class MerchandiseService
         $item->setIsSingleUnit((bool)$dto->isSingleUnit);
 
         if ($dto->categoryId) {
-            $category = $this->categoryRepository->find($dto->categoryId);
-            if ($category) {
-                $item->setCategory($category);
-            }
+            $item->setCategory($this->categoryRepository->find($dto->categoryId));
         }
 
         if ($dto->baseUnitId) {
-            $baseUnit = $this->unitRepository->find($dto->baseUnitId);
-            if ($baseUnit) {
-                $item->setBaseUnit($baseUnit);
-            }
+            $item->setBaseUnit($this->unitRepository->find($dto->baseUnitId));
         }
 
         $this->entityManager->persist($item);
@@ -116,8 +155,24 @@ class MerchandiseService
             $this->saveConversionsAndUnits($item, $dto->conversions, $dto->baseUnitId);
         }
 
-        if (!empty($dto->providers)) {
-            $this->saveProviders($item, $dto->providers);
+        if ($dto->type === 'finished_product') {
+            $item->setFinishedProductSource($dto->finishedProductSource ?? 'supplier');
+        } else {
+            $item->setFinishedProductSource(null);
+        }
+
+        if ($item->getType() === 'ingredient') {
+            if (!empty($dto->providers)) {
+                $this->saveProviders($item, $dto->providers);
+            }
+            $this->deleteRecipe($item);
+        } else {
+            if (!empty($dto->providers)) {
+                $this->saveProviders($item, $dto->providers);
+            }
+            if ($dto->recipe !== null && $dto->recipe->outputUnitId !== null && !empty($dto->recipe->items)) {
+                $this->saveRecipe($item, $dto->recipe);
+            }
         }
 
         $this->entityManager->flush();
@@ -125,6 +180,7 @@ class MerchandiseService
         $data = $item->jsonSerialize();
         $data['conversions'] = $this->getConversionsData($item->getId());
         $data['providers'] = $this->getProvidersData($item->getId());
+        $data['recipe'] = $this->getRecipeData($item->getId());
 
         return $data;
     }
@@ -149,37 +205,35 @@ class MerchandiseService
         $item->setStatus($dto->status);
         $item->setIsSingleUnit((bool)$dto->isSingleUnit);
 
-        if ($dto->categoryId) {
-            $category = $this->categoryRepository->find($dto->categoryId);
-            if ($category) {
-                $item->setCategory($category);
-            } else {
-                $item->setCategory(null);
-            }
-        } else {
-            $item->setCategory(null);
-        }
-
-        if ($dto->baseUnitId) {
-            $baseUnit = $this->unitRepository->find($dto->baseUnitId);
-            if ($baseUnit) {
-                $item->setBaseUnit($baseUnit);
-            } else {
-                $item->setBaseUnit(null);
-            }
-        } else {
-            $item->setBaseUnit(null);
-        }
+        $item->setCategory($dto->categoryId ? $this->categoryRepository->find($dto->categoryId) : null);
+        $item->setBaseUnit($dto->baseUnitId ? $this->unitRepository->find($dto->baseUnitId) : null);
 
         $this->saveConversionsAndUnits($item, $dto->conversions, $dto->baseUnitId);
 
-        $this->saveProviders($item, $dto->providers);
+        if ($item->getType() === 'finished_product') {
+            $item->setFinishedProductSource($dto->finishedProductSource ?? 'supplier');
+        } else {
+            $item->setFinishedProductSource(null);
+        }
+
+        if ($item->getType() === 'ingredient') {
+            $this->saveProviders($item, $dto->providers);
+            $this->deleteRecipe($item);
+        } else {
+            if (!empty($dto->providers)) {
+                $this->saveProviders($item, $dto->providers);
+            }
+            if ($dto->recipe !== null && $dto->recipe->outputUnitId !== null && !empty($dto->recipe->items)) {
+                $this->saveRecipe($item, $dto->recipe);
+            }
+        }
 
         $this->entityManager->flush();
 
         $data = $item->jsonSerialize();
         $data['conversions'] = $this->getConversionsData($item->getId());
         $data['providers'] = $this->getProvidersData($item->getId());
+        $data['recipe'] = $this->getRecipeData($item->getId());
 
         return $data;
     }
@@ -205,10 +259,10 @@ class MerchandiseService
             'id' => $c->getId(),
             'fromUnitId' => $c->getFromUnit()?->getId(),
             'fromUnit' => $c->getFromUnit()?->jsonSerialize(),
-            'fromValue' => $c->getFromValue(),
+            'fromValue' => formatDecimal($c->getFromValue()),
             'toUnitId' => $c->getToUnit()?->getId(),
             'toUnit' => $c->getToUnit()?->jsonSerialize(),
-            'toValue' => $c->getToValue(),
+            'toValue' => formatDecimal($c->getToValue()),
             'sortOrder' => $c->getSortOrder(),
         ], $conversions);
     }
@@ -429,10 +483,10 @@ class MerchandiseService
                 $conversions[] = [
                     'fromUnitId' => $fromUnitId,
                     'fromUnit' => $bc->getFromUnit()?->jsonSerialize(),
-                    'fromValue' => sprintf('%.2f', $fromVal),
+                    'fromValue' => formatDecimal((string)$fromVal),
                     'toUnitId' => $toUnitId,
                     'toUnit' => $bc->getToUnit()?->jsonSerialize(),
-                    'toValue' => sprintf('%.2f', $toVal),
+                    'toValue' => formatDecimal((string)$toVal),
                     'sortOrder' => $bc->getSortOrder(),
                 ];
             }
@@ -677,6 +731,115 @@ class MerchandiseService
                     $this->entityManager->persist($mPrice);
                 }
             }
+        }
+    }
+
+    public function getRecipeData(int $merchandiseId): ?array
+    {
+        $recipe = $this->merchandiseRecipeRepository->findOneBy(['finishedProduct' => $merchandiseId]);
+        if (!$recipe) {
+            return null;
+        }
+
+        return $recipe->jsonSerialize();
+    }
+
+    public function deleteRecipe(Merchandise $finishedProduct): void
+    {
+        $recipe = $this->merchandiseRecipeRepository->findOneBy(['finishedProduct' => $finishedProduct]);
+        if ($recipe) {
+            $this->entityManager->remove($recipe);
+        }
+    }
+
+    public function saveRecipe(Merchandise $finishedProduct, ?RecipeDTO $recipeDTO): void
+    {
+        if ($recipeDTO === null) {
+            return;
+        }
+
+        $this->entityManager->flush();
+
+        $outputQuantity = $recipeDTO->outputQuantity ?? 1;
+        $outputUnit = $this->unitRepository->find($recipeDTO->outputUnitId);
+
+        $finishedProductUnit = $this->merchandiseUnitRepository->findOneBy([
+            'merchandise' => $finishedProduct,
+            'unit' => $outputUnit
+        ]);
+        if (!$finishedProductUnit) {
+            throw new \Exception(t('recipe_error.output_unit_not_configured'));
+        }
+
+        if (empty($recipeDTO->items)) {
+            throw new \Exception(t('recipe_error.items_required'));
+        }
+
+        $recipe = $this->merchandiseRecipeRepository->findOneBy(['finishedProduct' => $finishedProduct]);
+        if (!$recipe) {
+            $recipe = new MerchandiseRecipe();
+            $recipe->setFinishedProduct($finishedProduct);
+            $this->entityManager->persist($recipe);
+        } else {
+            foreach ($recipe->getItems() as $oldItem) {
+                $this->entityManager->remove($oldItem);
+            }
+            $recipe->getItems()->clear();
+        }
+
+        $recipe->setOutputQuantity(sprintf('%.4f', $outputQuantity));
+        $recipe->setOutputUnit($outputUnit);
+
+        $outputFactor = $finishedProductUnit->getFactorToBase();
+        $recipe->setOutputFactorToBaseSnapshot($outputFactor);
+        $recipe->setOutputBaseQuantitySnapshot(sprintf('%.4f', (float)$outputQuantity * (float)$outputFactor));
+        $recipe->setVersion((int)($recipeDTO->version ?? 1));
+        $recipe->setIsActive(true);
+        $recipe->setStatus(1);
+        $recipe->setNotes($recipeDTO->notes ?? null);
+
+        $seenIngredientIds = [];
+        foreach ($recipeDTO->items as $index => $itemDTO) {
+            /** @var RecipeItemDTO $itemDTO */
+            $ingredientId = $itemDTO->ingredientId;
+
+            if (in_array($ingredientId, $seenIngredientIds, true)) {
+                throw new \Exception(t('recipe_error.ingredient_duplicate', ['%index%' => $index + 1]));
+            }
+            $seenIngredientIds[] = $ingredientId;
+
+            $ingredient = $this->merchandiseRepository->find($ingredientId);
+            if ($ingredient->getType() !== 'ingredient') {
+                throw new \Exception(t('recipe_error.not_an_ingredient', ['%name%' => $ingredient->getName()]));
+            }
+
+            $qty = $itemDTO->quantity ?? 0;
+            $unit = $this->unitRepository->find($itemDTO->unitId);
+
+            $ingredientUnit = $this->merchandiseUnitRepository->findOneBy([
+                'merchandise' => $ingredient,
+                'unit' => $unit
+            ]);
+            if (!$ingredientUnit) {
+                throw new \Exception(t('recipe_error.unit_not_configured', ['%name%' => $ingredient->getName()]));
+            }
+
+            $wasteRate = $itemDTO->wasteRate ?? 0;
+
+            $recipeItem = new MerchandiseRecipeItem();
+            $recipeItem->setRecipe($recipe);
+            $recipeItem->setIngredient($ingredient);
+            $recipeItem->setQuantity(sprintf('%.4f', $qty));
+            $recipeItem->setUnit($unit);
+
+            $factor = $ingredientUnit->getFactorToBase();
+            $recipeItem->setFactorToBaseSnapshot($factor);
+            $recipeItem->setBaseQuantitySnapshot(sprintf('%.4f', (float)$qty * (float)$factor));
+            $recipeItem->setWasteRate(sprintf('%.2f', $wasteRate));
+            $recipeItem->setSortOrder((int)($itemDTO->sortOrder ?? $index));
+            $recipeItem->setNotes($itemDTO->notes ?? null);
+
+            $this->entityManager->persist($recipeItem);
         }
     }
 }

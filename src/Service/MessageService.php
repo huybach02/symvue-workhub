@@ -67,9 +67,6 @@ class MessageService
     public function create(Request $request, MessageDTO $dto, User $currentUser): array
     {
         $conversation = $this->conversationRepository->find($dto->conversationId);
-        if (!$conversation) {
-            throw new \Exception(t('error.not_found'));
-        }
 
         $currentConversationUser = $this->conversationUserRepository->findOneBy([
             'conversation' => $conversation,
