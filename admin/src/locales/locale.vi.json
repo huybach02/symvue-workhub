@@ -30,6 +30,21 @@
         "enter_new_password": "Nhập mật khẩu mới (tối thiểu 6 ký tự)",
         "enter_confirm_password": "Nhập lại mật khẩu mới"
     },
+    "profile": {
+        "signature": {
+            "title": "Thông tin chữ ký",
+            "setup": "Thiết lập chữ ký",
+            "save": "Lưu chữ ký",
+            "cancel": "Hủy",
+            "clear": "Xóa",
+            "undo": "Hoàn tác",
+            "saved_success": "Thiết lập chữ ký thành công",
+            "deleted_success": "Xóa chữ ký thành công",
+            "error_empty": "Vui lòng vẽ chữ ký trước khi lưu",
+            "delete_confirm": "Bạn có chắc chắn muốn xóa chữ ký này không?",
+            "delete_btn": "Xóa chữ ký"
+        }
+    },
     "language": {
         "en": "English",
         "vi": "Tiếng Việt"

@@ -30,6 +30,21 @@
         "enter_new_password": "Enter new password (minimum 6 characters)",
         "enter_confirm_password": "Confirm new password"
     },
+    "profile": {
+        "signature": {
+            "title": "Signature Information",
+            "setup": "Setup Signature",
+            "save": "Save Signature",
+            "cancel": "Cancel",
+            "clear": "Clear",
+            "undo": "Undo",
+            "saved_success": "Signature setup successfully",
+            "deleted_success": "Signature deleted successfully",
+            "error_empty": "Please draw a signature before saving",
+            "delete_confirm": "Are you sure you want to delete this signature?",
+            "delete_btn": "Delete Signature"
+        }
+    },
     "language": {
         "en": "English",
         "vi": "Vietnamese"

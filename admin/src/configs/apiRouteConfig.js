@@ -18,6 +18,7 @@ export const API_ROUTES_CONFIG = {
     users: "/users",
     profile: "/profile",
     changePasswordProfile: "/profile/change-password",
+    profileSignature: "/profile/signature",
     importHistory: "/import-history",
     department: "/departments",
     departmentPermissions: "/departments/permissions",

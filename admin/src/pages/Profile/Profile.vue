@@ -29,6 +29,10 @@
                 <v-icon start>mdi-shield-lock</v-icon>
                 {{ $t("auth.security") }}
             </v-tab>
+            <v-tab value="signature" class="text-capitalize">
+                <v-icon start>mdi-draw</v-icon>
+                {{ $t("profile.signature.title") }}
+            </v-tab>
         </v-tabs>
 
         <v-window v-model="tab" :touch="false">
@@ -501,6 +505,11 @@
                     </v-row>
                 </VeeForm>
             </v-window-item>
+
+            <!-- TAB 3: THIẾT LẬP CHỮ KÝ -->
+            <v-window-item value="signature">
+                <UserSignatureSection />
+            </v-window-item>
         </v-window>
     </div>
 </template>
@@ -509,6 +518,7 @@
 import { Form as VeeForm, Field as VeeField } from "vee-validate";
 import DatePicker from "@/components/DatePicker.vue";
 import ImageSelector from "@/components/ImageSelector.vue";
+import UserSignatureSection from "./components/UserSignatureSection.vue";
 import { userSchema } from "@/utils/schemas/user";
 import { changePasswordSchema } from "@/utils/schemas/changePassword";
 import { constant } from "@/utils/constants/constant";
@@ -522,6 +532,7 @@ export default {
         VeeField,
         DatePicker,
         ImageSelector,
+        UserSignatureSection,
     },
     data() {
         return {
