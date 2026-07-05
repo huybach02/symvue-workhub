@@ -1,6 +1,9 @@
 services:
     be-php:
         container_name: workhub_be_php
+        networks:
+            - default
+            - dbnet
 
     be-nginx:
         container_name: workhub_be_nginx
@@ -16,9 +19,15 @@ services:
 
     messenger:
         container_name: workhub_messenger
+        networks:
+            - default
+            - dbnet
 
     scheduler:
         container_name: workhub_scheduler
+        networks:
+            - default
+            - dbnet
 
     mercure:
         container_name: workhub_mercure
@@ -31,4 +40,7 @@ services:
 
 networks:
     edge:
+        external: true
+
+    dbnet:
         external: true
