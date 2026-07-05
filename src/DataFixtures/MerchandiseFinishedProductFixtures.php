@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
+use App\DTO\RecipeDTO;
+use App\DTO\RecipeItemDTO;
 use App\Entity\Merchandise;
 use App\Entity\Category;
 use App\Entity\Provider;
@@ -312,23 +314,26 @@ class MerchandiseFinishedProductFixtures extends Fixture implements DependentFix
                 $ing = $merchandiseRepo->findOneBy(['code' => $itemData['ing_code']]);
                 $u = $unitRepo->findOneBy(['code' => $itemData['unit']]);
                 if ($ing && $u) {
-                    $recipeItems[] = [
-                        'ingredientId' => $ing->getId(),
-                        'quantity' => $itemData['qty'],
-                        'unitId' => $u->getId(),
-                        'wasteRate' => $itemData['waste_rate'],
-                        'notes' => ''
-                    ];
+                    $recipeItems[] = new RecipeItemDTO(
+                        ingredientId: $ing->getId(),
+                        quantity: $itemData['qty'],
+                        unitId: $u->getId(),
+                        wasteRate: $itemData['waste_rate'],
+                        notes: '',
+                    );
                 }
             }
 
             if (!empty($recipeItems) && $baseUnit) {
-                $this->merchandiseService->saveRecipe($merchandise, [
-                    'outputQuantity' => 1,
-                    'outputUnitId' => $baseUnit->getId(),
-                    'notes' => $p['recipe']['notes'],
-                    'items' => $recipeItems
-                ]);
+                $this->merchandiseService->saveRecipe(
+                    $merchandise,
+                    new RecipeDTO(
+                        outputUnitId: $baseUnit->getId(),
+                        outputQuantity: 1,
+                        items: $recipeItems,
+                        notes: $p['recipe']['notes'],
+                    )
+                );
             }
         }
 

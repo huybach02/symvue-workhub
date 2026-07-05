@@ -37,9 +37,15 @@ jobs:
                         exit 1
                       fi
 
-                      if [ -n "$(git status --porcelain)" ]; then
+                      DIRTY_STATUS="$(git status --porcelain -- . \
+                        ':(exclude).env' \
+                        ':(exclude).env.local' \
+                        ':(exclude).env.prod.local' \
+                        ':(exclude,glob).env.*.local')"
+
+                      if [ -n "$DIRTY_STATUS" ]; then
                         echo "The VPS working tree is dirty. Please clean it before deploying."
-                        git status --short
+                        printf '%s\n' "$DIRTY_STATUS"
                         exit 1
                       fi
 
