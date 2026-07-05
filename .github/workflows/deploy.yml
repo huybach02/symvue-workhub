@@ -45,8 +45,8 @@ jobs:
 
                       echo "[1/10] Update source code"
                       git fetch origin main
-                      git checkout main
-                      git pull --ff-only origin main
+                      git reset --hard origin/main
+                      git clean -fd
 
                       if [ ! -f docker-compose.vps.yml ]; then
                         echo "docker-compose.vps.yml was not found on the server after git pull."
