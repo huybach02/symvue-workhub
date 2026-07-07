@@ -6,18 +6,14 @@ namespace App\Entity;
 
 use App\Repository\MerchandiseProviderRepository;
 use App\Traits\ModifierTrait;
-use App\Traits\SoftDeleteableTrait;
 use App\Traits\TimestampableTrait;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: MerchandiseProviderRepository::class)]
 #[ORM\Table(name: 'merchandise_provider')]
-#[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
 class MerchandiseProvider
 {
     use TimestampableTrait;
-    use SoftDeleteableTrait;
     use ModifierTrait;
 
     #[ORM\Id]
@@ -36,7 +32,8 @@ class MerchandiseProvider
     #[ORM\Column(length: 50, options: ['default' => 'general', 'comment' => 'general hoặc custom'])]
     private ?string $unitConfigMode = 'general';
 
-
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $isDefault = false;
 
     public function getId(): ?int
     {
@@ -76,7 +73,16 @@ class MerchandiseProvider
         return $this;
     }
 
+    public function isDefault(): bool
+    {
+        return $this->isDefault;
+    }
 
+    public function setIsDefault(bool $isDefault): static
+    {
+        $this->isDefault = $isDefault;
+        return $this;
+    }
 
     public function jsonSerialize(): array
     {
@@ -87,10 +93,9 @@ class MerchandiseProvider
             'providerId' => $this->provider?->getId(),
             'provider' => $this->provider?->jsonSerialize(),
             'unitConfigMode' => $this->unitConfigMode,
-
+            'isDefault' => $this->isDefault,
             'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
-            'deletedAt' => $this->deletedAt?->format('Y-m-d H:i:s'),
             'createdBy' => $this->createdBy,
             'updatedBy' => $this->updatedBy,
         ];

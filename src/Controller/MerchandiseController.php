@@ -56,6 +56,21 @@ final class MerchandiseController extends AbstractController
         }
     }
 
+    #[Route('/merchandise/get-price-by-unit', methods: ['POST'])]
+    public function getPriceMerchandiseByUnitId(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        try {
+            $data = $this->merchandiseService->getPriceByUnitId(
+                $data['merchandiseId'],
+                $data['unitId']
+            );
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
     #[Route('/merchandise/{id}', methods: ['GET'], priority: -1)]
     public function getOne(int $id): JsonResponse
     {

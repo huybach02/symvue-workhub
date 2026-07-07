@@ -68,7 +68,7 @@ class MerchandiseService
 
         // Map collection to JSON
         $result['collection'] = array_map(
-            function(Merchandise $item) {
+            function (Merchandise $item) {
                 $data = $item->jsonSerialize();
                 $data['conversions'] = $this->getConversionsData($item->getId());
                 return $data;
@@ -129,113 +129,135 @@ class MerchandiseService
 
     public function create(MerchandiseDTO $dto): array
     {
-        $item = new Merchandise();
+        $conn = $this->entityManager->getConnection();
+        $conn->beginTransaction();
 
-        $item->setCode($dto->code);
-        $item->setName($dto->name);
-        $item->setType($dto->type);
-        $item->setProfit($dto->profit);
-        $item->setDescription($dto->description);
-        $item->setNotes($dto->notes);
-        $item->setStockAlertQuantity($dto->stockAlertQuantity);
-        $item->setStatus($dto->status);
-        $item->setIsSingleUnit((bool)$dto->isSingleUnit);
+        try {
+            $item = new Merchandise();
 
-        if ($dto->categoryId) {
-            $item->setCategory($this->categoryRepository->find($dto->categoryId));
-        }
+            $item->setCode($dto->code);
+            $item->setName($dto->name);
+            $item->setType($dto->type);
+            $item->setProfit($dto->profit);
+            $item->setDescription($dto->description);
+            $item->setNotes($dto->notes);
+            $item->setStockAlertQuantity($dto->stockAlertQuantity);
+            $item->setStatus($dto->status);
+            $item->setIsSingleUnit((bool)$dto->isSingleUnit);
 
-        if ($dto->baseUnitId) {
-            $item->setBaseUnit($this->unitRepository->find($dto->baseUnitId));
-        }
-
-        $this->entityManager->persist($item);
-
-        if ($dto->baseUnitId || !empty($dto->conversions)) {
-            $this->saveConversionsAndUnits($item, $dto->conversions, $dto->baseUnitId);
-        }
-
-        if ($dto->type === 'finished_product') {
-            $item->setFinishedProductSource($dto->finishedProductSource ?? 'supplier');
-        } else {
-            $item->setFinishedProductSource(null);
-        }
-
-        if ($item->getType() === 'ingredient') {
-            if (!empty($dto->providers)) {
-                $this->saveProviders($item, $dto->providers);
+            if ($dto->categoryId) {
+                $item->setCategory($this->categoryRepository->find($dto->categoryId));
             }
-            $this->deleteRecipe($item);
-        } else {
-            if (!empty($dto->providers)) {
-                $this->saveProviders($item, $dto->providers);
+
+            if ($dto->baseUnitId) {
+                $item->setBaseUnit($this->unitRepository->find($dto->baseUnitId));
             }
-            if ($dto->recipe !== null && $dto->recipe->outputUnitId !== null && !empty($dto->recipe->items)) {
-                $this->saveRecipe($item, $dto->recipe);
+
+            $this->entityManager->persist($item);
+
+            if ($dto->baseUnitId || !empty($dto->conversions)) {
+                $this->saveConversionsAndUnits($item, $dto->conversions, $dto->baseUnitId);
             }
+
+            if ($dto->type === 'finished_product') {
+                $item->setFinishedProductSource($dto->finishedProductSource ?? 'supplier');
+            } else {
+                $item->setFinishedProductSource(null);
+            }
+
+            if ($item->getType() === 'ingredient') {
+                if (!empty($dto->providers)) {
+                    $this->saveProviders($item, $dto->providers);
+                }
+                $this->deleteRecipe($item);
+            } else {
+                if (!empty($dto->providers)) {
+                    $this->saveProviders($item, $dto->providers);
+                }
+                if ($dto->finishedProductSource === 'production' && $dto->recipe !== null && $dto->recipe->outputUnitId !== null && !empty($dto->recipe->items)) {
+                    $this->saveRecipe($item, $dto->recipe);
+                }
+            }
+
+            $this->entityManager->flush();
+
+            $conn->commit();
+
+            $data = $item->jsonSerialize();
+            $data['conversions'] = $this->getConversionsData($item->getId());
+            $data['providers'] = $this->getProvidersData($item->getId());
+            $data['recipe'] = $this->getRecipeData($item->getId());
+
+            return $data;
+        } catch (\Throwable $e) {
+            $conn->rollBack();
+            throw $e;
         }
-
-        $this->entityManager->flush();
-
-        $data = $item->jsonSerialize();
-        $data['conversions'] = $this->getConversionsData($item->getId());
-        $data['providers'] = $this->getProvidersData($item->getId());
-        $data['recipe'] = $this->getRecipeData($item->getId());
-
-        return $data;
     }
 
     public function update(int $id, MerchandiseDTO $dto): array
     {
-        $item = $this->merchandiseRepository->find($id);
+        $conn = $this->entityManager->getConnection();
+        $conn->beginTransaction();
 
-        if (!$item) {
-            throw new \Exception(t('error.not_found'));
-        }
+        try {
+            $item = $this->merchandiseRepository->find($id);
 
-        $item->setCode($dto->code);
-        $item->setName($dto->name);
-        if ($dto->type) {
-            $item->setType($dto->type);
-        }
-        $item->setProfit($dto->profit);
-        $item->setDescription($dto->description);
-        $item->setNotes($dto->notes);
-        $item->setStockAlertQuantity($dto->stockAlertQuantity);
-        $item->setStatus($dto->status);
-        $item->setIsSingleUnit((bool)$dto->isSingleUnit);
+            if (!$item) {
+                throw new \Exception(t('error.not_found'));
+            }
 
-        $item->setCategory($dto->categoryId ? $this->categoryRepository->find($dto->categoryId) : null);
-        $item->setBaseUnit($dto->baseUnitId ? $this->unitRepository->find($dto->baseUnitId) : null);
+            $item->setCode($dto->code);
+            $item->setName($dto->name);
+            if ($dto->type) {
+                $item->setType($dto->type);
+            }
+            $item->setProfit($dto->profit);
+            $item->setDescription($dto->description);
+            $item->setNotes($dto->notes);
+            $item->setStockAlertQuantity($dto->stockAlertQuantity);
+            $item->setStatus($dto->status);
+            $item->setIsSingleUnit((bool)$dto->isSingleUnit);
 
-        $this->saveConversionsAndUnits($item, $dto->conversions, $dto->baseUnitId);
+            $item->setCategory($dto->categoryId ? $this->categoryRepository->find($dto->categoryId) : null);
+            $item->setBaseUnit($dto->baseUnitId ? $this->unitRepository->find($dto->baseUnitId) : null);
 
-        if ($item->getType() === 'finished_product') {
-            $item->setFinishedProductSource($dto->finishedProductSource ?? 'supplier');
-        } else {
-            $item->setFinishedProductSource(null);
-        }
+            $this->saveConversionsAndUnits($item, $dto->conversions, $dto->baseUnitId);
 
-        if ($item->getType() === 'ingredient') {
-            $this->saveProviders($item, $dto->providers);
-            $this->deleteRecipe($item);
-        } else {
-            if (!empty($dto->providers)) {
+            if ($item->getType() === 'finished_product') {
+                $item->setFinishedProductSource($dto->finishedProductSource ?? 'supplier');
+            } else {
+                $item->setFinishedProductSource(null);
+            }
+
+            if ($item->getType() === 'ingredient') {
                 $this->saveProviders($item, $dto->providers);
+                $this->deleteRecipe($item);
+            } else {
+                if (!empty($dto->providers)) {
+                    $this->saveProviders($item, $dto->providers);
+                }
+                if ($dto->finishedProductSource === 'production' && $dto->recipe !== null && $dto->recipe->outputUnitId !== null && !empty($dto->recipe->items)) {
+                    $this->saveRecipe($item, $dto->recipe);
+                } elseif ($dto->finishedProductSource === 'supplier') {
+                    $this->deleteRecipe($item);
+                }
             }
-            if ($dto->recipe !== null && $dto->recipe->outputUnitId !== null && !empty($dto->recipe->items)) {
-                $this->saveRecipe($item, $dto->recipe);
-            }
+
+            $this->entityManager->flush();
+
+            $conn->commit();
+
+            $data = $item->jsonSerialize();
+            $data['conversions'] = $this->getConversionsData($item->getId());
+            $data['providers'] = $this->getProvidersData($item->getId());
+            $data['recipe'] = $this->getRecipeData($item->getId());
+
+            return $data;
+        } catch (\Throwable $e) {
+            $conn->rollBack();
+            throw $e;
         }
-
-        $this->entityManager->flush();
-
-        $data = $item->jsonSerialize();
-        $data['conversions'] = $this->getConversionsData($item->getId());
-        $data['providers'] = $this->getProvidersData($item->getId());
-        $data['recipe'] = $this->getRecipeData($item->getId());
-
-        return $data;
     }
 
     public function delete(int $id): void
@@ -497,10 +519,11 @@ class MerchandiseService
             foreach ($providerPrices as $pp) {
                 $prices[] = [
                     'unitId' => $pp->getUnit()->getId(),
-                    'price' => $pp->getPrice(),
-                    'discountRate' => $pp->getDiscountRate(),
-                    'discountAmount' => $pp->getDiscountAmount(),
-                    'priceAfterDiscount' => $pp->getPriceAfterDiscount(),
+                    'isDefault' => $pp->isDefault(),
+                    'price' => formatDecimal($pp->getPrice()),
+                    'discountRate' => formatDecimal($pp->getDiscountRate()),
+                    'discountAmount' => formatDecimal($pp->getDiscountAmount()),
+                    'priceAfterDiscount' => formatDecimal($pp->getPriceAfterDiscount()),
                     'effectiveFrom' => $pp->getEffectiveFrom()?->format('Y-m-d'),
                     'effectiveTo' => $pp->getEffectiveTo()?->format('Y-m-d'),
                 ];
@@ -511,6 +534,7 @@ class MerchandiseService
                 'providerId' => $mp->getProvider()?->getId(),
                 'provider' => $mp->getProvider()?->jsonSerialize(),
                 'unitConfigMode' => $mp->getUnitConfigMode(),
+                'isDefault' => $mp->isDefault(),
                 'conversions' => $conversions,
                 'prices' => $prices,
             ];
@@ -539,6 +563,7 @@ class MerchandiseService
         $baseUnitId = $baseUnit->getId();
 
         // 2. Lưu từng MerchandiseProvider mới
+        $hasDefault = false;
         foreach ($providersData as $pData) {
             if (empty($pData['providerId'])) {
                 continue;
@@ -553,6 +578,14 @@ class MerchandiseService
             $mProvider->setMerchandise($merchandise);
             $mProvider->setProvider($providerObj);
             $mProvider->setUnitConfigMode($pData['unitConfigMode'] ?? 'custom');
+
+            $isDefault = (bool)($pData['isDefault'] ?? false);
+            if ($isDefault && !$hasDefault) {
+                $mProvider->setIsDefault(true);
+                $hasDefault = true;
+            } else {
+                $mProvider->setIsDefault(false);
+            }
 
             $this->entityManager->persist($mProvider);
 
@@ -680,7 +713,7 @@ class MerchandiseService
             // Xử lý prices cho nhà cung cấp để tạo MerchandiseProviderPrice
             if (!empty($pData['prices'])) {
                 foreach ($pData['prices'] as $priceItem) {
-                    if (empty($priceItem['unitId']) || !isset($priceItem['price'])) {
+                    if (empty($priceItem['unitId']) || !isset($priceItem['price']) || $priceItem['price'] === '' || $priceItem['price'] === null) {
                         continue;
                     }
 
@@ -712,10 +745,15 @@ class MerchandiseService
                     $mPrice->setUnit($unitObj);
                     $mPrice->setUnitLabelSnapshot($unitLabelSnapshot);
                     $mPrice->setFactorToBaseSnapshot($factorToBaseSnapshot);
-                    $mPrice->setPrice((string)($priceItem['price'] ?? 0));
-                    $mPrice->setDiscountRate((string)($priceItem['discountRate'] ?? '0.00'));
-                    $mPrice->setDiscountAmount((string)($priceItem['discountAmount'] ?? '0.00'));
-                    $mPrice->setPriceAfterDiscount((string)($priceItem['priceAfterDiscount'] ?? $priceItem['price'] ?? 0));
+                    $priceVal = ($priceItem['price'] !== null && $priceItem['price'] !== '') ? (string)$priceItem['price'] : '0.00';
+                    $discountRateVal = ($priceItem['discountRate'] !== null && $priceItem['discountRate'] !== '') ? (string)$priceItem['discountRate'] : '0.00';
+                    $discountAmountVal = ($priceItem['discountAmount'] !== null && $priceItem['discountAmount'] !== '') ? (string)$priceItem['discountAmount'] : '0.00';
+                    $priceAfterDiscountVal = ($priceItem['priceAfterDiscount'] !== null && $priceItem['priceAfterDiscount'] !== '') ? (string)$priceItem['priceAfterDiscount'] : $priceVal;
+
+                    $mPrice->setPrice($priceVal);
+                    $mPrice->setDiscountRate($discountRateVal);
+                    $mPrice->setDiscountAmount($discountAmountVal);
+                    $mPrice->setPriceAfterDiscount($priceAfterDiscountVal);
 
                     if (!empty($priceItem['effectiveFrom'])) {
                         $mPrice->setEffectiveFrom(new \DateTime($priceItem['effectiveFrom']));
@@ -725,7 +763,7 @@ class MerchandiseService
                     }
 
                     $mPrice->setCurrency('VND');
-                    $mPrice->setIsDefault(true);
+                    $mPrice->setIsDefault(!empty($priceItem['isDefault']));
                     $mPrice->setStatus(1);
 
                     $this->entityManager->persist($mPrice);
@@ -841,5 +879,200 @@ class MerchandiseService
 
             $this->entityManager->persist($recipeItem);
         }
+    }
+
+    // Lấy giá của nguyên liệu hoặc thành phẩm nhập từ nhà cung cấp theo đơn vị tính
+    public function getPriceMerchandiseByUnitId(int $merchandiseId, int $unitId)
+    {
+        $merchandise = $this->merchandiseRepository->find($merchandiseId);
+        if (!$merchandise) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $unit = $this->unitRepository->find($unitId);
+        if (!$unit) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $defaultProvider = $this->merchandiseProviderRepository->findOneBy([
+            'merchandise' => $merchandise,
+            'isDefault' => true
+        ]);
+
+        // Fallback: Nếu không có nhà cung cấp nào được đánh dấu mặc định, lấy nhà cung cấp đầu tiên
+        if (!$defaultProvider) {
+            $defaultProvider = $this->merchandiseProviderRepository->findOneBy([
+                'merchandise' => $merchandise
+            ]);
+        }
+
+        if (!$defaultProvider) {
+            return 0.0;
+        }
+
+        $providerPrice = $this->merchandiseProviderPriceRepository->findOneBy([
+            'merchandiseProvider' => $defaultProvider,
+            'unit' => $unit
+        ]);
+
+        $conversionRate = 1.0;
+        // Xử lý case nếu không tìm thấy providerPrice tương ứng theo unitId => Tìm providerPrice có isDefault = true của merchandise, sau đó từ providerPrice default này sẽ quy đổi giá sang unit cần tính
+        if (!$providerPrice) {
+            $defaultProviderPrice = $this->merchandiseProviderPriceRepository->findOneBy([
+                'merchandiseProvider' => $defaultProvider,
+                'isDefault' => true
+            ]);
+            if ($defaultProviderPrice) {
+                $providerPrice = $defaultProviderPrice;
+                $sourceUnit = $defaultProviderPrice->getUnit();
+
+                $sourceMUnit = $this->merchandiseUnitRepository->findOneBy([
+                    'merchandise' => $merchandise,
+                    'unit' => $sourceUnit
+                ]);
+                $targetMUnit = $this->merchandiseUnitRepository->findOneBy([
+                    'merchandise' => $merchandise,
+                    'unit' => $unit
+                ]);
+
+                $sourceFactor = $sourceMUnit ? (float)$sourceMUnit->getFactorToBase() : 1.0;
+                $targetFactor = $targetMUnit ? (float)$targetMUnit->getFactorToBase() : 1.0;
+
+                if ($sourceFactor > 0) {
+                    $conversionRate = $targetFactor / $sourceFactor;
+                }
+            }
+        }
+
+        // Kiểm tra time hiện tại có nằm trong khoảng effectiveFrom và effectiveTo không
+        $currentTime = new \DateTime();
+        $finalPrice = (float)$providerPrice->getPrice();
+
+        $hasDiscount = false;
+        $from = $providerPrice->getEffectiveFrom();
+        $to = $providerPrice->getEffectiveTo();
+
+        if ($from && $to) {
+            if ($currentTime >= $from && $currentTime <= $to) {
+                $hasDiscount = true;
+            }
+        } elseif ($from) {
+            if ($currentTime >= $from) {
+                $hasDiscount = true;
+            }
+        } elseif ($to) {
+            if ($currentTime <= $to) {
+                $hasDiscount = true;
+            }
+        }
+
+        if ($hasDiscount) {
+            $discountPrice = $providerPrice->getPriceAfterDiscount();
+            if ($discountPrice !== null && $discountPrice !== '') {
+                $finalPrice = (float)$discountPrice;
+            }
+        }
+
+        return (int)formatDecimal(sprintf('%.4f', $finalPrice * $conversionRate));
+    }
+
+    // Lấy giá thành phẩm theo đơn vị tính (hỗ trợ đệ quy tính giá từ công thức sản xuất)
+    public function getPriceFinishedProductByUnitId(int $merchandiseId, int $unitId, array $visited = [])
+    {
+        if (in_array($merchandiseId, $visited, true)) {
+            return 0.0;
+        }
+        $visited[] = $merchandiseId;
+
+        $merchandise = $this->merchandiseRepository->findOneBy(['id' => $merchandiseId, 'type' => 'finished_product']);
+        if (!$merchandise) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $unit = $this->unitRepository->find($unitId);
+        if (!$unit) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        // Case 1: Finished product nhập từ nhà cung cấp
+        if ($merchandise->getFinishedProductSource() === 'supplier') {
+            return $this->getPriceMerchandiseByUnitId($merchandiseId, $unitId);
+        }
+
+        // Case 2: Finished product nhập từ sản xuất => Sử dụng recipe
+        $recipe = $this->merchandiseRecipeRepository->findOneBy(['finishedProduct' => $merchandise]);
+        if (!$recipe) {
+            return 0.0;
+        }
+
+        $outputQuantity = (float)$recipe->getOutputQuantity();
+        if ($outputQuantity <= 0) {
+            $outputQuantity = 1.0;
+        }
+
+        $totalRecipeCost = 0.0;
+        foreach ($recipe->getItems() as $item) {
+            $ingredient = $item->getIngredient();
+            $ingredientQty = (float)$item->getQuantity();
+            $wasteRate = (float)$item->getWasteRate();
+
+            // Tính lượng thực tế cần dùng sau hao hụt
+            $actualQty = $ingredientQty * (1.0 + ($wasteRate / 100.0));
+
+            $ingredientUnitId = $item->getUnit()->getId();
+            $unitPrice = 0.0;
+
+            if ($ingredient->getType() === 'finished_product') {
+                $unitPrice = $this->getPriceFinishedProductByUnitId($ingredient->getId(), $ingredientUnitId, $visited);
+            } else {
+                $unitPrice = $this->getPriceMerchandiseByUnitId($ingredient->getId(), $ingredientUnitId);
+            }
+
+            $totalRecipeCost += $actualQty * $unitPrice;
+        }
+
+        $pricePerOutputUnit = $totalRecipeCost / $outputQuantity;
+
+        // Quy đổi giá từ outputUnit sang unit cần tính
+        $outputUnit = $recipe->getOutputUnit();
+        if ($outputUnit->getId() === $unitId) {
+            return (float)formatDecimal(sprintf('%.4f', $pricePerOutputUnit));
+        }
+
+        $sourceMUnit = $this->merchandiseUnitRepository->findOneBy([
+            'merchandise' => $merchandise,
+            'unit' => $outputUnit
+        ]);
+        $targetMUnit = $this->merchandiseUnitRepository->findOneBy([
+            'merchandise' => $merchandise,
+            'unit' => $unit
+        ]);
+
+        $sourceFactor = $sourceMUnit ? (float)$sourceMUnit->getFactorToBase() : 1.0;
+        $targetFactor = $targetMUnit ? (float)$targetMUnit->getFactorToBase() : 1.0;
+
+        $conversionRate = 1.0;
+        if ($sourceFactor > 0) {
+            $conversionRate = $targetFactor / $sourceFactor;
+        }
+
+        $finalPrice = $pricePerOutputUnit * $conversionRate;
+
+        return (int)formatDecimal(sprintf('%.4f', $finalPrice));
+    }
+
+    // Lấy giá chung của nguyên liệu/thành phẩm bất kỳ theo đơn vị tính
+    public function getPriceByUnitId(int $merchandiseId, int $unitId): float
+    {
+        $merchandise = $this->merchandiseRepository->find($merchandiseId);
+        if (!$merchandise) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        if ($merchandise->getType() === 'finished_product') {
+            return $this->getPriceFinishedProductByUnitId($merchandiseId, $unitId);
+        }
+
+        return $this->getPriceMerchandiseByUnitId($merchandiseId, $unitId);
     }
 }

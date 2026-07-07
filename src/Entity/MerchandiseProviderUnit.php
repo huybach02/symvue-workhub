@@ -6,19 +6,15 @@ namespace App\Entity;
 
 use App\Repository\MerchandiseProviderUnitRepository;
 use App\Traits\ModifierTrait;
-use App\Traits\SoftDeleteableTrait;
 use App\Traits\TimestampableTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: MerchandiseProviderUnitRepository::class)]
 #[ORM\Table(name: 'merchandise_provider_unit')]
-#[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
 class MerchandiseProviderUnit
 {
     use TimestampableTrait;
-    use SoftDeleteableTrait;
     use ModifierTrait;
 
     #[ORM\Id]
@@ -125,13 +121,12 @@ class MerchandiseProviderUnit
             'merchandiseProvider' => $this->merchandiseProvider?->jsonSerialize(),
             'unitId' => $this->unit?->getId(),
             'unit' => $this->unit?->jsonSerialize(),
-            'factorToBase' => $this->factorToBase,
+            'factorToBase' => formatDecimal($this->factorToBase),
             'level' => $this->level,
             'label' => $this->label,
             'isBase' => $this->isBase,
             'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
-            'deletedAt' => $this->deletedAt?->format('Y-m-d H:i:s'),
             'createdBy' => $this->createdBy,
             'updatedBy' => $this->updatedBy,
         ];

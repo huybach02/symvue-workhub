@@ -672,6 +672,12 @@
         "provider_title_default": "Provider #{index}",
         "default_prices_config": "Set Default Price by Unit",
         "no_providers": "No providers configured yet.",
+        "default": "Default",
+        "set_default": "Set Default",
+        "errors": {
+            "default_provider_required": "Please select a default provider!",
+            "default_provider_price_required": "The default provider must have at least one price!"
+        },
         "finished_product_source": {
             "supplier": "Import from supplier",
             "supplier_desc": "Manage purchasing settings and default purchase prices from suppliers.",

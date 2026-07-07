@@ -6,6 +6,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Merchandise;
 use App\Entity\Category;
+use App\Entity\Provider;
 use App\Service\MerchandiseService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
@@ -28,6 +29,7 @@ class MerchandiseIngredientFixtures extends Fixture implements DependentFixtureI
         return [
             CategoryFixture::class,
             UnitFixture::class,
+            ProviderFixture::class,
         ];
     }
 
@@ -217,6 +219,91 @@ class MerchandiseIngredientFixtures extends Fixture implements DependentFixtureI
                     }
                 }
                 $this->merchandiseService->saveConversionsAndUnits($merchandise, $conversionsData, $baseUnit->getId());
+            }
+
+            // Gán nhà cung cấp (provider) và thiết lập giá, quy đổi tương ứng cho nguyên liệu
+            $categoryProviderMap = [
+                'sua-dac-va-sua-tuoi' => 'VINAMILK',
+                'cai-thao' => 'VIETGAPDL',
+                'rau-an-kem' => 'VIETGAPDL',
+                'gia-vi' => 'MASAN',
+                'sot-va-gia-vi-long' => 'MASAN',
+                'sua-va-nuoc-giai-khat' => 'TRUNGUYEN',
+                'mi-goi-nguyen-lieu' => 'MASAN',
+                'mi-udon-nguyen-lieu' => 'MEGAMARKET',
+                'thit-bo' => 'MEGAMARKET',
+                'thit-heo' => 'MEGAMARKET',
+                'tom-tuoi' => 'MEGAMARKET',
+                'muc-tuoi' => 'MEGAMARKET',
+                'ca-vien' => 'MEGAMARKET',
+            ];
+
+            $providerRepo = $manager->getRepository(Provider::class);
+            $providerCode = $categoryProviderMap[$item['category_slug']] ?? 'MEGAMARKET';
+            $provider = $providerRepo->findOneBy(['code' => $providerCode]);
+
+            if ($provider) {
+                $pConversions = [];
+                if ($config) {
+                    foreach ($config['conversions'] as $c) {
+                        $fromUnit = $unitRepo->findOneBy(['code' => $c['from_unit']]);
+                        $toUnit = $unitRepo->findOneBy(['code' => $c['to_unit']]);
+                        if ($fromUnit && $toUnit) {
+                            $pConversions[] = [
+                                'fromUnitId' => $fromUnit->getId(),
+                                'fromValue' => $c['from_value'],
+                                'toUnitId' => $toUnit->getId(),
+                                'toValue' => $c['to_value'],
+                            ];
+                        }
+                    }
+                }
+
+                $pPrices = [];
+                if ($baseUnit) {
+                    $priceVal = (string)(rand(10, 100) * 100);
+                    $pPrices[] = [
+                        'unitId' => $baseUnit->getId(),
+                        'price' => $priceVal,
+                        'discountRate' => '0.00',
+                        'discountAmount' => '0.00',
+                        'priceAfterDiscount' => $priceVal,
+                        'effectiveFrom' => date('Y-m-d'),
+                        'effectiveTo' => null,
+                        'isDefault' => true,
+                    ];
+                }
+
+                if ($config) {
+                    foreach ($config['conversions'] as $c) {
+                        $fromUnit = $unitRepo->findOneBy(['code' => $c['from_unit']]);
+                        if ($fromUnit && $baseUnit && $fromUnit->getId() !== $baseUnit->getId()) {
+                            $priceVal = (string)(rand(50, 500) * 1000);
+                            $pPrices[] = [
+                                'unitId' => $fromUnit->getId(),
+                                'price' => $priceVal,
+                                'discountRate' => '0.00',
+                                'discountAmount' => '0.00',
+                                'priceAfterDiscount' => $priceVal,
+                                'effectiveFrom' => date('Y-m-d'),
+                                'effectiveTo' => null,
+                                'isDefault' => false,
+                            ];
+                        }
+                    }
+                }
+
+                $providersData = [
+                    [
+                        'providerId' => $provider->getId(),
+                        'unitConfigMode' => 'custom',
+                        'isDefault' => true,
+                        'conversions' => $pConversions,
+                        'prices' => $pPrices,
+                    ]
+                ];
+
+                $this->merchandiseService->saveProviders($merchandise, $providersData);
             }
         }
 

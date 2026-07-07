@@ -675,6 +675,13 @@
         "provider_title_default": "Nhà cung cấp #{index}",
         "default_prices_config": "Thiết lập Giá mặc định theo từng đơn vị",
         "no_providers": "Chưa có cấu hình nhà cung cấp nào.",
+        "default": "Mặc định",
+        "set_default": "Đặt mặc định",
+        "errors": {
+            "default_provider_required": "Vui lòng chọn một nhà cung cấp làm mặc định!",
+            "default_provider_price_required": "Nhà cung cấp mặc định phải có ít nhất một đơn giá!",
+            "price_default_required": "Vui lòng chọn một đơn vị giá làm mặc định!"
+        },
         "finished_product_source": {
             "supplier": "Nhập từ nhà cung cấp",
             "supplier_desc": "Quản lý cấu hình nhập hàng và giá mua mặc định theo nhà cung cấp.",

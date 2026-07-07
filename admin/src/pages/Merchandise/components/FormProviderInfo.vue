@@ -5,7 +5,9 @@
     >
         <div class="mb-4 d-flex justify-space-between align-center">
             <h3 class="text-h6 font-weight-bold">
-                {{ $t("merchandise.provider_config") || "Cấu hình Nhà cung cấp" }}
+                {{
+                    $t("merchandise.provider_config") || "Cấu hình Nhà cung cấp"
+                }}
             </h3>
             <v-btn
                 color="primary"
@@ -16,32 +18,67 @@
             </v-btn>
         </div>
 
-        <!-- Danh sách nhà cung cấp dưới dạng Expansion Panels -->
         <div v-if="fieldProviders.value && fieldProviders.value.length > 0">
             <v-expansion-panels variant="accordion" class="border rounded">
                 <v-expansion-panel
                     v-for="(prov, index) in fieldProviders.value"
                     :key="index"
                 >
-                    <!-- Tiêu đề Expansion Panel -->
                     <v-expansion-panel-title>
-                        <div class="d-flex align-center justify-space-between w-100 pr-4">
-                            <span class="font-weight-bold text-subtitle-1">
-                                {{ getProviderTitle(prov.providerId, index) }}
-                            </span>
-                            <v-btn
-                                icon="mdi-delete"
-                                color="error"
-                                variant="text"
-                                size="small"
-                                @click.stop="
-                                    removeProvider(
-                                        fieldProviders.value,
-                                        onChangeProviders,
-                                        index,
-                                    )
-                                "
-                            />
+                        <div
+                            class="d-flex align-center justify-space-between w-100 pr-4"
+                        >
+                            <div class="d-flex align-center">
+                                <span class="font-weight-bold text-subtitle-1">
+                                    {{
+                                        getProviderTitle(prov.providerId, index)
+                                    }}
+                                </span>
+                                <v-chip
+                                    v-if="prov.isDefault"
+                                    color="success"
+                                    size="x-small"
+                                    class="ml-2 font-weight-bold"
+                                    variant="flat"
+                                >
+                                    {{
+                                        $t("merchandise.default") || "Mặc định"
+                                    }}
+                                </v-chip>
+                            </div>
+                            <div class="d-flex align-center ga-2">
+                                <v-switch
+                                    :model-value="prov.isDefault"
+                                    color="success"
+                                    hide-details
+                                    density="compact"
+                                    class="mr-2"
+                                    style="margin-top: 0; margin-bottom: 0"
+                                    :label="
+                                        $t('merchandise.default') || 'Mặc định'
+                                    "
+                                    @click.stop="
+                                        toggleDefault(
+                                            fieldProviders.value,
+                                            onChangeProviders,
+                                            index,
+                                        )
+                                    "
+                                />
+                                <v-btn
+                                    icon="mdi-delete"
+                                    color="error"
+                                    variant="text"
+                                    size="small"
+                                    @click.stop="
+                                        removeProvider(
+                                            fieldProviders.value,
+                                            onChangeProviders,
+                                            index,
+                                        )
+                                    "
+                                />
+                            </div>
                         </div>
                     </v-expansion-panel-title>
 
@@ -55,7 +92,12 @@
                                 </div>
                                 <v-autocomplete
                                     v-model="prov.providerId"
-                                    :items="filteredProviders(index, fieldProviders.value)"
+                                    :items="
+                                        filteredProviders(
+                                            index,
+                                            fieldProviders.value,
+                                        )
+                                    "
                                     item-title="label"
                                     item-value="value"
                                     variant="outlined"
@@ -74,8 +116,6 @@
                                     "
                                 />
                             </v-col>
-
-
                         </v-row>
 
                         <!-- Tỉ lệ quy đổi đơn vị (Custom conversions) -->
@@ -96,7 +136,9 @@
                             <v-card variant="flat" class="pa-4 border mb-4">
                                 <div class="d-flex flex-column ga-2">
                                     <v-row
-                                        v-for="(conv, cIndex) in prov.conversions"
+                                        v-for="(
+                                            conv, cIndex
+                                        ) in prov.conversions"
                                         :key="cIndex"
                                         class="align-center pr-8 pt-2"
                                     >
@@ -179,94 +221,184 @@
                         </div>
 
                         <!-- Thiết lập Giá mặc định theo từng đơn vị -->
-                        <div
-                            v-if="
-                                prov.providerId && prov.prices && prov.prices.length > 0
-                            "
-                            class="mt-6"
-                        >
+                        <div v-if="prov.providerId && prov.prices" class="mt-6">
                             <h4 class="text-subtitle-1 font-weight-bold mb-4">
                                 {{
                                     $t("merchandise.default_prices_config") ||
                                     "Thiết lập Giá mặc định theo từng đơn vị"
                                 }}
                             </h4>
-                            <div class="v-table v-table--density-compact border rounded-lg mt-2 overflow-x-auto">
+                            <div
+                                class="v-table v-table--density-compact border rounded-lg mt-2 overflow-x-auto"
+                            >
                                 <div class="v-table__wrapper">
-                                    <table style="table-layout: fixed; width: 100%; border-collapse: collapse;">
+                                    <table
+                                        style="
+                                            table-layout: fixed;
+                                            width: 100%;
+                                            border-collapse: collapse;
+                                        "
+                                    >
                                         <colgroup>
-                                            <col style="width: 100px;" />
-                                            <col style="width: 140px;" />
-                                            <col style="width: 90px;" />
-                                            <col style="width: 140px;" />
-                                            <col style="width: 140px;" />
-                                            <col style="width: 180px;" />
-                                            <col style="width: 180px;" />
+                                            <col style="width: 100px" />
+                                            <col v-if="!isAllPricesFilled(prov)" style="width: 90px" />
+                                            <col style="width: 140px" />
+                                            <col style="width: 90px" />
+                                            <col style="width: 140px" />
+                                            <col style="width: 140px" />
+                                            <col style="width: 180px" />
+                                            <col style="width: 180px" />
                                         </colgroup>
                                         <thead>
                                             <tr>
-                                                <th class="text-left font-weight-bold px-4 py-3 border-bottom">
-                                                    {{ $t("merchandise.prices.unit") || "Đơn vị" }}
+                                                <th
+                                                    class="text-left font-weight-bold px-4 py-3 border-bottom"
+                                                >
+                                                    {{
+                                                        $t(
+                                                            "merchandise.prices.unit",
+                                                        ) || "Đơn vị"
+                                                    }}
                                                 </th>
-                                                <th class="text-left font-weight-bold px-4 py-3 border-bottom">
-                                                    {{ $t("merchandise.prices.original_price") || "Giá gốc" }} ({{ currency }})
+                                                <th
+                                                    v-if="!isAllPricesFilled(prov)"
+                                                    class="text-left font-weight-bold px-4 py-3 border-bottom"
+                                                >
+                                                    {{
+                                                        $t(
+                                                            "merchandise.default",
+                                                        ) || "Mặc định"
+                                                    }}
                                                 </th>
-                                                <th class="text-left font-weight-bold px-4 py-3 border-bottom">
-                                                    {{ $t("merchandise.prices.discount_rate") || "% Giảm" }}
+                                                <th
+                                                    class="text-left font-weight-bold px-4 py-3 border-bottom"
+                                                >
+                                                    {{
+                                                        $t(
+                                                            "merchandise.prices.original_price",
+                                                        ) || "Giá gốc"
+                                                    }}
+                                                    ({{ currency }})
                                                 </th>
-                                                <th class="text-left font-weight-bold px-4 py-3 border-bottom">
-                                                    {{ $t("merchandise.prices.discount_amount") || "Tiền giảm" }} ({{ currency }})
+                                                <th
+                                                    class="text-left font-weight-bold px-4 py-3 border-bottom"
+                                                >
+                                                    {{
+                                                        $t(
+                                                            "merchandise.prices.discount_rate",
+                                                        ) || "% Giảm"
+                                                    }}
                                                 </th>
-                                                <th class="text-left font-weight-bold px-4 py-3 border-bottom">
-                                                    {{ $t("merchandise.prices.price_after_discount") || "Giá sau giảm" }} ({{ currency }})
+                                                <th
+                                                    class="text-left font-weight-bold px-4 py-3 border-bottom"
+                                                >
+                                                    {{
+                                                        $t(
+                                                            "merchandise.prices.discount_amount",
+                                                        ) || "Tiền giảm"
+                                                    }}
+                                                    ({{ currency }})
                                                 </th>
-                                                <th class="text-left font-weight-bold px-4 py-3 border-bottom">
-                                                    {{ $t("merchandise.prices.effective_from") || "Hiệu lực từ" }}
+                                                <th
+                                                    class="text-left font-weight-bold px-4 py-3 border-bottom"
+                                                >
+                                                    {{
+                                                        $t(
+                                                            "merchandise.prices.price_after_discount",
+                                                        ) || "Giá sau giảm"
+                                                    }}
+                                                    ({{ currency }})
                                                 </th>
-                                                <th class="text-left font-weight-bold px-4 py-3 border-bottom">
-                                                    {{ $t("merchandise.prices.effective_to") || "Hiệu lực đến" }}
+                                                <th
+                                                    class="text-left font-weight-bold px-4 py-3 border-bottom"
+                                                >
+                                                    {{
+                                                        $t(
+                                                            "merchandise.prices.effective_from",
+                                                        ) || "Hiệu lực từ"
+                                                    }}
+                                                </th>
+                                                <th
+                                                    class="text-left font-weight-bold px-4 py-3 border-bottom"
+                                                >
+                                                    {{
+                                                        $t(
+                                                            "merchandise.prices.effective_to",
+                                                        ) || "Hiệu lực đến"
+                                                    }}
                                                 </th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr
-                                                v-for="(priceItem, pIndex) in getSortedPrices(prov.prices)"
+                                                v-for="(
+                                                    priceItem, pIndex
+                                                ) in getSortedPrices(
+                                                    prov.prices,
+                                                )"
                                                 :key="pIndex"
                                                 class="border-bottom"
                                             >
                                                 <!-- Cột 1: Đơn vị tính -->
-                                                <td class="font-weight-bold text-capitalize px-4 py-2">
-                                                    {{ getPriceLabel(priceItem.unitId) }}
+                                                <td
+                                                    class="font-weight-bold text-capitalize px-4 py-2"
+                                                >
+                                                    {{
+                                                        getPriceLabel(
+                                                            priceItem.unitId,
+                                                        )
+                                                    }}
+                                                </td>
+
+                                                <!-- Cột Mặc định (Checkbox) -->
+                                                <td v-if="!isAllPricesFilled(prov)" class="px-4 py-2">
+                                                    <v-checkbox
+                                                        v-model="priceItem.isDefault"
+                                                        hide-details
+                                                        density="compact"
+                                                        color="primary"
+                                                        :disabled="!priceItem.price"
+                                                        @update:model-value="(val) => handlePriceDefaultChange(prov, priceItem, val, onChangeProviders, fieldProviders.value)"
+                                                    />
                                                 </td>
 
                                                 <!-- Cột 2: Giá gốc -->
                                                 <td class="px-2 py-2">
                                                     <v-text-field
-                                                        v-model.number="priceItem.price"
-                                                        type="number"
+                                                        v-bind="
+                                                            bindFormattedNumberModel({
+                                                                fieldName: `price_${index}_${priceItem.unitId}`,
+                                                                value: priceItem.price,
+                                                                onChange: (val) => {
+                                                                    priceItem.price = val;
+                                                                    calculatePriceAfterDiscount(
+                                                                        prov,
+                                                                        priceItem,
+                                                                        fieldProviders.value,
+                                                                        onChangeProviders,
+                                                                    );
+                                                                }
+                                                            })
+                                                        "
                                                         variant="outlined"
                                                         density="compact"
                                                         hide-details
-                                                        @update:model-value="
-                                                            calculatePriceAfterDiscount(
-                                                                priceItem,
-                                                                fieldProviders.value,
-                                                                onChangeProviders,
-                                                            )
-                                                        "
                                                     />
                                                 </td>
 
                                                 <!-- Cột 3: % Giảm -->
                                                 <td class="px-2 py-2">
                                                     <v-text-field
-                                                        v-model.number="priceItem.discountRate"
+                                                        v-model.number="
+                                                            priceItem.discountRate
+                                                        "
                                                         type="number"
                                                         variant="outlined"
                                                         density="compact"
                                                         hide-details
                                                         @update:model-value="
                                                             calculatePriceAfterDiscount(
+                                                                prov,
                                                                 priceItem,
                                                                 fieldProviders.value,
                                                                 onChangeProviders,
@@ -278,26 +410,31 @@
                                                 <!-- Cột 4: Tiền giảm -->
                                                 <td class="px-2 py-2">
                                                     <v-text-field
-                                                        v-model.number="priceItem.discountAmount"
-                                                        type="number"
+                                                        v-bind="
+                                                            bindFormattedNumberModel({
+                                                                fieldName: `discountAmount_${index}_${priceItem.unitId}`,
+                                                                value: priceItem.discountAmount,
+                                                                onChange: (val) => {
+                                                                    priceItem.discountAmount = val;
+                                                                    calculatePriceAfterDiscount(
+                                                                        prov,
+                                                                        priceItem,
+                                                                        fieldProviders.value,
+                                                                        onChangeProviders,
+                                                                    );
+                                                                }
+                                                            })
+                                                        "
                                                         variant="outlined"
                                                         density="compact"
                                                         hide-details
-                                                        @update:model-value="
-                                                            calculatePriceAfterDiscount(
-                                                                priceItem,
-                                                                fieldProviders.value,
-                                                                onChangeProviders,
-                                                            )
-                                                        "
                                                     />
                                                 </td>
 
                                                 <!-- Cột 5: Giá sau giảm (Readonly) -->
                                                 <td class="px-2 py-2">
                                                     <v-text-field
-                                                        v-model="priceItem.priceAfterDiscount"
-                                                        type="number"
+                                                        :model-value="formatNumberWithDot(priceItem.priceAfterDiscount)"
                                                         variant="outlined"
                                                         density="compact"
                                                         readonly
@@ -310,13 +447,17 @@
                                                 <!-- Cột 6: Hiệu lực từ -->
                                                 <td class="px-2 py-2">
                                                     <DatePicker
-                                                        v-model="priceItem.effectiveFrom"
+                                                        v-model="
+                                                            priceItem.effectiveFrom
+                                                        "
                                                         density="compact"
                                                         variant="outlined"
                                                         :clearable="true"
                                                         hide-details
                                                         @update:model-value="
-                                                            onChangeProviders(fieldProviders.value)
+                                                            onChangeProviders(
+                                                                fieldProviders.value,
+                                                            )
                                                         "
                                                     />
                                                 </td>
@@ -324,13 +465,17 @@
                                                 <!-- Cột 7: Hiệu lực đến -->
                                                 <td class="px-2 py-2">
                                                     <DatePicker
-                                                        v-model="priceItem.effectiveTo"
+                                                        v-model="
+                                                            priceItem.effectiveTo
+                                                        "
                                                         density="compact"
                                                         variant="outlined"
                                                         :clearable="true"
                                                         hide-details
                                                         @update:model-value="
-                                                            onChangeProviders(fieldProviders.value)
+                                                            onChangeProviders(
+                                                                fieldProviders.value,
+                                                            )
                                                         "
                                                     />
                                                 </td>
@@ -364,6 +509,7 @@
 import { Field as VeeField } from "vee-validate";
 import { mapActions, mapGetters } from "vuex";
 import DatePicker from "@/components/DatePicker.vue";
+import { useFormatInputNumber } from "@/hooks/useFormatInputNumber";
 
 export default {
     name: "FormProviderInfo",
@@ -380,6 +526,14 @@ export default {
             type: Object,
             required: true,
         },
+    },
+    data() {
+        const { bindFormattedNumberModel, formatNumberWithDot } =
+            useFormatInputNumber();
+        return {
+            bindFormattedNumberModel,
+            formatNumberWithDot,
+        };
     },
     computed: {
         ...mapGetters("provider", {
@@ -426,13 +580,43 @@ export default {
                 unitConfigMode: "custom",
                 conversions: [],
                 prices: [],
+                isDefault: false,
             });
+            if (list.length === 1) {
+                list[0].isDefault = true;
+            } else {
+                list.forEach((p) => {
+                    p.isDefault = false;
+                });
+            }
             onChange(list);
         },
 
         removeProvider(providers, onChange, index) {
             const list = [...providers];
             list.splice(index, 1);
+            if (list.length === 1) {
+                list[0].isDefault = true;
+            }
+            onChange(list);
+        },
+
+        toggleDefault(providers, onChange, index) {
+            const list = providers.map((prov, idx) => {
+                if (idx === index) {
+                    return {
+                        ...prov,
+                        isDefault: !prov.isDefault,
+                    };
+                }
+                return {
+                    ...prov,
+                    isDefault: false,
+                };
+            });
+            if (list.length === 1) {
+                list[0].isDefault = true;
+            }
             onChange(list);
         },
 
@@ -566,8 +750,8 @@ export default {
                     priceItem = {
                         unitId: unit.value,
                         price: null,
-                        discountRate: "0.00",
-                        discountAmount: "0.00",
+                        discountRate: "0",
+                        discountAmount: "0",
                         priceAfterDiscount: null,
                         effectiveFrom: null,
                         effectiveTo: null,
@@ -578,20 +762,57 @@ export default {
                 const rate = parseFloat(priceItem.discountRate) || 0;
                 const amount = parseFloat(priceItem.discountAmount) || 0;
                 const discountFromRate = (price * rate) / 100;
-                const finalPrice = Math.max(0, price - discountFromRate - amount);
-                priceItem.priceAfterDiscount = finalPrice.toFixed(2);
+                const finalPrice = Math.max(
+                    0,
+                    price - discountFromRate - amount,
+                );
+                priceItem.priceAfterDiscount = String(Math.round(finalPrice));
                 sorted.push(priceItem);
             });
             return sorted;
         },
 
-        calculatePriceAfterDiscount(priceItem, providers, onChange) {
+        calculatePriceAfterDiscount(prov, priceItem, providers, onChange) {
             const price = parseFloat(priceItem.price) || 0;
             const rate = parseFloat(priceItem.discountRate) || 0;
             const amount = parseFloat(priceItem.discountAmount) || 0;
             const discountFromRate = (price * rate) / 100;
             const finalPrice = Math.max(0, price - discountFromRate - amount);
-            priceItem.priceAfterDiscount = finalPrice.toFixed(2);
+            priceItem.priceAfterDiscount = String(Math.round(finalPrice));
+
+            // Nếu điền đầy đủ giá rồi, tự động reset isDefault của tất cả các dòng về false
+            if (this.isAllPricesFilled(prov)) {
+                (prov.prices || []).forEach((p) => {
+                    p.isDefault = false;
+                });
+            }
+            onChange(providers);
+        },
+
+        isAllPricesFilled(prov) {
+            if (!prov || !prov.prices) return false;
+            const configuredUnits = this.getConfiguredUnits();
+            if (configuredUnits.length === 0) return false;
+
+            return configuredUnits.every((unit) => {
+                const priceItem = prov.prices.find((p) => Number(p.unitId) === Number(unit.value));
+                return (
+                    priceItem &&
+                    priceItem.price !== null &&
+                    priceItem.price !== undefined &&
+                    priceItem.price !== ""
+                );
+            });
+        },
+
+        handlePriceDefaultChange(prov, priceItem, val, onChange, providers) {
+            if (val) {
+                (prov.prices || []).forEach((p) => {
+                    if (p.unitId !== priceItem.unitId) {
+                        p.isDefault = false;
+                    }
+                });
+            }
             onChange(providers);
         },
 
@@ -626,9 +847,11 @@ export default {
                 return {
                     unitId: unit.value,
                     price: oldPrice ? oldPrice.price : null,
-                    discountRate: oldPrice ? oldPrice.discountRate : "0.00",
-                    discountAmount: oldPrice ? oldPrice.discountAmount : "0.00",
-                    priceAfterDiscount: oldPrice ? oldPrice.priceAfterDiscount : null,
+                    discountRate: oldPrice ? oldPrice.discountRate : "0",
+                    discountAmount: oldPrice ? oldPrice.discountAmount : "0",
+                    priceAfterDiscount: oldPrice
+                        ? oldPrice.priceAfterDiscount
+                        : null,
                     effectiveFrom: oldPrice ? oldPrice.effectiveFrom : null,
                     effectiveTo: oldPrice ? oldPrice.effectiveTo : null,
                 };
@@ -676,9 +899,11 @@ export default {
                     return {
                         unitId: unit.value,
                         price: match ? match.price : null,
-                        discountRate: match ? match.discountRate : "0.00",
-                        discountAmount: match ? match.discountAmount : "0.00",
-                        priceAfterDiscount: match ? match.priceAfterDiscount : null,
+                        discountRate: match ? match.discountRate : "0",
+                        discountAmount: match ? match.discountAmount : "0",
+                        priceAfterDiscount: match
+                            ? match.priceAfterDiscount
+                            : null,
                         effectiveFrom: match ? match.effectiveFrom : null,
                         effectiveTo: match ? match.effectiveTo : null,
                     };
@@ -686,6 +911,7 @@ export default {
 
                 return {
                     ...prov,
+                    isDefault: prov.isDefault ?? false,
                     conversions: updatedConversions,
                     prices: updatedPrices,
                 };
@@ -697,7 +923,10 @@ export default {
         getParentForm() {
             let parent = this.$parent;
             while (parent) {
-                if (parent.$options.name === "FormIngredient" || parent.$options.name === "FormFinishedProduct") {
+                if (
+                    parent.$options.name === "FormIngredient" ||
+                    parent.$options.name === "FormFinishedProduct"
+                ) {
                     return parent.$refs.formRef;
                 }
                 parent = parent.$parent;

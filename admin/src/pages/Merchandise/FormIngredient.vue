@@ -3,7 +3,7 @@
         <VeeForm
             v-if="mode === 'create' || (mode === 'update' && item)"
             ref="formRef"
-            v-slot="{ values }"
+            v-slot="{ values, errors, submitCount }"
             as="form"
             :validation-schema="validationSchema"
             :initial-values="initialValues"
@@ -42,30 +42,44 @@
 
             <!-- Nút cancel và create/update -->
             <div class="sticky-actions-bar">
-                <div class="d-flex justify-end ga-2">
-                    <v-btn
-                        v-if="activeTab !== 'info'"
-                        color="grey"
-                        variant="outlined"
-                        @click="handlePrevTab"
-                    >
-                        {{ $t("base.back") || "Quay lại" }}
-                    </v-btn>
-                    <v-btn
-                        v-if="activeTab !== 'provider'"
-                        color="primary"
-                        @click="handleNextTab(values)"
-                    >
-                        {{ $t("button.next") }}
-                    </v-btn>
-                    <v-btn
-                        v-else
-                        color="primary"
-                        type="submit"
-                        :loading="this.$store.state.isLoading"
-                    >
-                        {{ submitButtonText }}
-                    </v-btn>
+                <div class="d-flex align-center justify-space-between w-100">
+                    <div style="flex-grow: 1; min-width: 0;" class="pr-4">
+                        <v-alert
+                            v-if="submitCount > 0 && errors.providers"
+                            type="error"
+                            variant="tonal"
+                            density="compact"
+                            class="ma-0 py-1 text-truncate"
+                            style="max-width: 500px;"
+                        >
+                            {{ errors.providers }}
+                        </v-alert>
+                    </div>
+                    <div class="d-flex ga-2 flex-shrink-0">
+                        <v-btn
+                            v-if="activeTab !== 'info'"
+                            color="grey"
+                            variant="outlined"
+                            @click="handlePrevTab"
+                        >
+                            {{ $t("base.back") || "Quay lại" }}
+                        </v-btn>
+                        <v-btn
+                            v-if="activeTab !== 'provider'"
+                            color="primary"
+                            @click="handleNextTab(values)"
+                        >
+                            {{ $t("button.next") }}
+                        </v-btn>
+                        <v-btn
+                            v-else
+                            color="primary"
+                            type="submit"
+                            :loading="this.$store.state.isLoading"
+                        >
+                            {{ submitButtonText }}
+                        </v-btn>
+                    </div>
                 </div>
             </div>
         </VeeForm>
@@ -141,6 +155,9 @@ export default {
         },
         activeTab() {
             this.showUnitErrors = false;
+            if (this.$refs.formRef) {
+                this.$refs.formRef.setFieldError("providers", undefined);
+            }
         },
     },
     methods: {
@@ -170,8 +187,10 @@ export default {
         },
         async handleNextTab(values) {
             if (this.activeTab === "info") {
-                const { valid } = await this.$refs.formRef.validate();
-                if (!valid) return;
+                await this.$refs.formRef.validate();
+                const errors = this.$refs.formRef.errors;
+                const hasInfoErrors = ["code", "name", "categoryId", "profit", "stockAlertQuantity", "description", "notes", "status"].some(field => !!errors[field]);
+                if (hasInfoErrors) return;
                 this.activeTab = "unit";
             } else if (this.activeTab === "unit") {
                 if (!this.isCurrentTabValid(values)) {

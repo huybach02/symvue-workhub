@@ -6,19 +6,15 @@ namespace App\Entity;
 
 use App\Repository\MerchandiseProviderUnitConversionRepository;
 use App\Traits\ModifierTrait;
-use App\Traits\SoftDeleteableTrait;
 use App\Traits\TimestampableTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: MerchandiseProviderUnitConversionRepository::class)]
 #[ORM\Table(name: 'merchandise_provider_unit_conversion')]
-#[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
 class MerchandiseProviderUnitConversion
 {
     use TimestampableTrait;
-    use SoftDeleteableTrait;
     use ModifierTrait;
 
     #[ORM\Id]
@@ -126,14 +122,13 @@ class MerchandiseProviderUnitConversion
             'merchandiseProvider' => $this->merchandiseProvider?->jsonSerialize(),
             'fromUnitId' => $this->fromUnit?->getId(),
             'fromUnit' => $this->fromUnit?->jsonSerialize(),
-            'fromValue' => $this->fromValue,
+            'fromValue' => formatDecimal($this->fromValue),
             'toUnitId' => $this->toUnit?->getId(),
             'toUnit' => $this->toUnit?->jsonSerialize(),
-            'toValue' => $this->toValue,
+            'toValue' => formatDecimal($this->toValue),
             'sortOrder' => $this->sortOrder,
             'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
-            'deletedAt' => $this->deletedAt?->format('Y-m-d H:i:s'),
             'createdBy' => $this->createdBy,
             'updatedBy' => $this->updatedBy,
         ];

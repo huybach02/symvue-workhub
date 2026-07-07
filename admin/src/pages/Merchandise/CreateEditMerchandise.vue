@@ -22,7 +22,7 @@
                 </v-btn>
             </v-col>
         </v-row>
-        <v-dialog v-model="dialog" max-width="1400" scrollable persistent>
+        <v-dialog v-model="dialog" max-width="1600" scrollable persistent>
             <v-card
                 :title="mode === 'create' ? titleCreate : titleUpdate"
                 prepend-icon="mdi-plus"
@@ -102,13 +102,17 @@ export default {
         titleCreate() {
             const typeKey = this.type || "title";
             return (
-                this.$t("title.create") + " " + this.$t(`merchandise.${typeKey}`)
+                this.$t("title.create") +
+                " " +
+                this.$t(`merchandise.${typeKey}`)
             );
         },
         titleUpdate() {
             const typeKey = this.item?.type || this.type || "title";
             return (
-                this.$t("title.update") + " " + this.$t(`merchandise.${typeKey}`)
+                this.$t("title.update") +
+                " " +
+                this.$t(`merchandise.${typeKey}`)
             );
         },
     },
@@ -139,13 +143,23 @@ export default {
                         this.mode === "create"
                             ? this.type
                             : this.item?.type || this.type,
-                    stockAlertQuantity: (values.stockAlertQuantity !== null && values.stockAlertQuantity !== undefined && values.stockAlertQuantity !== "")
-                        ? String(values.stockAlertQuantity)
-                        : null,
-                    profit: (values.profit !== null && values.profit !== undefined && values.profit !== "")
-                        ? String(values.profit)
-                        : null,
+                    stockAlertQuantity:
+                        values.stockAlertQuantity !== null &&
+                        values.stockAlertQuantity !== undefined &&
+                        values.stockAlertQuantity !== ""
+                            ? String(values.stockAlertQuantity)
+                            : null,
+                    profit:
+                        values.profit !== null &&
+                        values.profit !== undefined &&
+                        values.profit !== ""
+                            ? String(values.profit)
+                            : null,
                 };
+                if (payload.type === "ingredient" || payload.finishedProductSource === "supplier") {
+                    payload.recipe = null;
+                }
+
                 if (this.mode === "create") {
                     await this.createItem(payload);
                 } else {

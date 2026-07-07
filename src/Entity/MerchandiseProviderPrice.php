@@ -6,19 +6,15 @@ namespace App\Entity;
 
 use App\Repository\MerchandiseProviderPriceRepository;
 use App\Traits\ModifierTrait;
-use App\Traits\SoftDeleteableTrait;
 use App\Traits\TimestampableTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: MerchandiseProviderPriceRepository::class)]
 #[ORM\Table(name: 'merchandise_provider_price')]
-#[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
 class MerchandiseProviderPrice
 {
     use TimestampableTrait;
-    use SoftDeleteableTrait;
     use ModifierTrait;
 
     #[ORM\Id]
@@ -224,11 +220,11 @@ class MerchandiseProviderPrice
             'unitId' => $this->unit?->getId(),
             'unit' => $this->unit?->jsonSerialize(),
             'unitLabelSnapshot' => $this->unitLabelSnapshot,
-            'factorToBaseSnapshot' => $this->factorToBaseSnapshot,
-            'price' => $this->price,
-            'discountRate' => $this->discountRate,
-            'discountAmount' => $this->discountAmount,
-            'priceAfterDiscount' => $this->priceAfterDiscount,
+            'factorToBaseSnapshot' => formatDecimal($this->factorToBaseSnapshot),
+            'price' => formatDecimal($this->price),
+            'discountRate' => formatDecimal($this->discountRate),
+            'discountAmount' => formatDecimal($this->discountAmount),
+            'priceAfterDiscount' => formatDecimal($this->priceAfterDiscount),
             'currency' => $this->currency,
             'effectiveFrom' => $this->effectiveFrom?->format('Y-m-d H:i:s'),
             'effectiveTo' => $this->effectiveTo?->format('Y-m-d H:i:s'),
@@ -236,7 +232,6 @@ class MerchandiseProviderPrice
             'status' => $this->status,
             'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
-            'deletedAt' => $this->deletedAt?->format('Y-m-d H:i:s'),
             'createdBy' => $this->createdBy,
             'updatedBy' => $this->updatedBy,
         ];
