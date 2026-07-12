@@ -17,6 +17,7 @@ import category from "./modules/category";
 import unit from "./modules/unit";
 import provider from "./modules/provider";
 import merchandise from "./modules/merchandise";
+import businessProduct from "./modules/businessProduct";
 
 const store = createStore({
     state() {
@@ -52,6 +53,7 @@ const store = createStore({
         unit,
         provider,
         merchandise,
+        businessProduct,
 },
 });
 

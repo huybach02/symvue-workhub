@@ -250,7 +250,7 @@
                                                     v-if="
                                                         showRecipeErrors &&
                                                         (!itemRow.quantity ||
-                                                            itemRow.quantity <=
+                                                            +itemRow.quantity <=
                                                                 0)
                                                     "
                                                     class="text-caption text-error"

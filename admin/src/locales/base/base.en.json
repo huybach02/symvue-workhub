@@ -33,7 +33,9 @@
         "apply": "Apply",
         "clear": "Clear",
         "select_time": "Select time",
-        "select_date": "Select date"
+        "select_date": "Select date",
+        "default": "Default",
+        "add_variant": "Add new variant"
     },
     "title": {
         "create": "Create",
@@ -49,7 +51,8 @@
         "close": "Close",
         "remove": "Remove",
         "restore_default": "Restore default",
-        "next": "Next"
+        "next": "Next",
+        "add_variant": "Add new variant"
     },
     "sidebar": {
         "home": "Home",
@@ -71,7 +74,8 @@
         "category": "Goods Category",
         "unit": "Unit",
         "provider": "Provider",
-        "merchandise": "Merchandise"
+        "merchandise": "Merchandise",
+        "business_product": "Business Product"
     },
     "gender": {
         "male": "Male",

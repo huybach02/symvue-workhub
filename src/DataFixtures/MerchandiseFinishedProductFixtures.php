@@ -171,6 +171,7 @@ class MerchandiseFinishedProductFixtures extends Fixture implements DependentFix
                 'conversions' => [
                     ['from_unit' => 'THUNG', 'from_value' => '1.00', 'to_unit' => 'GOI', 'to_value' => '10.00'],
                     ['from_unit' => 'GOI', 'from_value' => '1.00', 'to_unit' => 'KG', 'to_value' => '0.50'],
+                    ['from_unit' => 'KG', 'from_value' => '1.00', 'to_unit' => 'G', 'to_value' => '1000.00'],
                 ],
                 'recipe' => [
                     'notes' => 'Công thức sản xuất 1 kg Xúc xích heo',
@@ -191,6 +192,7 @@ class MerchandiseFinishedProductFixtures extends Fixture implements DependentFix
                 'conversions' => [
                     ['from_unit' => 'THUNG', 'from_value' => '1.00', 'to_unit' => 'GOI', 'to_value' => '10.00'],
                     ['from_unit' => 'GOI', 'from_value' => '1.00', 'to_unit' => 'KG', 'to_value' => '0.50'],
+                    ['from_unit' => 'KG', 'from_value' => '1.00', 'to_unit' => 'G', 'to_value' => '1000.00'],
                 ],
                 'recipe' => [
                     'notes' => 'Công thức sản xuất 1 kg Bò viên',
@@ -211,6 +213,7 @@ class MerchandiseFinishedProductFixtures extends Fixture implements DependentFix
                 'conversions' => [
                     ['from_unit' => 'THUNG', 'from_value' => '1.00', 'to_unit' => 'GOI', 'to_value' => '10.00'],
                     ['from_unit' => 'GOI', 'from_value' => '1.00', 'to_unit' => 'KG', 'to_value' => '0.50'],
+                    ['from_unit' => 'KG', 'from_value' => '1.00', 'to_unit' => 'G', 'to_value' => '1000.00'],
                 ],
                 'recipe' => [
                     'notes' => 'Công thức sản xuất 1 kg Chả cá',
@@ -230,6 +233,7 @@ class MerchandiseFinishedProductFixtures extends Fixture implements DependentFix
                 'base_unit' => 'L',
                 'conversions' => [
                     ['from_unit' => 'CHAI', 'from_value' => '1.00', 'to_unit' => 'L', 'to_value' => '0.50'],
+                    ['from_unit' => 'L', 'from_value' => '1.00', 'to_unit' => 'ML', 'to_value' => '1000.00'],
                 ],
                 'recipe' => [
                     'notes' => 'Công thức sản xuất 1 lít Nước lẩu mì cay',
@@ -250,6 +254,7 @@ class MerchandiseFinishedProductFixtures extends Fixture implements DependentFix
                 'base_unit' => 'L',
                 'conversions' => [
                     ['from_unit' => 'CHAI', 'from_value' => '1.00', 'to_unit' => 'L', 'to_value' => '0.50'],
+                    ['from_unit' => 'L', 'from_value' => '1.00', 'to_unit' => 'ML', 'to_value' => '1000.00'],
                 ],
                 'recipe' => [
                     'notes' => 'Công thức sản xuất 1 lít Sốt mì trộn cay',

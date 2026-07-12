@@ -37,4 +37,5 @@ export const API_ROUTES_CONFIG = {
     unit: "/unit",
     provider: "/provider",
     merchandise: "/merchandise",
+    businessProduct: "/business-product",
 };

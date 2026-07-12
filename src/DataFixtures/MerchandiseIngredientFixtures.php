@@ -259,15 +259,50 @@ class MerchandiseIngredientFixtures extends Fixture implements DependentFixtureI
                     }
                 }
 
+                $priceVal = 1000.00;
+                if ($baseUnit) {
+                    $slug = $item['category_slug'];
+                    $codeUnit = $baseUnit->getCode();
+                    
+                    if ($codeUnit === 'G') {
+                        if ($slug === 'thit-bo' || $slug === 'thit-heo') {
+                            $priceVal = rand(120, 180); // 120đ - 180đ/gam (120k - 180k/kg)
+                        } elseif ($slug === 'tom-tuoi' || $slug === 'muc-tuoi') {
+                            $priceVal = rand(160, 240); // 160đ - 240đ/gam
+                        } elseif ($slug === 'rau-an-kem' || $slug === 'cai-thao') {
+                            $priceVal = rand(15, 35); // 15đ - 35đ/gam (15k - 35k/kg)
+                        } else {
+                            $priceVal = rand(40, 100);
+                        }
+                    } elseif ($codeUnit === 'ML') {
+                        if ($slug === 'sua-dac-va-sua-tuoi') {
+                            $priceVal = rand(20, 50); // 20đ - 50đ/ml
+                        } elseif ($slug === 'sot-va-gia-vi-long') {
+                            if (str_contains(strtolower($name), 'nước dùng')) {
+                                $priceVal = rand(6, 12); // 6đ - 12đ/ml (6k - 12k/lít nước dùng)
+                            } else {
+                                $priceVal = rand(15, 35); // 15đ - 35đ/ml nước mắm/tương
+                            }
+                        } else {
+                            $priceVal = rand(10, 30);
+                        }
+                    } elseif ($codeUnit === 'VIEN') {
+                        $priceVal = rand(500, 1200); // 500đ - 1200đ/viên
+                    } elseif ($codeUnit === 'GOI' || $codeUnit === 'PHAN') {
+                        $priceVal = rand(5000, 9000); // 5000đ - 9000đ/gói hoặc phần
+                    } else {
+                        $priceVal = rand(1000, 3000);
+                    }
+                }
+
                 $pPrices = [];
                 if ($baseUnit) {
-                    $priceVal = (string)(rand(10, 100) * 100);
                     $pPrices[] = [
                         'unitId' => $baseUnit->getId(),
-                        'price' => $priceVal,
+                        'price' => (string)$priceVal,
                         'discountRate' => '0.00',
                         'discountAmount' => '0.00',
-                        'priceAfterDiscount' => $priceVal,
+                        'priceAfterDiscount' => (string)$priceVal,
                         'effectiveFrom' => date('Y-m-d'),
                         'effectiveTo' => null,
                         'isDefault' => true,
@@ -275,16 +310,36 @@ class MerchandiseIngredientFixtures extends Fixture implements DependentFixtureI
                 }
 
                 if ($config) {
+                    // Helper function to calculate ratio recursively
+                    $getRatio = function(string $from, string $to, array $convs) use (&$getRatio): float {
+                        if ($from === $to) return 1.0;
+                        foreach ($convs as $c) {
+                            if ($c['from_unit'] === $from && $c['to_unit'] === $to) {
+                                return (float)$c['to_value'] / (float)$c['from_value'];
+                            }
+                        }
+                        foreach ($convs as $c) {
+                            if ($c['from_unit'] === $from) {
+                                $nextRatio = $getRatio($c['to_unit'], $to, $convs);
+                                if ($nextRatio > 0) {
+                                    return ((float)$c['to_value'] / (float)$c['from_value']) * $nextRatio;
+                                }
+                            }
+                        }
+                        return 1.0;
+                    };
+
                     foreach ($config['conversions'] as $c) {
                         $fromUnit = $unitRepo->findOneBy(['code' => $c['from_unit']]);
                         if ($fromUnit && $baseUnit && $fromUnit->getId() !== $baseUnit->getId()) {
-                            $priceVal = (string)(rand(50, 500) * 1000);
+                            $ratio = $getRatio($c['from_unit'], $config['base_unit'], $config['conversions']);
+                            $convPrice = $priceVal * $ratio;
                             $pPrices[] = [
                                 'unitId' => $fromUnit->getId(),
-                                'price' => $priceVal,
+                                'price' => (string)$convPrice,
                                 'discountRate' => '0.00',
                                 'discountAmount' => '0.00',
-                                'priceAfterDiscount' => $priceVal,
+                                'priceAfterDiscount' => (string)$convPrice,
                                 'effectiveFrom' => date('Y-m-d'),
                                 'effectiveTo' => null,
                                 'isDefault' => false,

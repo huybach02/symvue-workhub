@@ -112,6 +112,17 @@
     "default_purchase_unit": "Default purchase unit",
     "select_purchase_unit": "Select default purchase unit",
     "price": "Price",
-    "currency": "System Currency"
+    "currency": "System Currency",
+    "business_product_code": "Product code",
+    "business_product_name": "Product name",
+    "business_product_profit": "Target profit margin (%)",
+    "business_product_description": "Description",
+    "business_product_notes": "Notes",
+    "sku_code": "Variant SKU / Code",
+    "variant_name": "Variant Name",
+    "is_default_variant": "Is default variant",
+    "selling_price": "Selling Price",
+    "barcode": "Barcode",
+    "select_unit": "Select unit"
   }
 }

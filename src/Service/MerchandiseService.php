@@ -100,11 +100,13 @@ class MerchandiseService
         );
 
         return array_map(function (Merchandise $item) {
+            $recipe = $this->merchandiseRecipeRepository->findOneBy(['finishedProduct' => $item]);
             return [
                 'id' => $item->getId(),
                 'code' => $item->getCode(),
                 'name' => $item->getName(),
                 'baseUnitId' => $item->getBaseUnit()?->getId(),
+                'outputUnitId' => $recipe?->getOutputUnit()?->getId(),
                 'isSingleUnit' => $item->isSingleUnit(),
                 'conversions' => $this->getConversionsData($item->getId()),
             ];

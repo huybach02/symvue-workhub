@@ -738,5 +738,57 @@
             "effective_from": "Hiệu lực từ",
             "effective_to": "Hiệu lực đến"
         }
+    },
+    "business_product": {
+        "title": "Sản phẩm kinh doanh",
+        "variants_management": "Quản lý phiên bản sản phẩm",
+        "variant_recipe": "Thiết lập công thức sản phẩm cho phiên bản",
+        "add_finished_product": "Thêm thành phẩm công thức",
+        "empty_variants": "Sản phẩm chưa thiết lập phiên bản nào",
+        "empty_variants_desc": "Vui lòng bấm 'Thêm mới phiên bản' để bắt đầu thiết lập.",
+        "tabs": {
+            "price_setting": "Thiết lập giá"
+        },
+        "columns": {
+            "id": "ID",
+            "code": "Mã",
+            "name": "Tên",
+            "category": "Danh mục",
+            "target_profit_margin": "Lợi nhuận mục tiêu (%)",
+            "variant_count": "Số biến thể",
+            "finished_product_count": "Số TP tạo thành",
+            "variant_prices": "Giá theo biến thể"
+        },
+        "recipe": {
+            "finished_product": "Thành phẩm",
+            "quantity": "Số lượng",
+            "unit": "Đơn vị tính",
+            "waste_rate": "Hao hụt (%)",
+            "waste_rate_non_negative": "Hao hụt >= 0",
+            "notes": "Ghi chú",
+            "select_finished_product": "Chọn thành phẩm",
+            "select_unit": "Chọn đơn vị",
+            "notes_placeholder": "Ghi chú...",
+            "empty_desc": "Chưa có thành phẩm nào trong công thức của phiên bản này.",
+            "items_required": "Phải có ít nhất 1 thành phẩm công thức!",
+            "quantity_positive": "Định lượng > 0"
+        },
+        "variants_required": "Phải có ít nhất 1 phiên bản!",
+        "price": {
+            "selling_price": "Giá bán",
+            "currency": "Đơn vị tiền tệ",
+            "effective_from": "Hiệu lực từ",
+            "effective_to": "Hiệu lực đến",
+            "is_current": "Giá hiện tại đang áp dụng",
+            "note": "Ghi chú",
+            "placeholder_price": "Nhập giá bán",
+            "placeholder_note": "Nhập ghi chú giá...",
+            "empty_variants_desc": "Vui lòng quay lại tab trước để thêm mới phiên bản.",
+            "formula_suggestion": "Gợi ý giá từ công thức:",
+            "formula_suggestion_desc": "Dựa trên định lượng nguyên vật liệu và lợi nhuận mục tiêu",
+            "cost_price": "Giá vốn (Cost):",
+            "target_profit_margin": "Lợi nhuận mục tiêu (%)",
+            "suggested_price": "Giá gợi ý (Suggested):"
+        }
     }
 }

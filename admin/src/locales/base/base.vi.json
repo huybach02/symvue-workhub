@@ -33,7 +33,9 @@
         "apply": "Áp dụng",
         "clear": "Xóa",
         "select_time": "Chọn thời gian",
-        "select_date": "Chọn ngày"
+        "select_date": "Chọn ngày",
+        "default": "Mặc định",
+        "add_variant": "Thêm mới phiên bản"
     },
     "title": {
         "create": "Thêm mới",
@@ -49,7 +51,8 @@
         "close": "Đóng",
         "remove": "Xóa",
         "restore_default": "Khôi phục mặc định",
-        "next": "Tiếp theo"
+        "next": "Tiếp theo",
+        "add_variant": "Thêm mới phiên bản"
     },
     "sidebar": {
         "home": "Trang chủ",
@@ -71,7 +74,8 @@
         "category": "Danh mục hàng hóa",
         "unit": "Đơn vị tính",
         "provider": "Nhà cung cấp",
-        "merchandise": "Hàng hóa"
+        "merchandise": "Hàng hóa",
+        "business_product": "Sản phẩm kinh doanh"
     },
     "gender": {
         "male": "Nam",

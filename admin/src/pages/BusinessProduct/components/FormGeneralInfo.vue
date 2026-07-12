@@ -3,7 +3,7 @@
         <v-col cols="12" md="4">
             <VeeField v-slot="{ field, errorMessage }" name="code">
                 <div class="mb-2">
-                    {{ $t("field.merchandise_code") }}
+                    {{ $t("field.business_product_code") }}
                     <span class="text-red"> * </span>
                 </div>
                 <v-text-field
@@ -11,7 +11,7 @@
                     :error-messages="errorMessage"
                     type="text"
                     variant="outlined"
-                    :placeholder="`${$t('base.enter')} ${$t('field.merchandise_code')}`"
+                    :placeholder="`${$t('base.enter')} ${$t('field.business_product_code')}`"
                 />
             </VeeField>
         </v-col>
@@ -19,7 +19,7 @@
         <v-col cols="12" md="4">
             <VeeField v-slot="{ field, errorMessage }" name="name">
                 <div class="mb-2">
-                    {{ $t("field.merchandise_name") }}
+                    {{ $t("field.business_product_name") }}
                     <span class="text-red"> * </span>
                 </div>
                 <v-text-field
@@ -27,7 +27,7 @@
                     :error-messages="errorMessage"
                     type="text"
                     variant="outlined"
-                    :placeholder="`${$t('base.enter')} ${$t('field.merchandise_name')}`"
+                    :placeholder="`${$t('base.enter')} ${$t('field.business_product_name')}`"
                 />
             </VeeField>
         </v-col>
@@ -56,34 +56,20 @@
         </v-col>
 
         <v-col cols="12" md="4">
-            <VeeField v-slot="{ field, errorMessage }" name="profit">
-                <div class="mb-2">
-                    {{ $t("field.merchandise_profit") }}
-                </div>
-                <v-text-field
-                    v-bind="field"
-                    :error-messages="errorMessage"
-                    type="number"
-                    variant="outlined"
-                    :placeholder="`${$t('base.enter')} ${$t('field.merchandise_profit')}`"
-                />
-            </VeeField>
-        </v-col>
-
-        <v-col cols="12" md="4">
             <VeeField
                 v-slot="{ field, errorMessage }"
-                name="stockAlertQuantity"
+                name="targetProfitMargin"
             >
                 <div class="mb-2">
-                    {{ $t("field.merchandise_stock_alert_quantity") }}
+                    {{ $t("field.business_product_profit") }}
+                    <span class="text-red"> * </span>
                 </div>
                 <v-text-field
                     v-bind="field"
                     :error-messages="errorMessage"
                     type="number"
                     variant="outlined"
-                    :placeholder="`${$t('base.enter')} ${$t('field.merchandise_stock_alert_quantity')}`"
+                    :placeholder="`${$t('base.enter')} ${$t('field.business_product_profit')}`"
                 />
             </VeeField>
         </v-col>
@@ -119,8 +105,8 @@
                 <RichEditor
                     :model-value="field.value"
                     :error-messages="errorMessage"
-                    :label="$t('field.merchandise_description')"
-                    :placeholder="`${$t('base.enter')} ${$t('field.merchandise_description')}`"
+                    :label="$t('field.business_product_description')"
+                    :placeholder="`${$t('base.enter')} ${$t('field.business_product_description')}`"
                     @update:model-value="handleChange"
                     @blur="handleBlur"
                 />
@@ -130,14 +116,14 @@
         <v-col cols="12" md="12">
             <VeeField v-slot="{ field, errorMessage }" name="notes">
                 <div class="mb-2">
-                    {{ $t("field.merchandise_notes") }}
+                    {{ $t("field.business_product_notes") }}
                 </div>
                 <v-textarea
                     v-bind="field"
                     :error-messages="errorMessage"
                     rows="3"
                     variant="outlined"
-                    :placeholder="`${$t('base.enter')} ${$t('field.merchandise_notes')}`"
+                    :placeholder="`${$t('base.enter')} ${$t('field.business_product_notes')}`"
                 />
             </VeeField>
         </v-col>
@@ -161,7 +147,7 @@ export default {
     props: {
         type: {
             type: String,
-            default: "ingredient",
+            default: "business_product",
         },
         item: {
             type: Object,

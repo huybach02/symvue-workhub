@@ -734,5 +734,57 @@
             "effective_from": "Effective From",
             "effective_to": "Effective To"
         }
-     }
+    },
+    "business_product": {
+        "title": "Business Product",
+        "variants_management": "Variants Management",
+        "variant_recipe": "Variant Recipe Setup",
+        "add_finished_product": "Add Recipe Ingredient",
+        "empty_variants": "Product has no variants configured",
+        "empty_variants_desc": "Please click 'Add new variant' to start configuration.",
+        "tabs": {
+            "price_setting": "Price Setting"
+        },
+        "columns": {
+            "id": "ID",
+            "code": "Code",
+            "name": "Name",
+            "category": "Category",
+            "target_profit_margin": "Target Profit (%)",
+            "variant_count": "Variants",
+            "finished_product_count": "Products Used",
+            "variant_prices": "Variant Prices"
+        },
+        "recipe": {
+            "finished_product": "Ingredient",
+            "quantity": "Quantity",
+            "unit": "Unit",
+            "waste_rate": "Waste Rate (%)",
+            "waste_rate_non_negative": "Waste rate >= 0",
+            "notes": "Notes",
+            "select_finished_product": "Select ingredient",
+            "select_unit": "Select unit",
+            "notes_placeholder": "Notes...",
+            "empty_desc": "No ingredients configured in the recipe for this variant.",
+            "items_required": "At least 1 recipe ingredient is required!",
+            "quantity_positive": "Quantity must be > 0"
+        },
+        "variants_required": "At least 1 variant is required!",
+        "price": {
+            "selling_price": "Selling Price",
+            "currency": "System Currency",
+            "effective_from": "Effective From",
+            "effective_to": "Effective To",
+            "is_current": "Current Price Applied",
+            "note": "Note",
+            "placeholder_price": "Enter selling price",
+            "placeholder_note": "Enter price note...",
+            "empty_variants_desc": "Please go back to previous tab to add a variant.",
+            "formula_suggestion": "Formula Price Suggestion:",
+            "formula_suggestion_desc": "Based on ingredients and target profit margin",
+            "cost_price": "Cost Price:",
+            "target_profit_margin": "Target Profit Margin (%)",
+            "suggested_price": "Suggested Price:"
+        }
+    }
 }

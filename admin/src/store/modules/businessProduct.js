@@ -1,5 +1,5 @@
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import { getDataById, getListData, getDataSelect } from "@/services/bases/getData";
+import { getDataById, getListData } from "@/services/bases/getData";
 import { deleteData } from "@/services/bases/deleteData";
 import { postData } from "@/services/bases/postData";
 import { putData } from "@/services/bases/updateData";
@@ -40,7 +40,7 @@ const actions = {
 
         try {
             const response = await getListData(
-                API_ROUTES_CONFIG.merchandise,
+                API_ROUTES_CONFIG.businessProduct,
                 params,
             );
             const items = response?.data ?? [];
@@ -62,33 +62,25 @@ const actions = {
             return cachedData;
         }
 
-        const data = await getDataById(API_ROUTES_CONFIG.merchandise, id);
+        const data = await getDataById(
+            API_ROUTES_CONFIG.businessProduct,
+            id,
+        );
         commit("SET_DETAIL", { id, data });
 
         return data;
     },
     async createItem(_, values) {
-        return postData(API_ROUTES_CONFIG.merchandise, values);
+        return postData(API_ROUTES_CONFIG.businessProduct, values);
     },
     async updateItem(_, { id, values }) {
-        return putData(API_ROUTES_CONFIG.merchandise, id, values);
+        return putData(API_ROUTES_CONFIG.businessProduct, id, values);
     },
     async deleteItem(_, id) {
-        return deleteData(API_ROUTES_CONFIG.merchandise, id);
+        return deleteData(API_ROUTES_CONFIG.businessProduct, id);
     },
-    async fetchIngredientsOptions() {
-        return getDataSelect(API_ROUTES_CONFIG.merchandise, {
-            f: [
-                {
-                    field: "type",
-                    operator: "equal",
-                    value: "ingredient",
-                },
-            ],
-        });
-    },
-    async fetchAllMerchandiseOptions() {
-        return getDataSelect(API_ROUTES_CONFIG.merchandise);
+    async fetchPricePreview(_, data) {
+        return postData(`${API_ROUTES_CONFIG.businessProduct}/price-preview`, { data }, () => {}, true);
     },
 };
 

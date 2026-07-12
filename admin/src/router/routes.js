@@ -287,6 +287,21 @@ export const routes = [
                         ).icon || "",
                 },
             },
+            {
+                path: "business-product",
+                name: NAME_ROUTES_CONFIG.businessProduct,
+                component: () => import("../pages/BusinessProduct/BusinessProduct.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.businessProduct,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.businessProduct,
+                        ).icon || "",
+                },
+            },
 ],
     },
     {

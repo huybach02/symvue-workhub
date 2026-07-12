@@ -18,8 +18,7 @@ class UnitFixture extends Fixture implements FixtureGroupInterface
 
     public function load(ObjectManager $manager): void
     {
-        $connection = $manager->getConnection();
-        $connection->executeStatement('DELETE FROM unit');
+        $repo = $manager->getRepository(Unit::class);
 
         $units = [
             ['name' => 'Kilôgam', 'code' => 'KG', 'symbol' => 'kg'],
@@ -57,7 +56,7 @@ class UnitFixture extends Fixture implements FixtureGroupInterface
         ];
 
         foreach ($units as $data) {
-            $unit = new Unit();
+            $unit = $repo->findOneBy(['code' => $data['code']]) ?? new Unit();
             $unit->setName($data['name']);
             $unit->setCode($data['code']);
             $unit->setSymbol($data['symbol']);

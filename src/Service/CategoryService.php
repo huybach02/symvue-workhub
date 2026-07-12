@@ -540,4 +540,22 @@ class CategoryService
             "
         );
     }
+
+    public function getDataSelect(array $params): array
+    {
+        $qb = $this->categoryRepository->createQueryBuilder('e')
+            ->andWhere('e.isActive = :isActive')
+            ->setParameter('isActive', true);
+
+        $result = FilterWithPagination::findWithPagination($qb, $params, 'e');
+
+        $result['collection'] = array_map(function (Category $item) {
+            return [
+                'label' => $item->getName(),
+                'value' => $item->getId(),
+            ];
+        }, $result['collection']);
+
+        return $result['collection'];
+    }
 }

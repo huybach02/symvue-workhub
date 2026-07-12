@@ -23,4 +23,5 @@ export const NAME_ROUTES_CONFIG = {
     provider: "system.provider",
     profile: "system.profile",
     merchandise: "system.merchandise",
+    businessProduct: "system.businessProduct",
 };

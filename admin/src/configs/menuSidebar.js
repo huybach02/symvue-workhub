@@ -76,7 +76,7 @@ export const menuSidebar = [
             },
             {
                 title: i18n.global.t("sidebar.provider"),
-                icon: "mdi-truck-delivery",
+                icon: "mdi-truck-delivery-outline",
                 value: NAME_ROUTES_CONFIG.provider,
                 to: { name: NAME_ROUTES_CONFIG.provider },
             },
@@ -85,6 +85,12 @@ export const menuSidebar = [
                 icon: "mdi-package-variant-closed",
                 value: NAME_ROUTES_CONFIG.merchandise,
                 to: { name: NAME_ROUTES_CONFIG.merchandise },
+            },
+            {
+                title: i18n.global.t("sidebar.business_product"),
+                icon: "mdi-basket-check-outline",
+                value: NAME_ROUTES_CONFIG.businessProduct,
+                to: { name: NAME_ROUTES_CONFIG.businessProduct },
             },
         ],
     },
@@ -122,4 +128,5 @@ export const menuSidebar = [
         value: NAME_ROUTES_CONFIG.attendance,
         to: { name: NAME_ROUTES_CONFIG.attendance },
     },
+
 ];

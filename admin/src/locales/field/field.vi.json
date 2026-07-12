@@ -116,6 +116,17 @@
     "default_purchase_unit": "Đơn vị mua hàng mặc định",
     "select_purchase_unit": "Chọn đơn vị mua hàng mặc định",
     "price": "Giá",
-    "currency": "Đơn vị tiền tệ"
+    "currency": "Đơn vị tiền tệ",
+    "business_product_code": "Mã sản phẩm",
+    "business_product_name": "Tên sản phẩm",
+    "business_product_profit": "Tỷ lệ lợi nhuận mục tiêu (%)",
+    "business_product_description": "Mô tả sản phẩm",
+    "business_product_notes": "Ghi chú sản phẩm",
+    "sku_code": "Mã biến thể / SKU",
+    "variant_name": "Tên biến thể",
+    "is_default_variant": "Là biến thể mặc định",
+    "selling_price": "Giá bán",
+    "barcode": "Mã vạch",
+    "select_unit": "Chọn đơn vị"
   }
 }

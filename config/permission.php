@@ -306,4 +306,24 @@ return [
             "delete" => t("permission.actions.delete"),
             "showMenu" => t("permission.actions.showMenu"),
         ],
-    ],];
+    ],
+    [
+        "name" => "business-product",
+        "actions" => [
+            "index" => true,
+            "create" => true,
+            "show" => true,
+            "edit" => true,
+            "delete" => true,
+            "showMenu" => true
+        ],
+        "actionLabel" => [
+            "index" => t("permission.actions.index"),
+            "create" => t("permission.actions.create"),
+            "show" => t("permission.actions.show"),
+            "edit" => t("permission.actions.edit"),
+            "delete" => t("permission.actions.delete"),
+            "showMenu" => t("permission.actions.showMenu"),
+        ],
+    ],
+];
