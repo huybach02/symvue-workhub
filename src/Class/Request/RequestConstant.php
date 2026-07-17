@@ -8,6 +8,8 @@ final class RequestConstant
 {
     // Request types
     public const TYPE_LEAVE = 'leave';
+    public const TYPE_STOCK_IN = 'stock:stock-in'; // Nhập kho
+    public const TYPE_STOCK_OUT = 'stock:stock-out'; // Xuất kho
 
     // Request status
     public const STATUS_PENDING = 'pending';
@@ -34,9 +36,10 @@ final class RequestConstant
     {
         return [
             self::TYPE_LEAVE,
+            self::TYPE_STOCK_IN,
         ];
     }
-    
+
     public static function typeOptions(): array
     {
         return [
@@ -45,6 +48,13 @@ final class RequestConstant
                 'title' => 'Đề xuất nghỉ phép',
                 'description' => 'Tạo và gửi đề xuất nghỉ phép cho quản lý trực tiếp duyệt',
                 'icon' => 'mdi-calendar-remove',
+                'color' => 'warning',
+            ],
+            [
+                'code' => self::TYPE_STOCK_IN,
+                'title' => 'Nhập kho',
+                'description' => 'Tạo và gửi đề xuất nhập kho',
+                'icon' => 'mdi-inbox-arrow-down',
                 'color' => 'warning',
             ],
         ];

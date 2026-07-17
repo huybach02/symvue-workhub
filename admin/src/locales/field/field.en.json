@@ -79,6 +79,9 @@
     "request_created_at": "Request Created At",
     "request_reason": "Request Reason",
     "handover_note": "Handover Note",
+    "stock_in_date": "Stock-in Date",
+    "stock_in_merchandise": "Ingredient/Finished product",
+    "stt": "No.",
     "checkInGraceMinutes": "Check-in grace minutes",
     "lateLimitMinutes": "Late limit minutes",
     "checkInEarliestMinutes": "Check-in earliest minutes",
@@ -123,6 +126,9 @@
     "is_default_variant": "Is default variant",
     "selling_price": "Selling Price",
     "barcode": "Barcode",
-    "select_unit": "Select unit"
+    "select_unit": "Select unit",
+    "import_price": "Import Price",
+    "total_amount": "Total Amount",
+    "grand_total": "Grand Total"
   }
 }

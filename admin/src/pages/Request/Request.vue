@@ -43,7 +43,7 @@
                             :show-requester="true"
                             :show-type="true"
                             :show-status-filter="false"
-                            :isApproval="true"
+                            :is-approval="true"
                             @reload="fetchActiveApprovalTab"
                             @show-detail="openDetailDialog"
                         />
@@ -193,9 +193,6 @@ export default {
             );
         },
     },
-    async created() {
-        await this.fetchRequestTypes();
-    },
     watch: {
         "$route.query.requestId": {
             immediate: true,
@@ -219,6 +216,9 @@ export default {
                 this.reloadApprovalTable();
             }
         },
+    },
+    async created() {
+        await this.fetchRequestTypes();
     },
     methods: {
         ...mapActions("request", [

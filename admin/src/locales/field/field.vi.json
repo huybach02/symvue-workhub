@@ -83,6 +83,9 @@
     "request_created_at": "Ngày tạo đề xuất",
     "request_reason": "Lý do đề xuất",
     "handover_note": "Ghi chú bàn giao",
+    "stock_in_date": "Ngày nhập kho",
+    "stock_in_merchandise": "Nguyên liệu/thành phẩm",
+    "stt": "STT",
     "checkInGraceMinutes": "Cho phép vào trễ không tính trễ",
     "lateLimitMinutes": "Thời gian trễ tối đa",
     "checkInEarliestMinutes": "Cho phép chấm công sớm tối đa",
@@ -127,6 +130,9 @@
     "is_default_variant": "Là biến thể mặc định",
     "selling_price": "Giá bán",
     "barcode": "Mã vạch",
-    "select_unit": "Chọn đơn vị"
+    "select_unit": "Chọn đơn vị",
+    "import_price": "Giá nhập",
+    "total_amount": "Thành tiền",
+    "grand_total": "Tổng cộng toàn bộ đề xuất"
   }
 }

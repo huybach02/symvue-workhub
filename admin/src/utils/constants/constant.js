@@ -131,4 +131,14 @@ export const constant = {
             text: i18n.global.t("bo_phan.employmentType.partTime"),
         },
     ],
+    DIALOG_REQUEST_FORM_WIDTH: [
+        {
+            type: "leave",
+            width: 900,
+        },
+        {
+            type: "stock:stock-in",
+            width: 1600,
+        }
+    ]
 };

@@ -7,7 +7,7 @@
             scrollable
             @update:model-value="$emit('update:modelValue', $event)"
         >
-            <v-card class="request-detail-dialog" rounded="xl">
+            <v-card class="request-detail-dialog">
                 <div class="dialog-header">
                     <div class="d-flex align-start ga-3 flex-grow-1 min-w-0">
                         <v-avatar
@@ -100,7 +100,7 @@
 
                         <v-row>
                             <v-col cols="12" md="9">
-                                <v-card class="section-card" rounded="lg">
+                                <v-card class="section-card">
                                     <div class="section-title">
                                         <v-icon
                                             icon="mdi-information-outline"
@@ -135,7 +135,6 @@
                                         item?.permissions?.canReject
                                     "
                                     class="section-card mt-4"
-                                    rounded="lg"
                                 >
                                     <div class="section-title">
                                         <v-icon
@@ -195,7 +194,6 @@
                             <v-col cols="12" md="3">
                                 <v-card
                                     class="section-card timeline-card"
-                                    rounded="lg"
                                 >
                                     <div class="section-title">
                                         <v-icon icon="mdi-history" size="20" />

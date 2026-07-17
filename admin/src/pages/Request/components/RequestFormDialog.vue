@@ -1,11 +1,25 @@
 <template>
-    <v-dialog :model-value="modelValue" max-width="900" persistent scrollable @update:model-value="$emit('update:modelValue', $event)">
+    <v-dialog
+        :model-value="modelValue"
+        :max-width="dialogMaxWidth"
+        persistent
+        scrollable
+        @update:model-value="$emit('update:modelValue', $event)"
+    >
         <v-card>
             <v-card-title class="d-flex align-center justify-space-between">
                 <div>
-                    {{ mode === "create" ? $t("request.create_title") : $t("request.edit_title") }}
+                    {{
+                        mode === "create"
+                            ? $t("request.create_title")
+                            : $t("request.edit_title")
+                    }}
                 </div>
-                <v-btn icon="mdi-close" variant="text" @click="$emit('update:modelValue', false)" />
+                <v-btn
+                    icon="mdi-close"
+                    variant="text"
+                    @click="$emit('update:modelValue', false)"
+                />
             </v-card-title>
 
             <v-card-text>
@@ -21,20 +35,27 @@
                         v-if="activeFormComponent"
                     />
 
-                    <v-alert
-                        v-else
-                        type="warning"
-                        variant="tonal"
-                    >
+                    <v-alert v-else type="warning" variant="tonal">
                         {{ $t("request.unsupported_type") }}
                     </v-alert>
 
                     <div class="d-flex justify-end ga-2 mt-4">
-                        <v-btn color="grey" @click="$emit('update:modelValue', false)">
+                        <v-btn
+                            color="grey"
+                            @click="$emit('update:modelValue', false)"
+                        >
                             {{ $t("button.cancel") }}
                         </v-btn>
-                        <v-btn color="primary" type="submit" :loading="$store.state.isLoading">
-                            {{ mode === "create" ? $t("button.create") : $t("button.update") }}
+                        <v-btn
+                            color="primary"
+                            type="submit"
+                            :loading="$store.state.isLoading"
+                        >
+                            {{
+                                mode === "create"
+                                    ? $t("button.create")
+                                    : $t("button.update")
+                            }}
                         </v-btn>
                     </div>
                 </VeeForm>
@@ -47,6 +68,7 @@
 import { Form as VeeForm } from "vee-validate";
 import { mapActions } from "vuex";
 import { getRequestTypeComponentConfig } from "./request-types/requestTypeComponentRegistry";
+import { constant } from "@/utils/constants/constant";
 
 export default {
     name: "RequestFormDialog",
@@ -90,12 +112,22 @@ export default {
         activeFormComponent() {
             return this.requestTypeConfig?.formComponent ?? null;
         },
+        dialogMaxWidth() {
+            const dialogWidth = constant.DIALOG_REQUEST_FORM_WIDTH.find(
+                (item) => item.type === this.requestTypeCode,
+            );
+            return dialogWidth?.width || 900;
+        },
         defaultValues() {
             return { ...(this.requestTypeConfig?.initialValues ?? {}) };
         },
         currentFormValues() {
             if (this.mode === "edit" && this.item?.payload) {
-                return this.requestTypeConfig?.mapPayloadToForm?.(this.item.payload) ?? this.item.payload;
+                return (
+                    this.requestTypeConfig?.mapPayloadToForm?.(
+                        this.item.payload,
+                    ) ?? this.item.payload
+                );
             }
 
             return this.defaultValues;

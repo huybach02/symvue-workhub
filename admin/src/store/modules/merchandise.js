@@ -90,6 +90,48 @@ const actions = {
     async fetchAllMerchandiseOptions() {
         return getDataSelect(API_ROUTES_CONFIG.merchandise);
     },
+    /**
+     * Merchandise đủ điều kiện nhập kho:
+     * - type = ingredient
+     * - hoặc type = finished_product + finishedProductSource = supplier
+     */
+    async fetchStockInMerchandiseOptions() {
+        const [ingredients, finishedProducts] = await Promise.all([
+            getDataSelect(API_ROUTES_CONFIG.merchandise, {
+                f: [
+                    {
+                        field: "type",
+                        operator: "equal",
+                        value: "ingredient",
+                    },
+                ],
+            }),
+            getDataSelect(API_ROUTES_CONFIG.merchandise, {
+                f: [
+                    {
+                        field: "type",
+                        operator: "equal",
+                        value: "finished_product",
+                    },
+                    {
+                        field: "finishedProductSource",
+                        operator: "equal",
+                        value: "supplier",
+                    },
+                ],
+            }),
+        ]);
+
+        const mergeById = new Map();
+
+        [...(ingredients || []), ...(finishedProducts || [])].forEach((item) => {
+            if (item?.id != null) {
+                mergeById.set(item.id, item);
+            }
+        });
+
+        return Array.from(mergeById.values());
+    },
 };
 
 export default {

@@ -159,7 +159,7 @@ class RequestService
 
         $requestType = $request->getType() ?? '';
         $payloadDto = $this->requestTypeService->validatePayload($requestType, $dto->payload);
-        $payload = $payloadDto->toArray();
+        $payload = $this->requestTypeService->enrichPayload($requestType, $payloadDto->toArray());
         $approver = $this->userService->findDirectManager($currentUser);
         $primaryPosition = $this->userPositionRepository->findLatestPrimaryPositionByUser($currentUser);
         $revisionNo = $request->getRevisionNo() + 1;
@@ -171,8 +171,8 @@ class RequestService
             ->setSummary($this->requestTypeService->buildSummary($requestType, $payloadDto))
             ->setStatus(RequestConstant::STATUS_PENDING)
             ->setCurrentApprover($approver)
-            ->setRequesterDepartmentSnapshot($primaryPosition->getDepartment()?->jsonSerialize() ?? null)
-            ->setRequesterPositionSnapshot($primaryPosition->getPosition()?->jsonSerialize() ?? null)
+            ->setRequesterDepartmentSnapshot($primaryPosition?->getDepartment()?->jsonSerialize() ?? null)
+            ->setRequesterPositionSnapshot($primaryPosition?->getPosition()?->jsonSerialize() ?? null)
             ->setRevisionNo($revisionNo)
             ->setSubmittedAt(new \DateTime())
             ->setRejectedAt(null)
@@ -364,7 +364,7 @@ class RequestService
         ?int $sourceRefId = null,
     ): Request {
         $payloadDto = $this->requestTypeService->validatePayload($type, $payload);
-        $payloadData = $payloadDto->toArray();
+        $payloadData = $this->requestTypeService->enrichPayload($type, $payloadDto->toArray());
         $approver = $this->userService->findDirectManager($requester);
         $primaryPosition = $this->userPositionRepository->findLatestPrimaryPositionByUser($requester);
         $now = new \DateTime();

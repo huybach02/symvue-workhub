@@ -709,10 +709,11 @@ class UserService
         //     throw new \Exception(t('request.error.primary_department_not_found'));
         // }
 
-        $approver = $this->userPositionRepository->findPrimaryManagerByDepartmentExcludingUser(
-            $primaryPosition->getDepartment(),
+        $department = $primaryPosition?->getDepartment();
+        $approver = $department ? $this->userPositionRepository->findPrimaryManagerByDepartmentExcludingUser(
+            $department,
             $user,
-        );
+        ) : null;
 
         if ($approver instanceof UserPosition && $approver->getMember()) {
             return $approver->getMember();

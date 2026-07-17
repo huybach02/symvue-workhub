@@ -92,12 +92,17 @@ request:
     title:
         leave: "Leave request"
         leave_range: "Leave request from %startDate% to %endDate%"
+        stock_in: "Stock-in request on %stockInDate%"
+        stock_in_default: "Stock-in request"
         default: "Request"
     payload:
         leave_type_default: "Leave"
+        stock_in_default: "Stock in"
+        stock_in_provider_count: "providers"
     error:
         unsupported_type: "Unsupported request type"
         invalid_leave_payload_format: "Invalid leave request payload format"
+        invalid_stock_in_payload_format: "Invalid stock-in request payload format"
         primary_department_not_found: "Cannot determine the requester's primary department"
         approver_not_found: "No direct manager or admin found to approve this request"
         invalid_leave_payload_for_apply: "Invalid leave payload for applying related data"

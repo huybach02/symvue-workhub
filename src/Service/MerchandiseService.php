@@ -101,16 +101,56 @@ class MerchandiseService
 
         return array_map(function (Merchandise $item) {
             $recipe = $this->merchandiseRecipeRepository->findOneBy(['finishedProduct' => $item]);
+            $mProviders = $this->merchandiseProviderRepository->findBy(['merchandise' => $item->getId()]);
+            $providerIds = array_map(fn($mp) => $mp->getProvider()?->getId(), $mProviders);
+
             return [
                 'id' => $item->getId(),
                 'code' => $item->getCode(),
                 'name' => $item->getName(),
+                'type' => $item->getType(),
                 'baseUnitId' => $item->getBaseUnit()?->getId(),
                 'outputUnitId' => $recipe?->getOutputUnit()?->getId(),
                 'isSingleUnit' => $item->isSingleUnit(),
                 'conversions' => $this->getConversionsData($item->getId()),
+                'units' => $this->getMerchandiseUnitsSelectData($item->getId()),
+                'providerIds' => $providerIds,
             ];
         }, $result['collection']);
+    }
+
+    /**
+     * @return list<array{value: int, label: string, isBase: bool}>
+     */
+    private function getMerchandiseUnitsSelectData(int $merchandiseId): array
+    {
+        $merchandiseUnits = $this->merchandiseUnitRepository->findBy(
+            ['merchandise' => $merchandiseId],
+            ['level' => 'ASC', 'id' => 'ASC'],
+        );
+
+        $seenUnitIds = [];
+        $units = [];
+
+        foreach ($merchandiseUnits as $merchandiseUnit) {
+            $unit = $merchandiseUnit->getUnit();
+            $unitId = $unit?->getId();
+
+            if ($unitId === null || isset($seenUnitIds[$unitId])) {
+                continue;
+            }
+
+            $seenUnitIds[$unitId] = true;
+            $label = trim((string) ($merchandiseUnit->getLabel() ?: $unit?->getName() ?: ''));
+
+            $units[] = [
+                'value' => $unitId,
+                'label' => $label !== '' ? $label : (string) $unitId,
+                'isBase' => (bool) $merchandiseUnit->isBase(),
+            ];
+        }
+
+        return $units;
     }
 
     public function findById(int $id): array
@@ -526,6 +566,7 @@ class MerchandiseService
                     'discountRate' => formatDecimal($pp->getDiscountRate()),
                     'discountAmount' => formatDecimal($pp->getDiscountAmount()),
                     'priceAfterDiscount' => formatDecimal($pp->getPriceAfterDiscount()),
+                    'currency' => $pp->getCurrency(),
                     'effectiveFrom' => $pp->getEffectiveFrom()?->format('Y-m-d'),
                     'effectiveTo' => $pp->getEffectiveTo()?->format('Y-m-d'),
                 ];
