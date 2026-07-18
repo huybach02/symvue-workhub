@@ -302,6 +302,36 @@ export const routes = [
                         ).icon || "",
                 },
             },
+            {
+                path: "warehouse",
+                name: NAME_ROUTES_CONFIG.warehouse,
+                component: () => import("../pages/Warehouse/Warehouse.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.warehouse,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.warehouse,
+                        ).icon || "",
+                },
+            },
+            {
+                path: "stock-receipt",
+                name: NAME_ROUTES_CONFIG.stockReceipt,
+                component: () => import("../pages/StockReceipt/StockReceipt.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.stockReceipt,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.stockReceipt,
+                        ).icon || "",
+                },
+            },
 ],
     },
     {

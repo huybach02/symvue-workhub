@@ -64,6 +64,7 @@ final class GeneralSettingService
                 'checkInReminderMinutesBefore' => 'CHECK_IN_REMINDER_MINUTES_BEFORE',
                 'checkOutReminderMinutesBefore' => 'CHECK_OUT_REMINDER_MINUTES_BEFORE',
                 'currency' => 'CURRENCY',
+                'receiveFromProviderWarehouseId' => 'RECEIVE_FROM_PROVIDER_WAREHOUSE_ID',
             ];
 
             $cauHinhChungList = $this->cauHinhChungRepository->findAll();
@@ -95,6 +96,13 @@ final class GeneralSettingService
                     }
 
                     $cauHinhChungMap[$tenCauHinh]->setGiaTri((string) $giaTri);
+                    $cauHinhChungCacheData[$tenCauHinh] = (string) $giaTri;
+                } else {
+                    $newSetting = new GeneralSetting();
+                    $newSetting->setTenCauHinh($tenCauHinh);
+                    $newSetting->setGiaTri((string) $giaTri);
+                    $this->entityManager->persist($newSetting);
+
                     $cauHinhChungCacheData[$tenCauHinh] = (string) $giaTri;
                 }
             }

@@ -108,7 +108,8 @@
         "get_current_ip": "Lấy địa chỉ IP hiện tại",
         "detect_ip_failed": "Không thể lấy địa chỉ IP: {message}",
         "notification_test": "Test thông báo của hệ thống",
-        "currency_setting": "Cấu hình Tiền tệ hệ thống"
+        "currency_setting": "Cấu hình tiền tệ hệ thống",
+        "warehouse_settings": "Cấu hình kho"
     },
     "thoi_gian_lam_viec": {
         "fulltime": "Thời gian cố định",
@@ -439,7 +440,9 @@
             "select_merchandise": "Chọn nguyên liệu/thành phẩm",
             "select_unit": "Chọn đơn vị tính",
             "providers_required": "Vui lòng thêm ít nhất 1 nhà cung cấp",
-            "items_required": "Vui lòng thêm ít nhất 1 nguyên liệu/thành phẩm"
+            "items_required": "Vui lòng thêm ít nhất 1 nguyên liệu/thành phẩm",
+            "create_receipt_button": "Tạo phiếu nhập kho",
+            "receipt_created_success": "Tạo phiếu nhập kho thành công!"
         },
         "create_button": "Thêm mới",
         "my_requests": "Đề xuất của tôi",
@@ -804,6 +807,82 @@
             "cost_price": "Giá vốn (Cost):",
             "target_profit_margin": "Lợi nhuận mục tiêu (%)",
             "suggested_price": "Giá gợi ý (Suggested):"
+        }
+    },
+    "warehouse": {
+        "title": "Warehouse",
+        "columns": {
+            "id": "ID",
+            "name": "Tên"
+        }
+    },
+    "stock_receipt": {
+        "title": "Phiếu nhập kho",
+        "detail_title": "Chi tiết phiếu nhập kho",
+        "columns": {
+            "id": "ID",
+            "code": "Mã phiếu",
+            "title": "Tiêu đề",
+            "warehouse": "Kho nhận",
+            "request": "Đề xuất nguồn",
+            "fulfillment_status": "Đáp ứng"
+        },
+        "status": {
+            "CREATED": "Khởi tạo",
+            "IN_PROGRESS": "Đang xử lý",
+            "PARTIALLY_COMPLETED": "Hoàn tất một phần",
+            "COMPLETED": "Hoàn tất",
+            "CANCELLED": "Đã hủy"
+        },
+        "provider_status": {
+            "CREATED": "Khởi tạo",
+            "AWAITING_SHIPMENT": "Chờ giao hàng",
+            "IN_TRANSIT": "Đang vận chuyển",
+            "ARRIVED": "Đã đến kho",
+            "INSPECTING": "Đang kiểm hàng",
+            "COMPLETED": "Hoàn tất",
+            "CANCELLED": "Đã hủy"
+        },
+        "fulfillment": {
+            "PENDING": "Chờ xử lý",
+            "FULL": "Đầy đủ",
+            "PARTIAL_CLOSED": "Đóng một phần",
+            "BACKORDER_OPEN": "Chờ bổ sung",
+            "BACKORDER_CREATED": "Đã tạo bổ sung"
+        },
+        "stepper_tooltip": {
+            "current": "Trạng thái hiện tại",
+            "completed": "Đã hoàn thành",
+            "next": "Bấm để chuyển sang trạng thái này",
+            "locked": "Chưa thể thực hiện bước này"
+        },
+        "inspection": {
+            "title": "Kiểm hàng",
+            "lots_title": "Danh sách lô",
+            "lot_label": "Lô #{index}",
+            "add_lot": "Thêm lô",
+            "no_lots": "Chưa có lô nào. Vui lòng thêm ít nhất một lô.",
+            "lots_required": "Mỗi mặt hàng cần ít nhất một lô.",
+            "items_required": "Danh sách mặt hàng kiểm tra không được để trống.",
+            "expected": "Yêu cầu",
+            "total_received": "Tổng nhận",
+            "total_accepted": "Tổng chấp nhận",
+            "total_rejected": "Tổng từ chối",
+            "shortage": "Thiếu",
+            "surplus": "Thừa",
+            "balanced": "Đủ",
+            "internal_lot_auto": "Tự động tạo",
+            "base_convert_hint": "Quy đổi base: nhận {received} · chấp nhận {accepted} · từ chối {rejected} {unit}",
+            "received_eq_accepted_rejected": "Số lượng nhận phải bằng chấp nhận + từ chối.",
+            "expiry_after_manufacture": "Hạn sử dụng phải sau ngày sản xuất.",
+            "duplicate_lot_dates": "Không được trùng cặp ngày sản xuất và hạn sử dụng trong cùng mặt hàng.",
+            "shortage_resolution": "Xử lý thiếu hàng",
+            "shortage_description": "Tổng số lượng chấp nhận nhỏ hơn số lượng yêu cầu. Vui lòng chọn cách xử lý phần thiếu.",
+            "accept_shortage": "Chấp nhận thiếu (đóng phiếu với số lượng đã nhận)",
+            "create_backorder": "Tạo phiếu bổ sung cho phần thiếu",
+            "shortage_required": "Vui lòng chọn cách xử lý thiếu hàng.",
+            "shortage_resolution_invalid": "Cách xử lý thiếu hàng không hợp lệ.",
+            "submit": "Xác nhận kiểm hàng"
         }
     }
 }

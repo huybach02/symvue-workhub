@@ -14,6 +14,16 @@ export const ATTENDANCE_STATUS = Object.freeze({
     SCHEDULED: "scheduled",
 });
 
+export const STOCK_RECEIPT_PROVIDER_STATUS = Object.freeze({
+    CREATED: "CREATED",
+    AWAITING_SHIPMENT: "AWAITING_SHIPMENT",
+    IN_TRANSIT: "IN_TRANSIT",
+    ARRIVED: "ARRIVED",
+    INSPECTING: "INSPECTING",
+    COMPLETED: "COMPLETED",
+    CANCELLED: "CANCELLED",
+});
+
 export const ATTENDANCE_UI = Object.freeze({
     actions: [
         {
@@ -140,5 +150,37 @@ export const constant = {
             type: "stock:stock-in",
             width: 1600,
         }
-    ]
+    ],
+    CURRENCIES: [
+        { value: "VND", title: "VND (Đồng Việt Nam)" },
+        { value: "USD", title: "USD (Đô la Mỹ)" },
+        { value: "EUR", title: "EUR (Euro)" },
+        { value: "JPY", title: "JPY (Yên Nhật)" },
+        { value: "SGD", title: "SGD (Đô la Singapore)" },
+    ],
+    STOCK_RECEIPT_PROVIDER_STATUS_STEPS: [
+        { value: "CREATED", key: "stock_receipt.provider_status.CREATED" },
+        { value: "AWAITING_SHIPMENT", key: "stock_receipt.provider_status.AWAITING_SHIPMENT" },
+        { value: "IN_TRANSIT", key: "stock_receipt.provider_status.IN_TRANSIT" },
+        { value: "ARRIVED", key: "stock_receipt.provider_status.ARRIVED" },
+        { value: "INSPECTING", key: "stock_receipt.provider_status.INSPECTING" },
+        { value: "COMPLETED", key: "stock_receipt.provider_status.COMPLETED" },
+    ],
+    STOCK_RECEIPT_STATUS_COLORS: {
+        CREATED: "grey",
+        AWAITING_SHIPMENT: "info",
+        IN_TRANSIT: "warning",
+        ARRIVED: "info",
+        INSPECTING: "warning",
+        COMPLETED: "success",
+        CANCELLED: "error",
+        IN_PROGRESS: "warning",
+        PARTIALLY_COMPLETED: "warning"
+    },
+    FULFILLMENT_STATUS_COLORS: {
+        PENDING: "warning",
+        FULL: "success",
+        PARTIAL_CLOSED: "error",
+        BACKORDER_OPEN: "info"
+    }
 };

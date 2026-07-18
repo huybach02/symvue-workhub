@@ -1,10 +1,11 @@
 import * as yup from "yup";
-import { buildNumberRule, buildStringRule } from "../../validationBuilder";
+import { buildNumberRule, buildStringRule, buildUuidRule } from "../../validationBuilder";
 import { i18n } from "@/plugins/i18n";
 
 const t = (key, params) => i18n.global.t(key, params);
 
 const stockInItemSchema = yup.object({
+    lineId: buildUuidRule("lineId", { required: true }),
     merchandiseId: yup
         .mixed()
         .nullable()

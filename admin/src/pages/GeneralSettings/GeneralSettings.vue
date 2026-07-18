@@ -819,6 +819,42 @@
                     </VeeField>
                 </v-col>
             </v-row>
+            <v-sheet
+                color="primary"
+                theme="dark"
+                class="pa-3 mb-5 rounded d-flex align-center ga-2"
+                elevation="1"
+            >
+                <v-icon icon="mdi-currency-usd" size="22" />
+                <p class="text-h6 font-weight-bold ma-0">
+                    {{ $t("system_config.warehouse_settings") || "Cấu hình kho" }}
+                </p>
+            </v-sheet>
+            <v-row class="mb-6">
+                <v-col cols="12" md="4">
+                    <VeeField
+                        v-slot="{ field, errorMessage, handleChange, handleBlur }"
+                        name="receiveFromProviderWarehouseId"
+                    >
+                        <div class="mb-2">
+                            {{ $t("field.warehouse_receive_from_provider") }}
+                            <span class="text-red"> * </span>
+                        </div>
+                        <v-autocomplete
+                            :model-value="field.value"
+                            :error-messages="errorMessage"
+                            :items="warehouseOptionsString"
+                            item-title="label"
+                            item-value="value"
+                            variant="outlined"
+                            :readonly="!isEditing"
+                            persistent-placeholder
+                            @update:model-value="handleChange"
+                            @blur="handleBlur"
+                        />
+                    </VeeField>
+                </v-col>
+            </v-row>
         </VeeForm>
     </div>
 </template>
@@ -831,6 +867,7 @@ import { Field, Form } from "vee-validate";
 import { mapActions, mapGetters } from "vuex";
 import { toast } from "@/main";
 import axiosInstance from "@/configs/axios";
+import { constant } from "@/utils/constants/constant";
 
 export default {
     components: {
@@ -844,13 +881,7 @@ export default {
             locating: false,
             detectingIp: false,
             isSending: false,
-            currencies: [
-                { value: "VND", title: "VND (Đồng Việt Nam)" },
-                { value: "USD", title: "USD (Đô la Mỹ)" },
-                { value: "EUR", title: "EUR (Euro)" },
-                { value: "JPY", title: "JPY (Yên Nhật)" },
-                { value: "SGD", title: "SGD (Đô la Singapore)" },
-            ],
+            currencies: constant.CURRENCIES,
         };
     },
     computed: {
@@ -859,6 +890,15 @@ export default {
             "initialValues",
             "saving",
         ]),
+        ...mapGetters("warehouse", {
+            warehouseOptions: "options",
+        }),
+        warehouseOptionsString() {
+            return (this.warehouseOptions || []).map((o) => ({
+                ...o,
+                value: String(o.value),
+            }));
+        },
         permission() {
             return usePermission(API_ROUTES_CONFIG.generalSettings);
         },
@@ -868,8 +908,12 @@ export default {
     },
     methods: {
         ...mapActions("generalSettings", ["fetchSettings", "updateSettings"]),
+        ...mapActions("warehouse", {
+            fetchWarehouseOptions: "fetchOptions",
+        }),
         async getAll() {
             await this.fetchSettings();
+            await this.fetchWarehouseOptions();
         },
         async sendTestNotification() {
             this.isSending = true;

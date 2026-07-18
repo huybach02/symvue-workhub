@@ -60,6 +60,15 @@ final readonly class StockInRequestPayloadDTO
                     continue;
                 }
 
+                $lineId = $item['lineId'] ?? null;
+                if ($lineId !== null && $lineId !== '') {
+                    if (!\Ramsey\Uuid\Uuid::isValid((string) $lineId)) {
+                        $context->buildViolation('Mã dòng hàng (lineId) phải là UUID hợp lệ')
+                            ->atPath(sprintf('providers[%d].items[%d].lineId', $providerIndex, $itemIndex))
+                            ->addViolation();
+                    }
+                }
+
                 if (($item['merchandiseId'] ?? null) === null || $item['merchandiseId'] === '') {
                     $context->buildViolation('Vui lòng chọn nguyên liệu/thành phẩm')
                         ->atPath(sprintf('providers[%d].items[%d].merchandiseId', $providerIndex, $itemIndex))
@@ -104,7 +113,13 @@ final readonly class StockInRequestPayloadDTO
                     continue;
                 }
 
+                $lineId = isset($item['lineId']) ? trim((string) $item['lineId']) : '';
+                if ($lineId === '' || !\Ramsey\Uuid\Uuid::isValid($lineId)) {
+                    $lineId = \Ramsey\Uuid\Uuid::uuid4()->toString();
+                }
+
                 $items[] = [
+                    'lineId' => $lineId,
                     'merchandiseId' => (int) ($item['merchandiseId'] ?? 0) ?: null,
                     'quantity' => is_numeric($item['quantity'] ?? null)
                         ? (string) $item['quantity']

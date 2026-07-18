@@ -277,6 +277,16 @@
 
                 <div class="d-flex justify-end ga-2 my-4 me-4">
                     <v-btn
+                        v-if="showCreateReceiptButton"
+                        color="success"
+                        prepend-icon="mdi-plus-box-outline"
+                        :loading="isCreatingReceipt"
+                        @click="handleCreateStockReceipt"
+                    >
+                        {{ $t("request.stock_in.create_receipt_button") || "Tạo phiếu nhập kho" }}
+                    </v-btn>
+
+                    <v-btn
                         v-if="item?.permissions?.canEdit && permission?.edit"
                         color="warning"
                         prepend-icon="mdi-pencil-outline"
@@ -353,7 +363,7 @@
 
 <script>
 import dayjs from "dayjs";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import { functionHelper } from "@/helpers/functionHelper";
 import { constant } from "@/utils/constants/constant";
 import { getRequestTypeComponentConfig } from "./request-types/requestTypeComponentRegistry";
@@ -399,13 +409,23 @@ export default {
             isCancelling: false,
             showConfirmDelete: false,
             isDeleting: false,
+            isCreatingReceipt: false,
         };
     },
     computed: {
+        ...mapGetters("auth", ["currentUser"]),
         activeDetailComponent() {
             return (
                 getRequestTypeComponentConfig(this.item?.type)
                     ?.detailComponent ?? null
+            );
+        },
+        showCreateReceiptButton() {
+            return (
+                this.item?.type === "stock:stock-in" &&
+                this.item?.status === "approved" &&
+                this.currentUser?.id === this.item?.requester?.id &&
+                !this.item?.targetRefId
             );
         },
     },
@@ -424,6 +444,18 @@ export default {
             "cancelRequest",
             "deleteRequest",
         ]),
+        ...mapActions("stockReceipt", {
+            createStockReceipt: "createItem",
+        }),
+        async handleCreateStockReceipt() {
+            this.isCreatingReceipt = true;
+            await this.createStockReceipt({
+                requestId: this.item.id,
+            });
+            this.$emit("refresh");
+
+            this.isCreatingReceipt = false;
+        },
         getRequestStatusColor(status) {
             return (
                 constant.REQUEST_STATUS.find((item) => item.value === status)

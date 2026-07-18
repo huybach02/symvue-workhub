@@ -522,6 +522,7 @@ export default {
 
         createEmptyItem() {
             return {
+                lineId: crypto.randomUUID(),
                 merchandiseId: null,
                 quantity: null,
                 unitId: null,

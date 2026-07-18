@@ -4,6 +4,9 @@ php bin/console make:migration
 
 php bin/console doctrine:migrations:migrate
 
+php bin/console doctrine:schema:drop --full-database --force
+php bin/console doctrine:migrations:migrate --no-interaction
+
 php bin/console cache:clear
 
 Chạy và XÓA sạch dữ liệu cũ
@@ -16,7 +19,7 @@ Chạy worker để xử lý message (ví dụ: gửi email)
 php bin/console messenger:consume async --memory-limit=128M -vv
 
 
-Command cronjob 
+Command cronjob
 php bin/console messenger:consume scheduler_default -vv
 
 Chạy ngay lập tức

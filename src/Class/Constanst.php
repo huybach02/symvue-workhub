@@ -317,3 +317,76 @@ enum WarehouseType: string
     case Main = 'main';
     case Branch = 'branch';
 }
+
+enum StockReceiptStatus: string
+{
+    case Created = 'CREATED';
+    case InProgress = 'IN_PROGRESS';
+    case PartiallyCompleted = 'PARTIALLY_COMPLETED';
+    case Completed = 'COMPLETED';
+    case Cancelled = 'CANCELLED';
+}
+
+enum StockReceiptProviderStatus: string
+{
+    case Created = 'CREATED';
+    case AwaitingShipment = 'AWAITING_SHIPMENT';
+    case InTransit = 'IN_TRANSIT';
+    case Arrived = 'ARRIVED';
+    case Inspecting = 'INSPECTING';
+    case Completed = 'COMPLETED';
+    case Cancelled = 'CANCELLED';
+}
+
+enum FulfillmentStatus: string
+{
+    case Pending = 'PENDING';
+    case Full = 'FULL';
+    case PartialClosed = 'PARTIAL_CLOSED';
+    case BackorderOpen = 'BACKORDER_OPEN';
+    case BackorderCreated = 'BACKORDER_CREATED';
+}
+
+enum ShortageResolution: string
+{
+    case AcceptShortage = 'ACCEPT_SHORTAGE';
+    case CreateBackorder = 'CREATE_BACKORDER';
+}
+
+enum InventoryLotStatus: string
+{
+    case Available = 'AVAILABLE';
+    case Blocked = 'BLOCKED';
+    case Expired = 'EXPIRED';
+    case Depleted = 'DEPLETED';
+}
+
+enum InventoryMovementType: string
+{
+    case StockIn = 'STOCK_IN';
+    case StockOut = 'STOCK_OUT';
+    case Adjustment = 'ADJUSTMENT';
+    case TransferIn = 'TRANSFER_IN';
+    case TransferOut = 'TRANSFER_OUT';
+    case Reversal = 'REVERSAL';
+}
+
+enum StockReceiptEventType: string
+{
+    case Created = 'CREATED';
+    case StatusChanged = 'STATUS_CHANGED';
+    case InspectionStarted = 'INSPECTION_STARTED';
+    case InspectionSaved = 'INSPECTION_SAVED';
+    case InventoryPosted = 'INVENTORY_POSTED';
+    case ShortageAccepted = 'SHORTAGE_ACCEPTED';
+    case BackorderCreated = 'BACKORDER_CREATED';
+    case Cancelled = 'CANCELLED';
+    case Reversed = 'REVERSED';
+}
+
+enum ActorType: string
+{
+    case User = 'USER';
+    case System = 'SYSTEM';
+    case Job = 'JOB';
+}

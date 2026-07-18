@@ -52,7 +52,8 @@
         "remove": "Remove",
         "restore_default": "Restore default",
         "next": "Next",
-        "add_variant": "Add new variant"
+        "add_variant": "Add new variant",
+        "detail": "Detail"
     },
     "sidebar": {
         "home": "Home",
@@ -75,7 +76,9 @@
         "unit": "Unit",
         "provider": "Provider",
         "merchandise": "Merchandise",
-        "business_product": "Business Product"
+        "business_product": "Business Product",
+        "warehouse": "Warehouse",
+        "stock_receipt": "StockReceipt"
     },
     "gender": {
         "male": "Male",

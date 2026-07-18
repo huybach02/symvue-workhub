@@ -129,5 +129,9 @@ class GeneralSettingDTO
         #[Assert\NotBlank(allowNull: true)]
         #[Assert\Type(type: "string")]
         public readonly ?string $currency = 'VND',
+
+        #[Assert\NotBlank(allowNull: true)]
+        #[Assert\Type(type: "string")]
+        public readonly ?string $receiveFromProviderWarehouseId = null,
     ) {}
 }

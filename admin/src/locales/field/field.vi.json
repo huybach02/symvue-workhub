@@ -86,6 +86,7 @@
     "stock_in_date": "Ngày nhập kho",
     "stock_in_merchandise": "Nguyên liệu/thành phẩm",
     "stt": "STT",
+    "sl_yeu_cau": "Số lượng yêu cầu",
     "checkInGraceMinutes": "Cho phép vào trễ không tính trễ",
     "lateLimitMinutes": "Thời gian trễ tối đa",
     "checkInEarliestMinutes": "Cho phép chấm công sớm tối đa",
@@ -133,6 +134,15 @@
     "select_unit": "Chọn đơn vị",
     "import_price": "Giá nhập",
     "total_amount": "Thành tiền",
-    "grand_total": "Tổng cộng toàn bộ đề xuất"
+    "grand_total": "Tổng cộng toàn bộ đề xuất",
+    "warehouse_receive_from_provider": "Kho nhập Nguyên liệu/Thành phẩm từ nhà cung cấp",
+    "received_quantity": "Số lượng nhận",
+    "accepted_quantity": "Số lượng chấp nhận",
+    "rejected_quantity": "Số lượng từ chối",
+    "rejection_reason": "Lý do từ chối",
+    "manufacture_date": "Ngày sản xuất",
+    "expiry_date": "Hạn sử dụng",
+    "supplier_lot_code": "Mã lô NCC",
+    "internal_lot_code": "Mã lot nội bộ"
   }
 }

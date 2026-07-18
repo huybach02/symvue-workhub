@@ -114,4 +114,10 @@ export const cauHinhChungSchema = yup.object({
     currency: buildStringRule(t("field.currency"), {
         required: true,
     }),
+    receiveFromProviderWarehouseId: buildStringRule(
+        t("field.warehouse_receive_from_provider"),
+        {
+            required: true,
+        },
+    ),
 });

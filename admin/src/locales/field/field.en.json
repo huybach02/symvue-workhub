@@ -82,6 +82,7 @@
     "stock_in_date": "Stock-in Date",
     "stock_in_merchandise": "Ingredient/Finished product",
     "stt": "No.",
+    "sl_yeu_cau": "Requested Qty",
     "checkInGraceMinutes": "Check-in grace minutes",
     "lateLimitMinutes": "Late limit minutes",
     "checkInEarliestMinutes": "Check-in earliest minutes",
@@ -129,6 +130,15 @@
     "select_unit": "Select unit",
     "import_price": "Import Price",
     "total_amount": "Total Amount",
-    "grand_total": "Grand Total"
+    "grand_total": "Grand Total",
+    "warehouse_receive_from_provider": "Warehouse receiving merchandise from providers",
+    "received_quantity": "Received quantity",
+    "accepted_quantity": "Accepted quantity",
+    "rejected_quantity": "Rejected quantity",
+    "rejection_reason": "Rejection reason",
+    "manufacture_date": "Manufacture date",
+    "expiry_date": "Expiry date",
+    "supplier_lot_code": "Supplier lot code",
+    "internal_lot_code": "Internal lot code"
   }
 }

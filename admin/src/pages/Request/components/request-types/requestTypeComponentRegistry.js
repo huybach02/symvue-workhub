@@ -41,6 +41,7 @@ export const REQUEST_TYPE_COMPONENT_REGISTRY = {
                           providerId: providerGroup.providerId ?? null,
                           items: Array.isArray(providerGroup.items)
                               ? providerGroup.items.map((item) => ({
+                                    lineId: item.lineId ?? crypto.randomUUID(),
                                     merchandiseId: item.merchandiseId ?? null,
                                     quantity:
                                         item.quantity === null ||

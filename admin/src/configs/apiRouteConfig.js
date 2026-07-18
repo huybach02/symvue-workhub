@@ -38,4 +38,6 @@ export const API_ROUTES_CONFIG = {
     provider: "/provider",
     merchandise: "/merchandise",
     businessProduct: "/business-product",
+    warehouse: "/warehouse",
+    stockReceipt: "/stock-receipt",
 };

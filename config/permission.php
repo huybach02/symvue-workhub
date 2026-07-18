@@ -193,7 +193,7 @@ return [
             "show" => true,
             "edit" => true,
             "delete" => true,
-            "showMenu" => true
+            "showMenu" => true,
         ],
         "actionLabel" => [
             "index" => t("permission.actions.index"),
@@ -212,7 +212,7 @@ return [
             "show" => true,
             "edit" => true,
             "delete" => true,
-            "showMenu" => true
+            "showMenu" => true,
         ],
         "actionLabel" => [
             "index" => t("permission.actions.index"),
@@ -231,7 +231,7 @@ return [
             "show" => true,
             "edit" => true,
             "delete" => true,
-            "showMenu" => true
+            "showMenu" => true,
         ],
         "actionLabel" => [
             "index" => t("permission.actions.index"),
@@ -252,7 +252,7 @@ return [
             "delete" => true,
             "export" => true,
             "import" => true,
-            "showMenu" => true
+            "showMenu" => true,
         ],
         "actionLabel" => [
             "index" => t("permission.actions.index"),
@@ -275,7 +275,7 @@ return [
             "delete" => true,
             "export" => true,
             "import" => true,
-            "showMenu" => true
+            "showMenu" => true,
         ],
         "actionLabel" => [
             "index" => t("permission.actions.index"),
@@ -296,7 +296,7 @@ return [
             "show" => true,
             "edit" => true,
             "delete" => true,
-            "showMenu" => true
+            "showMenu" => true,
         ],
         "actionLabel" => [
             "index" => t("permission.actions.index"),
@@ -315,7 +315,7 @@ return [
             "show" => true,
             "edit" => true,
             "delete" => true,
-            "showMenu" => true
+            "showMenu" => true,
         ],
         "actionLabel" => [
             "index" => t("permission.actions.index"),
@@ -326,4 +326,41 @@ return [
             "showMenu" => t("permission.actions.showMenu"),
         ],
     ],
-];
+    [
+        "name" => "warehouse",
+        "actions" => [
+            "index" => true,
+            "create" => true,
+            "show" => true,
+            "edit" => true,
+            "delete" => true,
+            "showMenu" => true,
+        ],
+        "actionLabel" => [
+            "index" => t("permission.actions.index"),
+            "create" => t("permission.actions.create"),
+            "show" => t("permission.actions.show"),
+            "edit" => t("permission.actions.edit"),
+            "delete" => t("permission.actions.delete"),
+            "showMenu" => t("permission.actions.showMenu"),
+        ],
+    ],
+    [
+        "name" => "stock-receipt",
+        "actions" => [
+            "index" => true,
+            "create" => true,
+            "show" => true,
+            "edit" => true,
+            "delete" => true,
+            "showMenu" => true
+        ],
+        "actionLabel" => [
+            "index" => t("permission.actions.index"),
+            "create" => t("permission.actions.create"),
+            "show" => t("permission.actions.show"),
+            "edit" => t("permission.actions.edit"),
+            "delete" => t("permission.actions.delete"),
+            "showMenu" => t("permission.actions.showMenu"),
+        ],
+    ],];

@@ -52,7 +52,8 @@
         "remove": "Xóa",
         "restore_default": "Khôi phục mặc định",
         "next": "Tiếp theo",
-        "add_variant": "Thêm mới phiên bản"
+        "add_variant": "Thêm mới phiên bản",
+        "detail": "Chi tiết"
     },
     "sidebar": {
         "home": "Trang chủ",
@@ -75,7 +76,9 @@
         "unit": "Đơn vị tính",
         "provider": "Nhà cung cấp",
         "merchandise": "Hàng hóa",
-        "business_product": "Sản phẩm kinh doanh"
+        "business_product": "Sản phẩm kinh doanh",
+        "warehouse": "Warehouse",
+        "stock_receipt": "StockReceipt"
     },
     "gender": {
         "male": "Nam",

@@ -107,7 +107,9 @@
         "get_current_ip": "Get current IP address",
         "detect_ip_failed": "Failed to detect IP address: {message}",
         "notification_test": "System notification test ",
-        "currency_setting": "System Currency Setting"
+        "currency_setting": "System currency setting",
+        "warehouse_settings": "Warehouse settings",
+        "warehouse_receive_from_provider": "Warehouse receive from provider"
     },
     "thoi_gian_lam_viec": {
         "fulltime": "Fixed time",
@@ -436,7 +438,9 @@
             "select_merchandise": "Select ingredient/finished product",
             "select_unit": "Select unit",
             "providers_required": "Please add at least 1 provider",
-            "items_required": "Please add at least 1 ingredient/finished product"
+            "items_required": "Please add at least 1 ingredient/finished product",
+            "create_receipt_button": "Create stock receipt",
+            "receipt_created_success": "Stock receipt created successfully!"
         },
         "create_button": "Create",
         "my_requests": "My requests",
@@ -800,6 +804,82 @@
             "cost_price": "Cost Price:",
             "target_profit_margin": "Target Profit Margin (%)",
             "suggested_price": "Suggested Price:"
+        }
+    },
+    "warehouse": {
+        "title": "Warehouse",
+        "columns": {
+            "id": "ID",
+            "name": "Name"
+        }
+    },
+    "stock_receipt": {
+        "title": "Stock Receipt",
+        "detail_title": "Stock Receipt Detail",
+        "columns": {
+            "id": "ID",
+            "code": "Code",
+            "title": "Title",
+            "warehouse": "Warehouse",
+            "request": "Source Request",
+            "fulfillment_status": "Fulfillment"
+        },
+        "status": {
+            "CREATED": "Created",
+            "IN_PROGRESS": "In Progress",
+            "PARTIALLY_COMPLETED": "Partially Completed",
+            "COMPLETED": "Completed",
+            "CANCELLED": "Cancelled"
+        },
+        "provider_status": {
+            "CREATED": "Created",
+            "AWAITING_SHIPMENT": "Awaiting Shipment",
+            "IN_TRANSIT": "In Transit",
+            "ARRIVED": "Arrived",
+            "INSPECTING": "Inspecting",
+            "COMPLETED": "Completed",
+            "CANCELLED": "Cancelled"
+        },
+        "fulfillment": {
+            "PENDING": "Pending",
+            "FULL": "Full",
+            "PARTIAL_CLOSED": "Partially Closed",
+            "BACKORDER_OPEN": "Backorder Open",
+            "BACKORDER_CREATED": "Backorder Created"
+        },
+        "stepper_tooltip": {
+            "current": "Current status",
+            "completed": "Completed",
+            "next": "Click to transition to this status",
+            "locked": "Cannot perform this step yet"
+        },
+        "inspection": {
+            "title": "Goods inspection",
+            "lots_title": "Lots",
+            "lot_label": "Lot #{index}",
+            "add_lot": "Add lot",
+            "no_lots": "No lots yet. Please add at least one lot.",
+            "lots_required": "Each item must have at least one lot.",
+            "items_required": "Inspection items are required.",
+            "expected": "Expected",
+            "total_received": "Received",
+            "total_accepted": "Accepted",
+            "total_rejected": "Rejected",
+            "shortage": "Shortage",
+            "surplus": "Surplus",
+            "balanced": "Balanced",
+            "internal_lot_auto": "Auto-generated",
+            "base_convert_hint": "Base convert: received {received} · accepted {accepted} · rejected {rejected} {unit}",
+            "received_eq_accepted_rejected": "Received quantity must equal accepted + rejected.",
+            "expiry_after_manufacture": "Expiry date must be after manufacture date.",
+            "duplicate_lot_dates": "Duplicate manufacture/expiry date pairs are not allowed within the same item.",
+            "shortage_resolution": "Shortage resolution",
+            "shortage_description": "Total accepted quantity is less than expected. Please choose how to handle the shortage.",
+            "accept_shortage": "Accept shortage (close with received quantity)",
+            "create_backorder": "Create a backorder for the missing quantity",
+            "shortage_required": "Please choose a shortage resolution.",
+            "shortage_resolution_invalid": "Invalid shortage resolution.",
+            "submit": "Confirm inspection"
         }
     }
 }

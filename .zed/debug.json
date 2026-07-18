@@ -1,0 +1,18 @@
+[
+  {
+    "label": "PHP: Listen to Xdebug",
+    "adapter": "Xdebug",
+    "request": "launch",
+    "port": 9003
+  },
+  {
+    "label": "PHPUnit: Debug Current Test",
+    "adapter": "Xdebug",
+    "request": "launch",
+    "program": "vendor/bin/phpunit",
+    "args": [
+      "--filter",
+      "$ZED_SYMBOL"
+    ]
+  }
+]

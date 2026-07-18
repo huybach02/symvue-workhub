@@ -1,21 +1,24 @@
 <?php
 
 use App\Class\Request\RequestConstant;
-use App\DTO\AttendanceDTO;
 use App\Entity\Request;
 use App\Entity\User;
 use App\Class\TranslationHelper;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request as HttpRequest;
 
-if (!function_exists('t')) {
-    function t(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
-    {
+if (!function_exists("t")) {
+    function t(
+        string $id,
+        array $parameters = [],
+        ?string $domain = null,
+        ?string $locale = null,
+    ): string {
         return TranslationHelper::trans($id, $parameters, $domain, $locale);
     }
 }
 
-if (!function_exists('appEnv')) {
+if (!function_exists("appEnv")) {
     function appEnv(string $key, mixed $default = null): mixed
     {
         if (array_key_exists($key, $_ENV)) {
@@ -32,7 +35,7 @@ if (!function_exists('appEnv')) {
     }
 }
 
-if (!function_exists('isAdmin')) {
+if (!function_exists("isAdmin")) {
     function isAdmin($user)
     {
         return in_array("ROLE_ADMIN", $user->getRoles(), true);
@@ -40,29 +43,30 @@ if (!function_exists('isAdmin')) {
 }
 
 // Hàm format từ số giây sang chuỗi string (nếu < 60 giây thì format giây, nếu >= 60 giây thì format phút giây)
-if (!function_exists('formatSeconds')) {
+if (!function_exists("formatSeconds")) {
     function formatSeconds($seconds)
     {
         $seconds = (int) $seconds;
 
         if ($seconds < 60) {
-            return $seconds . ' giây';
+            return $seconds . " giây";
         }
 
         $minutes = floor($seconds / 60);
         $seconds = $seconds % 60;
 
-        return $minutes . ' phút ' . $seconds . ' giây';
+        return $minutes . " phút " . $seconds . " giây";
     }
 }
 
 // Hàm tạo chuỗi string ngẫu nhiên
-if (!function_exists('generateRandomString')) {
+if (!function_exists("generateRandomString")) {
     function generateRandomString($length = 10)
     {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $characters =
+            "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         $charactersLength = strlen($characters);
-        $randomString = '';
+        $randomString = "";
         for ($i = 0; $i < $length; $i++) {
             $randomString .= $characters[rand(0, $charactersLength - 1)];
         }
@@ -70,86 +74,100 @@ if (!function_exists('generateRandomString')) {
     }
 }
 
-if (!function_exists('validateFilterParams')) {
+if (!function_exists("validateFilterParams")) {
     function validateFilterParams(array $params)
     {
         // Đảm bảo các tham số có giá trị mặc định
-        $params['page'] = isset($params['page']) ? (int) $params['page'] : 1;
-        $params['limit'] = isset($params['limit']) ? (int) $params['limit'] : 10;
-        $params['sort_direction'] = $params['sort_direction'] ?? 'desc';
-        $params['sort_column'] = $params['sort_column'] ?? 'id';
+        $params["page"] = isset($params["page"]) ? (int) $params["page"] : 1;
+        $params["limit"] = isset($params["limit"])
+            ? (int) $params["limit"]
+            : 10;
+        $params["sort_direction"] = $params["sort_direction"] ?? "desc";
+        $params["sort_column"] = $params["sort_column"] ?? "id";
 
         // Validate filter parameters
-        if (isset($params['f']) && is_array($params['f'])) {
-            foreach ($params['f'] as $index => $filter) {
-                if (!isset($filter['field']) || !isset($filter['operator']) || !isset($filter['value'])) {
-                    unset($params['f'][$index]);
+        if (isset($params["f"]) && is_array($params["f"])) {
+            foreach ($params["f"] as $index => $filter) {
+                if (
+                    !isset($filter["field"]) ||
+                    !isset($filter["operator"]) ||
+                    !isset($filter["value"])
+                ) {
+                    unset($params["f"][$index]);
                 }
             }
             // Reindex array để đảm bảo index liên tục
-            $params['f'] = array_values($params['f']);
+            $params["f"] = array_values($params["f"]);
         }
 
         return $params;
     }
 }
 
-if (!function_exists('getProvinceByCode')) {
+if (!function_exists("getProvinceByCode")) {
     function getProvinceByCode(?string $provinceCode): string
     {
         if (!$provinceCode) {
-            return '';
+            return "";
         }
 
         $projectDir = dirname(__DIR__);
-        $filePath = $projectDir . '/public/province.json';
+        $filePath = $projectDir . "/public/province.json";
 
         if (!file_exists($filePath)) {
-            throw new \Exception('File province.json không tồn tại');
+            throw new \Exception("File province.json không tồn tại");
         }
         $content = file_get_contents($filePath);
         $items = json_decode($content, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception('File province.json không đúng định dạng JSON');
+            throw new \Exception(
+                "File province.json không đúng định dạng JSON",
+            );
         }
 
-        $filtered = array_filter($items, fn($item) => $item['code'] == $provinceCode);
+        $filtered = array_filter(
+            $items,
+            fn($item) => $item["code"] == $provinceCode,
+        );
 
-        return array_values($filtered)[0]['name'] ?? '';
+        return array_values($filtered)[0]["name"] ?? "";
     }
 }
 
-if (!function_exists('getWardByCode')) {
+if (!function_exists("getWardByCode")) {
     function getWardByCode(?string $wardCode): string
     {
         if (!$wardCode) {
-            return '';
+            return "";
         }
 
         $projectDir = dirname(__DIR__);
-        $filePath = $projectDir . '/public/ward.json';
+        $filePath = $projectDir . "/public/ward.json";
 
         if (!file_exists($filePath)) {
-            throw new \Exception('File ward.json không tồn tại');
+            throw new \Exception("File ward.json không tồn tại");
         }
         $content = file_get_contents($filePath);
         $items = json_decode($content, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception('File ward.json không đúng định dạng JSON');
+            throw new \Exception("File ward.json không đúng định dạng JSON");
         }
 
-        $filtered = array_filter($items, fn($item) => $item['code'] == $wardCode);
+        $filtered = array_filter(
+            $items,
+            fn($item) => $item["code"] == $wardCode,
+        );
 
-        return array_values($filtered)[0]['name'] ?? '';
+        return array_values($filtered)[0]["name"] ?? "";
     }
 }
 
 /**
  * Convert tên cột Excel (A, B, C, AA, AB...) sang index số (0, 1, 2...)
- * 
+ *
  * @param string $column Tên cột Excel (VD: "A", "B", "AA", "AB")
  * @return int Index số tương ứng (0-based)
- * 
+ *
  * @example
  * excelColumnToIndex("A") => 0
  * excelColumnToIndex("B") => 1
@@ -157,7 +175,7 @@ if (!function_exists('getWardByCode')) {
  * excelColumnToIndex("AA") => 26
  * excelColumnToIndex("AB") => 27
  */
-if (!function_exists('excelColumnToIndex')) {
+if (!function_exists("excelColumnToIndex")) {
     function excelColumnToIndex(string $column): int
     {
         $column = strtoupper($column);
@@ -165,7 +183,7 @@ if (!function_exists('excelColumnToIndex')) {
         $index = 0;
 
         for ($i = 0; $i < $length; $i++) {
-            $index = $index * 26 + (ord($column[$i]) - ord('A') + 1);
+            $index = $index * 26 + (ord($column[$i]) - ord("A") + 1);
         }
 
         return $index - 1; // Trả về 0-based index
@@ -174,25 +192,28 @@ if (!function_exists('excelColumnToIndex')) {
 
 /**
  * Helper function để lấy giá trị từ row Excel theo tên cột
- * 
+ *
  * @param array $row Mảng dữ liệu từ Excel row
  * @param string $column Tên cột Excel (VD: "A", "B", "AA")
  * @param mixed $default Giá trị mặc định nếu không tồn tại
  * @return mixed Giá trị tại cột đó hoặc giá trị mặc định
- * 
+ *
  * @example
  * excelGetValue($row, "A") => Lấy giá trị cột A
  * excelGetValue($row, "B", "default") => Lấy giá trị cột B, nếu null thì trả về "default"
  */
-if (!function_exists('excelGetValue')) {
-    function excelGetValue(array $row, string $column, mixed $default = null): mixed
-    {
+if (!function_exists("excelGetValue")) {
+    function excelGetValue(
+        array $row,
+        string $column,
+        mixed $default = null,
+    ): mixed {
         $index = excelColumnToIndex($column);
         return $row[$index] ?? $default;
     }
 }
 
-if (!function_exists('convertMethod')) {
+if (!function_exists("convertMethod")) {
     function convertMethod(string $path, string $method): string
     {
         $pathArr = explode("/", $path);
@@ -222,10 +243,10 @@ if (!function_exists('convertMethod')) {
     }
 }
 
-if (!function_exists('getRequestBodyValue')) {
+if (!function_exists("getRequestBodyValue")) {
     function getRequestBodyValue(HttpRequest $request, string $key): mixed
     {
-        if ($key === '') {
+        if ($key === "") {
             return null;
         }
 
@@ -239,7 +260,7 @@ if (!function_exists('getRequestBodyValue')) {
     }
 }
 
-if (!function_exists('normalizePermissionSegment')) {
+if (!function_exists("normalizePermissionSegment")) {
     function normalizePermissionSegment(mixed $value): ?string
     {
         if (!is_scalar($value)) {
@@ -248,14 +269,14 @@ if (!function_exists('normalizePermissionSegment')) {
 
         $normalized = trim((string) $value);
 
-        return $normalized !== '' ? $normalized : null;
+        return $normalized !== "" ? $normalized : null;
     }
 }
 
-if (!function_exists('resolveEntityClass')) {
+if (!function_exists("resolveEntityClass")) {
     function resolveEntityClass(mixed $entity): ?string
     {
-        if (!is_string($entity) || $entity === '') {
+        if (!is_string($entity) || $entity === "") {
             return null;
         }
 
@@ -263,12 +284,16 @@ if (!function_exists('resolveEntityClass')) {
     }
 }
 
-if (!function_exists('readObjectField')) {
+if (!function_exists("readObjectField")) {
     function readObjectField(object $object, string $field): mixed
     {
-        $camelField = str_replace(' ', '', ucwords(str_replace(['_', '-'], ' ', $field)));
-        $getter = 'get' . $camelField;
-        $isser = 'is' . $camelField;
+        $camelField = str_replace(
+            " ",
+            "",
+            ucwords(str_replace(["_", "-"], " ", $field)),
+        );
+        $getter = "get" . $camelField;
+        $isser = "is" . $camelField;
 
         if (method_exists($object, $getter)) {
             return $object->{$getter}();
@@ -282,7 +307,7 @@ if (!function_exists('readObjectField')) {
     }
 }
 
-if (!function_exists('getPermissionSuffixesByPrefix')) {
+if (!function_exists("getPermissionSuffixesByPrefix")) {
     function getPermissionSuffixesByPrefix(
         array $permissions,
         string $prefix,
@@ -291,8 +316,8 @@ if (!function_exists('getPermissionSuffixesByPrefix')) {
         $suffixes = [];
 
         foreach ($permissions as $permission) {
-            $name = (string) ($permission['name'] ?? '');
-            $actions = $permission['actions'] ?? [];
+            $name = (string) ($permission["name"] ?? "");
+            $actions = $permission["actions"] ?? [];
 
             if (!str_starts_with($name, $prefix)) {
                 continue;
@@ -307,14 +332,14 @@ if (!function_exists('getPermissionSuffixesByPrefix')) {
 
         $suffixes = array_filter(
             array_unique($suffixes),
-            static fn(string $suffix): bool => $suffix !== '',
+            static fn(string $suffix): bool => $suffix !== "",
         );
 
         return array_values($suffixes);
     }
 }
 
-if (!function_exists('assertAttendanceLocationWithinConfiguredRadius')) {
+if (!function_exists("assertAttendanceLocationWithinConfiguredRadius")) {
     function assertAttendanceLocationWithinConfiguredRadius(
         $latitude,
         $longitude,
@@ -324,19 +349,28 @@ if (!function_exists('assertAttendanceLocationWithinConfiguredRadius')) {
             !isValidAttendanceLatitude($latitude) ||
             !isValidAttendanceLongitude($longitude)
         ) {
-            throw new \Exception(t('error.location_invalid'));
+            throw new \Exception(t("error.location_invalid"));
         }
 
-        $configuredLatitude = getAttendanceRequiredFloatConfig($configs, 'LATITUDE');
-        $configuredLongitude = getAttendanceRequiredFloatConfig($configs, 'LONGITUDE');
-        $radiusMetres = getAttendanceRequiredFloatConfig($configs, 'RADIUS_METERS');
+        $configuredLatitude = getAttendanceRequiredFloatConfig(
+            $configs,
+            "LATITUDE",
+        );
+        $configuredLongitude = getAttendanceRequiredFloatConfig(
+            $configs,
+            "LONGITUDE",
+        );
+        $radiusMetres = getAttendanceRequiredFloatConfig(
+            $configs,
+            "RADIUS_METERS",
+        );
 
         if (
             !isValidAttendanceLatitude($configuredLatitude) ||
             !isValidAttendanceLongitude($configuredLongitude) ||
             $radiusMetres <= 0
         ) {
-            throw new \Exception(t('error.attendance_location_config_invalid'));
+            throw new \Exception(t("error.attendance_location_config_invalid"));
         }
 
         $distanceMetres = calculateAttendanceDistanceMetres(
@@ -347,16 +381,18 @@ if (!function_exists('assertAttendanceLocationWithinConfiguredRadius')) {
         );
 
         if ($distanceMetres > $radiusMetres) {
-            throw new \Exception(t('error.location_out_of_range', [
-                '%distance%' => (string) round($distanceMetres, 2),
-                '%radius%' => (string) round($radiusMetres, 2),
-            ]));
+            throw new \Exception(
+                t("error.location_out_of_range", [
+                    "%distance%" => (string) round($distanceMetres, 2),
+                    "%radius%" => (string) round($radiusMetres, 2),
+                ]),
+            );
         }
     }
 }
 
 /**
- * Parse ngày + giờ thành DateTimeImmutable 
+ * Parse ngày + giờ thành DateTimeImmutable
  *
  * Input:
  * - $baseDate: 2026-06-11 00:00:00
@@ -367,17 +403,17 @@ if (!function_exists('assertAttendanceLocationWithinConfiguredRadius')) {
  * - 2026-06-11 08:30:15
  *
  */
-if (!function_exists('parseAttendanceDateTime')) {
+if (!function_exists("parseAttendanceDateTime")) {
     function parseAttendanceDateTime(
         \DateTimeImmutable $baseDate,
         string $time,
     ): ?\DateTimeImmutable {
-        $formats = ['Y-m-d H:i:s', 'Y-m-d H:i'];
+        $formats = ["Y-m-d H:i:s", "Y-m-d H:i"];
 
         foreach ($formats as $format) {
             $dateTime = \DateTimeImmutable::createFromFormat(
                 $format,
-                $baseDate->format('Y-m-d') . ' ' . $time,
+                $baseDate->format("Y-m-d") . " " . $time,
             );
 
             if ($dateTime instanceof \DateTimeImmutable) {
@@ -389,32 +425,34 @@ if (!function_exists('parseAttendanceDateTime')) {
     }
 }
 
-if (!function_exists('getAttendanceRequiredFloatConfig')) {
-    function getAttendanceRequiredFloatConfig(array $configs, string $key): float
-    {
+if (!function_exists("getAttendanceRequiredFloatConfig")) {
+    function getAttendanceRequiredFloatConfig(
+        array $configs,
+        string $key,
+    ): float {
         if (!isset($configs[$key]) || !is_numeric($configs[$key])) {
-            throw new \Exception(t('error.attendance_location_config_invalid'));
+            throw new \Exception(t("error.attendance_location_config_invalid"));
         }
 
         return (float) $configs[$key];
     }
 }
 
-if (!function_exists('isValidAttendanceLatitude')) {
+if (!function_exists("isValidAttendanceLatitude")) {
     function isValidAttendanceLatitude(float $latitude): bool
     {
         return $latitude >= -90 && $latitude <= 90;
     }
 }
 
-if (!function_exists('isValidAttendanceLongitude')) {
+if (!function_exists("isValidAttendanceLongitude")) {
     function isValidAttendanceLongitude(float $longitude): bool
     {
         return $longitude >= -180 && $longitude <= 180;
     }
 }
 
-if (!function_exists('calculateAttendanceDistanceMetres')) {
+if (!function_exists("calculateAttendanceDistanceMetres")) {
     function calculateAttendanceDistanceMetres(
         float $fromLatitude,
         float $fromLongitude,
@@ -428,9 +466,11 @@ if (!function_exists('calculateAttendanceDistanceMetres')) {
         $fromLatitudeRadians = deg2rad($fromLatitude);
         $toLatitudeRadians = deg2rad($toLatitude);
 
-        $a = sin($latitudeDelta / 2) ** 2
-            + cos($fromLatitudeRadians) * cos($toLatitudeRadians)
-            * sin($longitudeDelta / 2) ** 2;
+        $a =
+            sin($latitudeDelta / 2) ** 2 +
+            cos($fromLatitudeRadians) *
+                cos($toLatitudeRadians) *
+                sin($longitudeDelta / 2) ** 2;
 
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
@@ -438,10 +478,14 @@ if (!function_exists('calculateAttendanceDistanceMetres')) {
     }
 }
 
-if (!function_exists('uploadFile')) {
-    function uploadFile(UploadedFile $file, string $folder, string $baseUrl = '', string $prefix = 'media')
-    {
-        $fileName = $prefix . '_' . uniqid() . '.' . $file->guessExtension();
+if (!function_exists("uploadFile")) {
+    function uploadFile(
+        UploadedFile $file,
+        string $folder,
+        string $baseUrl = "",
+        string $prefix = "media",
+    ) {
+        $fileName = $prefix . "_" . uniqid() . "." . $file->guessExtension();
 
         $targetDirectory = dirname(__DIR__) . "/public/uploads/$folder";
         if (!is_dir($targetDirectory)) {
@@ -450,137 +494,249 @@ if (!function_exists('uploadFile')) {
         $file->move($targetDirectory, $fileName);
 
         if ($baseUrl) {
-            return $baseUrl . '/uploads/' . $folder . '/' . $fileName;
+            return $baseUrl . "/uploads/" . $folder . "/" . $fileName;
         }
-        return '/uploads/' . $folder . '/' . $fileName;
+        return "/uploads/" . $folder . "/" . $fileName;
     }
 }
 
-if (!function_exists('convertSlugToNameWithUpperWords')) {
+if (!function_exists("convertSlugToNameWithUpperWords")) {
     function convertSlugToNameWithUpperWords(string $slug): string
     {
-        return ucwords(str_replace('-', ' ', $slug));
+        return ucwords(str_replace("-", " ", $slug));
     }
 }
 
-if (!function_exists('formatTimeString')) {
+if (!function_exists("formatTimeString")) {
     function formatTimeString(string $time): string
     {
-        $dateTime = \DateTime::createFromFormat("H:i:s", $time)
-            ?: \DateTime::createFromFormat("H:i", $time);
+        $dateTime =
+            \DateTime::createFromFormat("H:i:s", $time) ?:
+            \DateTime::createFromFormat("H:i", $time);
 
         return $dateTime ? $dateTime->format("H:i") : substr($time, 0, 5);
     }
 }
 
-if (!function_exists('generateCode')) {
-    function generateCode(string $prefix = 'CODE'): string
+if (!function_exists("generateCode")) {
+    function generateCode(string $prefix = "CODE"): string
     {
         return sprintf(
-            '%s-%s%s',
+            "%s-%s%s",
             strtoupper($prefix),
-            date('ymdHi'),
-            strtoupper(substr(bin2hex(random_bytes(1)), 0, 2))
+            date("ymdHi"),
+            strtoupper(substr(bin2hex(random_bytes(1)), 0, 2)),
         );
     }
 }
 
-if (!function_exists('buildRequestPermissions')) {
+if (!function_exists("buildRequestPermissions")) {
     function buildRequestPermissions(Request $request, User $currentUser): array
     {
         return [
-            'canApprove' => $request->getCurrentApprover()?->getId() === $currentUser->getId()
-                && $request->getStatus() === RequestConstant::STATUS_PENDING,
-            'canReject' => $request->getCurrentApprover()?->getId() === $currentUser->getId()
-                && $request->getStatus() === RequestConstant::STATUS_PENDING,
-            'canEdit' => $request->getRequester()?->getId() === $currentUser->getId()
-                && $request->getStatus() === RequestConstant::STATUS_REJECTED,
-            'canCancel' => $request->getRequester()?->getId() === $currentUser->getId()
-                && in_array($request->getStatus(), [RequestConstant::STATUS_PENDING, RequestConstant::STATUS_REJECTED], true),
-            'canDelete' => $request->getRequester()?->getId() === $currentUser->getId()
-                && in_array($request->getStatus(), [RequestConstant::STATUS_REJECTED, RequestConstant::STATUS_CANCELLED], true),
+            "canApprove" =>
+                $request->getCurrentApprover()?->getId() ===
+                    $currentUser->getId() &&
+                $request->getStatus() === RequestConstant::STATUS_PENDING,
+            "canReject" =>
+                $request->getCurrentApprover()?->getId() ===
+                    $currentUser->getId() &&
+                $request->getStatus() === RequestConstant::STATUS_PENDING,
+            "canEdit" =>
+                $request->getRequester()?->getId() === $currentUser->getId() &&
+                $request->getStatus() === RequestConstant::STATUS_REJECTED,
+            "canCancel" =>
+                $request->getRequester()?->getId() === $currentUser->getId() &&
+                in_array(
+                    $request->getStatus(),
+                    [
+                        RequestConstant::STATUS_PENDING,
+                        RequestConstant::STATUS_REJECTED,
+                    ],
+                    true,
+                ),
+            "canDelete" =>
+                $request->getRequester()?->getId() === $currentUser->getId() &&
+                in_array(
+                    $request->getStatus(),
+                    [
+                        RequestConstant::STATUS_REJECTED,
+                        RequestConstant::STATUS_CANCELLED,
+                    ],
+                    true,
+                ),
         ];
     }
 }
 
-if (!function_exists('canViewRequest')) {
+if (!function_exists("canViewRequest")) {
     function canViewRequest(Request $request, User $currentUser): bool
     {
         $watcherIds = array_map(
             fn($watcher) => $watcher->getUser()?->getId(),
-            $request->getWatchers()->toArray()
+            $request->getWatchers()->toArray(),
         );
 
-        $result = $request->getRequester()?->getId() === $currentUser->getId()
-            || $request->getCurrentApprover()?->getId() === $currentUser->getId()
-            || in_array($currentUser->getId(), $watcherIds, true)
-            || isAdmin($currentUser);
+        $result =
+            $request->getRequester()?->getId() === $currentUser->getId() ||
+            $request->getCurrentApprover()?->getId() ===
+                $currentUser->getId() ||
+            in_array($currentUser->getId(), $watcherIds, true) ||
+            isAdmin($currentUser);
 
         if (!$result) {
-            throw new \Exception(t('request.error.cannot_view'));
+            throw new \Exception(t("request.error.cannot_view"));
         }
         return $result;
     }
 }
 
-if (!function_exists('generateQRCodeAttendance')) {
+if (!function_exists("generateQRCodeAttendance")) {
     function generateQRCodeAttendance(): string
     {
         // Format QR code attendance: dd/mm/yyyy-HH:mm:ss-random
         $randomString = bin2hex(random_bytes(10));
         $qrCode = sprintf(
-            '%s-%s-%s',
-            date('d/m/Y'),
-            date('H\\hi\\ms\\s'),
+            "%s-%s-%s",
+            date("d/m/Y"),
+            date("H\\hi\\ms\\s"),
             $randomString,
         );
         return $qrCode;
     }
 }
 
-if (!function_exists('removeVietnameseDiacritics')) {
+if (!function_exists("removeVietnameseDiacritics")) {
     function removeVietnameseDiacritics(string $str): string
     {
         $charMap = [
-            'à' => 'a', 'á' => 'a', 'ả' => 'a', 'ã' => 'a', 'ạ' => 'a',
-            'ă' => 'a', 'ằ' => 'a', 'ắ' => 'a', 'ẳ' => 'a', 'ẵ' => 'a', 'ặ' => 'a',
-            'â' => 'a', 'ầ' => 'a', 'ấ' => 'a', 'ẩ' => 'a', 'ẫ' => 'a', 'ậ' => 'a',
-            'đ' => 'd',
-            'è' => 'e', 'é' => 'e', 'ẻ' => 'e', 'ẽ' => 'e', 'ẹ' => 'e',
-            'ê' => 'e', 'ề' => 'e', 'ế' => 'e', 'ể' => 'e', 'ễ' => 'e', 'ệ' => 'e',
-            'ì' => 'i', 'í' => 'i', 'ỉ' => 'i', 'ĩ' => 'i', 'ị' => 'i',
-            'ò' => 'o', 'ó' => 'o', 'ỏ' => 'o', 'õ' => 'o', 'ọ' => 'o',
-            'ô' => 'o', 'ồ' => 'o', 'ố' => 'o', 'ổ' => 'o', 'ỗ' => 'o', 'ộ' => 'o',
-            'ơ' => 'o', 'ờ' => 'o', 'ớ' => 'o', 'ở' => 'o', 'ỡ' => 'o', 'ợ' => 'o',
-            'ù' => 'u', 'ú' => 'u', 'ủ' => 'u', 'ũ' => 'u', 'ụ' => 'u',
-            'ư' => 'u', 'ừ' => 'u', 'ứ' => 'u', 'ử' => 'u', 'ữ' => 'u', 'ự' => 'u',
-            'ỳ' => 'y', 'ý' => 'y', 'ỷ' => 'y', 'ỹ' => 'y', 'ỵ' => 'y',
+            "à" => "a",
+            "á" => "a",
+            "ả" => "a",
+            "ã" => "a",
+            "ạ" => "a",
+            "ă" => "a",
+            "ằ" => "a",
+            "ắ" => "a",
+            "ẳ" => "a",
+            "ẵ" => "a",
+            "ặ" => "a",
+            "â" => "a",
+            "ầ" => "a",
+            "ấ" => "a",
+            "ẩ" => "a",
+            "ẫ" => "a",
+            "ậ" => "a",
+            "đ" => "d",
+            "è" => "e",
+            "é" => "e",
+            "ẻ" => "e",
+            "ẽ" => "e",
+            "ẹ" => "e",
+            "ê" => "e",
+            "ề" => "e",
+            "ế" => "e",
+            "ể" => "e",
+            "ễ" => "e",
+            "ệ" => "e",
+            "ì" => "i",
+            "í" => "i",
+            "ỉ" => "i",
+            "ĩ" => "i",
+            "ị" => "i",
+            "ò" => "o",
+            "ó" => "o",
+            "ỏ" => "o",
+            "õ" => "o",
+            "ọ" => "o",
+            "ô" => "o",
+            "ồ" => "o",
+            "ố" => "o",
+            "ổ" => "o",
+            "ỗ" => "o",
+            "ộ" => "o",
+            "ơ" => "o",
+            "ờ" => "o",
+            "ớ" => "o",
+            "ở" => "o",
+            "ỡ" => "o",
+            "ợ" => "o",
+            "ù" => "u",
+            "ú" => "u",
+            "ủ" => "u",
+            "ũ" => "u",
+            "ụ" => "u",
+            "ư" => "u",
+            "ừ" => "u",
+            "ứ" => "u",
+            "ử" => "u",
+            "ữ" => "u",
+            "ự" => "u",
+            "ỳ" => "y",
+            "ý" => "y",
+            "ỷ" => "y",
+            "ỹ" => "y",
+            "ỵ" => "y",
         ];
 
-        $lowerStr = mb_strtolower($str, 'UTF-8');
+        $lowerStr = mb_strtolower($str, "UTF-8");
         $result = strtr($lowerStr, $charMap);
 
         return $result;
     }
 }
 
-if (!function_exists('generateCodeFromName')) {
+if (!function_exists("generateCodeFromName")) {
     function generateCodeFromName(string $name): string
     {
         $normalized = removeVietnameseDiacritics($name);
 
-        return strtoupper(str_replace(' ', '_', $normalized));
+        return strtoupper(str_replace(" ", "_", $normalized));
     }
 }
 
-if (!function_exists('formatDecimal')) {
+if (!function_exists("formatDecimal")) {
     function formatDecimal(?string $val): ?string
     {
         if ($val === null) {
             return null;
         }
-        $formatted = rtrim($val, '0');
-        $formatted = rtrim($formatted, '.');
+        $formatted = rtrim($val, "0");
+        $formatted = rtrim($formatted, ".");
         return $formatted;
+    }
+}
+
+if (!function_exists("generateSequentialCode")) {
+    function generateSequentialCode(
+        \Doctrine\ORM\EntityManagerInterface $entityManager,
+        string $prefix,
+        string $tableName,
+        string $columnName = "code",
+        int $padLength = 6,
+    ): string {
+        if (
+            !preg_match('/^\w+$/', $tableName) ||
+            !preg_match('/^\w+$/', $columnName)
+        ) {
+            throw new \InvalidArgumentException(
+                "Tên bảng hoặc cột không hợp lệ",
+            );
+        }
+
+        $prefixWithDate = sprintf("%s-%s-", strtoupper($prefix), date("Ymd"));
+        $sql = "SELECT $columnName FROM $tableName WHERE $columnName LIKE :prefix ORDER BY $columnName DESC LIMIT 1 FOR UPDATE";
+        $row = $entityManager
+            ->getConnection()
+            ->executeQuery($sql, ["prefix" => $prefixWithDate . "%"])
+            ->fetchAssociative();
+
+        $seq =
+            $row && isset($row[$columnName])
+                ? (int) substr($row[$columnName], -$padLength) + 1
+                : 1;
+
+        return $prefixWithDate .
+            str_pad((string) $seq, $padLength, "0", STR_PAD_LEFT);
     }
 }

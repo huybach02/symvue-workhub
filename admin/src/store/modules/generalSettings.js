@@ -29,6 +29,7 @@ const defaultValues = {
     checkInReminderMinutesBefore: 0,
     checkOutReminderMinutesBefore: 0,
     currency: "VND",
+    receiveFromProviderWarehouseId: "",
 };
 
 const configMapping = {
@@ -58,6 +59,7 @@ const configMapping = {
     CHECK_IN_REMINDER_MINUTES_BEFORE: "checkInReminderMinutesBefore",
     CHECK_OUT_REMINDER_MINUTES_BEFORE: "checkOutReminderMinutesBefore",
     CURRENCY: "currency",
+    RECEIVE_FROM_PROVIDER_WAREHOUSE_ID: "receiveFromProviderWarehouseId",
 };
 
 const booleanFields = [
@@ -67,7 +69,12 @@ const booleanFields = [
     "remindMissingCheckOut",
 ];
 
-const stringFields = ["addressDisplay", "ipAddress", "currency"];
+const stringFields = [
+    "addressDisplay",
+    "ipAddress",
+    "currency",
+    "receiveFromProviderWarehouseId",
+];
 
 const decimalFields = ["latitude", "longitude"];
 

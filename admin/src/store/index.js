@@ -18,6 +18,8 @@ import unit from "./modules/unit";
 import provider from "./modules/provider";
 import merchandise from "./modules/merchandise";
 import businessProduct from "./modules/businessProduct";
+import warehouse from "./modules/warehouse";
+import stockReceipt from "./modules/stockReceipt";
 
 const store = createStore({
     state() {
@@ -54,6 +56,8 @@ const store = createStore({
         provider,
         merchandise,
         businessProduct,
+        warehouse,
+        stockReceipt,
 },
 });
 
