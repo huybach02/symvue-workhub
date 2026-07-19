@@ -186,7 +186,37 @@ class RequestTypeService
                     $unitId = $item['unitId'] ?? null;
                     if ($unitId) {
                         $unit = $this->unitRepository->find($unitId);
-                        $item['unitName'] = $unit?->getName() ?? '';
+                        $unitName = $unit?->getName() ?? '';
+
+                        if ($merchandiseId) {
+                            if ($providerId) {
+                                $mProvider = $merchandiseProviderRepo->findOneBy([
+                                    'merchandise' => $merchandiseId,
+                                    'provider' => $providerId,
+                                ]);
+                                if ($mProvider) {
+                                    $providerUnit = $merchandiseProviderUnitRepo->findOneBy([
+                                        'merchandiseProvider' => $mProvider->getId(),
+                                        'unit' => $unitId,
+                                    ]);
+                                    if ($providerUnit && $providerUnit->getLabel()) {
+                                        $unitName = $providerUnit->getLabel();
+                                    }
+                                }
+                            }
+
+                            if ($unitName === ($unit?->getName() ?? '')) {
+                                $mUnit = $merchandiseUnitRepo->findOneBy([
+                                    'merchandise' => $merchandiseId,
+                                    'unit' => $unitId,
+                                ]);
+                                if ($mUnit && $mUnit->getLabel()) {
+                                    $unitName = $mUnit->getLabel();
+                                }
+                            }
+                        }
+
+                        $item['unitName'] = $unitName;
                     }
 
                     if ($merchandiseId && $unitId && $providerId) {

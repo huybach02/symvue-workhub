@@ -100,6 +100,11 @@ export const functionHelper = {
             return date.format("DD/MM/YYYY HH:mm");
         }
     },
+    formatDate(dateString, formatPattern = "DD/MM/YYYY") {
+        if (!dateString) return "";
+        const date = dayjs(dateString);
+        return date.isValid() ? date.format(formatPattern) : "";
+    },
     formatNumber(value) {
         const digits = String(value ?? "").replace(/[^\d]/g, "");
         return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".") || "--";

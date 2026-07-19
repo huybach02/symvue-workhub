@@ -869,6 +869,8 @@
             "surplus": "Surplus",
             "balanced": "Balanced",
             "internal_lot_auto": "Auto-generated",
+            "base_convert": "Base convert",
+            "total_convert_summary": "Total item breakdown:",
             "base_convert_hint": "Base convert: received {received} · accepted {accepted} · rejected {rejected} {unit}",
             "received_eq_accepted_rejected": "Received quantity must equal accepted + rejected.",
             "expiry_after_manufacture": "Expiry date must be after manufacture date.",

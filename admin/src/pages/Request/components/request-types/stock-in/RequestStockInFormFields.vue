@@ -11,14 +11,18 @@
                 <v-btn
                     color="primary"
                     prepend-icon="mdi-plus"
-                    @click="addProvider(fieldProviders.value, onChangeProviders)"
+                    @click="
+                        addProvider(fieldProviders.value, onChangeProviders)
+                    "
                 >
                     {{ $t("request.stock_in.add_provider") }}
                 </v-btn>
             </div>
 
             <div
-                v-if="!fieldProviders.value || fieldProviders.value.length === 0"
+                v-if="
+                    !fieldProviders.value || fieldProviders.value.length === 0
+                "
                 class="text-center text-medium-emphasis py-8 border rounded-lg"
             >
                 {{ $t("request.stock_in.empty_providers") }}
@@ -32,7 +36,9 @@
                 class="border rounded"
             >
                 <v-expansion-panel
-                    v-for="(providerGroup, providerIndex) in fieldProviders.value"
+                    v-for="(
+                        providerGroup, providerIndex
+                    ) in fieldProviders.value"
                     :key="providerIndex"
                 >
                     <v-expansion-panel-title>
@@ -143,60 +149,64 @@
                                             border-collapse: collapse;
                                         "
                                     >
-                                          <colgroup>
-                                              <col style="width: 56px" />
-                                              <col style="width: 260px" />
-                                              <col style="width: 120px" />
-                                              <col style="width: 160px" />
-                                              <col style="width: 160px" />
-                                              <col style="width: 160px" />
-                                              <col style="width: 180px" />
-                                              <col style="width: 56px" />
-                                          </colgroup>
-                                          <thead>
-                                              <tr>
-                                                  <th
-                                                      class="text-left font-weight-bold px-3 py-2"
-                                                  >
-                                                      {{ $t("field.stt") }}
-                                                  </th>
-                                                  <th
-                                                      class="text-left font-weight-bold px-3 py-2"
-                                                  >
-                                                      {{
-                                                          $t(
-                                                              "field.stock_in_merchandise",
-                                                          )
-                                                      }}
-                                                  </th>
-                                                  <th
-                                                      class="text-left font-weight-bold px-3 py-2"
-                                                  >
-                                                      {{ $t("field.quantity") }}
-                                                  </th>
-                                                  <th
-                                                      class="text-left font-weight-bold px-3 py-2"
-                                                  >
-                                                      {{ $t("field.unit") }}
-                                                  </th>
-                                                  <th
-                                                      class="text-left font-weight-bold px-3 py-2"
-                                                  >
-                                                      {{ $t("field.import_price") }}
-                                                  </th>
-                                                  <th
-                                                      class="text-left font-weight-bold px-3 py-2"
-                                                  >
-                                                      {{ $t("field.total_amount") }}
-                                                  </th>
-                                                  <th
-                                                      class="text-left font-weight-bold px-3 py-2"
-                                                  >
-                                                      {{ $t("field.ghi_chu") }}
-                                                  </th>
-                                                  <th class="px-2 py-2"></th>
-                                              </tr>
-                                          </thead>
+                                        <colgroup>
+                                            <col style="width: 56px" />
+                                            <col style="width: 260px" />
+                                            <col style="width: 120px" />
+                                            <col style="width: 160px" />
+                                            <col style="width: 160px" />
+                                            <col style="width: 160px" />
+                                            <col style="width: 180px" />
+                                            <col style="width: 56px" />
+                                        </colgroup>
+                                        <thead>
+                                            <tr>
+                                                <th
+                                                    class="text-left font-weight-bold px-3 py-2"
+                                                >
+                                                    {{ $t("field.stt") }}
+                                                </th>
+                                                <th
+                                                    class="text-left font-weight-bold px-3 py-2"
+                                                >
+                                                    {{
+                                                        $t(
+                                                            "field.stock_in_merchandise",
+                                                        )
+                                                    }}
+                                                </th>
+                                                <th
+                                                    class="text-left font-weight-bold px-3 py-2"
+                                                >
+                                                    {{ $t("field.quantity") }}
+                                                </th>
+                                                <th
+                                                    class="text-left font-weight-bold px-3 py-2"
+                                                >
+                                                    {{ $t("field.unit") }}
+                                                </th>
+                                                <th
+                                                    class="text-left font-weight-bold px-3 py-2"
+                                                >
+                                                    {{
+                                                        $t("field.import_price")
+                                                    }}
+                                                </th>
+                                                <th
+                                                    class="text-left font-weight-bold px-3 py-2"
+                                                >
+                                                    {{
+                                                        $t("field.total_amount")
+                                                    }}
+                                                </th>
+                                                <th
+                                                    class="text-left font-weight-bold px-3 py-2"
+                                                >
+                                                    {{ $t("field.ghi_chu") }}
+                                                </th>
+                                                <th class="px-2 py-2"></th>
+                                            </tr>
+                                        </thead>
                                         <tbody>
                                             <tr
                                                 v-for="(
@@ -214,7 +224,9 @@
                                                             itemRow.merchandiseId
                                                         "
                                                         :items="
-                                                            getMerchandiseOptionsForProvider(providerGroup.providerId)
+                                                            getMerchandiseOptionsForProvider(
+                                                                providerGroup.providerId,
+                                                            )
                                                         "
                                                         item-title="label"
                                                         item-value="value"
@@ -265,7 +277,8 @@
                                                         v-model="itemRow.unitId"
                                                         :items="
                                                             getUnitOptions(
-                                                                 itemRow.merchandiseId,
+                                                                itemRow.merchandiseId,
+                                                                providerGroup.providerId,
                                                             )
                                                         "
                                                         item-title="label"
@@ -297,18 +310,28 @@
                                                 <td class="px-2 py-2">
                                                     <v-text-field
                                                         v-bind="
-                                                            bindFormattedNumberModel({
-                                                                fieldName: `price_${providerIndex}_${itemIndex}`,
-                                                                value: itemRow.price,
-                                                                onChange: (val) => {
-                                                                    itemRow.price = val;
-                                                                    onChangeProviders(
-                                                                        fieldProviders.value,
-                                                                    );
-                                                                }
-                                                            })
+                                                            bindFormattedNumberModel(
+                                                                {
+                                                                    fieldName: `price_${providerIndex}_${itemIndex}`,
+                                                                    value: itemRow.price,
+                                                                    onChange: (
+                                                                        val,
+                                                                    ) => {
+                                                                        itemRow.price =
+                                                                            val;
+                                                                        onChangeProviders(
+                                                                            fieldProviders.value,
+                                                                        );
+                                                                    },
+                                                                },
+                                                            )
                                                         "
-                                                        :suffix="getItemCurrency(itemRow, providerGroup.providerId)"
+                                                        :suffix="
+                                                            getItemCurrency(
+                                                                itemRow,
+                                                                providerGroup.providerId,
+                                                            )
+                                                        "
                                                         variant="outlined"
                                                         density="compact"
                                                         hide-details
@@ -316,8 +339,17 @@
                                                 </td>
                                                 <td class="px-2 py-2">
                                                     <v-text-field
-                                                        :model-value="calculateTotalRow(itemRow)"
-                                                        :suffix="getItemCurrency(itemRow, providerGroup.providerId)"
+                                                        :model-value="
+                                                            calculateTotalRow(
+                                                                itemRow,
+                                                            )
+                                                        "
+                                                        :suffix="
+                                                            getItemCurrency(
+                                                                itemRow,
+                                                                providerGroup.providerId,
+                                                            )
+                                                        "
                                                         variant="outlined"
                                                         density="compact"
                                                         hide-details
@@ -337,7 +369,9 @@
                                                         "
                                                     />
                                                 </td>
-                                                <td class="px-2 py-2 text-center">
+                                                <td
+                                                    class="px-2 py-2 text-center"
+                                                >
                                                     <v-btn
                                                         icon="mdi-delete"
                                                         color="error"
@@ -418,7 +452,7 @@ export default {
                 const items = await this.fetchStockInMerchandiseOptions();
                 const list = Array.isArray(items) ? items : [];
 
-                 this.merchandiseOptions = list.map((item) => ({
+                this.merchandiseOptions = list.map((item) => ({
                     value: item.id,
                     label: `[${item.code}] ${item.name}`,
                     code: item.code,
@@ -428,7 +462,16 @@ export default {
 
                 const cache = { ...this.merchandiseUnitsCache };
                 list.forEach((item) => {
-                    cache[item.id] = this.normalizeUnits(item.units);
+                    const providerUnitsMap = {};
+                    if (item.unitByProviders) {
+                        Object.keys(item.unitByProviders).forEach((pId) => {
+                            providerUnitsMap[pId] = this.normalizeUnits(
+                                item.unitByProviders[pId],
+                            );
+                        });
+                    }
+                    providerUnitsMap.general = this.normalizeUnits(item.units);
+                    cache[item.id] = providerUnitsMap;
                 });
                 this.merchandiseUnitsCache = cache;
             } finally {
@@ -465,12 +508,21 @@ export default {
             return result;
         },
 
-        getUnitOptions(merchandiseId) {
+        getUnitOptions(merchandiseId, providerId) {
             if (!merchandiseId) {
                 return [];
             }
 
-            return this.merchandiseUnitsCache[merchandiseId] || [];
+            const cache = this.merchandiseUnitsCache[merchandiseId];
+            if (!cache) {
+                return [];
+            }
+
+            if (providerId && cache[providerId]) {
+                return cache[providerId];
+            }
+
+            return cache.general || [];
         },
 
         filteredProviderOptions(currentIndex, providers) {
@@ -587,7 +639,7 @@ export default {
             await this.ensureMerchandiseUnits(merchandiseId);
             await this.ensureMerchandiseDetail(merchandiseId);
 
-            const units = this.getUnitOptions(merchandiseId);
+            const units = this.getUnitOptions(merchandiseId, providerId);
             const baseUnit = units.find((unit) => unit.isBase) || units[0];
             itemRow.unitId = baseUnit?.value ?? null;
             this.updateItemPrice(itemRow, providerId, providers, onChange);
@@ -601,7 +653,12 @@ export default {
             this.updateItemPrice(itemRow, providerId, providers, onChange);
         },
 
-        async onProviderSelected(providerId, providerGroup, providers, onChange) {
+        async onProviderSelected(
+            providerId,
+            providerGroup,
+            providers,
+            onChange,
+        ) {
             providerGroup.providerId = providerId;
             providerGroup.items = []; // Xóa toàn bộ các dòng hàng hóa khi thay đổi nhà cung cấp
             onChange(providers);
@@ -695,25 +752,36 @@ export default {
         },
 
         async ensureMerchandiseUnits(merchandiseId) {
-            if (this.merchandiseUnitsCache[merchandiseId]?.length) {
+            if (this.merchandiseUnitsCache[merchandiseId]) {
                 return;
             }
 
             try {
-                const detail = await this.fetchItemDetail({ id: merchandiseId });
+                const detail = await this.fetchItemDetail({
+                    id: merchandiseId,
+                });
                 if (!detail) {
                     return;
                 }
 
-                let units = this.normalizeUnits(detail.units);
-
-                if (!units.length) {
-                    units = this.extractUnitsFromDetail(detail);
+                const providerUnitsMap = {};
+                if (detail.providers) {
+                    detail.providers.forEach((prov) => {
+                        providerUnitsMap[prov.providerId] = this.normalizeUnits(
+                            prov.units,
+                        );
+                    });
                 }
+
+                let generalUnits = this.normalizeUnits(detail.units);
+                if (!generalUnits.length) {
+                    generalUnits = this.extractUnitsFromDetail(detail);
+                }
+                providerUnitsMap.general = generalUnits;
 
                 this.merchandiseUnitsCache = {
                     ...this.merchandiseUnitsCache,
-                    [merchandiseId]: units,
+                    [merchandiseId]: providerUnitsMap,
                 };
             } catch (error) {
                 console.error(error);
@@ -731,20 +799,13 @@ export default {
                 seen.add(unitId);
                 units.push({
                     value: unitId,
-                    label:
-                        label ||
-                        detail?.baseUnit?.name ||
-                        String(unitId),
+                    label: label || detail?.baseUnit?.name || String(unitId),
                     isBase,
                 });
             };
 
             if (detail.baseUnitId) {
-                pushUnit(
-                    detail.baseUnitId,
-                    detail.baseUnit?.name,
-                    true,
-                );
+                pushUnit(detail.baseUnitId, detail.baseUnit?.name, true);
             }
 
             (detail.conversions || []).forEach((conversion) => {
@@ -753,11 +814,7 @@ export default {
                     conversion.fromUnit?.name,
                     false,
                 );
-                pushUnit(
-                    conversion.toUnitId,
-                    conversion.toUnit?.name,
-                    false,
-                );
+                pushUnit(conversion.toUnitId, conversion.toUnit?.name, false);
             });
 
             return units;

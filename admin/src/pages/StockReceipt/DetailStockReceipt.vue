@@ -241,16 +241,38 @@
                                             }}
                                         </span>
                                     </div>
-                                    <div
-                                        class="text-subtitle-2 text-medium-emphasis"
-                                    >
-                                        {{ $t("base.status") || "Trạng thái" }}:
-                                        {{
-                                            $t(
-                                                "stock_receipt.provider_status." +
-                                                    providerGroup.status,
-                                            ) || providerGroup.status
-                                        }}
+                                    <div class="d-flex align-center ga-3">
+                                        <!-- Nút mở lại dialog kiểm hàng -->
+                                        <v-btn
+                                            v-if="isInspecting(providerGroup)"
+                                            color="primary"
+                                            variant="flat"
+                                            size="small"
+                                            prepend-icon="mdi-clipboard-check-outline"
+                                            @click="
+                                                openInspection(providerGroup)
+                                            "
+                                        >
+                                            {{
+                                                $t(
+                                                    "stock_receipt.inspection.title",
+                                                ) || "Kiểm hàng"
+                                            }}
+                                        </v-btn>
+                                        <div
+                                            class="text-subtitle-2 text-medium-emphasis"
+                                        >
+                                            {{
+                                                $t("base.status") ||
+                                                "Trạng thái"
+                                            }}:
+                                            {{
+                                                $t(
+                                                    "stock_receipt.provider_status." +
+                                                        providerGroup.status,
+                                                ) || providerGroup.status
+                                            }}
+                                        </div>
                                     </div>
                                 </v-card-title>
 
@@ -427,6 +449,11 @@
         </v-dialog>
 
         <!-- Dialog kiểm hàng -->
+        <InspectStockReceiptDialog
+            v-model="inspectionDialog"
+            :provider="inspectingProvider"
+            @saved="handleInspectionSaved"
+        />
     </div>
 </template>
 
@@ -438,11 +465,13 @@ import {
     STOCK_RECEIPT_PROVIDER_STATUS,
 } from "@/utils/constants/constant";
 import StatusStepper from "@/components/StatusStepper.vue";
+import InspectStockReceiptDialog from "./components/InspectStockReceiptDialog.vue";
 
 export default {
     name: "DetailStockReceipt",
     components: {
         StatusStepper,
+        InspectStockReceiptDialog,
     },
     inheritAttrs: false,
     props: {
@@ -459,6 +488,7 @@ export default {
             default: "",
         },
     },
+    emits: ["reload"],
     data() {
         return {
             dialog: false,
@@ -511,18 +541,35 @@ export default {
                 this.$emit("reload");
 
                 if (status === STOCK_RECEIPT_PROVIDER_STATUS.INSPECTING) {
-                    this.inspectingProvider =
+                    this.openInspection(
                         this.detailData?.providers?.find(
                             (provider) => provider.id === providerGroup.id,
-                        ) || providerGroup;
-                    this.inspectionDialog = true;
+                        ) || providerGroup,
+                    );
                 }
             } finally {
                 this.updatingProviderId = null;
                 this.targetStatus = null;
             }
         },
-        async handleInspectionSaved() {
+        isInspecting(providerGroup) {
+            return (
+                providerGroup.status ===
+                STOCK_RECEIPT_PROVIDER_STATUS.INSPECTING
+            );
+        },
+        openInspection(providerGroup) {
+            this.inspectingProvider = providerGroup;
+            this.inspectionDialog = true;
+        },
+        async handleInspectionSaved(payload) {
+            // TODO: gọi action inspectProviderAction khi BE sẵn sàng
+            console.log("Inspection payload:", payload);
+            // Kiểm hàng xong thì chuyển provider sang Hoàn thành
+            await this.updateProviderStatus({
+                id: this.inspectingProvider.id,
+                status: STOCK_RECEIPT_PROVIDER_STATUS.COMPLETED,
+            });
             this.detailData = await this.fetchItemDetail({
                 id: this.item.id,
                 force: true,

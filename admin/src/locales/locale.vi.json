@@ -872,6 +872,8 @@
             "surplus": "Thừa",
             "balanced": "Đủ",
             "internal_lot_auto": "Tự động tạo",
+            "base_convert": "Quy đổi base",
+            "total_convert_summary": "Tổng cộng quy đổi mặt hàng:",
             "base_convert_hint": "Quy đổi base: nhận {received} · chấp nhận {accepted} · từ chối {rejected} {unit}",
             "received_eq_accepted_rejected": "Số lượng nhận phải bằng chấp nhận + từ chối.",
             "expiry_after_manufacture": "Hạn sử dụng phải sau ngày sản xuất.",

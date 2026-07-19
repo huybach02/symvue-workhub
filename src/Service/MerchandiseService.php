@@ -49,84 +49,90 @@ class MerchandiseService
 
     public function findAll(array $params): array
     {
-        $qb = $this->merchandiseRepository->createQueryBuilder('e');
+        $qb = $this->merchandiseRepository->createQueryBuilder("e");
 
         $relationFields = [
-            'category' => [
-                'joinField' => 'e.category',
-                'alias' => 'cat',
-                'targetField' => 'name',
+            "category" => [
+                "joinField" => "e.category",
+                "alias" => "cat",
+                "targetField" => "name",
             ],
         ];
 
         $result = FilterWithPagination::findWithPagination(
             $qb,
             $params,
-            'e',
+            "e",
             $relationFields,
         );
 
         // Map collection to JSON
-        $result['collection'] = array_map(
-            function (Merchandise $item) {
-                $data = $item->jsonSerialize();
-                $data['conversions'] = $this->getConversionsData($item->getId());
-                return $data;
-            },
-            $result['collection']
-        );
+        $result["collection"] = array_map(function (Merchandise $item) {
+            $data = $item->jsonSerialize();
+            $data["conversions"] = $this->getConversionsData($item->getId());
+            return $data;
+        }, $result["collection"]);
 
         return $result;
     }
 
     public function getDataSelect(array $params): array
     {
-        $qb = $this->merchandiseRepository->createQueryBuilder('e')
-            ->andWhere('e.status = 1');
+        $qb = $this->merchandiseRepository
+            ->createQueryBuilder("e")
+            ->andWhere("e.status = 1");
 
         $relationFields = [
-            'category' => [
-                'joinField' => 'e.category',
-                'alias' => 'cat',
-                'targetField' => 'name',
+            "category" => [
+                "joinField" => "e.category",
+                "alias" => "cat",
+                "targetField" => "name",
             ],
         ];
 
         $result = FilterWithPagination::findWithPagination(
             $qb,
             $params,
-            'e',
+            "e",
             $relationFields,
         );
 
         return array_map(function (Merchandise $item) {
-            $recipe = $this->merchandiseRecipeRepository->findOneBy(['finishedProduct' => $item]);
-            $mProviders = $this->merchandiseProviderRepository->findBy(['merchandise' => $item->getId()]);
-            $providerIds = array_map(fn($mp) => $mp->getProvider()?->getId(), $mProviders);
+            $recipe = $this->merchandiseRecipeRepository->findOneBy([
+                "finishedProduct" => $item,
+            ]);
+            $mProviders = $this->merchandiseProviderRepository->findBy([
+                "merchandise" => $item->getId(),
+            ]);
+            $providerIds = array_map(
+                fn($mp) => $mp->getProvider()?->getId(),
+                $mProviders,
+            );
+
+            $units = $this->getMerchandiseUnitsSelectData($item->getId());
+            $unitByProviders = $this->getMerchandiseUnitByProvider($mProviders);
 
             return [
-                'id' => $item->getId(),
-                'code' => $item->getCode(),
-                'name' => $item->getName(),
-                'type' => $item->getType(),
-                'baseUnitId' => $item->getBaseUnit()?->getId(),
-                'outputUnitId' => $recipe?->getOutputUnit()?->getId(),
-                'isSingleUnit' => $item->isSingleUnit(),
-                'conversions' => $this->getConversionsData($item->getId()),
-                'units' => $this->getMerchandiseUnitsSelectData($item->getId()),
-                'providerIds' => $providerIds,
+                "id" => $item->getId(),
+                "code" => $item->getCode(),
+                "name" => $item->getName(),
+                "type" => $item->getType(),
+                "baseUnitId" => $item->getBaseUnit()?->getId(),
+                "outputUnitId" => $recipe?->getOutputUnit()?->getId(),
+                "isSingleUnit" => $item->isSingleUnit(),
+                "conversions" => $this->getConversionsData($item->getId()),
+                "units" => $units,
+                "unitByProviders" => $unitByProviders,
+                "providerIds" => $providerIds,
             ];
-        }, $result['collection']);
+        }, $result["collection"]);
     }
 
-    /**
-     * @return list<array{value: int, label: string, isBase: bool}>
-     */
     private function getMerchandiseUnitsSelectData(int $merchandiseId): array
     {
         $merchandiseUnits = $this->merchandiseUnitRepository->findBy(
-            ['merchandise' => $merchandiseId],
-            ['level' => 'ASC', 'id' => 'ASC'],
+            ["merchandise" => $merchandiseId],
+            ["level" => "ASC", "id" => "ASC"],
         );
 
         $seenUnitIds = [];
@@ -141,16 +147,74 @@ class MerchandiseService
             }
 
             $seenUnitIds[$unitId] = true;
-            $label = trim((string) ($merchandiseUnit->getLabel() ?: $unit?->getName() ?: ''));
+            $label = trim(
+                (string) ($merchandiseUnit->getLabel() ?:
+                $unit?->getName() ?:
+                ""),
+            );
 
             $units[] = [
-                'value' => $unitId,
-                'label' => $label !== '' ? $label : (string) $unitId,
-                'isBase' => (bool) $merchandiseUnit->isBase(),
+                "value" => $unitId,
+                "label" => $label !== "" ? $label : (string) $unitId,
+                "isBase" => (bool) $merchandiseUnit->isBase(),
             ];
         }
 
         return $units;
+    }
+
+    private function getMerchandiseUnitByProvider(
+        array $merchandiseProviders,
+    ): array {
+        $result = [];
+        foreach ($merchandiseProviders as $merchandiseProvider) {
+            $units = [];
+            if ($merchandiseProvider->getUnitConfigMode() === "general") {
+                $merchandiseId = $merchandiseProvider->getMerchandise()?->getId();
+                if ($merchandiseId !== null) {
+                    $units = $this->getMerchandiseUnitsSelectData($merchandiseId);
+                }
+            } else {
+                $merchandiseProviderUnits = $this->merchandiseProviderUnitRepository->findBy(
+                    [
+                        "merchandiseProvider" => $merchandiseProvider,
+                    ],
+                    [
+                        "level" => "ASC",
+                        "id" => "ASC",
+                    ],
+                );
+                $seenUnitIds = [];
+
+                foreach ($merchandiseProviderUnits as $merchandiseUnit) {
+                    $unit = $merchandiseUnit->getUnit();
+                    $unitId = $unit?->getId();
+
+                    if ($unitId === null || isset($seenUnitIds[$unitId])) {
+                        continue;
+                    }
+
+                    $seenUnitIds[$unitId] = true;
+                    $label = trim(
+                        (string) ($merchandiseUnit->getLabel() ?:
+                        $unit?->getName() ?:
+                        ""),
+                    );
+
+                    $units[] = [
+                        "value" => $unitId,
+                        "label" => $label !== "" ? $label : (string) $unitId,
+                        "isBase" => (bool) $merchandiseUnit->isBase(),
+                    ];
+                }
+            }
+
+            $providerId = $merchandiseProvider->getProvider()?->getId();
+            if ($providerId !== null) {
+                $result[$providerId] = $units;
+            }
+        }
+        return $result;
     }
 
     public function findById(int $id): array
@@ -158,13 +222,13 @@ class MerchandiseService
         $item = $this->merchandiseRepository->find($id);
 
         if (!$item) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         $data = $item->jsonSerialize();
-        $data['conversions'] = $this->getConversionsData($id);
-        $data['providers'] = $this->getProvidersData($id);
-        $data['recipe'] = $this->getRecipeData($id);
+        $data["conversions"] = $this->getConversionsData($id);
+        $data["providers"] = $this->getProvidersData($id);
+        $data["recipe"] = $this->getRecipeData($id);
 
         return $data;
     }
@@ -185,29 +249,39 @@ class MerchandiseService
             $item->setNotes($dto->notes);
             $item->setStockAlertQuantity($dto->stockAlertQuantity);
             $item->setStatus($dto->status);
-            $item->setIsSingleUnit((bool)$dto->isSingleUnit);
+            $item->setIsSingleUnit((bool) $dto->isSingleUnit);
 
             if ($dto->categoryId) {
-                $item->setCategory($this->categoryRepository->find($dto->categoryId));
+                $item->setCategory(
+                    $this->categoryRepository->find($dto->categoryId),
+                );
             }
 
             if ($dto->baseUnitId) {
-                $item->setBaseUnit($this->unitRepository->find($dto->baseUnitId));
+                $item->setBaseUnit(
+                    $this->unitRepository->find($dto->baseUnitId),
+                );
             }
 
             $this->entityManager->persist($item);
 
             if ($dto->baseUnitId || !empty($dto->conversions)) {
-                $this->saveConversionsAndUnits($item, $dto->conversions, $dto->baseUnitId);
+                $this->saveConversionsAndUnits(
+                    $item,
+                    $dto->conversions,
+                    $dto->baseUnitId,
+                );
             }
 
-            if ($dto->type === 'finished_product') {
-                $item->setFinishedProductSource($dto->finishedProductSource ?? 'supplier');
+            if ($dto->type === "finished_product") {
+                $item->setFinishedProductSource(
+                    $dto->finishedProductSource ?? "supplier",
+                );
             } else {
                 $item->setFinishedProductSource(null);
             }
 
-            if ($item->getType() === 'ingredient') {
+            if ($item->getType() === "ingredient") {
                 if (!empty($dto->providers)) {
                     $this->saveProviders($item, $dto->providers);
                 }
@@ -216,7 +290,12 @@ class MerchandiseService
                 if (!empty($dto->providers)) {
                     $this->saveProviders($item, $dto->providers);
                 }
-                if ($dto->finishedProductSource === 'production' && $dto->recipe !== null && $dto->recipe->outputUnitId !== null && !empty($dto->recipe->items)) {
+                if (
+                    $dto->finishedProductSource === "production" &&
+                    $dto->recipe !== null &&
+                    $dto->recipe->outputUnitId !== null &&
+                    !empty($dto->recipe->items)
+                ) {
                     $this->saveRecipe($item, $dto->recipe);
                 }
             }
@@ -226,9 +305,9 @@ class MerchandiseService
             $conn->commit();
 
             $data = $item->jsonSerialize();
-            $data['conversions'] = $this->getConversionsData($item->getId());
-            $data['providers'] = $this->getProvidersData($item->getId());
-            $data['recipe'] = $this->getRecipeData($item->getId());
+            $data["conversions"] = $this->getConversionsData($item->getId());
+            $data["providers"] = $this->getProvidersData($item->getId());
+            $data["recipe"] = $this->getRecipeData($item->getId());
 
             return $data;
         } catch (\Throwable $e) {
@@ -246,7 +325,7 @@ class MerchandiseService
             $item = $this->merchandiseRepository->find($id);
 
             if (!$item) {
-                throw new \Exception(t('error.not_found'));
+                throw new \Exception(t("error.not_found"));
             }
 
             $item->setCode($dto->code);
@@ -259,29 +338,48 @@ class MerchandiseService
             $item->setNotes($dto->notes);
             $item->setStockAlertQuantity($dto->stockAlertQuantity);
             $item->setStatus($dto->status);
-            $item->setIsSingleUnit((bool)$dto->isSingleUnit);
+            $item->setIsSingleUnit((bool) $dto->isSingleUnit);
 
-            $item->setCategory($dto->categoryId ? $this->categoryRepository->find($dto->categoryId) : null);
-            $item->setBaseUnit($dto->baseUnitId ? $this->unitRepository->find($dto->baseUnitId) : null);
+            $item->setCategory(
+                $dto->categoryId
+                    ? $this->categoryRepository->find($dto->categoryId)
+                    : null,
+            );
+            $item->setBaseUnit(
+                $dto->baseUnitId
+                    ? $this->unitRepository->find($dto->baseUnitId)
+                    : null,
+            );
 
-            $this->saveConversionsAndUnits($item, $dto->conversions, $dto->baseUnitId);
+            $this->saveConversionsAndUnits(
+                $item,
+                $dto->conversions,
+                $dto->baseUnitId,
+            );
 
-            if ($item->getType() === 'finished_product') {
-                $item->setFinishedProductSource($dto->finishedProductSource ?? 'supplier');
+            if ($item->getType() === "finished_product") {
+                $item->setFinishedProductSource(
+                    $dto->finishedProductSource ?? "supplier",
+                );
             } else {
                 $item->setFinishedProductSource(null);
             }
 
-            if ($item->getType() === 'ingredient') {
+            if ($item->getType() === "ingredient") {
                 $this->saveProviders($item, $dto->providers);
                 $this->deleteRecipe($item);
             } else {
                 if (!empty($dto->providers)) {
                     $this->saveProviders($item, $dto->providers);
                 }
-                if ($dto->finishedProductSource === 'production' && $dto->recipe !== null && $dto->recipe->outputUnitId !== null && !empty($dto->recipe->items)) {
+                if (
+                    $dto->finishedProductSource === "production" &&
+                    $dto->recipe !== null &&
+                    $dto->recipe->outputUnitId !== null &&
+                    !empty($dto->recipe->items)
+                ) {
                     $this->saveRecipe($item, $dto->recipe);
-                } elseif ($dto->finishedProductSource === 'supplier') {
+                } elseif ($dto->finishedProductSource === "supplier") {
                     $this->deleteRecipe($item);
                 }
             }
@@ -291,9 +389,9 @@ class MerchandiseService
             $conn->commit();
 
             $data = $item->jsonSerialize();
-            $data['conversions'] = $this->getConversionsData($item->getId());
-            $data['providers'] = $this->getProvidersData($item->getId());
-            $data['recipe'] = $this->getRecipeData($item->getId());
+            $data["conversions"] = $this->getConversionsData($item->getId());
+            $data["providers"] = $this->getProvidersData($item->getId());
+            $data["recipe"] = $this->getRecipeData($item->getId());
 
             return $data;
         } catch (\Throwable $e) {
@@ -307,7 +405,7 @@ class MerchandiseService
         $item = $this->merchandiseRepository->find($id);
 
         if (!$item) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         $this->entityManager->remove($item);
@@ -316,33 +414,45 @@ class MerchandiseService
 
     private function getConversionsData(int $merchandiseId): array
     {
-        $conversions = $this->merchandiseUnitConversionRepository
-            ->findBy(['merchandise' => $merchandiseId], ['sortOrder' => 'ASC']);
+        $conversions = $this->merchandiseUnitConversionRepository->findBy(
+            ["merchandise" => $merchandiseId],
+            ["sortOrder" => "ASC"],
+        );
 
-        return array_map(fn(MerchandiseUnitConversion $c) => [
-            'id' => $c->getId(),
-            'fromUnitId' => $c->getFromUnit()?->getId(),
-            'fromUnit' => $c->getFromUnit()?->jsonSerialize(),
-            'fromValue' => formatDecimal($c->getFromValue()),
-            'toUnitId' => $c->getToUnit()?->getId(),
-            'toUnit' => $c->getToUnit()?->jsonSerialize(),
-            'toValue' => formatDecimal($c->getToValue()),
-            'sortOrder' => $c->getSortOrder(),
-        ], $conversions);
+        return array_map(
+            fn(MerchandiseUnitConversion $c) => [
+                "id" => $c->getId(),
+                "fromUnitId" => $c->getFromUnit()?->getId(),
+                "fromUnit" => $c->getFromUnit()?->jsonSerialize(),
+                "fromValue" => formatDecimal($c->getFromValue()),
+                "toUnitId" => $c->getToUnit()?->getId(),
+                "toUnit" => $c->getToUnit()?->jsonSerialize(),
+                "toValue" => formatDecimal($c->getToValue()),
+                "sortOrder" => $c->getSortOrder(),
+            ],
+            $conversions,
+        );
     }
 
-    public function saveConversionsAndUnits(Merchandise $merchandise, ?array $conversionsData, ?int $baseUnitId): void
-    {
+    public function saveConversionsAndUnits(
+        Merchandise $merchandise,
+        ?array $conversionsData,
+        ?int $baseUnitId,
+    ): void {
         // 1. Xóa các MerchandiseUnitConversion cũ
         $conversionRepo = $this->merchandiseUnitConversionRepository;
-        $oldConversions = $conversionRepo->findBy(['merchandise' => $merchandise]);
+        $oldConversions = $conversionRepo->findBy([
+            "merchandise" => $merchandise,
+        ]);
         foreach ($oldConversions as $oldC) {
             $this->entityManager->remove($oldC);
         }
 
         // 2. Xóa các MerchandiseUnit cũ
         $merchandiseUnitRepo = $this->merchandiseUnitRepository;
-        $oldUnits = $merchandiseUnitRepo->findBy(['merchandise' => $merchandise]);
+        $oldUnits = $merchandiseUnitRepo->findBy([
+            "merchandise" => $merchandise,
+        ]);
         foreach ($oldUnits as $oldU) {
             $this->entityManager->remove($oldU);
         }
@@ -354,7 +464,7 @@ class MerchandiseService
                     $mUnit = new MerchandiseUnit();
                     $mUnit->setMerchandise($merchandise);
                     $mUnit->setUnit($baseUnitEntity);
-                    $mUnit->setFactorToBase('1.0000');
+                    $mUnit->setFactorToBase("1.0000");
                     $mUnit->setLevel(0);
                     $mUnit->setIsBase(true);
                     $mUnit->setLabel($baseUnitEntity->getName());
@@ -369,11 +479,11 @@ class MerchandiseService
         // 3. Lưu các conversions mới
         $savedConversions = [];
         foreach ($conversionsData as $index => $cData) {
-            if (empty($cData['fromUnitId']) || empty($cData['toUnitId'])) {
+            if (empty($cData["fromUnitId"]) || empty($cData["toUnitId"])) {
                 continue;
             }
-            $fromUnit = $unitRepo->find($cData['fromUnitId']);
-            $toUnit = $unitRepo->find($cData['toUnitId']);
+            $fromUnit = $unitRepo->find($cData["fromUnitId"]);
+            $toUnit = $unitRepo->find($cData["toUnitId"]);
 
             if (!$fromUnit || !$toUnit) {
                 continue;
@@ -382,10 +492,10 @@ class MerchandiseService
             $conversion = new MerchandiseUnitConversion();
             $conversion->setMerchandise($merchandise);
             $conversion->setFromUnit($fromUnit);
-            $conversion->setFromValue((string)($cData['fromValue'] ?? 1));
+            $conversion->setFromValue((string) ($cData["fromValue"] ?? 1));
             $conversion->setToUnit($toUnit);
-            $conversion->setToValue((string)($cData['toValue'] ?? 1));
-            $conversion->setSortOrder((int)($cData['sortOrder'] ?? $index));
+            $conversion->setToValue((string) ($cData["toValue"] ?? 1));
+            $conversion->setSortOrder((int) ($cData["sortOrder"] ?? $index));
 
             $this->entityManager->persist($conversion);
             $savedConversions[] = $conversion;
@@ -401,8 +511,8 @@ class MerchandiseService
         foreach ($savedConversions as $c) {
             $fromId = $c->getFromUnit()->getId();
             $toId = $c->getToUnit()->getId();
-            $fromVal = (float)$c->getFromValue();
-            $toVal = (float)$c->getToValue();
+            $fromVal = (float) $c->getFromValue();
+            $toVal = (float) $c->getToValue();
 
             if ($fromVal <= 0 || $toVal <= 0) {
                 continue;
@@ -410,8 +520,16 @@ class MerchandiseService
 
             $ratio = $toVal / $fromVal;
 
-            $adj[$fromId][] = ['node' => $toId, 'ratio' => $ratio, 'direction' => 'forward'];
-            $adj[$toId][] = ['node' => $fromId, 'ratio' => $ratio, 'direction' => 'backward'];
+            $adj[$fromId][] = [
+                "node" => $toId,
+                "ratio" => $ratio,
+                "direction" => "forward",
+            ];
+            $adj[$toId][] = [
+                "node" => $fromId,
+                "ratio" => $ratio,
+                "direction" => "backward",
+            ];
 
             $allUnitIds[$fromId] = $c->getFromUnit();
             $allUnitIds[$toId] = $c->getToUnit();
@@ -436,13 +554,13 @@ class MerchandiseService
 
             if (isset($adj[$u])) {
                 foreach ($adj[$u] as $edge) {
-                    $v = $edge['node'];
+                    $v = $edge["node"];
                     if (!isset($visited[$v])) {
                         $visited[$v] = true;
-                        if ($edge['direction'] === 'forward') {
-                            $factors[$v] = $uFactor / $edge['ratio'];
+                        if ($edge["direction"] === "forward") {
+                            $factors[$v] = $uFactor / $edge["ratio"];
                         } else {
-                            $factors[$v] = $edge['ratio'] * $uFactor;
+                            $factors[$v] = $edge["ratio"] * $uFactor;
                         }
                         $queue[] = $v;
                     }
@@ -455,39 +573,39 @@ class MerchandiseService
         foreach ($allUnitIds as $uId => $unitObj) {
             $factor = $factors[$uId] ?? 1.0;
             $unitFactors[] = [
-                'id' => $uId,
-                'unit' => $unitObj,
-                'factor' => $factor
+                "id" => $uId,
+                "unit" => $unitObj,
+                "factor" => $factor,
             ];
         }
 
         // Sắp xếp base unit lên đầu tiên
         usort($unitFactors, function ($a, $b) use ($baseUnitId) {
-            if ($a['id'] === $baseUnitId) {
+            if ($a["id"] === $baseUnitId) {
                 return -1;
             }
-            if ($b['id'] === $baseUnitId) {
+            if ($b["id"] === $baseUnitId) {
                 return 1;
             }
-            return $a['factor'] <=> $b['factor'];
+            return $a["factor"] <=> $b["factor"];
         });
 
         $levels = [];
         foreach ($unitFactors as $level => $uf) {
-            $levels[$uf['id']] = $level;
+            $levels[$uf["id"]] = $level;
         }
 
         // 5. Lưu các MerchandiseUnit mới
         foreach ($unitFactors as $uf) {
-            $uId = $uf['id'];
-            $unitObj = $uf['unit'];
-            $factor = $uf['factor'];
+            $uId = $uf["id"];
+            $unitObj = $uf["unit"];
+            $factor = $uf["factor"];
             $level = $levels[$uId];
 
             $mUnit = new MerchandiseUnit();
             $mUnit->setMerchandise($merchandise);
             $mUnit->setUnit($unitObj);
-            $mUnit->setFactorToBase(sprintf('%.4f', $factor));
+            $mUnit->setFactorToBase(sprintf("%.4f", $factor));
             $mUnit->setLevel($level);
             $mUnit->setIsBase($uId === $baseUnitId);
 
@@ -495,8 +613,13 @@ class MerchandiseService
             $label = $unitObj->getName();
             foreach ($savedConversions as $c) {
                 if ($c->getFromUnit()->getId() === $uId) {
-                    $toValFloat = (float)$c->getToValue();
-                    $label = sprintf('%s %g %s', $unitObj->getName(), $toValFloat, $c->getToUnit()->getName());
+                    $toValFloat = (float) $c->getToValue();
+                    $label = sprintf(
+                        "%s %g %s",
+                        $unitObj->getName(),
+                        $toValFloat,
+                        $c->getToUnit()->getName(),
+                    );
                     break;
                 }
             }
@@ -508,20 +631,29 @@ class MerchandiseService
 
     private function getProvidersData(int $merchandiseId): array
     {
-        $mProviders = $this->merchandiseProviderRepository->findBy(['merchandise' => $merchandiseId]);
+        $mProviders = $this->merchandiseProviderRepository->findBy([
+            "merchandise" => $merchandiseId,
+        ]);
 
         // Lấy conversions gốc của Merchandise
-        $baseConversions = $this->merchandiseUnitConversionRepository->findBy(['merchandise' => $merchandiseId], ['sortOrder' => 'ASC']);
+        $baseConversions = $this->merchandiseUnitConversionRepository->findBy(
+            ["merchandise" => $merchandiseId],
+            ["sortOrder" => "ASC"],
+        );
 
         $result = [];
         foreach ($mProviders as $mp) {
             $mpId = $mp->getId();
 
             // Lấy các units đã lưu cho provider này
-            $providerUnits = $this->merchandiseProviderUnitRepository->findBy(['merchandiseProvider' => $mpId]);
+            $providerUnits = $this->merchandiseProviderUnitRepository->findBy([
+                "merchandiseProvider" => $mpId,
+            ]);
             $providerUnitMap = [];
             foreach ($providerUnits as $pu) {
-                $providerUnitMap[$pu->getUnit()->getId()] = (float)$pu->getFactorToBase();
+                $providerUnitMap[
+                    $pu->getUnit()->getId()
+                ] = (float) $pu->getFactorToBase();
             }
 
             // Tái cấu trúc conversions cho provider
@@ -530,66 +662,91 @@ class MerchandiseService
                 $fromUnitId = $bc->getFromUnit()->getId();
                 $toUnitId = $bc->getToUnit()->getId();
 
-                $fromVal = (float)$bc->getFromValue();
-                $toVal = (float)$bc->getToValue();
+                $fromVal = (float) $bc->getFromValue();
+                $toVal = (float) $bc->getToValue();
 
                 // Nếu provider dùng custom config và có lưu factor riêng
-                if ($mp->getUnitConfigMode() === 'custom' && isset($providerUnitMap[$fromUnitId]) && isset($providerUnitMap[$toUnitId])) {
+                if (
+                    $mp->getUnitConfigMode() === "custom" &&
+                    isset($providerUnitMap[$fromUnitId]) &&
+                    isset($providerUnitMap[$toUnitId])
+                ) {
                     $fromFactor = $providerUnitMap[$fromUnitId];
                     $toFactor = $providerUnitMap[$toUnitId];
 
                     if ($fromFactor > 0 && $toFactor > 0) {
-                        $fromVal = (float)$bc->getFromValue();
+                        $fromVal = (float) $bc->getFromValue();
                         $toVal = $fromVal * ($fromFactor / $toFactor);
                     }
                 }
 
                 $conversions[] = [
-                    'fromUnitId' => $fromUnitId,
-                    'fromUnit' => $bc->getFromUnit()?->jsonSerialize(),
-                    'fromValue' => formatDecimal((string)$fromVal),
-                    'toUnitId' => $toUnitId,
-                    'toUnit' => $bc->getToUnit()?->jsonSerialize(),
-                    'toValue' => formatDecimal((string)$toVal),
-                    'sortOrder' => $bc->getSortOrder(),
+                    "fromUnitId" => $fromUnitId,
+                    "fromUnit" => $bc->getFromUnit()?->jsonSerialize(),
+                    "fromValue" => formatDecimal((string) $fromVal),
+                    "toUnitId" => $toUnitId,
+                    "toUnit" => $bc->getToUnit()?->jsonSerialize(),
+                    "toValue" => formatDecimal((string) $toVal),
+                    "sortOrder" => $bc->getSortOrder(),
                 ];
             }
 
             // Lấy danh sách giá mặc định theo từng đơn vị của provider
             $prices = [];
-            $providerPrices = $this->merchandiseProviderPriceRepository->findBy(['merchandiseProvider' => $mpId]);
+            $providerPrices = $this->merchandiseProviderPriceRepository->findBy(
+                ["merchandiseProvider" => $mpId],
+            );
             foreach ($providerPrices as $pp) {
                 $prices[] = [
-                    'unitId' => $pp->getUnit()->getId(),
-                    'isDefault' => $pp->isDefault(),
-                    'price' => formatDecimal($pp->getPrice()),
-                    'discountRate' => formatDecimal($pp->getDiscountRate()),
-                    'discountAmount' => formatDecimal($pp->getDiscountAmount()),
-                    'priceAfterDiscount' => formatDecimal($pp->getPriceAfterDiscount()),
-                    'currency' => $pp->getCurrency(),
-                    'effectiveFrom' => $pp->getEffectiveFrom()?->format('Y-m-d'),
-                    'effectiveTo' => $pp->getEffectiveTo()?->format('Y-m-d'),
+                    "unitId" => $pp->getUnit()->getId(),
+                    "isDefault" => $pp->isDefault(),
+                    "price" => formatDecimal($pp->getPrice()),
+                    "discountRate" => formatDecimal($pp->getDiscountRate()),
+                    "discountAmount" => formatDecimal($pp->getDiscountAmount()),
+                    "priceAfterDiscount" => formatDecimal(
+                        $pp->getPriceAfterDiscount(),
+                    ),
+                    "currency" => $pp->getCurrency(),
+                    "effectiveFrom" => $pp
+                        ->getEffectiveFrom()
+                        ?->format("Y-m-d"),
+                    "effectiveTo" => $pp->getEffectiveTo()?->format("Y-m-d"),
+                ];
+            }
+
+            $units = [];
+            foreach ($providerUnits as $pu) {
+                $units[] = [
+                    "value" => $pu->getUnit()->getId(),
+                    "label" => $pu->getLabel() ?: $pu->getUnit()->getName(),
+                    "factorToBase" => formatDecimal($pu->getFactorToBase()),
+                    "isBase" => (bool) $pu->isBase(),
                 ];
             }
 
             $result[] = [
-                'id' => $mpId,
-                'providerId' => $mp->getProvider()?->getId(),
-                'provider' => $mp->getProvider()?->jsonSerialize(),
-                'unitConfigMode' => $mp->getUnitConfigMode(),
-                'isDefault' => $mp->isDefault(),
-                'conversions' => $conversions,
-                'prices' => $prices,
+                "id" => $mpId,
+                "providerId" => $mp->getProvider()?->getId(),
+                "provider" => $mp->getProvider()?->jsonSerialize(),
+                "unitConfigMode" => $mp->getUnitConfigMode(),
+                "isDefault" => $mp->isDefault(),
+                "conversions" => $conversions,
+                "prices" => $prices,
+                "units" => $units,
             ];
         }
 
         return $result;
     }
 
-    public function saveProviders(Merchandise $merchandise, ?array $providersData): void
-    {
+    public function saveProviders(
+        Merchandise $merchandise,
+        ?array $providersData,
+    ): void {
         // 1. Xóa các MerchandiseProvider cũ
-        $oldProviders = $this->merchandiseProviderRepository->findBy(['merchandise' => $merchandise]);
+        $oldProviders = $this->merchandiseProviderRepository->findBy([
+            "merchandise" => $merchandise,
+        ]);
         foreach ($oldProviders as $oldP) {
             $this->entityManager->remove($oldP);
         }
@@ -608,11 +765,13 @@ class MerchandiseService
         // 2. Lưu từng MerchandiseProvider mới
         $hasDefault = false;
         foreach ($providersData as $pData) {
-            if (empty($pData['providerId'])) {
+            if (empty($pData["providerId"])) {
                 continue;
             }
 
-            $providerObj = $this->providerRepository->find($pData['providerId']);
+            $providerObj = $this->providerRepository->find(
+                $pData["providerId"],
+            );
             if (!$providerObj) {
                 continue;
             }
@@ -620,9 +779,9 @@ class MerchandiseService
             $mProvider = new MerchandiseProvider();
             $mProvider->setMerchandise($merchandise);
             $mProvider->setProvider($providerObj);
-            $mProvider->setUnitConfigMode($pData['unitConfigMode'] ?? 'custom');
+            $mProvider->setUnitConfigMode($pData["unitConfigMode"] ?? "custom");
 
-            $isDefault = (bool)($pData['isDefault'] ?? false);
+            $isDefault = (bool) ($pData["isDefault"] ?? false);
             if ($isDefault && !$hasDefault) {
                 $mProvider->setIsDefault(true);
                 $hasDefault = true;
@@ -637,41 +796,49 @@ class MerchandiseService
             $factors = [$baseUnitId => 1.0];
             $allUnits = [$baseUnitId => $baseUnit];
 
-            if (!empty($pData['conversions'])) {
+            if (!empty($pData["conversions"])) {
                 // BFS tính toán factorToBase cho các đơn vị của provider này
                 $adj = [];
                 $validConversions = [];
 
-                foreach ($pData['conversions'] as $c) {
-                    if (empty($c['fromUnitId']) || empty($c['toUnitId'])) {
+                foreach ($pData["conversions"] as $c) {
+                    if (empty($c["fromUnitId"]) || empty($c["toUnitId"])) {
                         continue;
                     }
 
-                    $fromUnit = $this->unitRepository->find($c['fromUnitId']);
-                    $toUnit = $this->unitRepository->find($c['toUnitId']);
+                    $fromUnit = $this->unitRepository->find($c["fromUnitId"]);
+                    $toUnit = $this->unitRepository->find($c["toUnitId"]);
                     if (!$fromUnit || !$toUnit) {
                         continue;
                     }
 
-                    $fromVal = (float)$c['fromValue'];
-                    $toVal = (float)$c['toValue'];
+                    $fromVal = (float) $c["fromValue"];
+                    $toVal = (float) $c["toValue"];
                     if ($fromVal <= 0 || $toVal <= 0) {
                         continue;
                     }
 
                     $ratio = $toVal / $fromVal;
-                    $fromId = (int)$c['fromUnitId'];
-                    $toId = (int)$c['toUnitId'];
+                    $fromId = (int) $c["fromUnitId"];
+                    $toId = (int) $c["toUnitId"];
 
-                    $adj[$fromId][] = ['node' => $toId, 'ratio' => $ratio, 'direction' => 'forward'];
-                    $adj[$toId][] = ['node' => $fromId, 'ratio' => $ratio, 'direction' => 'backward'];
+                    $adj[$fromId][] = [
+                        "node" => $toId,
+                        "ratio" => $ratio,
+                        "direction" => "forward",
+                    ];
+                    $adj[$toId][] = [
+                        "node" => $fromId,
+                        "ratio" => $ratio,
+                        "direction" => "backward",
+                    ];
 
                     $allUnits[$fromId] = $fromUnit;
                     $allUnits[$toId] = $toUnit;
                     $validConversions[] = [
-                        'fromUnit' => $fromUnit,
-                        'toUnit' => $toUnit,
-                        'toValue' => $toVal,
+                        "fromUnit" => $fromUnit,
+                        "toUnit" => $toUnit,
+                        "toValue" => $toVal,
                     ];
                 }
 
@@ -684,13 +851,13 @@ class MerchandiseService
 
                     if (isset($adj[$u])) {
                         foreach ($adj[$u] as $edge) {
-                            $v = $edge['node'];
+                            $v = $edge["node"];
                             if (!isset($visited[$v])) {
                                 $visited[$v] = true;
-                                if ($edge['direction'] === 'forward') {
-                                    $factors[$v] = $uFactor / $edge['ratio'];
+                                if ($edge["direction"] === "forward") {
+                                    $factors[$v] = $uFactor / $edge["ratio"];
                                 } else {
-                                    $factors[$v] = $edge['ratio'] * $uFactor;
+                                    $factors[$v] = $edge["ratio"] * $uFactor;
                                 }
                                 $queue[] = $v;
                             }
@@ -703,46 +870,51 @@ class MerchandiseService
                 foreach ($allUnits as $uId => $unitObj) {
                     $factor = $factors[$uId] ?? 1.0;
                     $unitFactors[] = [
-                        'id' => $uId,
-                        'unit' => $unitObj,
-                        'factor' => $factor
+                        "id" => $uId,
+                        "unit" => $unitObj,
+                        "factor" => $factor,
                     ];
                 }
 
                 usort($unitFactors, function ($a, $b) use ($baseUnitId) {
-                    if ($a['id'] === $baseUnitId) {
+                    if ($a["id"] === $baseUnitId) {
                         return -1;
                     }
-                    if ($b['id'] === $baseUnitId) {
+                    if ($b["id"] === $baseUnitId) {
                         return 1;
                     }
-                    return $a['factor'] <=> $b['factor'];
+                    return $a["factor"] <=> $b["factor"];
                 });
 
                 $levels = [];
                 foreach ($unitFactors as $level => $uf) {
-                    $levels[$uf['id']] = $level;
+                    $levels[$uf["id"]] = $level;
                 }
 
                 // Tạo các MerchandiseProviderUnit
                 foreach ($unitFactors as $uf) {
-                    $uId = $uf['id'];
-                    $unitObj = $uf['unit'];
-                    $factor = $uf['factor'];
+                    $uId = $uf["id"];
+                    $unitObj = $uf["unit"];
+                    $factor = $uf["factor"];
                     $level = $levels[$uId];
 
                     $mpUnit = new MerchandiseProviderUnit();
                     $mpUnit->setMerchandiseProvider($mProvider);
                     $mpUnit->setUnit($unitObj);
-                    $mpUnit->setFactorToBase(sprintf('%.4f', $factor));
+                    $mpUnit->setFactorToBase(sprintf("%.4f", $factor));
                     $mpUnit->setLevel($level);
                     $mpUnit->setIsBase($uId === $baseUnitId);
 
                     // Build label
                     $label = $unitObj->getName();
                     foreach ($validConversions as $vc) {
-                        if ($vc['fromUnit']->getId() === $uId) {
-                            $label = sprintf('%s %g %s', $unitObj->getName(), $vc['toValue'], $vc['toUnit']->getName());
+                        if ($vc["fromUnit"]->getId() === $uId) {
+                            $label = sprintf(
+                                "%s %g %s",
+                                $unitObj->getName(),
+                                $vc["toValue"],
+                                $vc["toUnit"]->getName(),
+                            );
                             break;
                         }
                     }
@@ -754,29 +926,43 @@ class MerchandiseService
             }
 
             // Xử lý prices cho nhà cung cấp để tạo MerchandiseProviderPrice
-            if (!empty($pData['prices'])) {
-                foreach ($pData['prices'] as $priceItem) {
-                    if (empty($priceItem['unitId']) || !isset($priceItem['price']) || $priceItem['price'] === '' || $priceItem['price'] === null) {
+            if (!empty($pData["prices"])) {
+                foreach ($pData["prices"] as $priceItem) {
+                    if (
+                        empty($priceItem["unitId"]) ||
+                        !isset($priceItem["price"]) ||
+                        $priceItem["price"] === "" ||
+                        $priceItem["price"] === null
+                    ) {
                         continue;
                     }
 
-                    $unitObj = $this->unitRepository->find($priceItem['unitId']);
+                    $unitObj = $this->unitRepository->find(
+                        $priceItem["unitId"],
+                    );
                     if (!$unitObj) {
                         continue;
                     }
 
-                    $uId = (int)$priceItem['unitId'];
+                    $uId = (int) $priceItem["unitId"];
 
                     // Lấy snapshot label và factor từ MerchandiseProviderUnit mới tạo
                     $unitLabelSnapshot = $unitObj->getName();
-                    $factorToBaseSnapshot = '1.0000';
+                    $factorToBaseSnapshot = "1.0000";
 
                     if (isset($savedProviderUnits[$uId])) {
-                        $unitLabelSnapshot = $savedProviderUnits[$uId]->getLabel();
-                        $factorToBaseSnapshot = $savedProviderUnits[$uId]->getFactorToBase();
+                        $unitLabelSnapshot = $savedProviderUnits[
+                            $uId
+                        ]->getLabel();
+                        $factorToBaseSnapshot = $savedProviderUnits[
+                            $uId
+                        ]->getFactorToBase();
                     } else {
                         // Backup lấy từ MerchandiseUnit của Merchandise
-                        $mUnit = $this->merchandiseUnitRepository->findOneBy(['merchandise' => $merchandise, 'unit' => $unitObj]);
+                        $mUnit = $this->merchandiseUnitRepository->findOneBy([
+                            "merchandise" => $merchandise,
+                            "unit" => $unitObj,
+                        ]);
                         if ($mUnit) {
                             $unitLabelSnapshot = $mUnit->getLabel();
                             $factorToBaseSnapshot = $mUnit->getFactorToBase();
@@ -788,25 +974,45 @@ class MerchandiseService
                     $mPrice->setUnit($unitObj);
                     $mPrice->setUnitLabelSnapshot($unitLabelSnapshot);
                     $mPrice->setFactorToBaseSnapshot($factorToBaseSnapshot);
-                    $priceVal = ($priceItem['price'] !== null && $priceItem['price'] !== '') ? (string)$priceItem['price'] : '0.00';
-                    $discountRateVal = ($priceItem['discountRate'] !== null && $priceItem['discountRate'] !== '') ? (string)$priceItem['discountRate'] : '0.00';
-                    $discountAmountVal = ($priceItem['discountAmount'] !== null && $priceItem['discountAmount'] !== '') ? (string)$priceItem['discountAmount'] : '0.00';
-                    $priceAfterDiscountVal = ($priceItem['priceAfterDiscount'] !== null && $priceItem['priceAfterDiscount'] !== '') ? (string)$priceItem['priceAfterDiscount'] : $priceVal;
+                    $priceVal =
+                        $priceItem["price"] !== null &&
+                        $priceItem["price"] !== ""
+                            ? (string) $priceItem["price"]
+                            : "0.00";
+                    $discountRateVal =
+                        $priceItem["discountRate"] !== null &&
+                        $priceItem["discountRate"] !== ""
+                            ? (string) $priceItem["discountRate"]
+                            : "0.00";
+                    $discountAmountVal =
+                        $priceItem["discountAmount"] !== null &&
+                        $priceItem["discountAmount"] !== ""
+                            ? (string) $priceItem["discountAmount"]
+                            : "0.00";
+                    $priceAfterDiscountVal =
+                        $priceItem["priceAfterDiscount"] !== null &&
+                        $priceItem["priceAfterDiscount"] !== ""
+                            ? (string) $priceItem["priceAfterDiscount"]
+                            : $priceVal;
 
                     $mPrice->setPrice($priceVal);
                     $mPrice->setDiscountRate($discountRateVal);
                     $mPrice->setDiscountAmount($discountAmountVal);
                     $mPrice->setPriceAfterDiscount($priceAfterDiscountVal);
 
-                    if (!empty($priceItem['effectiveFrom'])) {
-                        $mPrice->setEffectiveFrom(new \DateTime($priceItem['effectiveFrom']));
+                    if (!empty($priceItem["effectiveFrom"])) {
+                        $mPrice->setEffectiveFrom(
+                            new \DateTime($priceItem["effectiveFrom"]),
+                        );
                     }
-                    if (!empty($priceItem['effectiveTo'])) {
-                        $mPrice->setEffectiveTo(new \DateTime($priceItem['effectiveTo']));
+                    if (!empty($priceItem["effectiveTo"])) {
+                        $mPrice->setEffectiveTo(
+                            new \DateTime($priceItem["effectiveTo"]),
+                        );
                     }
 
-                    $mPrice->setCurrency('VND');
-                    $mPrice->setIsDefault(!empty($priceItem['isDefault']));
+                    $mPrice->setCurrency("VND");
+                    $mPrice->setIsDefault(!empty($priceItem["isDefault"]));
                     $mPrice->setStatus(1);
 
                     $this->entityManager->persist($mPrice);
@@ -817,7 +1023,9 @@ class MerchandiseService
 
     public function getRecipeData(int $merchandiseId): ?array
     {
-        $recipe = $this->merchandiseRecipeRepository->findOneBy(['finishedProduct' => $merchandiseId]);
+        $recipe = $this->merchandiseRecipeRepository->findOneBy([
+            "finishedProduct" => $merchandiseId,
+        ]);
         if (!$recipe) {
             return null;
         }
@@ -827,14 +1035,18 @@ class MerchandiseService
 
     public function deleteRecipe(Merchandise $finishedProduct): void
     {
-        $recipe = $this->merchandiseRecipeRepository->findOneBy(['finishedProduct' => $finishedProduct]);
+        $recipe = $this->merchandiseRecipeRepository->findOneBy([
+            "finishedProduct" => $finishedProduct,
+        ]);
         if ($recipe) {
             $this->entityManager->remove($recipe);
         }
     }
 
-    public function saveRecipe(Merchandise $finishedProduct, ?RecipeDTO $recipeDTO): void
-    {
+    public function saveRecipe(
+        Merchandise $finishedProduct,
+        ?RecipeDTO $recipeDTO,
+    ): void {
         if ($recipeDTO === null) {
             return;
         }
@@ -845,18 +1057,20 @@ class MerchandiseService
         $outputUnit = $this->unitRepository->find($recipeDTO->outputUnitId);
 
         $finishedProductUnit = $this->merchandiseUnitRepository->findOneBy([
-            'merchandise' => $finishedProduct,
-            'unit' => $outputUnit
+            "merchandise" => $finishedProduct,
+            "unit" => $outputUnit,
         ]);
         if (!$finishedProductUnit) {
-            throw new \Exception(t('recipe_error.output_unit_not_configured'));
+            throw new \Exception(t("recipe_error.output_unit_not_configured"));
         }
 
         if (empty($recipeDTO->items)) {
-            throw new \Exception(t('recipe_error.items_required'));
+            throw new \Exception(t("recipe_error.items_required"));
         }
 
-        $recipe = $this->merchandiseRecipeRepository->findOneBy(['finishedProduct' => $finishedProduct]);
+        $recipe = $this->merchandiseRecipeRepository->findOneBy([
+            "finishedProduct" => $finishedProduct,
+        ]);
         if (!$recipe) {
             $recipe = new MerchandiseRecipe();
             $recipe->setFinishedProduct($finishedProduct);
@@ -868,13 +1082,15 @@ class MerchandiseService
             $recipe->getItems()->clear();
         }
 
-        $recipe->setOutputQuantity(sprintf('%.4f', $outputQuantity));
+        $recipe->setOutputQuantity(sprintf("%.4f", $outputQuantity));
         $recipe->setOutputUnit($outputUnit);
 
         $outputFactor = $finishedProductUnit->getFactorToBase();
         $recipe->setOutputFactorToBaseSnapshot($outputFactor);
-        $recipe->setOutputBaseQuantitySnapshot(sprintf('%.4f', (float)$outputQuantity * (float)$outputFactor));
-        $recipe->setVersion((int)($recipeDTO->version ?? 1));
+        $recipe->setOutputBaseQuantitySnapshot(
+            sprintf("%.4f", (float) $outputQuantity * (float) $outputFactor),
+        );
+        $recipe->setVersion((int) ($recipeDTO->version ?? 1));
         $recipe->setIsActive(true);
         $recipe->setStatus(1);
         $recipe->setNotes($recipeDTO->notes ?? null);
@@ -885,24 +1101,36 @@ class MerchandiseService
             $ingredientId = $itemDTO->ingredientId;
 
             if (in_array($ingredientId, $seenIngredientIds, true)) {
-                throw new \Exception(t('recipe_error.ingredient_duplicate', ['%index%' => $index + 1]));
+                throw new \Exception(
+                    t("recipe_error.ingredient_duplicate", [
+                        "%index%" => $index + 1,
+                    ]),
+                );
             }
             $seenIngredientIds[] = $ingredientId;
 
             $ingredient = $this->merchandiseRepository->find($ingredientId);
-            if ($ingredient->getType() !== 'ingredient') {
-                throw new \Exception(t('recipe_error.not_an_ingredient', ['%name%' => $ingredient->getName()]));
+            if ($ingredient->getType() !== "ingredient") {
+                throw new \Exception(
+                    t("recipe_error.not_an_ingredient", [
+                        "%name%" => $ingredient->getName(),
+                    ]),
+                );
             }
 
             $qty = $itemDTO->quantity ?? 0;
             $unit = $this->unitRepository->find($itemDTO->unitId);
 
             $ingredientUnit = $this->merchandiseUnitRepository->findOneBy([
-                'merchandise' => $ingredient,
-                'unit' => $unit
+                "merchandise" => $ingredient,
+                "unit" => $unit,
             ]);
             if (!$ingredientUnit) {
-                throw new \Exception(t('recipe_error.unit_not_configured', ['%name%' => $ingredient->getName()]));
+                throw new \Exception(
+                    t("recipe_error.unit_not_configured", [
+                        "%name%" => $ingredient->getName(),
+                    ]),
+                );
             }
 
             $wasteRate = $itemDTO->wasteRate ?? 0;
@@ -910,14 +1138,16 @@ class MerchandiseService
             $recipeItem = new MerchandiseRecipeItem();
             $recipeItem->setRecipe($recipe);
             $recipeItem->setIngredient($ingredient);
-            $recipeItem->setQuantity(sprintf('%.4f', $qty));
+            $recipeItem->setQuantity(sprintf("%.4f", $qty));
             $recipeItem->setUnit($unit);
 
             $factor = $ingredientUnit->getFactorToBase();
             $recipeItem->setFactorToBaseSnapshot($factor);
-            $recipeItem->setBaseQuantitySnapshot(sprintf('%.4f', (float)$qty * (float)$factor));
-            $recipeItem->setWasteRate(sprintf('%.2f', $wasteRate));
-            $recipeItem->setSortOrder((int)($itemDTO->sortOrder ?? $index));
+            $recipeItem->setBaseQuantitySnapshot(
+                sprintf("%.4f", (float) $qty * (float) $factor),
+            );
+            $recipeItem->setWasteRate(sprintf("%.2f", $wasteRate));
+            $recipeItem->setSortOrder((int) ($itemDTO->sortOrder ?? $index));
             $recipeItem->setNotes($itemDTO->notes ?? null);
 
             $this->entityManager->persist($recipeItem);
@@ -929,23 +1159,23 @@ class MerchandiseService
     {
         $merchandise = $this->merchandiseRepository->find($merchandiseId);
         if (!$merchandise) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         $unit = $this->unitRepository->find($unitId);
         if (!$unit) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         $defaultProvider = $this->merchandiseProviderRepository->findOneBy([
-            'merchandise' => $merchandise,
-            'isDefault' => true
+            "merchandise" => $merchandise,
+            "isDefault" => true,
         ]);
 
         // Fallback: Nếu không có nhà cung cấp nào được đánh dấu mặc định, lấy nhà cung cấp đầu tiên
         if (!$defaultProvider) {
             $defaultProvider = $this->merchandiseProviderRepository->findOneBy([
-                'merchandise' => $merchandise
+                "merchandise" => $merchandise,
             ]);
         }
 
@@ -954,32 +1184,38 @@ class MerchandiseService
         }
 
         $providerPrice = $this->merchandiseProviderPriceRepository->findOneBy([
-            'merchandiseProvider' => $defaultProvider,
-            'unit' => $unit
+            "merchandiseProvider" => $defaultProvider,
+            "unit" => $unit,
         ]);
 
         $conversionRate = 1.0;
         // Xử lý case nếu không tìm thấy providerPrice tương ứng theo unitId => Tìm providerPrice có isDefault = true của merchandise, sau đó từ providerPrice default này sẽ quy đổi giá sang unit cần tính
         if (!$providerPrice) {
-            $defaultProviderPrice = $this->merchandiseProviderPriceRepository->findOneBy([
-                'merchandiseProvider' => $defaultProvider,
-                'isDefault' => true
-            ]);
+            $defaultProviderPrice = $this->merchandiseProviderPriceRepository->findOneBy(
+                [
+                    "merchandiseProvider" => $defaultProvider,
+                    "isDefault" => true,
+                ],
+            );
             if ($defaultProviderPrice) {
                 $providerPrice = $defaultProviderPrice;
                 $sourceUnit = $defaultProviderPrice->getUnit();
 
                 $sourceMUnit = $this->merchandiseUnitRepository->findOneBy([
-                    'merchandise' => $merchandise,
-                    'unit' => $sourceUnit
+                    "merchandise" => $merchandise,
+                    "unit" => $sourceUnit,
                 ]);
                 $targetMUnit = $this->merchandiseUnitRepository->findOneBy([
-                    'merchandise' => $merchandise,
-                    'unit' => $unit
+                    "merchandise" => $merchandise,
+                    "unit" => $unit,
                 ]);
 
-                $sourceFactor = $sourceMUnit ? (float)$sourceMUnit->getFactorToBase() : 1.0;
-                $targetFactor = $targetMUnit ? (float)$targetMUnit->getFactorToBase() : 1.0;
+                $sourceFactor = $sourceMUnit
+                    ? (float) $sourceMUnit->getFactorToBase()
+                    : 1.0;
+                $targetFactor = $targetMUnit
+                    ? (float) $targetMUnit->getFactorToBase()
+                    : 1.0;
 
                 if ($sourceFactor > 0) {
                     $conversionRate = $targetFactor / $sourceFactor;
@@ -989,7 +1225,7 @@ class MerchandiseService
 
         // Kiểm tra time hiện tại có nằm trong khoảng effectiveFrom và effectiveTo không
         $currentTime = new \DateTime();
-        $finalPrice = (float)$providerPrice->getPrice();
+        $finalPrice = (float) $providerPrice->getPrice();
 
         $hasDiscount = false;
         $from = $providerPrice->getEffectiveFrom();
@@ -1011,44 +1247,54 @@ class MerchandiseService
 
         if ($hasDiscount) {
             $discountPrice = $providerPrice->getPriceAfterDiscount();
-            if ($discountPrice !== null && $discountPrice !== '') {
-                $finalPrice = (float)$discountPrice;
+            if ($discountPrice !== null && $discountPrice !== "") {
+                $finalPrice = (float) $discountPrice;
             }
         }
 
-        return (int)formatDecimal(sprintf('%.4f', $finalPrice * $conversionRate));
+        return (int) formatDecimal(
+            sprintf("%.4f", $finalPrice * $conversionRate),
+        );
     }
 
     // Lấy giá thành phẩm theo đơn vị tính (hỗ trợ đệ quy tính giá từ công thức sản xuất)
-    public function getPriceFinishedProductByUnitId(int $merchandiseId, int $unitId, array $visited = [])
-    {
+    public function getPriceFinishedProductByUnitId(
+        int $merchandiseId,
+        int $unitId,
+        array $visited = [],
+    ) {
         if (in_array($merchandiseId, $visited, true)) {
             return 0.0;
         }
         $visited[] = $merchandiseId;
 
-        $merchandise = $this->merchandiseRepository->findOneBy(['id' => $merchandiseId, 'type' => 'finished_product']);
+        $merchandise = $this->merchandiseRepository->findOneBy([
+            "id" => $merchandiseId,
+            "type" => "finished_product",
+        ]);
         if (!$merchandise) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         $unit = $this->unitRepository->find($unitId);
         if (!$unit) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
         // Case 1: Finished product nhập từ nhà cung cấp
-        if ($merchandise->getFinishedProductSource() === 'supplier') {
+        if ($merchandise->getFinishedProductSource() === "supplier") {
             return $this->getPriceMerchandiseByUnitId($merchandiseId, $unitId);
         }
 
         // Case 2: Finished product nhập từ sản xuất => Sử dụng recipe
-        $recipe = $this->merchandiseRecipeRepository->findOneBy(['finishedProduct' => $merchandise]);
+        $recipe = $this->merchandiseRecipeRepository->findOneBy([
+            "finishedProduct" => $merchandise,
+        ]);
         if (!$recipe) {
             return 0.0;
         }
 
-        $outputQuantity = (float)$recipe->getOutputQuantity();
+        $outputQuantity = (float) $recipe->getOutputQuantity();
         if ($outputQuantity <= 0) {
             $outputQuantity = 1.0;
         }
@@ -1056,19 +1302,26 @@ class MerchandiseService
         $totalRecipeCost = 0.0;
         foreach ($recipe->getItems() as $item) {
             $ingredient = $item->getIngredient();
-            $ingredientQty = (float)$item->getQuantity();
-            $wasteRate = (float)$item->getWasteRate();
+            $ingredientQty = (float) $item->getQuantity();
+            $wasteRate = (float) $item->getWasteRate();
 
             // Tính lượng thực tế cần dùng sau hao hụt
-            $actualQty = $ingredientQty * (1.0 + ($wasteRate / 100.0));
+            $actualQty = $ingredientQty * (1.0 + $wasteRate / 100.0);
 
             $ingredientUnitId = $item->getUnit()->getId();
             $unitPrice = 0.0;
 
-            if ($ingredient->getType() === 'finished_product') {
-                $unitPrice = $this->getPriceFinishedProductByUnitId($ingredient->getId(), $ingredientUnitId, $visited);
+            if ($ingredient->getType() === "finished_product") {
+                $unitPrice = $this->getPriceFinishedProductByUnitId(
+                    $ingredient->getId(),
+                    $ingredientUnitId,
+                    $visited,
+                );
             } else {
-                $unitPrice = $this->getPriceMerchandiseByUnitId($ingredient->getId(), $ingredientUnitId);
+                $unitPrice = $this->getPriceMerchandiseByUnitId(
+                    $ingredient->getId(),
+                    $ingredientUnitId,
+                );
             }
 
             $totalRecipeCost += $actualQty * $unitPrice;
@@ -1079,20 +1332,24 @@ class MerchandiseService
         // Quy đổi giá từ outputUnit sang unit cần tính
         $outputUnit = $recipe->getOutputUnit();
         if ($outputUnit->getId() === $unitId) {
-            return (float)formatDecimal(sprintf('%.4f', $pricePerOutputUnit));
+            return (float) formatDecimal(sprintf("%.4f", $pricePerOutputUnit));
         }
 
         $sourceMUnit = $this->merchandiseUnitRepository->findOneBy([
-            'merchandise' => $merchandise,
-            'unit' => $outputUnit
+            "merchandise" => $merchandise,
+            "unit" => $outputUnit,
         ]);
         $targetMUnit = $this->merchandiseUnitRepository->findOneBy([
-            'merchandise' => $merchandise,
-            'unit' => $unit
+            "merchandise" => $merchandise,
+            "unit" => $unit,
         ]);
 
-        $sourceFactor = $sourceMUnit ? (float)$sourceMUnit->getFactorToBase() : 1.0;
-        $targetFactor = $targetMUnit ? (float)$targetMUnit->getFactorToBase() : 1.0;
+        $sourceFactor = $sourceMUnit
+            ? (float) $sourceMUnit->getFactorToBase()
+            : 1.0;
+        $targetFactor = $targetMUnit
+            ? (float) $targetMUnit->getFactorToBase()
+            : 1.0;
 
         $conversionRate = 1.0;
         if ($sourceFactor > 0) {
@@ -1101,7 +1358,7 @@ class MerchandiseService
 
         $finalPrice = $pricePerOutputUnit * $conversionRate;
 
-        return (int)formatDecimal(sprintf('%.4f', $finalPrice));
+        return (int) formatDecimal(sprintf("%.4f", $finalPrice));
     }
 
     // Lấy giá chung của nguyên liệu/thành phẩm bất kỳ theo đơn vị tính
@@ -1109,11 +1366,14 @@ class MerchandiseService
     {
         $merchandise = $this->merchandiseRepository->find($merchandiseId);
         if (!$merchandise) {
-            throw new \Exception(t('error.not_found'));
+            throw new \Exception(t("error.not_found"));
         }
 
-        if ($merchandise->getType() === 'finished_product') {
-            return $this->getPriceFinishedProductByUnitId($merchandiseId, $unitId);
+        if ($merchandise->getType() === "finished_product") {
+            return $this->getPriceFinishedProductByUnitId(
+                $merchandiseId,
+                $unitId,
+            );
         }
 
         return $this->getPriceMerchandiseByUnitId($merchandiseId, $unitId);

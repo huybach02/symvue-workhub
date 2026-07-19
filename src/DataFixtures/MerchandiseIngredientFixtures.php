@@ -244,16 +244,35 @@ class MerchandiseIngredientFixtures extends Fixture implements DependentFixtureI
 
             if ($provider) {
                 $pConversions = [];
+                $customConvs = [];
                 if ($config) {
                     foreach ($config['conversions'] as $c) {
                         $fromUnit = $unitRepo->findOneBy(['code' => $c['from_unit']]);
                         $toUnit = $unitRepo->findOneBy(['code' => $c['to_unit']]);
                         if ($fromUnit && $toUnit) {
+                            $fromValue = $c['from_value'];
+                            $toValue = $c['to_value'];
+                            
+                            if ($providerCode === 'VIETGAPDL') {
+                                if ($c['from_unit'] === 'THUNG' && $c['to_unit'] === 'TUI') {
+                                    $toValue = '24.00';
+                                } elseif ($c['from_unit'] === 'TUI' && $c['to_unit'] === 'G') {
+                                    $toValue = '400.00';
+                                }
+                            }
+
                             $pConversions[] = [
                                 'fromUnitId' => $fromUnit->getId(),
-                                'fromValue' => $c['from_value'],
+                                'fromValue' => $fromValue,
                                 'toUnitId' => $toUnit->getId(),
-                                'toValue' => $c['to_value'],
+                                'toValue' => $toValue,
+                            ];
+
+                            $customConvs[] = [
+                                'from_unit' => $c['from_unit'],
+                                'from_value' => $fromValue,
+                                'to_unit' => $c['to_unit'],
+                                'to_value' => $toValue,
                             ];
                         }
                     }
@@ -265,33 +284,37 @@ class MerchandiseIngredientFixtures extends Fixture implements DependentFixtureI
                     $codeUnit = $baseUnit->getCode();
                     
                     if ($codeUnit === 'G') {
-                        if ($slug === 'thit-bo' || $slug === 'thit-heo') {
-                            $priceVal = rand(120, 180); // 120đ - 180đ/gam (120k - 180k/kg)
-                        } elseif ($slug === 'tom-tuoi' || $slug === 'muc-tuoi') {
-                            $priceVal = rand(160, 240); // 160đ - 240đ/gam
+                        if ($slug === 'thit-bo') {
+                            $priceVal = rand(220, 280); // 220đ - 280đ/gam (220k - 280k/kg)
+                        } elseif ($slug === 'thit-heo') {
+                            $priceVal = rand(110, 150); // 110đ - 150đ/gam (110k - 150k/kg)
+                        } elseif ($slug === 'tom-tuoi') {
+                            $priceVal = rand(180, 250); // 180đ - 250đ/gam (180k - 250k/kg)
+                        } elseif ($slug === 'muc-tuoi') {
+                            $priceVal = rand(220, 320); // 220đ - 320đ/gam (220k - 320k/kg)
                         } elseif ($slug === 'rau-an-kem' || $slug === 'cai-thao') {
-                            $priceVal = rand(15, 35); // 15đ - 35đ/gam (15k - 35k/kg)
+                            $priceVal = rand(15, 30); // 15đ - 30đ/gam (15k - 30k/kg)
                         } else {
                             $priceVal = rand(40, 100);
                         }
                     } elseif ($codeUnit === 'ML') {
                         if ($slug === 'sua-dac-va-sua-tuoi') {
-                            $priceVal = rand(20, 50); // 20đ - 50đ/ml
+                            $priceVal = rand(35, 65); // 35đ - 65đ/ml (35k - 65k/lít)
                         } elseif ($slug === 'sot-va-gia-vi-long') {
                             if (str_contains(strtolower($name), 'nước dùng')) {
-                                $priceVal = rand(6, 12); // 6đ - 12đ/ml (6k - 12k/lít nước dùng)
+                                $priceVal = rand(15, 30); // 15đ - 30đ/ml (15k - 30k/lít nước dùng)
                             } else {
-                                $priceVal = rand(15, 35); // 15đ - 35đ/ml nước mắm/tương
+                                $priceVal = rand(40, 80); // 40đ - 80đ/ml nước mắm/tương (40k - 80k/lít)
                             }
                         } else {
-                            $priceVal = rand(10, 30);
+                            $priceVal = rand(20, 40);
                         }
                     } elseif ($codeUnit === 'VIEN') {
-                        $priceVal = rand(500, 1200); // 500đ - 1200đ/viên
+                        $priceVal = rand(600, 1500); // 600đ - 1500đ/viên
                     } elseif ($codeUnit === 'GOI' || $codeUnit === 'PHAN') {
-                        $priceVal = rand(5000, 9000); // 5000đ - 9000đ/gói hoặc phần
+                        $priceVal = rand(6000, 10000); // 6000đ - 10000đ/gói hoặc phần
                     } else {
-                        $priceVal = rand(1000, 3000);
+                        $priceVal = rand(2000, 5000);
                     }
                 }
 
@@ -332,7 +355,7 @@ class MerchandiseIngredientFixtures extends Fixture implements DependentFixtureI
                     foreach ($config['conversions'] as $c) {
                         $fromUnit = $unitRepo->findOneBy(['code' => $c['from_unit']]);
                         if ($fromUnit && $baseUnit && $fromUnit->getId() !== $baseUnit->getId()) {
-                            $ratio = $getRatio($c['from_unit'], $config['base_unit'], $config['conversions']);
+                            $ratio = $getRatio($c['from_unit'], $config['base_unit'], $customConvs);
                             $convPrice = $priceVal * $ratio;
                             $pPrices[] = [
                                 'unitId' => $fromUnit->getId(),

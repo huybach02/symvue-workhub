@@ -701,9 +701,21 @@ if (!function_exists("formatDecimal")) {
         if ($val === null) {
             return null;
         }
-        $formatted = rtrim($val, "0");
-        $formatted = rtrim($formatted, ".");
-        return $formatted;
+
+        $value = trim($val);
+        if (!preg_match('/^([+-]?\d+)\.(\d+)$/', $value, $matches)) {
+            return $value;
+        }
+
+        $integerPart = $matches[1];
+        $decimalPart = rtrim($matches[2], "0");
+        $formatted = $decimalPart === ""
+            ? $integerPart
+            : $integerPart . "." . $decimalPart;
+
+        return in_array($formatted, ["-0", "+0"], true)
+            ? "0"
+            : $formatted;
     }
 }
 
