@@ -130,15 +130,22 @@ export const menuSidebar = [
     },
 
     {
-        title: i18n.global.t("sidebar.warehouse"),
-        icon: "mdi-view-dashboard",
-        value: NAME_ROUTES_CONFIG.warehouse,
-        to: { name: NAME_ROUTES_CONFIG.warehouse },
-    },
-    {
-        title: i18n.global.t("sidebar.stock_receipt"),
-        icon: "mdi-view-dashboard",
-        value: NAME_ROUTES_CONFIG.stockReceipt,
-        to: { name: NAME_ROUTES_CONFIG.stockReceipt },
+        title: i18n.global.t("sidebar.warehouse_management"),
+        icon: "mdi-warehouse",
+        value: "warehouse_management",
+        children: [
+            {
+                title: i18n.global.t("sidebar.warehouse"),
+                icon: "mdi-home-floor-g",
+                value: NAME_ROUTES_CONFIG.warehouse,
+                to: { name: NAME_ROUTES_CONFIG.warehouse },
+            },
+            {
+                title: i18n.global.t("sidebar.stock_receipt"),
+                icon: "mdi-file-import-outline",
+                value: NAME_ROUTES_CONFIG.stockReceipt,
+                to: { name: NAME_ROUTES_CONFIG.stockReceipt },
+            },
+        ],
     },
 ];

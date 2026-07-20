@@ -13,7 +13,7 @@
         </v-btn>
 
         <!-- Dialog xem chi tiết phiếu -->
-        <v-dialog v-model="dialog" max-width="1400" scrollable persistent>
+        <v-dialog v-model="dialog" max-width="1600" scrollable persistent>
             <v-card class="position-relative">
                 <v-card-title
                     class="d-flex align-center justify-space-between py-3 px-4"
@@ -320,7 +320,7 @@
                                             </th>
                                             <th
                                                 class="text-right font-weight-bold py-3"
-                                                style="width: 120px"
+                                                style="width: 200px"
                                             >
                                                 {{
                                                     $t("field.sl_yeu_cau") ||
@@ -329,15 +329,15 @@
                                             </th>
                                             <th
                                                 class="text-center font-weight-bold py-3"
-                                                style="width: 120px"
+                                                style="width: 250px"
                                             >
                                                 {{
                                                     $t("field.unit") || "Đơn vị"
                                                 }}
                                             </th>
                                             <th
-                                                class="text-right font-weight-bold py-3"
-                                                style="width: 150px"
+                                                class="text-center font-weight-bold py-3"
+                                                style="width: 250px"
                                             >
                                                 {{
                                                     $t("field.import_price") ||
@@ -345,8 +345,8 @@
                                                 }}
                                             </th>
                                             <th
-                                                class="text-right font-weight-bold py-3"
-                                                style="width: 180px"
+                                                class="text-center font-weight-bold py-3"
+                                                style="width: 250px"
                                             >
                                                 {{
                                                     $t("field.total_amount") ||
@@ -404,7 +404,7 @@
                                                 </v-chip>
                                             </td>
                                             <td
-                                                class="text-right py-2 text-grey-darken-3"
+                                                class="text-center py-2 text-grey-darken-3"
                                             >
                                                 {{
                                                     formatNumber(
@@ -417,7 +417,7 @@
                                                 </span>
                                             </td>
                                             <td
-                                                class="text-right py-2 font-weight-bold text-primary"
+                                                class="text-center py-2 font-weight-bold text-primary"
                                             >
                                                 {{
                                                     formatNumber(
@@ -452,6 +452,7 @@
         <InspectStockReceiptDialog
             v-model="inspectionDialog"
             :provider="inspectingProvider"
+            :saving="inspectionSaving"
             @saved="handleInspectionSaved"
         />
     </div>
@@ -499,6 +500,7 @@ export default {
             statusSteps: constant.STOCK_RECEIPT_PROVIDER_STATUS_STEPS,
             inspectionDialog: false,
             inspectingProvider: null,
+            inspectionSaving: false,
         };
     },
     computed: {
@@ -525,6 +527,7 @@ export default {
         ...mapActions("stockReceipt", [
             "fetchItemDetail",
             "updateProviderStatus",
+            "inspectProviderAction",
         ]),
         async changeProviderStatus(providerGroup, status) {
             this.updatingProviderId = providerGroup.id;
@@ -563,18 +566,23 @@ export default {
             this.inspectionDialog = true;
         },
         async handleInspectionSaved(payload) {
-            // TODO: gọi action inspectProviderAction khi BE sẵn sàng
-            console.log("Inspection payload:", payload);
-            // Kiểm hàng xong thì chuyển provider sang Hoàn thành
-            await this.updateProviderStatus({
-                id: this.inspectingProvider.id,
-                status: STOCK_RECEIPT_PROVIDER_STATUS.COMPLETED,
-            });
-            this.detailData = await this.fetchItemDetail({
-                id: this.item.id,
-                force: true,
-            });
-            this.$emit("reload");
+            this.inspectionSaving = true;
+            try {
+                const result = await this.inspectProviderAction({
+                    id: this.inspectingProvider.id,
+                    values: payload,
+                });
+                if (!result) return;
+
+                this.inspectionDialog = false;
+                this.detailData = await this.fetchItemDetail({
+                    id: this.item.id,
+                    force: true,
+                });
+                this.$emit("reload");
+            } finally {
+                this.inspectionSaving = false;
+            }
         },
         formatNumber(val) {
             if (val == null) return "--";

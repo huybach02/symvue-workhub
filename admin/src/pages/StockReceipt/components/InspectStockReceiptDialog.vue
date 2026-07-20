@@ -995,7 +995,7 @@ export default {
         },
         createEmptyLot(row = {}) {
             return {
-                clientLineUuid: crypto.randomUUID(),
+                clientLineUuid: functionHelper.createRandomString(6),
                 receivedQuantity: Number(row.expectedQuantity) || null,
                 receivedUnitId: row.expectedUnitId || null,
                 acceptedQuantity: Number(row.expectedQuantity) || null,
@@ -1118,6 +1118,9 @@ export default {
         },
         // So sánh tổng chấp nhận với yêu cầu để ra trạng thái cân bằng
         balanceStatus(item) {
+            if (!this.unitOptionsMap[item.merchandiseId]) {
+                return "balanced";
+            }
             const accepted = Number(this.totalAcceptedBase(item).toFixed(6));
             const expected = Number(item.expectedBaseQuantity.toFixed(6));
             if (accepted < expected) return "shortage";

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Class\CustomResponse;
 use App\DTO\StockReceiptDTO;
+use App\DTO\StockReceiptInspectingDTO;
 use App\DTO\StockReceiptProviderStatusDTO;
 use App\Service\StockReceiptService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -131,6 +132,27 @@ final class StockReceiptController extends AbstractController
         try {
             $this->stockReceiptService->delete($id);
             return CustomResponse::success([], t("success.deleted"));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route("/stock-receipt/inspecting", methods: ["POST"])]
+    public function inspecting(
+        #[
+            MapRequestPayload(validationGroups: ["create"]),
+        ]
+        StockReceiptInspectingDTO $stockReceiptInspectingDTO,
+    ): JsonResponse {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        try {
+            $data = $this->stockReceiptService->inspecting(
+                $stockReceiptInspectingDTO,
+                $currentUser,
+            );
+            return CustomResponse::success($data, t("success.created"));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }

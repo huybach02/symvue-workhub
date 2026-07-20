@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: StockReceiptRepository::class)]
 #[ORM\Table(name: 'stock_receipt')]
 #[ORM\UniqueConstraint(name: 'UNIQ_STOCK_RECEIPT_CODE', fields: ['code'])]
-class StockReceipt
+class StockReceipt implements \JsonSerializable
 {
     use TimestampableTrait;
     use ModifierTrait;

@@ -43,6 +43,12 @@ export const functionHelper = {
         }
         return password;
     },
+    createRandomString(length = 6) {
+        const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        const bytes = new Uint8Array(length);
+        crypto.getRandomValues(bytes);
+        return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
+    },
     timeAgo(dateString) {
         if (!dateString) return "";
 
@@ -116,7 +122,11 @@ export const functionHelper = {
             .replace(/[\u0300-\u036f]/g, "")
             .replace(/đ/g, "d");
     },
-    getParttimeScheduleFetchRange(date = dayjs(), beforeMonths = 2, afterMonths = 2) {
+    getParttimeScheduleFetchRange(
+        date = dayjs(),
+        beforeMonths = 2,
+        afterMonths = 2,
+    ) {
         const baseDate = dayjs(date);
 
         return {
@@ -144,7 +154,9 @@ export const functionHelper = {
     mergeDateRanges(ranges = []) {
         const sortedRanges = ranges
             .filter((range) => range?.startDate && range?.endDate)
-            .sort((left, right) => left.startDate.localeCompare(right.startDate));
+            .sort((left, right) =>
+                left.startDate.localeCompare(right.startDate),
+            );
 
         return sortedRanges.reduce((mergedRanges, range) => {
             const lastRange = mergedRanges[mergedRanges.length - 1];
@@ -250,10 +262,7 @@ export const functionHelper = {
 
         const validConversions = (conversions || []).filter(
             (c) =>
-                c.fromUnitId &&
-                c.toUnitId &&
-                c.fromValue > 0 &&
-                c.toValue > 0,
+                c.fromUnitId && c.toUnitId && c.fromValue > 0 && c.toValue > 0,
         );
 
         validConversions.forEach((c) => {
@@ -332,7 +341,12 @@ export const functionHelper = {
 
         const adj = {};
         conversions.forEach((c) => {
-            if (c.fromUnitId && c.toUnitId && c.fromValue > 0 && c.toValue > 0) {
+            if (
+                c.fromUnitId &&
+                c.toUnitId &&
+                c.fromValue > 0 &&
+                c.toValue > 0
+            ) {
                 const u = String(c.fromUnitId);
                 const v = String(c.toUnitId);
                 if (!adj[u]) adj[u] = [];

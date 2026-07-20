@@ -87,7 +87,10 @@ const actions = {
         return putData(`${API_ROUTES_CONFIG.stockReceipt}/provider/${id}/status`, null, { status });
     },
     async inspectProviderAction(_, { id, values }) {
-        return postData(`${API_ROUTES_CONFIG.stockReceipt}/provider/${id}/inspect`, values);
+        return postData(`${API_ROUTES_CONFIG.stockReceipt}/inspecting`, {
+            ...values,
+            providerId: id,
+        });
     },
     async fetchInspectionOptions(_, providerId) {
         if (!providerId) {

@@ -11,12 +11,19 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: StockReceiptItemLotRepository::class)]
-#[ORM\Table(name: 'stock_receipt_item_lot')]
-#[ORM\UniqueConstraint(name: 'UNIQ_STOCK_RECEIPT_ITEM_LOT_CLIENT_UUID', fields: ['clientLineUuid'])]
-#[ORM\UniqueConstraint(
-    name: 'UNIQ_STOCK_RECEIPT_ITEM_LOT_DATE_PAIR',
-    columns: ['receipt_item_id', 'manufacture_date', 'expiry_date']
-)]
+#[ORM\Table(name: "stock_receipt_item_lot")]
+#[
+    ORM\UniqueConstraint(
+        name: "UNIQ_STOCK_RECEIPT_ITEM_LOT_CLIENT_UUID",
+        fields: ["clientLineUuid"],
+    ),
+]
+#[
+    ORM\UniqueConstraint(
+        name: "UNIQ_STOCK_RECEIPT_ITEM_LOT_DATE_PAIR",
+        columns: ["receipt_item_id", "manufacture_date", "expiry_date"],
+    ),
+]
 class StockReceiptItemLot
 {
     use TimestampableTrait;
@@ -27,58 +34,198 @@ class StockReceiptItemLot
     #[ORM\Column(type: Types::BIGINT)]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: StockReceiptItem::class, inversedBy: 'lots')]
-    #[ORM\JoinColumn(name: 'receipt_item_id', referencedColumnName: 'id', nullable: false, options: ['comment' => 'Merchandise chứa dòng lô'])]
+    #[ORM\ManyToOne(targetEntity: StockReceiptItem::class, inversedBy: "lots")]
+    #[
+        ORM\JoinColumn(
+            name: "receipt_item_id",
+            referencedColumnName: "id",
+            nullable: false,
+            options: ["comment" => "Merchandise chứa dòng lô"],
+        ),
+    ]
     private ?StockReceiptItem $receiptItem = null;
 
-    #[ORM\Column(type: Types::GUID, options: ['comment' => 'ID tạm ổn định để UI lưu/chỉnh sửa dòng trước khi post'])]
+    #[
+        ORM\Column(
+            length: 6,
+            options: [
+                "comment" =>
+                    "ID tạm 6 ký tự do UI sinh để định danh dòng lô trước khi post",
+            ],
+        ),
+    ]
     private ?string $clientLineUuid = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 18, scale: 6, options: ['comment' => 'Số lượng nhà cung cấp giao thực tế theo đơn vị người dùng chọn'])]
+    #[
+        ORM\Column(
+            type: Types::DECIMAL,
+            precision: 18,
+            scale: 6,
+            options: [
+                "comment" =>
+                    "Số lượng nhà cung cấp giao thực tế theo đơn vị người dùng chọn",
+            ],
+        ),
+    ]
     private ?string $receivedQuantity = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(name: 'received_unit_id', referencedColumnName: 'id', nullable: false, options: ['comment' => 'Đơn vị nhận thực tế, ví dụ lốc'])]
+    #[
+        ORM\JoinColumn(
+            name: "received_unit_id",
+            referencedColumnName: "id",
+            nullable: false,
+            options: ["comment" => "Đơn vị nhận thực tế, ví dụ lốc"],
+        ),
+    ]
     private ?Unit $receivedUnit = null;
 
-    #[ORM\Column(length: 255, options: ['comment' => 'Snapshot nhãn đơn vị nhận'])]
+    #[
+        ORM\Column(
+            length: 255,
+            options: ["comment" => "Snapshot nhãn đơn vị nhận"],
+        ),
+    ]
     private ?string $receivedUnitLabelSnapshot = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 18, scale: 8, options: ['comment' => 'Hệ số quy đổi đơn vị thực tế về base unit'])]
+    #[
+        ORM\Column(
+            type: Types::DECIMAL,
+            precision: 18,
+            scale: 8,
+            options: ["comment" => "Hệ số quy đổi đơn vị thực tế về base unit"],
+        ),
+    ]
     private ?string $receivedFactorToBase = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 18, scale: 6, options: ['comment' => 'Số lượng giao thực tế đã quy đổi về base unit'])]
+    #[
+        ORM\Column(
+            type: Types::DECIMAL,
+            precision: 18,
+            scale: 6,
+            options: [
+                "comment" => "Số lượng giao thực tế đã quy đổi về base unit",
+            ],
+        ),
+    ]
     private ?string $receivedBaseQuantity = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 18, scale: 6, options: ['comment' => 'Số lượng chấp nhận nhập kho theo đơn vị nhận thực tế'])]
+    #[
+        ORM\Column(
+            type: Types::DECIMAL,
+            precision: 18,
+            scale: 6,
+            options: [
+                "comment" =>
+                    "Số lượng chấp nhận nhập kho theo đơn vị nhận thực tế",
+            ],
+        ),
+    ]
     private ?string $acceptedQuantity = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 18, scale: 6, options: ['comment' => 'Số lượng chấp nhận nhập kho đã quy đổi về base unit'])]
+    #[
+        ORM\Column(
+            type: Types::DECIMAL,
+            precision: 18,
+            scale: 6,
+            options: [
+                "comment" =>
+                    "Số lượng chấp nhận nhập kho đã quy đổi về base unit",
+            ],
+        ),
+    ]
     private ?string $acceptedBaseQuantity = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 18, scale: 6, options: ['default' => '0.000000', 'comment' => 'Số lượng bị từ chối theo đơn vị nhận thực tế'])]
-    private string $rejectedQuantity = '0.000000';
+    #[
+        ORM\Column(
+            type: Types::DECIMAL,
+            precision: 18,
+            scale: 6,
+            options: [
+                "default" => "0.000000",
+                "comment" => "Số lượng bị từ chối theo đơn vị nhận thực tế",
+            ],
+        ),
+    ]
+    private string $rejectedQuantity = "0.000000";
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 18, scale: 6, options: ['default' => '0.000000', 'comment' => 'Số lượng bị từ chối đã quy đổi về base unit'])]
-    private string $rejectedBaseQuantity = '0.000000';
+    #[
+        ORM\Column(
+            type: Types::DECIMAL,
+            precision: 18,
+            scale: 6,
+            options: [
+                "default" => "0.000000",
+                "comment" => "Số lượng bị từ chối đã quy đổi về base unit",
+            ],
+        ),
+    ]
+    private string $rejectedBaseQuantity = "0.000000";
 
-    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => 'Lý do từ chối như hư hỏng hoặc sai chất lượng'])]
+    #[
+        ORM\Column(
+            type: Types::TEXT,
+            nullable: true,
+            options: [
+                "comment" => "Lý do từ chối như hư hỏng hoặc sai chất lượng",
+            ],
+        ),
+    ]
     private ?string $rejectionReason = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, options: ['comment' => 'Ngày sản xuất của lô'])]
+    #[
+        ORM\Column(
+            type: Types::DATE_MUTABLE,
+            options: ["comment" => "Ngày sản xuất của lô"],
+        ),
+    ]
     private ?\DateTimeInterface $manufactureDate = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, options: ['comment' => 'Hạn sử dụng của lô'])]
+    #[
+        ORM\Column(
+            type: Types::DATE_MUTABLE,
+            options: ["comment" => "Hạn sử dụng của lô"],
+        ),
+    ]
     private ?\DateTimeInterface $expiryDate = null;
 
-    #[ORM\Column(length: 100, nullable: true, options: ['comment' => 'Mã lô do nhà cung cấp/nhà sản xuất cung cấp'])]
+    #[
+        ORM\Column(
+            length: 100,
+            nullable: true,
+            options: [
+                "comment" => "Mã lô do nhà cung cấp/nhà sản xuất cung cấp",
+            ],
+        ),
+    ]
     private ?string $supplierLotCode = null;
 
-    #[ORM\OneToOne(targetEntity: InventoryLot::class, inversedBy: 'sourceReceiptLotLine')]
-    #[ORM\JoinColumn(name: 'inventory_lot_id', referencedColumnName: 'id', unique: true, nullable: true, options: ['comment' => 'Lot tồn kho được tạo khi post dòng kiểm hàng'])]
+    #[
+        ORM\OneToOne(
+            targetEntity: InventoryLot::class,
+            inversedBy: "sourceReceiptLotLine",
+        ),
+    ]
+    #[
+        ORM\JoinColumn(
+            name: "inventory_lot_id",
+            referencedColumnName: "id",
+            unique: true,
+            nullable: true,
+            options: [
+                "comment" => "Lot tồn kho được tạo khi post dòng kiểm hàng",
+            ],
+        ),
+    ]
     private ?InventoryLot $inventoryLot = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => 'Ghi chú cho riêng lô'])]
+    #[
+        ORM\Column(
+            type: Types::TEXT,
+            nullable: true,
+            options: ["comment" => "Ghi chú cho riêng lô"],
+        ),
+    ]
     private ?string $note = null;
 
     public function getId(): ?int
@@ -135,8 +282,9 @@ class StockReceiptItemLot
         return $this->receivedUnitLabelSnapshot;
     }
 
-    public function setReceivedUnitLabelSnapshot(string $receivedUnitLabelSnapshot): static
-    {
+    public function setReceivedUnitLabelSnapshot(
+        string $receivedUnitLabelSnapshot,
+    ): static {
         $this->receivedUnitLabelSnapshot = $receivedUnitLabelSnapshot;
         return $this;
     }
@@ -146,8 +294,9 @@ class StockReceiptItemLot
         return $this->receivedFactorToBase;
     }
 
-    public function setReceivedFactorToBase(string $receivedFactorToBase): static
-    {
+    public function setReceivedFactorToBase(
+        string $receivedFactorToBase,
+    ): static {
         $this->receivedFactorToBase = $receivedFactorToBase;
         return $this;
     }
@@ -157,8 +306,9 @@ class StockReceiptItemLot
         return $this->receivedBaseQuantity;
     }
 
-    public function setReceivedBaseQuantity(string $receivedBaseQuantity): static
-    {
+    public function setReceivedBaseQuantity(
+        string $receivedBaseQuantity,
+    ): static {
         $this->receivedBaseQuantity = $receivedBaseQuantity;
         return $this;
     }
@@ -179,8 +329,9 @@ class StockReceiptItemLot
         return $this->acceptedBaseQuantity;
     }
 
-    public function setAcceptedBaseQuantity(string $acceptedBaseQuantity): static
-    {
+    public function setAcceptedBaseQuantity(
+        string $acceptedBaseQuantity,
+    ): static {
         $this->acceptedBaseQuantity = $acceptedBaseQuantity;
         return $this;
     }
@@ -201,8 +352,9 @@ class StockReceiptItemLot
         return $this->rejectedBaseQuantity;
     }
 
-    public function setRejectedBaseQuantity(string $rejectedBaseQuantity): static
-    {
+    public function setRejectedBaseQuantity(
+        string $rejectedBaseQuantity,
+    ): static {
         $this->rejectedBaseQuantity = $rejectedBaseQuantity;
         return $this;
     }
@@ -223,8 +375,9 @@ class StockReceiptItemLot
         return $this->manufactureDate;
     }
 
-    public function setManufactureDate(\DateTimeInterface $manufactureDate): static
-    {
+    public function setManufactureDate(
+        \DateTimeInterface $manufactureDate,
+    ): static {
         $this->manufactureDate = $manufactureDate;
         return $this;
     }
@@ -269,7 +422,10 @@ class StockReceiptItemLot
             $previousInventoryLot->setSourceReceiptLotLine(null);
         }
 
-        if ($inventoryLot !== null && $inventoryLot->getSourceReceiptLotLine() !== $this) {
+        if (
+            $inventoryLot !== null &&
+            $inventoryLot->getSourceReceiptLotLine() !== $this
+        ) {
             $inventoryLot->setSourceReceiptLotLine($this);
         }
 
@@ -290,26 +446,26 @@ class StockReceiptItemLot
     public function jsonSerialize(): array
     {
         return [
-            'id' => $this->id,
-            'receipt_item_id' => $this->receiptItem?->getId(),
-            'client_line_uuid' => $this->clientLineUuid,
-            'received_quantity' => $this->receivedQuantity,
-            'received_unit_id' => $this->receivedUnit?->getId(),
-            'received_unit_label_snapshot' => $this->receivedUnitLabelSnapshot,
-            'received_factor_to_base' => $this->receivedFactorToBase,
-            'received_base_quantity' => $this->receivedBaseQuantity,
-            'accepted_quantity' => $this->acceptedQuantity,
-            'accepted_base_quantity' => $this->acceptedBaseQuantity,
-            'rejected_quantity' => $this->rejectedQuantity,
-            'rejected_base_quantity' => $this->rejectedBaseQuantity,
-            'rejection_reason' => $this->rejectionReason,
-            'manufacture_date' => $this->manufactureDate?->format('Y-m-d'),
-            'expiry_date' => $this->expiryDate?->format('Y-m-d'),
-            'supplier_lot_code' => $this->supplierLotCode,
-            'inventory_lot_id' => $this->inventoryLot?->getId(),
-            'note' => $this->note,
-            'created_at' => $this->createdAt?->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updatedAt?->format('Y-m-d H:i:s'),
+            "id" => $this->id,
+            "receipt_item_id" => $this->receiptItem?->getId(),
+            "client_line_uuid" => $this->clientLineUuid,
+            "received_quantity" => $this->receivedQuantity,
+            "received_unit_id" => $this->receivedUnit?->getId(),
+            "received_unit_label_snapshot" => $this->receivedUnitLabelSnapshot,
+            "received_factor_to_base" => $this->receivedFactorToBase,
+            "received_base_quantity" => $this->receivedBaseQuantity,
+            "accepted_quantity" => $this->acceptedQuantity,
+            "accepted_base_quantity" => $this->acceptedBaseQuantity,
+            "rejected_quantity" => $this->rejectedQuantity,
+            "rejected_base_quantity" => $this->rejectedBaseQuantity,
+            "rejection_reason" => $this->rejectionReason,
+            "manufacture_date" => $this->manufactureDate?->format("Y-m-d"),
+            "expiry_date" => $this->expiryDate?->format("Y-m-d"),
+            "supplier_lot_code" => $this->supplierLotCode,
+            "inventory_lot_id" => $this->inventoryLot?->getId(),
+            "note" => $this->note,
+            "created_at" => $this->createdAt?->format("Y-m-d H:i:s"),
+            "updated_at" => $this->updatedAt?->format("Y-m-d H:i:s"),
         ];
     }
 }
