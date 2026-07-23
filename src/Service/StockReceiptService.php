@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Class\FilterWithPagination;
+use App\Class\MathHelper;
 use App\Class\StockReceiptStatus;
 use App\Class\StockReceiptProviderStatus;
 use App\Class\FulfillmentStatus;
@@ -436,11 +437,11 @@ class StockReceiptService
 
         $expectedQuantity = (string) ($itemData["quantity"] ?? "0");
         $unitPrice = (string) ($itemData["price"] ?? "0");
-        $expectedBaseQuantity = bcmul($expectedQuantity, $factorToBase, 6);
+        $expectedBaseQuantity = MathHelper::mul($expectedQuantity, $factorToBase, 6);
         $baseUnitCost =
-            bccomp($factorToBase, "0", 8) === 0
+            MathHelper::comp($factorToBase, "0", 8) === 0
                 ? "0.0000"
-                : bcdiv($unitPrice, $factorToBase, 4);
+                : MathHelper::div($unitPrice, $factorToBase, 4);
 
         $baseUnit = $merchandise->getBaseUnit();
         if (!$baseUnit) {
@@ -720,18 +721,18 @@ class StockReceiptService
                     $currentUser,
                 );
 
-                $itemAcceptedBase = bcadd(
+                $itemAcceptedBase = MathHelper::add(
                     $itemAcceptedBase,
                     $acceptedBase,
                     self::QUANTITY_SCALE,
                 );
-                $totalAcceptedBase = bcadd(
+                $totalAcceptedBase = MathHelper::add(
                     $totalAcceptedBase,
                     $acceptedBase,
                     self::QUANTITY_SCALE,
                 );
 
-                if (bccomp($acceptedBase, "0", self::QUANTITY_SCALE) > 0) {
+                if (MathHelper::comp($acceptedBase, "0", self::QUANTITY_SCALE) > 0) {
                     $postedLotCount++;
                 }
             }
@@ -775,28 +776,28 @@ class StockReceiptService
             $receivedUnit,
         );
 
-        $receivedQty = bcadd(
+        $receivedQty = MathHelper::add(
             (string) $lotDto->receivedQuantity,
             "0",
             self::QUANTITY_SCALE,
         );
-        $acceptedQty = bcadd(
+        $acceptedQty = MathHelper::add(
             (string) $lotDto->acceptedQuantity,
             "0",
             self::QUANTITY_SCALE,
         );
-        if (bccomp($receivedQty, "0", self::QUANTITY_SCALE) <= 0) {
+        if (MathHelper::comp($receivedQty, "0", self::QUANTITY_SCALE) <= 0) {
             throw new \Exception("Số lượng nhận phải lớn hơn 0");
         }
 
-        $rejectedQty = bcsub($receivedQty, $acceptedQty, self::QUANTITY_SCALE);
-        if (bccomp($acceptedQty, $receivedQty, self::QUANTITY_SCALE) > 0) {
+        $rejectedQty = MathHelper::sub($receivedQty, $acceptedQty, self::QUANTITY_SCALE);
+        if (MathHelper::comp($acceptedQty, $receivedQty, self::QUANTITY_SCALE) > 0) {
             throw new \Exception(
                 "Số lượng chấp nhận không được lớn hơn số lượng nhận",
             );
         }
         if (
-            bccomp($rejectedQty, "0", self::QUANTITY_SCALE) > 0 &&
+            MathHelper::comp($rejectedQty, "0", self::QUANTITY_SCALE) > 0 &&
             trim((string) $lotDto->rejectionReason) === ""
         ) {
             throw new \Exception(
@@ -804,9 +805,9 @@ class StockReceiptService
             );
         }
 
-        $receivedBase = bcmul($receivedQty, $factor, self::QUANTITY_SCALE);
-        $acceptedBase = bcmul($acceptedQty, $factor, self::QUANTITY_SCALE);
-        $rejectedBase = bcmul($rejectedQty, $factor, self::QUANTITY_SCALE);
+        $receivedBase = MathHelper::mul($receivedQty, $factor, self::QUANTITY_SCALE);
+        $acceptedBase = MathHelper::mul($acceptedQty, $factor, self::QUANTITY_SCALE);
+        $rejectedBase = MathHelper::mul($rejectedQty, $factor, self::QUANTITY_SCALE);
 
         $manufactureDate = \DateTime::createFromInterface(
             new \DateTimeImmutable((string) $lotDto->manufactureDate),
@@ -837,7 +838,7 @@ class StockReceiptService
         $receiptLot->setNote($lotDto->note);
         $this->entityManager->persist($receiptLot);
 
-        if (bccomp($acceptedBase, "0", self::QUANTITY_SCALE) > 0) {
+        if (MathHelper::comp($acceptedBase, "0", self::QUANTITY_SCALE) > 0) {
             $this->postAcceptedLotToInventory(
                 $receipt,
                 $receiptProvider,
@@ -869,12 +870,12 @@ class StockReceiptService
         foreach ($providerItems as $itemId => $item) {
             $acceptedBase = $acceptedBaseByItem[$itemId] ?? "0.000000";
             $expectedBase = $item->getExpectedBaseQuantity() ?? "0.000000";
-            $shortageBase = bcsub(
+            $shortageBase = MathHelper::sub(
                 $expectedBase,
                 $acceptedBase,
                 self::QUANTITY_SCALE,
             );
-            if (bccomp($shortageBase, "0", self::QUANTITY_SCALE) > 0) {
+            if (MathHelper::comp($shortageBase, "0", self::QUANTITY_SCALE) > 0) {
                 $hasShortage = true;
                 $shortageItems[] = [$item, $shortageBase];
             }
@@ -1205,7 +1206,7 @@ class StockReceiptService
                 $factor = $providerUnit->getFactorToBase();
                 if (
                     $factor === null ||
-                    bccomp($factor, "0", self::FACTOR_SCALE) <= 0
+                    MathHelper::comp($factor, "0", self::FACTOR_SCALE) <= 0
                 ) {
                     throw new \Exception(
                         "Hệ số quy đổi đơn vị theo nhà cung cấp không hợp lệ",
@@ -1224,7 +1225,7 @@ class StockReceiptService
             $factor = $merchandiseUnit->getFactorToBase();
             if (
                 $factor === null ||
-                bccomp($factor, "0", self::FACTOR_SCALE) <= 0
+                MathHelper::comp($factor, "0", self::FACTOR_SCALE) <= 0
             ) {
                 throw new \Exception(
                     "Hệ số quy đổi đơn vị hàng hóa không hợp lệ",
@@ -1289,9 +1290,9 @@ class StockReceiptService
             $factor = $sourceItem->getExpectedFactorToBase() ?? "1.00000000";
             // Quy đổi số thiếu từ base unit về đơn vị yêu cầu gốc
             $shortageInExpected =
-                bccomp($factor, "0", self::FACTOR_SCALE) === 0
+                MathHelper::comp($factor, "0", self::FACTOR_SCALE) === 0
                     ? "0.000000"
-                    : bcdiv($shortageBase, $factor, self::QUANTITY_SCALE);
+                    : MathHelper::div($shortageBase, $factor, self::QUANTITY_SCALE);
 
             $supplementItem = new StockReceiptItem();
             $supplementItem->setReceiptProvider($supplementProvider);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
+use App\Class\MathHelper;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -77,17 +78,17 @@ final readonly class StockReceiptInspectingLotDTO
         $receivedQtyStr =
             $this->receivedQuantity !== null
                 ? (string) $this->receivedQuantity
-                : null;
+                : "";
         $acceptedQtyStr =
             $this->acceptedQuantity !== null
                 ? (string) $this->acceptedQuantity
-                : null;
+                : "";
 
         if (
-            $receivedQtyStr !== null &&
+            $receivedQtyStr !== '' &&
             preg_match('/^\d{1,12}(?:\.\d{1,6})?$/', $receivedQtyStr)
         ) {
-            if (bccomp($receivedQtyStr, "0", 6) <= 0) {
+            if (MathHelper::comp($receivedQtyStr, "0", 6) <= 0) {
                 $context
                     ->buildViolation("Số lượng nhận phải lớn hơn 0")
                     ->atPath("receivedQuantity")
@@ -96,11 +97,11 @@ final readonly class StockReceiptInspectingLotDTO
         }
 
         if (
-            $receivedQtyStr !== null &&
-            $acceptedQtyStr !== null &&
+            $receivedQtyStr !== '' &&
+            $acceptedQtyStr !== '' &&
             preg_match('/^\d{1,12}(?:\.\d{1,6})?$/', $receivedQtyStr) &&
             preg_match('/^\d{1,12}(?:\.\d{1,6})?$/', $acceptedQtyStr) &&
-            bccomp($acceptedQtyStr, $receivedQtyStr, 6) > 0
+            MathHelper::comp($acceptedQtyStr, $receivedQtyStr, 6) > 0
         ) {
             $context
                 ->buildViolation(
@@ -111,11 +112,11 @@ final readonly class StockReceiptInspectingLotDTO
         }
 
         if (
-            $receivedQtyStr !== null &&
-            $acceptedQtyStr !== null &&
+            $receivedQtyStr !== '' &&
+            $acceptedQtyStr !== '' &&
             preg_match('/^\d{1,12}(?:\.\d{1,6})?$/', $receivedQtyStr) &&
             preg_match('/^\d{1,12}(?:\.\d{1,6})?$/', $acceptedQtyStr) &&
-            bccomp($receivedQtyStr, $acceptedQtyStr, 6) > 0 &&
+            MathHelper::comp($receivedQtyStr, $acceptedQtyStr, 6) > 0 &&
             trim((string) $this->rejectionReason) === ""
         ) {
             $context

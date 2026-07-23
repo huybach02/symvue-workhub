@@ -11,13 +11,21 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: WarehouseRepository::class)]
-#[ORM\Table(name: 'warehouse')]
-#[ORM\UniqueConstraint(
-    name: 'UNIQ_WAREHOUSE_CODE',
-    fields: ['code'],
-    options: ['where' => 'deleted_at IS NULL']
-)]
-#[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
+#[ORM\Table(name: "warehouse")]
+#[
+    ORM\UniqueConstraint(
+        name: "UNIQ_WAREHOUSE_CODE",
+        fields: ["code"],
+        options: ["where" => "deleted_at IS NULL"],
+    ),
+]
+#[
+    Gedmo\SoftDeleteable(
+        fieldName: "deletedAt",
+        timeAware: false,
+        hardDelete: true,
+    ),
+]
 class Warehouse
 {
     use TimestampableTrait;
@@ -29,7 +37,7 @@ class Warehouse
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'warehouse', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: "warehouse", cascade: ["persist", "remove"])]
     private ?Branch $branch = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -41,7 +49,13 @@ class Warehouse
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $type = null;
 
-    #[ORM\Column(type: Types::BOOLEAN, nullable: true, options: ['default' => true])]
+    #[
+        ORM\Column(
+            type: Types::BOOLEAN,
+            nullable: true,
+            options: ["default" => true],
+        ),
+    ]
     private ?bool $status = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -127,15 +141,16 @@ class Warehouse
     public function jsonSerialize(): array
     {
         return [
-            'id' => $this->id,
-            'code' => $this->code,
-            'name' => $this->name,
-            'type' => $this->type,
-            'status' => $this->status,
-            'note' => $this->note,
-            'branch_id' => $this->branch?->getId(),
-            'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
+            "id" => $this->id,
+            "code" => $this->code,
+            "name" => $this->name,
+            "type" => $this->type,
+            "status" => $this->status,
+            "note" => $this->note,
+            "branch_id" => $this->branch?->getId(),
+            "branch" => $this->branch?->jsonSerialize(),
+            "created_at" => $this->createdAt->format("Y-m-d H:i:s"),
+            "updated_at" => $this->updatedAt->format("Y-m-d H:i:s"),
         ];
     }
 }
