@@ -1172,6 +1172,12 @@ export default {
             ) {
                 return this.requiredMsg(this.$t("field.accepted_quantity"));
             }
+            const item = this.items.find((i) =>
+                i.lots.some((l) => l.clientLineUuid === lot.clientLineUuid),
+            );
+            if (item && this.balanceStatus(item) === "surplus") {
+                return "Tổng số lượng chấp nhận không được vượt quá đề xuất";
+            }
             return "";
         },
         lotExpiryError(lot) {
@@ -1193,6 +1199,7 @@ export default {
         validate() {
             for (const item of this.items) {
                 if (!item.lots.length) return false;
+                if (this.balanceStatus(item) === "surplus") return false;
                 for (const lot of item.lots) {
                     if (!lot.receivedQuantity || +lot.receivedQuantity <= 0)
                         return false;

@@ -28,6 +28,10 @@ class StockReceiptProvider
     #[ORM\JoinColumn(name: 'receipt_id', referencedColumnName: 'id', nullable: false, options: ['comment' => 'Phiếu nhập kho tổng'])]
     private ?StockReceipt $receipt = null;
 
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    #[ORM\JoinColumn(name: 'source_receipt_provider_id', referencedColumnName: 'id', nullable: true, options: ['comment' => 'Provider nguồn nếu đây là phiếu bổ sung'])]
+    private ?self $sourceReceiptProvider = null;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'provider_id', referencedColumnName: 'id', nullable: false, options: ['comment' => 'Nhà cung cấp'])]
     private ?Provider $provider = null;
@@ -37,6 +41,9 @@ class StockReceiptProvider
 
     #[ORM\Column(length: 30, options: ['comment' => 'Kết quả nhập đủ, chấp nhận thiếu hoặc tạo bổ sung: PENDING, FULL, PARTIAL_CLOSED, BACKORDER_CREATED'])]
     private ?string $fulfillmentStatus = null;
+
+    #[ORM\Column(length: 30, nullable: true, options: ['comment' => 'Trạng thái giải quyết backorder của provider: NONE, OPEN, RESOLVED_FULL, RESOLVED_PARTIAL, CANCELLED'])]
+    private ?string $backorderResolutionStatus = null;
 
     #[ORM\Column(length: 30, nullable: true, options: ['comment' => 'Cách xử lý khi có thiếu hàng: ACCEPT_SHORTAGE, CREATE_BACKORDER'])]
     private ?string $shortageResolution = null;
@@ -107,6 +114,17 @@ class StockReceiptProvider
         return $this;
     }
 
+    public function getSourceReceiptProvider(): ?self
+    {
+        return $this->sourceReceiptProvider;
+    }
+
+    public function setSourceReceiptProvider(?self $sourceReceiptProvider): static
+    {
+        $this->sourceReceiptProvider = $sourceReceiptProvider;
+        return $this;
+    }
+
     public function getProvider(): ?Provider
     {
         return $this->provider;
@@ -137,6 +155,17 @@ class StockReceiptProvider
     public function setFulfillmentStatus(string $fulfillmentStatus): static
     {
         $this->fulfillmentStatus = $fulfillmentStatus;
+        return $this;
+    }
+
+    public function getBackorderResolutionStatus(): ?string
+    {
+        return $this->backorderResolutionStatus;
+    }
+
+    public function setBackorderResolutionStatus(?string $backorderResolutionStatus): static
+    {
+        $this->backorderResolutionStatus = $backorderResolutionStatus;
         return $this;
     }
 

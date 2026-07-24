@@ -17,4 +17,16 @@ class StockReceiptRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, StockReceipt::class);
     }
+
+    public function getNextSupplementNo(StockReceipt $parentReceipt): int
+    {
+        $maxNo = $this->createQueryBuilder('r')
+            ->select('MAX(r.supplementNo)')
+            ->where('r.parentReceipt = :parent')
+            ->setParameter('parent', $parentReceipt)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return ((int) $maxNo) + 1;
+    }
 }

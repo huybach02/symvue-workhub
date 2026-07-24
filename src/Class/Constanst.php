@@ -347,6 +347,15 @@ enum FulfillmentStatus: string
     case BackorderCreated = 'BACKORDER_CREATED';
 }
 
+enum BackorderResolutionStatus: string
+{
+    case None = 'NONE';
+    case Open = 'OPEN';
+    case ResolvedFull = 'RESOLVED_FULL';
+    case ResolvedPartial = 'RESOLVED_PARTIAL';
+    case Cancelled = 'CANCELLED';
+}
+
 enum ShortageResolution: string
 {
     case AcceptShortage = 'ACCEPT_SHORTAGE';
