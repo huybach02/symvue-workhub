@@ -917,8 +917,14 @@
 
             <v-divider />
 
-            <v-card-actions class="pa-4">
-                <v-btn color="primary" variant="flat" @click="submit">
+            <v-card-actions class="pa-4 justify-end">
+                <v-btn
+                    color="primary"
+                    variant="flat"
+                    :loading="saving"
+                    :disabled="saving"
+                    @click="submit"
+                >
                     {{ $t("stock_receipt.inspection.submit") }}
                 </v-btn>
             </v-card-actions>
@@ -944,6 +950,10 @@ export default {
         provider: {
             type: Object,
             default: null,
+        },
+        saving: {
+            type: Boolean,
+            default: false,
         },
     },
     emits: ["update:modelValue", "saved"],
@@ -1249,7 +1259,6 @@ export default {
             };
 
             this.$emit("saved", payload);
-            this.$emit("update:modelValue", false);
         },
 
         formatQty(val) {

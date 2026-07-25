@@ -29,4 +29,25 @@ class StockReceiptRepository extends ServiceEntityRepository
 
         return ((int) $maxNo) + 1;
     }
+
+    public function findChildren(int $parentReceiptId): array
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('IDENTITY(e.parentReceipt) = :parentId')
+            ->setParameter('parentId', $parentReceiptId)
+            ->orderBy('e.supplementNo', 'ASC')
+            ->addOrderBy('e.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function countChildren(int $parentReceiptId): int
+    {
+        return (int) $this->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->andWhere('IDENTITY(e.parentReceipt) = :parentId')
+            ->setParameter('parentId', $parentReceiptId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

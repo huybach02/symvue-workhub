@@ -68,6 +68,7 @@ class StockReceipt implements \JsonSerializable
      * @var Collection<int, StockReceiptProvider>
      */
     #[ORM\OneToMany(targetEntity: StockReceiptProvider::class, mappedBy: 'receipt', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['id' => 'ASC'])]
     private Collection $providers;
 
     /**
@@ -281,6 +282,7 @@ class StockReceipt implements \JsonSerializable
             'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
             'providers' => array_map(fn(StockReceiptProvider $p) => $p->jsonSerialize(), $this->providers->toArray()),
+            'events' => array_map(fn(StockReceiptEvent $e) => $e->jsonSerialize(), array_reverse($this->events->toArray())),
         ];
     }
 }

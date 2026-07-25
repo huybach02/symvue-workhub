@@ -91,6 +91,7 @@ class StockReceiptProvider
      * @var Collection<int, StockReceiptItem>
      */
     #[ORM\OneToMany(targetEntity: StockReceiptItem::class, mappedBy: 'receiptProvider', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['sortOrder' => 'ASC', 'id' => 'ASC'])]
     private Collection $items;
 
     public function __construct()

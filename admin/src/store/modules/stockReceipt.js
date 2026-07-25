@@ -13,6 +13,8 @@ const state = {
     totalItems: 0,
     loading: false,
     detailsById: {},
+    childrenByParentId: {},
+    loadingParentIds: [],
 };
 
 const getters = {
@@ -20,12 +22,18 @@ const getters = {
     totalItems: (state) => state.totalItems,
     loading: (state) => state.loading,
     itemById: (state) => (id) => state.detailsById[id] ?? null,
+    childrenByParentId: (state) => state.childrenByParentId,
+    childrenOf: (state) => (parentId) =>
+        state.childrenByParentId[parentId] ?? [],
+    isChildLoading: (state) => (parentId) =>
+        state.loadingParentIds.includes(parentId),
 };
 
 const mutations = {
     SET_ITEMS(state, { items, totalItems }) {
         state.items = items;
         state.totalItems = totalItems;
+        state.childrenByParentId = {};
     },
     SET_LOADING(state, value) {
         state.loading = value;
@@ -35,6 +43,22 @@ const mutations = {
             ...state.detailsById,
             [id]: data,
         };
+    },
+    SET_CHILDREN(state, { parentId, children }) {
+        state.childrenByParentId = {
+            ...state.childrenByParentId,
+            [parentId]: children,
+        };
+    },
+    ADD_LOADING_PARENT(state, parentId) {
+        if (!state.loadingParentIds.includes(parentId)) {
+            state.loadingParentIds.push(parentId);
+        }
+    },
+    REMOVE_LOADING_PARENT(state, parentId) {
+        state.loadingParentIds = state.loadingParentIds.filter(
+            (id) => id !== parentId,
+        );
     },
 };
 
@@ -54,6 +78,27 @@ const actions = {
             return { items, totalItems };
         } finally {
             commit("SET_LOADING", false);
+        }
+    },
+    async fetchChildren({ commit }, parentId) {
+        if (!parentId) {
+            return [];
+        }
+
+        commit("ADD_LOADING_PARENT", parentId);
+        try {
+            const children = await getAllData(
+                `${API_ROUTES_CONFIG.stockReceipt}/${parentId}/children`,
+            );
+
+            commit("SET_CHILDREN", {
+                parentId,
+                children: children ?? [],
+            });
+
+            return children ?? [];
+        } finally {
+            commit("REMOVE_LOADING_PARENT", parentId);
         }
     },
     async fetchItemDetail({ commit, state }, { id, force = false }) {

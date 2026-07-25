@@ -20,8 +20,8 @@ use Doctrine\ORM\Mapping as ORM;
 ]
 #[
     ORM\UniqueConstraint(
-        name: "UNIQ_STOCK_RECEIPT_ITEM_LOT_DATE_PAIR",
-        columns: ["receipt_item_id", "manufacture_date", "expiry_date"],
+        name: "UNIQ_STOCK_RECEIPT_ITEM_LOT_IDENTITY",
+        columns: ["receipt_item_id", "supplier_lot_code", "manufacture_date", "expiry_date"],
     ),
 ]
 class StockReceiptItemLot
@@ -449,15 +449,15 @@ class StockReceiptItemLot
             "id" => $this->id,
             "receipt_item_id" => $this->receiptItem?->getId(),
             "client_line_uuid" => $this->clientLineUuid,
-            "received_quantity" => $this->receivedQuantity,
+            "received_quantity" => formatDecimal($this->receivedQuantity),
             "received_unit_id" => $this->receivedUnit?->getId(),
             "received_unit_label_snapshot" => $this->receivedUnitLabelSnapshot,
-            "received_factor_to_base" => $this->receivedFactorToBase,
-            "received_base_quantity" => $this->receivedBaseQuantity,
-            "accepted_quantity" => $this->acceptedQuantity,
-            "accepted_base_quantity" => $this->acceptedBaseQuantity,
-            "rejected_quantity" => $this->rejectedQuantity,
-            "rejected_base_quantity" => $this->rejectedBaseQuantity,
+            "received_factor_to_base" => formatDecimal($this->receivedFactorToBase),
+            "received_base_quantity" => formatDecimal($this->receivedBaseQuantity),
+            "accepted_quantity" => formatDecimal($this->acceptedQuantity),
+            "accepted_base_quantity" => formatDecimal($this->acceptedBaseQuantity),
+            "rejected_quantity" => formatDecimal($this->rejectedQuantity),
+            "rejected_base_quantity" => formatDecimal($this->rejectedBaseQuantity),
             "rejection_reason" => $this->rejectionReason,
             "manufacture_date" => $this->manufactureDate?->format("Y-m-d"),
             "expiry_date" => $this->expiryDate?->format("Y-m-d"),

@@ -58,6 +58,17 @@ final class StockReceiptController extends AbstractController
         }
     }
 
+    #[Route("/stock-receipt/{id}/children", methods: ["GET"])]
+    public function getChildren(int $id): JsonResponse
+    {
+        try {
+            $data = $this->stockReceiptService->findChildren($id);
+            return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
     #[Route("/stock-receipt/{id}", methods: ["GET"], priority: -1)]
     public function getOne(int $id): JsonResponse
     {

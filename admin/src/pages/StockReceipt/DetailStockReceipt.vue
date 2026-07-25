@@ -1,34 +1,24 @@
 <template>
-    <div>
-        <v-btn
-            v-if="mode === 'update'"
-            v-bind="$attrs"
-            icon
-            size="small"
-            variant="outlined"
-            color="primary"
-            @click="dialog = true"
-        >
-            <v-icon>mdi-eye</v-icon>
-        </v-btn>
-
-        <!-- Dialog xem chi tiết phiếu -->
-        <v-dialog v-model="dialog" max-width="1600" scrollable persistent>
+    <!-- Dialog xem chi tiết phiếu -->
+    <v-dialog v-model="dialog" max-width="1600" scrollable persistent>
             <v-card class="position-relative">
                 <v-card-title
-                    class="d-flex align-center justify-space-between py-3 px-4"
+                    class="d-flex align-start justify-space-between py-3 px-4 ga-2 border-b"
                 >
-                    <span class="font-weight-bold text-h6 text-grey-darken-3">
+                    <div
+                        class="font-weight-bold text-h6 text-grey-darken-3 text-wrap pr-2"
+                        style="word-break: break-word;"
+                    >
                         {{
                             $t("stock_receipt.detail_title") ||
                             "Chi tiết phiếu nhập kho"
                         }}: {{ item?.code }}
-                    </span>
+                    </div>
                     <v-btn
                         icon="mdi-close"
                         variant="text"
                         size="small"
-                        class="close-btn"
+                        class="flex-shrink-0 align-self-start"
                         @click="dialog = false"
                     />
                 </v-card-title>
@@ -222,18 +212,24 @@
                                 class="mb-4 overflow-hidden"
                             >
                                 <v-card-title
-                                    class="bg-grey-lighten-4 py-3 px-4 d-flex align-center justify-space-between flex-wrap ga-2"
+                                    class="bg-grey-lighten-4 py-3 px-4 d-flex align-center justify-space-between flex-wrap ga-2 text-wrap"
+                                    style="word-break: break-word;"
                                 >
-                                    <div class="d-flex align-center ga-2">
+                                    <div
+                                        class="d-flex align-center flex-wrap ga-2 text-wrap"
+                                        style="word-break: break-word;"
+                                    >
                                         <v-chip
                                             size="small"
                                             color="primary"
                                             variant="flat"
+                                            class="flex-shrink-0"
                                         >
                                             {{ providerIndex + 1 }}
                                         </v-chip>
                                         <span
-                                            class="text-subtitle-1 font-weight-bold text-grey-darken-3"
+                                            class="text-subtitle-1 font-weight-bold text-grey-darken-3 text-wrap"
+                                            style="word-break: break-word;"
                                         >
                                             {{
                                                 providerGroup.providerSnapshot
@@ -299,7 +295,8 @@
 
                                 <v-divider />
 
-                                <v-table density="comfortable">
+                                <div class="overflow-x-auto">
+                                    <v-table density="comfortable" style="min-width: 650px">
                                     <thead>
                                         <tr class="bg-grey-lighten-5">
                                             <th
@@ -440,7 +437,8 @@
                                             </td>
                                         </tr>
                                     </tbody>
-                                </v-table>
+                                    </v-table>
+                                </div>
                             </v-card>
                         </v-col>
                     </v-row>
@@ -455,7 +453,6 @@
             :saving="inspectionSaving"
             @saved="handleInspectionSaved"
         />
-    </div>
 </template>
 
 <script>
@@ -488,11 +485,15 @@ export default {
             type: String,
             default: "",
         },
+        modelValue: {
+            type: Boolean,
+            default: undefined,
+        },
     },
-    emits: ["reload"],
+    emits: ["reload", "update:modelValue"],
     data() {
         return {
-            dialog: false,
+            internalDialog: false,
             detailData: null,
             loadingDetail: false,
             updatingProviderId: null,
@@ -504,23 +505,37 @@ export default {
         };
     },
     computed: {
+        dialog: {
+            get() {
+                return this.modelValue !== undefined
+                    ? this.modelValue
+                    : this.internalDialog;
+            },
+            set(val) {
+                this.internalDialog = val;
+                this.$emit("update:modelValue", val);
+            },
+        },
         statusColors() {
             return constant.STOCK_RECEIPT_STATUS_COLORS;
         },
     },
     watch: {
-        async dialog(isOpen) {
-            if (isOpen && this.item?.id) {
-                this.loadingDetail = true;
-                try {
-                    this.detailData = await this.fetchItemDetail({
-                        id: this.item.id,
-                        force: true,
-                    });
-                } finally {
-                    this.loadingDetail = false;
+        dialog: {
+            immediate: true,
+            async handler(isOpen) {
+                if (isOpen && this.item?.id) {
+                    this.loadDetail();
                 }
-            }
+            },
+        },
+        item: {
+            immediate: true,
+            async handler(newItem) {
+                if (this.dialog && newItem?.id) {
+                    this.loadDetail();
+                }
+            },
         },
     },
     methods: {
@@ -529,6 +544,18 @@ export default {
             "updateProviderStatus",
             "inspectProviderAction",
         ]),
+        async loadDetail() {
+            if (!this.item?.id) return;
+            this.loadingDetail = true;
+            try {
+                this.detailData = await this.fetchItemDetail({
+                    id: this.item.id,
+                    force: true,
+                });
+            } finally {
+                this.loadingDetail = false;
+            }
+        },
         async changeProviderStatus(providerGroup, status) {
             this.updatingProviderId = providerGroup.id;
             this.targetStatus = status;

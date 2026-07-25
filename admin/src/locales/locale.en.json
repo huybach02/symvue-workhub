@@ -882,6 +882,39 @@
             "shortage_required": "Please choose a shortage resolution.",
             "shortage_resolution_invalid": "Invalid shortage resolution.",
             "submit": "Confirm inspection"
+        },
+        "event": {
+            "title": "Action History",
+            "tooltip": "Action History",
+            "no_events": "No action history found",
+            "types": {
+                "CREATED": "Created Stock Receipt",
+                "STATUS_CHANGED": "Status Changed",
+                "INSPECTION_STARTED": "Started Inspection",
+                "INSPECTION_SAVED": "Saved Inspection",
+                "INVENTORY_POSTED": "Inventory Posted",
+                "SHORTAGE_ACCEPTED": "Shortage Accepted",
+                "BACKORDER_CREATED": "Backorder Created",
+                "CANCELLED": "Cancelled",
+                "REVERSED": "Reversed"
+            }
+        },
+        "inspection_history": {
+            "title": "Inspection History",
+            "tooltip": "Inspection History",
+            "no_data": "No inspection data found",
+            "provider": "Provider",
+            "inspected_at": "Inspected At",
+            "inspected_by": "Inspected By",
+            "item_name": "Merchandise Name",
+            "expected_qty": "Expected Quantity",
+            "received_qty": "Received",
+            "accepted_qty": "Accepted",
+            "rejected_qty": "Rejected",
+            "rejection_reason": "Rejection Reason",
+            "mfg_exp_date": "Mfg / Expiry Date",
+            "supplier_lot": "Supplier Lot",
+            "note": "Note"
         }
     }
 }

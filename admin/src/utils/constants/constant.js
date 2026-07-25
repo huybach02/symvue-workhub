@@ -182,5 +182,38 @@ export const constant = {
         FULL: "success",
         PARTIAL_CLOSED: "error",
         BACKORDER_OPEN: "info"
+    },
+    STOCK_RECEIPT_EVENT_COLORS: {
+        CREATED: "primary",
+        STATUS_CHANGED: "info",
+        INSPECTION_STARTED: "warning",
+        INSPECTION_SAVED: "warning",
+        INVENTORY_POSTED: "success",
+        SHORTAGE_ACCEPTED: "orange",
+        BACKORDER_CREATED: "deep-purple",
+        CANCELLED: "error",
+        REVERSED: "error",
+    },
+    STOCK_RECEIPT_EVENT_ICONS: {
+        CREATED: "mdi-plus-circle-outline",
+        STATUS_CHANGED: "mdi-swap-horizontal",
+        INSPECTION_STARTED: "mdi-clipboard-search-outline",
+        INSPECTION_SAVED: "mdi-clipboard-check-outline",
+        INVENTORY_POSTED: "mdi-package-down",
+        SHORTAGE_ACCEPTED: "mdi-alert-circle-outline",
+        BACKORDER_CREATED: "mdi-file-plus-outline",
+        CANCELLED: "mdi-close-circle-outline",
+        REVERSED: "mdi-undo",
+    },
+    STOCK_RECEIPT_EVENT_TITLE_KEYS: {
+        CREATED: "stock_receipt.event.types.CREATED",
+        STATUS_CHANGED: "stock_receipt.event.types.STATUS_CHANGED",
+        INSPECTION_STARTED: "stock_receipt.event.types.INSPECTION_STARTED",
+        INSPECTION_SAVED: "stock_receipt.event.types.INSPECTION_SAVED",
+        INVENTORY_POSTED: "stock_receipt.event.types.INVENTORY_POSTED",
+        SHORTAGE_ACCEPTED: "stock_receipt.event.types.SHORTAGE_ACCEPTED",
+        BACKORDER_CREATED: "stock_receipt.event.types.BACKORDER_CREATED",
+        CANCELLED: "stock_receipt.event.types.CANCELLED",
+        REVERSED: "stock_receipt.event.types.REVERSED",
     }
 };

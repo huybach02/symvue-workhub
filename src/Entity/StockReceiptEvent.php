@@ -166,6 +166,11 @@ class StockReceiptEvent
             'from_status' => $this->fromStatus,
             'to_status' => $this->toStatus,
             'actor_id' => $this->actor?->getId(),
+            'actor' => $this->actor ? [
+                'id' => $this->actor->getId(),
+                'name' => $this->actor->getName(),
+                'email' => $this->actor->getEmail(),
+            ] : null,
             'actor_type' => $this->actorType,
             'comment' => $this->comment,
             'meta' => $this->meta,

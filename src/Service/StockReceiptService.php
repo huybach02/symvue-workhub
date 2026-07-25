@@ -65,14 +65,80 @@ class StockReceiptService
     {
         $qb = $this->stockReceiptRepository->createQueryBuilder("e");
 
-        $result = FilterWithPagination::findWithPagination($qb, $params, "e");
+        if (!empty($params["f"]) && is_array($params["f"])) {
+            // Lấy tất cả phiếu (gốc hoặc bổ sung) thỏa mãn điều kiện filter
+            $filterQb = $this->stockReceiptRepository->createQueryBuilder("e");
+            FilterWithPagination::findWithPagination(
+                $filterQb,
+                ["f" => $params["f"], "limit" => -1],
+                "e"
+            );
+            /** @var StockReceipt[] $matchingReceipts */
+            $matchingReceipts = $filterQb->getQuery()->getResult();
+
+            if (empty($matchingReceipts)) {
+                return [
+                    "collection" => [],
+                    "total" => 0,
+                    "total_current" => 0,
+                    "current_page" => 1,
+                    "last_page" => 1,
+                    "from" => 0,
+                    "to" => 0,
+                ];
+            }
+
+            // Tìm ra tập hợp ID của các phiếu Root tương ứng
+            $rootIds = [];
+            foreach ($matchingReceipts as $receipt) {
+                $curr = $receipt;
+                while ($curr->getParentReceipt() !== null) {
+                    $curr = $curr->getParentReceipt();
+                }
+                $rootIds[$curr->getId()] = $curr->getId();
+            }
+
+            $qb->andWhere("e.parentReceipt IS NULL")
+                ->andWhere("e.id IN (:rootIds)")
+                ->setParameter("rootIds", array_values($rootIds));
+
+            $paramsWithoutF = $params;
+            unset($paramsWithoutF["f"]);
+
+            $result = FilterWithPagination::findWithPagination($qb, $paramsWithoutF, "e");
+        } else {
+            $qb->andWhere("e.parentReceipt IS NULL");
+            $result = FilterWithPagination::findWithPagination($qb, $params, "e");
+        }
 
         $result["collection"] = array_map(
-            fn(StockReceipt $item) => $item->jsonSerialize(),
+            function (StockReceipt $item) {
+                $data = $item->jsonSerialize();
+                $childCount = $this->stockReceiptRepository->countChildren($item->getId());
+                $data["childCount"] = $childCount;
+                $data["hasChildren"] = $childCount > 0;
+                return $data;
+            },
             $result["collection"],
         );
 
         return $result;
+    }
+
+    public function findChildren(int $parentId): array
+    {
+        $children = $this->stockReceiptRepository->findChildren($parentId);
+
+        return array_map(
+            function (StockReceipt $item) {
+                $data = $item->jsonSerialize();
+                $childCount = $this->stockReceiptRepository->countChildren($item->getId());
+                $data["childCount"] = $childCount;
+                $data["hasChildren"] = $childCount > 0;
+                return $data;
+            },
+            $children,
+        );
     }
 
     public function getDataSelect(array $params): array
@@ -439,7 +505,11 @@ class StockReceiptService
 
         $expectedQuantity = (string) ($itemData["quantity"] ?? "0");
         $unitPrice = (string) ($itemData["price"] ?? "0");
-        $expectedBaseQuantity = MathHelper::mul($expectedQuantity, $factorToBase, 6);
+        $expectedBaseQuantity = MathHelper::mul(
+            $expectedQuantity,
+            $factorToBase,
+            6,
+        );
         $baseUnitCost =
             MathHelper::comp($factorToBase, "0", 8) === 0
                 ? "0.0000"
@@ -493,10 +563,12 @@ class StockReceiptService
             "provider" => $provider,
         ]);
         if ($mProvider) {
-            $providerUnit = $this->merchandiseProviderUnitRepository->findOneBy([
-                "merchandiseProvider" => $mProvider,
-                "unit" => $expectedUnit,
-            ]);
+            $providerUnit = $this->merchandiseProviderUnitRepository->findOneBy(
+                [
+                    "merchandiseProvider" => $mProvider,
+                    "unit" => $expectedUnit,
+                ],
+            );
             if ($providerUnit) {
                 $factor = $providerUnit->getFactorToBase();
                 if (
@@ -521,10 +593,7 @@ class StockReceiptService
                 $factor !== null &&
                 MathHelper::comp($factor, "0", self::FACTOR_SCALE) > 0
             ) {
-                return [
-                    $factor,
-                    $mUnit->getLabel() ?: $expectedUnitLabel,
-                ];
+                return [$factor, $mUnit->getLabel() ?: $expectedUnitLabel];
             }
         }
 
@@ -743,12 +812,24 @@ class StockReceiptService
                     self::QUANTITY_SCALE,
                 );
 
-                $expectedBase = $receiptItem->getExpectedBaseQuantity() ?? "0.000000";
-                if (MathHelper::comp($itemAcceptedBase, $expectedBase, self::QUANTITY_SCALE) > 0) {
-                    throw new \Exception("Số lượng chấp nhận không được vượt quá số lượng đề xuất");
+                $expectedBase =
+                    $receiptItem->getExpectedBaseQuantity() ?? "0.000000";
+                if (
+                    MathHelper::comp(
+                        $itemAcceptedBase,
+                        $expectedBase,
+                        self::QUANTITY_SCALE,
+                    ) > 0
+                ) {
+                    throw new \Exception(
+                        "Số lượng chấp nhận không được vượt quá số lượng đề xuất",
+                    );
                 }
 
-                if (MathHelper::comp($acceptedBase, "0", self::QUANTITY_SCALE) > 0) {
+                if (
+                    MathHelper::comp($acceptedBase, "0", self::QUANTITY_SCALE) >
+                    0
+                ) {
                     $postedLotCount++;
                 }
             }
@@ -805,8 +886,15 @@ class StockReceiptService
             throw new \Exception("Số lượng nhận phải lớn hơn 0");
         }
 
-        $rejectedQty = MathHelper::sub($receivedQty, $acceptedQty, self::QUANTITY_SCALE);
-        if (MathHelper::comp($acceptedQty, $receivedQty, self::QUANTITY_SCALE) > 0) {
+        $rejectedQty = MathHelper::sub(
+            $receivedQty,
+            $acceptedQty,
+            self::QUANTITY_SCALE,
+        );
+        if (
+            MathHelper::comp($acceptedQty, $receivedQty, self::QUANTITY_SCALE) >
+            0
+        ) {
             throw new \Exception(
                 "Số lượng chấp nhận không được lớn hơn số lượng nhận",
             );
@@ -820,9 +908,21 @@ class StockReceiptService
             );
         }
 
-        $receivedBase = MathHelper::mul($receivedQty, $factor, self::QUANTITY_SCALE);
-        $acceptedBase = MathHelper::mul($acceptedQty, $factor, self::QUANTITY_SCALE);
-        $rejectedBase = MathHelper::mul($rejectedQty, $factor, self::QUANTITY_SCALE);
+        $receivedBase = MathHelper::mul(
+            $receivedQty,
+            $factor,
+            self::QUANTITY_SCALE,
+        );
+        $acceptedBase = MathHelper::mul(
+            $acceptedQty,
+            $factor,
+            self::QUANTITY_SCALE,
+        );
+        $rejectedBase = MathHelper::mul(
+            $rejectedQty,
+            $factor,
+            self::QUANTITY_SCALE,
+        );
 
         $manufactureDate = \DateTime::createFromInterface(
             new \DateTimeImmutable((string) $lotDto->manufactureDate),
@@ -886,7 +986,9 @@ class StockReceiptService
                 $acceptedBase,
                 self::QUANTITY_SCALE,
             );
-            if (MathHelper::comp($shortageBase, "0", self::QUANTITY_SCALE) > 0) {
+            if (
+                MathHelper::comp($shortageBase, "0", self::QUANTITY_SCALE) > 0
+            ) {
                 $hasShortage = true;
                 $shortageItems[] = [$item, $shortageBase];
             }
@@ -1140,10 +1242,16 @@ class StockReceiptService
         $hasCompletedProvider = false;
 
         foreach ($receipt->getProviders() as $provider) {
-            if ($provider->getStatus() === StockReceiptProviderStatus::Completed->value) {
+            if (
+                $provider->getStatus() ===
+                StockReceiptProviderStatus::Completed->value
+            ) {
                 $hasCompletedProvider = true;
                 $allCancelled = false;
-            } elseif ($provider->getStatus() !== StockReceiptProviderStatus::Cancelled->value) {
+            } elseif (
+                $provider->getStatus() !==
+                StockReceiptProviderStatus::Cancelled->value
+            ) {
                 $allFinished = false;
                 $allCancelled = false;
             }
@@ -1152,18 +1260,29 @@ class StockReceiptService
             $resolution = $provider->getBackorderResolutionStatus();
 
             $isEffectiveFull =
-                $provider->getStatus() === StockReceiptProviderStatus::Completed->value &&
-                ($fulfillment === FulfillmentStatus::Full->value || $resolution === BackorderResolutionStatus::ResolvedFull->value);
+                $provider->getStatus() ===
+                    StockReceiptProviderStatus::Completed->value &&
+                ($fulfillment === FulfillmentStatus::Full->value ||
+                    $resolution ===
+                        BackorderResolutionStatus::ResolvedFull->value);
 
             if (!$isEffectiveFull) {
                 $allFull = false;
             }
 
-            if ($resolution === BackorderResolutionStatus::Open->value || ($fulfillment === FulfillmentStatus::BackorderCreated->value && $resolution === null)) {
+            if (
+                $resolution === BackorderResolutionStatus::Open->value ||
+                ($fulfillment === FulfillmentStatus::BackorderCreated->value &&
+                    $resolution === null)
+            ) {
                 $anyBackorder = true;
             }
 
-            if ($fulfillment === FulfillmentStatus::PartialClosed->value || $resolution === BackorderResolutionStatus::ResolvedPartial->value) {
+            if (
+                $fulfillment === FulfillmentStatus::PartialClosed->value ||
+                $resolution ===
+                    BackorderResolutionStatus::ResolvedPartial->value
+            ) {
                 $anyPartial = true;
             }
         }
@@ -1198,42 +1317,6 @@ class StockReceiptService
         $receipt->setCompletedAt($isTerminal ? $completedAt : null);
     }
 
-    private function resolveSourceProvider(
-        StockReceiptProvider $supplementProvider,
-    ): StockReceiptProvider {
-        if ($supplementProvider->getSourceReceiptProvider() !== null) {
-            return $supplementProvider->getSourceReceiptProvider();
-        }
-
-        $sourceProvider = null;
-        foreach ($supplementProvider->getItems() as $supplementItem) {
-            $sourceItem = $supplementItem->getSourceReceiptItem();
-            if (!$sourceItem || !$sourceItem->getReceiptProvider()) {
-                throw new \LogicException(
-                    "Không xác định được provider nguồn của phiếu bổ sung",
-                );
-            }
-            $candidate = $sourceItem->getReceiptProvider();
-            if (
-                $sourceProvider !== null &&
-                $sourceProvider->getId() !== $candidate->getId()
-            ) {
-                throw new \LogicException(
-                    "Các item của phiếu bổ sung không cùng provider nguồn",
-                );
-            }
-            $sourceProvider = $candidate;
-        }
-
-        if (!$sourceProvider) {
-            throw new \LogicException(
-                "Phiếu bổ sung không có item để xác định provider nguồn",
-            );
-        }
-
-        return $sourceProvider;
-    }
-
     private function propagateSupplementResultToAncestors(
         StockReceipt $receipt,
         \DateTimeInterface $completedAt,
@@ -1241,7 +1324,9 @@ class StockReceiptService
     ): void {
         $currentReceipt = $receipt;
 
-        while (($parentReceipt = $currentReceipt->getParentReceipt()) !== null) {
+        while (
+            ($parentReceipt = $currentReceipt->getParentReceipt()) !== null
+        ) {
             $this->entityManager->lock(
                 $parentReceipt,
                 \Doctrine\DBAL\LockMode::PESSIMISTIC_WRITE,
@@ -1255,7 +1340,14 @@ class StockReceiptService
                     continue;
                 }
 
-                $sourceProvider = $this->resolveSourceProvider($childProvider);
+                $sourceProvider = null;
+                if ($childProvider->getSourceReceiptProvider() !== null) {
+                    $sourceProvider = $childProvider->getSourceReceiptProvider();
+                } else {
+                    throw new \Exception(
+                        "Phiếu bổ sung không thể xác định provider nguồn",
+                    );
+                }
 
                 $this->entityManager->lock(
                     $sourceProvider,
@@ -1266,25 +1358,32 @@ class StockReceiptService
                 $childFulfillment = $childProvider->getFulfillmentStatus();
 
                 $effectiveChildStatus = match (true) {
-                    $childFulfillment === FulfillmentStatus::Full->value || $childResolution === BackorderResolutionStatus::ResolvedFull->value =>
-                        BackorderResolutionStatus::ResolvedFull->value,
+                    $childFulfillment === FulfillmentStatus::Full->value ||
+                        $childResolution ===
+                            BackorderResolutionStatus::ResolvedFull->value
+                        => BackorderResolutionStatus::ResolvedFull->value,
 
-                    $childFulfillment === FulfillmentStatus::PartialClosed->value || $childResolution === BackorderResolutionStatus::ResolvedPartial->value =>
-                        BackorderResolutionStatus::ResolvedPartial->value,
+                    $childFulfillment ===
+                        FulfillmentStatus::PartialClosed->value ||
+                        $childResolution ===
+                            BackorderResolutionStatus::ResolvedPartial->value
+                        => BackorderResolutionStatus::ResolvedPartial->value,
 
-                    $childFulfillment === FulfillmentStatus::BackorderCreated->value || $childResolution === BackorderResolutionStatus::Open->value =>
-                        BackorderResolutionStatus::Open->value,
+                    $childFulfillment ===
+                        FulfillmentStatus::BackorderCreated->value ||
+                        $childResolution ===
+                            BackorderResolutionStatus::Open->value
+                        => BackorderResolutionStatus::Open->value,
 
                     default => $sourceProvider->getBackorderResolutionStatus(),
                 };
 
-                $sourceProvider->setBackorderResolutionStatus($effectiveChildStatus);
+                $sourceProvider->setBackorderResolutionStatus(
+                    $effectiveChildStatus,
+                );
             }
 
-            $this->aggregateReceiptStatus(
-                $parentReceipt,
-                $completedAt,
-            );
+            $this->aggregateReceiptStatus($parentReceipt, $completedAt);
 
             $this->recordReceiptEvent(
                 receipt: $parentReceipt,
@@ -1384,7 +1483,9 @@ class StockReceiptService
         );
         $supplement->setRequest($receipt->getRequest());
         $supplement->setWarehouse($receipt->getWarehouse());
-        $nextSupplementNo = $this->stockReceiptRepository->getNextSupplementNo($receipt);
+        $nextSupplementNo = $this->stockReceiptRepository->getNextSupplementNo(
+            $receipt,
+        );
         $supplement->setParentReceipt($receipt);
         $supplement->setSupplementNo($nextSupplementNo);
         $supplement->setStatus(StockReceiptStatus::Created->value);
@@ -1417,7 +1518,11 @@ class StockReceiptService
             $shortageInExpected =
                 MathHelper::comp($factor, "0", self::FACTOR_SCALE) === 0
                     ? "0.000000"
-                    : MathHelper::div($shortageBase, $factor, self::QUANTITY_SCALE);
+                    : MathHelper::div(
+                        $shortageBase,
+                        $factor,
+                        self::QUANTITY_SCALE,
+                    );
 
             $supplementItem = new StockReceiptItem();
             $supplementItem->setReceiptProvider($supplementProvider);

@@ -4,8 +4,9 @@
             class="table-scroll-container"
             :style="{ '--table-min-width': tableMinWidth + 'px' }"
         >
-            <v-data-table
-                :items="items"
+            <v-data-table-server
+                :items="visibleItems"
+                :items-length="totalItems"
                 :headers="headers"
                 :sort-by="sortArray"
                 :items-per-page="-1"
@@ -63,21 +64,122 @@
                     </tr>
                 </template>
 
+                <template #[`item.code`]="{ item }">
+                    <div
+                        class="receipt-tree-cell"
+                        :style="{
+                            paddingLeft: `${item._treeDepth * 28}px`,
+                        }"
+                    >
+                        <v-progress-circular
+                            v-if="isChildLoading(item.id)"
+                            indeterminate
+                            size="16"
+                            width="2"
+                            color="primary"
+                            class="mr-3 ml-1"
+                        />
+
+                        <v-btn
+                            v-else-if="item._hasChildren"
+                            :icon="
+                                item._expanded
+                                    ? 'mdi-chevron-down'
+                                    : 'mdi-chevron-right'
+                            "
+                            variant="text"
+                            class="tree-toggle mr-1"
+                            @click.stop="toggleReceipt(item)"
+                        />
+
+                        <span v-else class="tree-toggle-placeholder" />
+
+                        <v-icon
+                            :icon="
+                                item._treeDepth === 0
+                                    ? 'mdi-file-document-outline'
+                                    : 'mdi-file-tree-outline'
+                            "
+                            size="18"
+                            :color="
+                                item._treeDepth === 0
+                                    ? 'primary'
+                                    : 'grey-darken-1'
+                            "
+                            class="mr-2"
+                        />
+
+                        <span
+                            :class="{
+                                'font-weight-medium': item._treeDepth === 0,
+                            }"
+                        >
+                            {{ item.code }}
+                        </span>
+                    </div>
+                </template>
+
                 <template #[`item.action`]="{ item }">
-                    <div class="d-flex align-center justify-center">
+                    <div class="d-flex align-center justify-center ga-1">
                         <v-tooltip
                             v-if="permission?.show"
                             :text="$t('button.detail') || 'Chi tiết'" 
                             location="top"
                         >
                             <template #activator="{ props: tooltipProps }">
-                                <DetailStockReceipt
+                                <v-btn
                                     v-bind="tooltipProps"
-                                    :path="path"
-                                    mode="update"
-                                    :item="item"
-                                    @reload="$emit('reload', { ...query })"
-                                />
+                                    icon
+                                    size="small"
+                                    variant="outlined"
+                                    color="primary"
+                                    @click="openDetail(item)"
+                                >
+                                    <v-icon>mdi-eye</v-icon>
+                                </v-btn>
+                            </template>
+                        </v-tooltip>
+
+                        <v-tooltip
+                            :text="
+                                $t(
+                                    'stock_receipt.inspection_history.tooltip',
+                                ) || 'Lịch sử kiểm hàng'
+                            "
+                            location="top"
+                        >
+                            <template #activator="{ props: tooltipProps }">
+                                <v-btn
+                                    v-bind="tooltipProps"
+                                    icon
+                                    size="small"
+                                    variant="outlined"
+                                    color="warning"
+                                    @click="openInspectionHistory(item)"
+                                >
+                                    <v-icon>mdi-clipboard-check-outline</v-icon>
+                                </v-btn>
+                            </template>
+                        </v-tooltip>
+
+                        <v-tooltip
+                            :text="
+                                $t('stock_receipt.event.tooltip') ||
+                                'Lịch sử thao tác'
+                            "
+                            location="top"
+                        >
+                            <template #activator="{ props: tooltipProps }">
+                                <v-btn
+                                    v-bind="tooltipProps"
+                                    icon
+                                    size="small"
+                                    variant="outlined"
+                                    color="info"
+                                    @click="openEventHistory(item)"
+                                >
+                                    <v-icon>mdi-history</v-icon>
+                                </v-btn>
                             </template>
                         </v-tooltip>
                     </div>
@@ -115,7 +217,7 @@
                         </div>
                     </div>
                 </template>
-            </v-data-table>
+            </v-data-table-server>
         </div>
 
         <!-- Custom Pagination -->
@@ -125,6 +227,27 @@
             :items-per-page="query.limit"
             @update:page="onPageChange"
             @update:items-per-page="onLimitChange"
+        />
+
+        <DetailStockReceipt
+            v-if="selectedDetailItem"
+            v-model="detailDialog"
+            :path="path"
+            mode="update"
+            :item="selectedDetailItem"
+            @reload="$emit('reload', { ...query })"
+        />
+
+        <StockReceiptInspectionDialog
+            v-if="selectedInspectionItem"
+            v-model="inspectionHistoryDialog"
+            :item="selectedInspectionItem"
+        />
+
+        <StockReceiptEventDialog
+            v-if="selectedEventItem"
+            v-model="eventDialog"
+            :item="selectedEventItem"
         />
     </div>
 </template>
@@ -137,14 +260,18 @@ import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import DetailStockReceipt from "./DetailStockReceipt.vue";
+import StockReceiptEventDialog from "./components/StockReceiptEventDialog.vue";
+import StockReceiptInspectionDialog from "./components/StockReceiptInspectionDialog.vue";
 import { constant } from "@/utils/constants/constant";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     name: "StockReceiptList",
     components: {
         FilterPagination,
         DetailStockReceipt,
+        StockReceiptEventDialog,
+        StockReceiptInspectionDialog,
     },
     props: {
         path: {
@@ -180,43 +307,50 @@ export default {
     },
     data() {
         return {
+            expandedReceiptIds: [],
+            selectedDetailItem: null,
+            detailDialog: false,
+            selectedInspectionItem: null,
+            inspectionHistoryDialog: false,
+            selectedEventItem: null,
+            eventDialog: false,
             headers: [
                 {
                     key: "action",
-                    width: 80,
-                    minWidth: 80,
-                    maxWidth: 80,
+                    width: 130,
+                    minWidth: 130,
+                    maxWidth: 130,
                     sortable: false,
                 },
                 {
                     title: this.$t("stock_receipt.columns.id") || "ID",
                     key: "id",
-                    width: 80,
+                    width: 100,
                     filterComponent: markRaw(FilterText),
                 },
                 {
                     title: this.$t("stock_receipt.columns.code") || "Mã phiếu",
                     key: "code",
-                    width: 180,
+                    width: 450,
                     filterComponent: markRaw(FilterText),
                 },
                 {
                     title: this.$t("stock_receipt.columns.title") || "Tiêu đề",
                     key: "title",
-                    width: 250,
+                    width: 500,
                     filterComponent: markRaw(FilterText),
                 },
                 {
                     title: this.$t("stock_receipt.columns.warehouse") || "Kho nhận",
                     key: "warehouseSnapshot",
-                    width: 200,
+                    width: 250,
                     filterComponent: markRaw(FilterText),
                     value: (item) => item.warehouseSnapshot?.name || "",
                 },
                 {
                     title: this.$t("base.status") || "Trạng thái",
                     key: "status",
-                    width: 150,
+                    width: 200,
                     filterComponent: markRaw(FilterSelect),
                     items: [
                         { title: this.$t("stock_receipt.status.CREATED") || "CREATED", value: "CREATED" },
@@ -241,27 +375,130 @@ export default {
                 {
                     title: this.$t("base.created_at") || "Ngày tạo",
                     key: "createdAt",
-                    width: 150,
+                    width: 200,
                     filterComponent: markRaw(FilterDateRange),
                 },
                 {
                     title: this.$t("base.updated_at") || "Ngày cập nhật",
                     key: "updatedAt",
-                    width: 150,
+                    width: 200,
                     filterComponent: markRaw(FilterDateRange),
                 },
             ],
         };
     },
     computed: {
-        ...mapGetters("stockReceipt", ["items", "loading", "totalItems"]),
+        ...mapGetters("stockReceipt", [
+            "items",
+            "loading",
+            "totalItems",
+            "childrenByParentId",
+            "isChildLoading",
+        ]),
+        visibleItems() {
+            const rows = [];
+
+            const appendRows = (receipts, depth = 0) => {
+                for (const receipt of receipts) {
+                    const children = this.childrenByParentId[receipt.id] ?? [];
+
+                    const hasChildren =
+                        Boolean(receipt.hasChildren) ||
+                        Number(receipt.childCount) > 0 ||
+                        children.length > 0;
+
+                    const expanded = this.expandedReceiptIds.includes(
+                        receipt.id,
+                    );
+
+                    rows.push({
+                        ...receipt,
+                        _treeDepth: depth,
+                        _hasChildren: hasChildren,
+                        _expanded: expanded,
+                    });
+
+                    if (expanded && children.length > 0) {
+                        appendRows(children, depth + 1);
+                    }
+                }
+            };
+
+            appendRows(this.items);
+
+            return rows;
+        },
         tableMinWidth() {
             return this.headers.reduce((total, col) => {
                 return total + (col.width || col.minWidth || 0);
             }, 0);
         },
     },
+    watch: {
+        items: {
+            immediate: true,
+            handler(newItems) {
+                if (Array.isArray(newItems)) {
+                    // Tải lại dữ liệu phiếu con cho các node đang được mở (expanded)
+                    if (this.expandedReceiptIds.length > 0) {
+                        this.expandedReceiptIds.forEach(async (parentId) => {
+                            await this.fetchChildren(parentId);
+                        });
+                    }
+
+                    if (this.query?.f?.length > 0) {
+                        newItems.forEach(async (item) => {
+                            if (item.hasChildren || item.childCount > 0) {
+                                if (
+                                    !this.expandedReceiptIds.includes(item.id)
+                                ) {
+                                    this.expandedReceiptIds.push(item.id);
+                                }
+                                if (!this.childrenByParentId[item.id]) {
+                                    await this.fetchChildren(item.id);
+                                }
+                            }
+                        });
+                    }
+                }
+            },
+        },
+    },
     methods: {
+        ...mapActions("stockReceipt", ["fetchChildren"]),
+        openDetail(item) {
+            this.selectedDetailItem = item;
+            this.detailDialog = true;
+        },
+        openInspectionHistory(item) {
+            this.selectedInspectionItem = item;
+            this.inspectionHistoryDialog = true;
+        },
+        openEventHistory(item) {
+            this.selectedEventItem = item;
+            this.eventDialog = true;
+        },
+        async toggleReceipt(item) {
+            const expanded = this.expandedReceiptIds.includes(item.id);
+
+            if (expanded) {
+                this.expandedReceiptIds = this.expandedReceiptIds.filter(
+                    (id) => id !== item.id,
+                );
+                return;
+            }
+
+            const loaded = Object.prototype.hasOwnProperty.call(
+                this.childrenByParentId,
+                item.id,
+            );
+
+            if (!loaded) {
+                await this.fetchChildren(item.id);
+            }
+
+            this.expandedReceiptIds = [...this.expandedReceiptIds, item.id];
+        },
         getStatusColor(status) {
             return constant.STOCK_RECEIPT_STATUS_COLORS[status] || "primary";
         },
@@ -282,5 +519,21 @@ export default {
 .table-scroll-container :deep(.v-data-table),
 .table-scroll-container :deep(table) {
     min-width: var(--table-min-width, 600px);
+}
+
+.receipt-tree-cell {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    position: relative;
+}
+
+.tree-toggle {
+    flex: 0 0 28px;
+}
+
+.tree-toggle-placeholder {
+    display: inline-block;
+    flex: 0 0 28px;
 }
 </style>

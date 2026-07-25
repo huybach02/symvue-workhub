@@ -885,6 +885,39 @@
             "shortage_required": "Vui lòng chọn cách xử lý thiếu hàng.",
             "shortage_resolution_invalid": "Cách xử lý thiếu hàng không hợp lệ.",
             "submit": "Xác nhận kiểm hàng"
+        },
+        "event": {
+            "title": "Lịch sử thao tác",
+            "tooltip": "Lịch sử thao tác",
+            "no_events": "Chưa có lịch sử thao tác",
+            "types": {
+                "CREATED": "Tạo phiếu nhập kho",
+                "STATUS_CHANGED": "Thay đổi trạng thái",
+                "INSPECTION_STARTED": "Bắt đầu kiểm hàng",
+                "INSPECTION_SAVED": "Lưu kết quả kiểm hàng",
+                "INVENTORY_POSTED": "Đã nhập kho",
+                "SHORTAGE_ACCEPTED": "Chấp nhận thiếu hàng",
+                "BACKORDER_CREATED": "Tạo phiếu bổ sung",
+                "CANCELLED": "Hủy phiếu",
+                "REVERSED": "Hoàn tác"
+            }
+        },
+        "inspection_history": {
+            "title": "Lịch sử kiểm hàng",
+            "tooltip": "Lịch sử kiểm hàng",
+            "no_data": "Chưa có dữ liệu kiểm hàng",
+            "provider": "Nhà cung cấp",
+            "inspected_at": "Thời gian kiểm",
+            "inspected_by": "Người kiểm hàng",
+            "item_name": "Tên hàng hóa",
+            "expected_qty": "Số lượng yêu cầu",
+            "received_qty": "Số nhận",
+            "accepted_qty": "Chấp nhận",
+            "rejected_qty": "Từ chối",
+            "rejection_reason": "Lý do từ chối",
+            "mfg_exp_date": "NSX / HSD",
+            "supplier_lot": "Mã lô NSX",
+            "note": "Ghi chú"
         }
     }
 }

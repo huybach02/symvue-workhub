@@ -1,10 +1,10 @@
 <template>
-    <div class="bg-white border-b py-2 px-2 d-flex justify-center">
+    <div class="bg-white border-b py-2 px-4 d-flex justify-center overflow-x-auto">
         <v-timeline
             direction="horizontal"
             align="center"
             truncate-line="both"
-            style="width: 100%; max-width: 900px"
+            style="width: 100%; min-width: 550px; max-width: 900px"
             density="compact"
         >
             <v-timeline-item
