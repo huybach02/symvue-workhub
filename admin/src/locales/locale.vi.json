@@ -421,7 +421,21 @@
         "nhan_su": "Nhân sự"
     },
     "request": {
-        "title": "Đề xuất",
+        "title": {
+            "leave": "Đề xuất nghỉ phép",
+            "leave_range": "Đề xuất nghỉ phép từ {startDate} đến {endDate}",
+            "stock_in": "Đề xuất nhập kho ngày {stockInDate}",
+            "stock_in_default": "Đề xuất nhập kho",
+            "production_default": "Đề xuất sản xuất",
+            "default": "Đề xuất"
+        },
+        "payload": {
+            "leave_type_default": "Nghỉ phép",
+            "stock_in_default": "Nhập kho",
+            "stock_in_provider_count": "nhà cung cấp",
+            "production_default": "Sản xuất thành phẩm",
+            "production_item_count": "sản phẩm"
+        },
         "management_title": "Quản lý đề xuất",
         "description": "Quản lý các đề xuất của bạn và những đề xuất đang chờ bạn duyệt.",
         "drawer_title": "Loại đề xuất",
@@ -443,6 +457,18 @@
             "items_required": "Vui lòng thêm ít nhất 1 nguyên liệu/thành phẩm",
             "create_receipt_button": "Tạo phiếu nhập kho",
             "receipt_created_success": "Tạo phiếu nhập kho thành công!"
+        },
+        "production": {
+            "items_title": "Thành phẩm sản xuất",
+            "add_item": "Thêm Thành phẩm sản xuất",
+            "empty_items": "Chưa có thành phẩm sản xuất. Bấm Thêm Thành phẩm sản xuất để bắt đầu.",
+            "item_untitled": "Thành phẩm #{index}",
+            "select_finished_product": "Chọn thành phẩm sản xuất",
+            "output_unit_auto": "Tự động theo công thức",
+            "materials_title": "Nguyên liệu tạo thành",
+            "empty_materials": "Thành phẩm chưa được cấu hình công thức nguyên liệu.",
+            "items_required": "Vui lòng thêm ít nhất 1 thành phẩm sản xuất",
+            "materials_required": "Thành phẩm phải có ít nhất 1 nguyên liệu tạo thành"
         },
         "create_button": "Thêm mới",
         "my_requests": "Đề xuất của tôi",
@@ -918,6 +944,13 @@
             "mfg_exp_date": "NSX / HSD",
             "supplier_lot": "Mã lô NSX",
             "note": "Ghi chú"
+        }
+    },
+    "production_order": {
+        "title": "ProductionOrder",
+        "columns": {
+            "id": "ID",
+            "name": "Tên"
         }
     }
 }

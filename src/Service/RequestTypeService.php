@@ -6,6 +6,7 @@ namespace App\Service;
 
 use App\Class\Request\RequestConstant;
 use App\DTO\LeaveRequestPayloadDTO;
+use App\DTO\ProductionRequestPayloadDTO;
 use App\DTO\StockInRequestPayloadDTO;
 use App\Entity\LeaveSchedule;
 use App\Entity\Request;
@@ -57,6 +58,11 @@ class RequestTypeService
                 StockInRequestPayloadDTO::class,
                 t('request.error.invalid_stock_in_payload_format')
             ),
+            RequestConstant::TYPE_PRODUCTION => $this->mapAndValidatePayloadDto(
+                $payload,
+                ProductionRequestPayloadDTO::class,
+                t('request.error.invalid_production_payload_format')
+            ),
             default => throw new \Exception(t('request.error.unsupported_type')),
         };
     }
@@ -72,6 +78,7 @@ class RequestTypeService
                 ]
             ),
             RequestConstant::TYPE_STOCK_IN => t('request.title.stock_in_default'),
+            RequestConstant::TYPE_PRODUCTION => t('request.title.production_default'),
             default => t('request.title.default'),
         };
     }
@@ -90,6 +97,12 @@ class RequestTypeService
                 t('request.payload.stock_in_default'),
                 count($payload->providers ?? []),
                 t('request.payload.stock_in_provider_count')
+            )),
+            RequestConstant::TYPE_PRODUCTION => trim(sprintf(
+                '%s | %d %s',
+                t('request.payload.production_default'),
+                count($payload->items ?? []),
+                t('request.payload.production_item_count')
             )),
             default => null,
         };
@@ -132,6 +145,7 @@ class RequestTypeService
     {
         return match ($type) {
             RequestConstant::TYPE_STOCK_IN => $this->enrichStockInPayloadNames($payload),
+            RequestConstant::TYPE_PRODUCTION => $this->enrichProductionPayloadNames($payload),
             default => $payload,
         };
     }
@@ -244,6 +258,53 @@ class RequestTypeService
                             }
                         }
                         $item['factorToBase'] = (float)$factorToBase;
+                    }
+                }
+            }
+        }
+
+        return $payload;
+    }
+
+    private function enrichProductionPayloadNames(array $payload): array
+    {
+        if (empty($payload['items']) || !is_array($payload['items'])) {
+            return $payload;
+        }
+
+        foreach ($payload['items'] as &$item) {
+            $finishedProductId = $item['finishedProductId'] ?? null;
+            if ($finishedProductId) {
+                $product = $this->merchandiseRepository->find($finishedProductId);
+                if ($product) {
+                    $item['finishedProductName'] = sprintf('[%s] %s', $product->getCode(), $product->getName());
+                }
+            }
+
+            $outputUnitId = $item['outputUnitId'] ?? null;
+            if ($outputUnitId) {
+                $unit = $this->unitRepository->find($outputUnitId);
+                if ($unit) {
+                    $item['outputUnitName'] = $unit->getName();
+                }
+            }
+
+            if (!empty($item['materials']) && is_array($item['materials'])) {
+                foreach ($item['materials'] as &$material) {
+                    $ingredientId = $material['ingredientId'] ?? null;
+                    if ($ingredientId) {
+                        $ingredient = $this->merchandiseRepository->find($ingredientId);
+                        if ($ingredient) {
+                            $material['ingredientName'] = sprintf('[%s] %s', $ingredient->getCode(), $ingredient->getName());
+                        }
+                    }
+
+                    $unitId = $material['unitId'] ?? null;
+                    if ($unitId) {
+                        $mUnit = $this->unitRepository->find($unitId);
+                        if ($mUnit) {
+                            $material['unitName'] = $mUnit->getName();
+                        }
                     }
                 }
             }

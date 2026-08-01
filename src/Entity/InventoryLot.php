@@ -26,6 +26,9 @@ class InventoryLot
     #[ORM\Column(length: 100, unique: true, options: ['comment' => 'Mã lot nội bộ tự sinh'])]
     private ?string $internalCode = null;
 
+    #[ORM\Column(length: 20, options: ['default' => 'PURCHASE', 'comment' => 'Nguồn tạo lot'])]
+    private string $originType = 'PURCHASE';
+
     #[ORM\OneToOne(targetEntity: StockReceiptItemLot::class, mappedBy: 'inventoryLot')]
     private ?StockReceiptItemLot $sourceReceiptLotLine = null;
 
@@ -34,11 +37,17 @@ class InventoryLot
     private ?Merchandise $merchandise = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(name: 'provider_id', referencedColumnName: 'id', nullable: false, options: ['comment' => 'Nhà cung cấp của lot'])]
+    #[ORM\JoinColumn(name: 'provider_id', referencedColumnName: 'id', nullable: true, options: ['comment' => 'Nhà cung cấp; null với lot sản xuất'])]
     private ?Provider $provider = null;
 
     #[ORM\Column(length: 100, nullable: true, options: ['comment' => 'Mã lô của nhà cung cấp nếu có'])]
     private ?string $supplierLotCode = null;
+
+    #[ORM\Column(length: 100, nullable: true, options: ['comment' => 'Mã lô sản xuất nội bộ'])]
+    private ?string $productionLotCode = null;
+
+    #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => 'Thông tin nguồn tạo lot'])]
+    private ?array $sourceRef = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, options: ['comment' => 'Ngày sản xuất'])]
     private ?\DateTimeInterface $manufactureDate = null;
@@ -68,6 +77,18 @@ class InventoryLot
     public function setInternalCode(string $internalCode): static
     {
         $this->internalCode = $internalCode;
+        return $this;
+    }
+
+    public function getOriginType(): string
+    {
+        return $this->originType;
+    }
+
+    public function setOriginType(string $originType): static
+    {
+        $this->originType = $originType;
+
         return $this;
     }
 
@@ -126,6 +147,30 @@ class InventoryLot
     public function setSupplierLotCode(?string $supplierLotCode): static
     {
         $this->supplierLotCode = $supplierLotCode;
+        return $this;
+    }
+
+    public function getProductionLotCode(): ?string
+    {
+        return $this->productionLotCode;
+    }
+
+    public function setProductionLotCode(?string $productionLotCode): static
+    {
+        $this->productionLotCode = $productionLotCode;
+
+        return $this;
+    }
+
+    public function getSourceRef(): ?array
+    {
+        return $this->sourceRef;
+    }
+
+    public function setSourceRef(?array $sourceRef): static
+    {
+        $this->sourceRef = $sourceRef;
+
         return $this;
     }
 
@@ -188,11 +233,14 @@ class InventoryLot
     {
         return [
             'id' => $this->id,
+            'origin_type' => $this->originType,
             'internal_code' => $this->internalCode,
             'source_receipt_lot_line_id' => $this->sourceReceiptLotLine?->getId(),
             'merchandise_id' => $this->merchandise?->getId(),
             'provider_id' => $this->provider?->getId(),
             'supplier_lot_code' => $this->supplierLotCode,
+            'production_lot_code' => $this->productionLotCode,
+            'source_ref' => $this->sourceRef,
             'manufacture_date' => $this->manufactureDate?->format('Y-m-d'),
             'expiry_date' => $this->expiryDate?->format('Y-m-d'),
             'received_at' => $this->receivedAt?->format('Y-m-d H:i:s'),

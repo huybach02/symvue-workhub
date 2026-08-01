@@ -10,6 +10,7 @@ final class RequestConstant
     public const TYPE_LEAVE = 'leave';
     public const TYPE_STOCK_IN = 'stock:stock-in'; // Nhập kho
     public const TYPE_STOCK_OUT = 'stock:stock-out'; // Xuất kho
+    public const TYPE_PRODUCTION = 'stock:production'; // Đề xuất sản xuất
 
     // Request status
     public const STATUS_PENDING = 'pending';
@@ -37,6 +38,7 @@ final class RequestConstant
         return [
             self::TYPE_LEAVE,
             self::TYPE_STOCK_IN,
+            self::TYPE_PRODUCTION,
         ];
     }
 
@@ -45,7 +47,7 @@ final class RequestConstant
         return [
             [
                 'code' => self::TYPE_LEAVE,
-                'title' => 'Đề xuất nghỉ phép',
+                'title' => 'Nghỉ phép',
                 'description' => 'Tạo và gửi đề xuất nghỉ phép cho quản lý trực tiếp duyệt',
                 'icon' => 'mdi-calendar-remove',
                 'color' => 'warning',
@@ -56,6 +58,13 @@ final class RequestConstant
                 'description' => 'Tạo và gửi đề xuất nhập kho',
                 'icon' => 'mdi-inbox-arrow-down',
                 'color' => 'warning',
+            ],
+            [
+                'code' => self::TYPE_PRODUCTION,
+                'title' => 'Sản xuất',
+                'description' => 'Tạo và gửi đề xuất sản xuất thành phẩm nội bộ',
+                'icon' => 'mdi-factory',
+                'color' => 'info',
             ],
         ];
     }

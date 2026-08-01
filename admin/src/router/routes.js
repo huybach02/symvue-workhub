@@ -332,6 +332,21 @@ export const routes = [
                         ).icon || "",
                 },
             },
+            {
+                path: "production-order",
+                name: NAME_ROUTES_CONFIG.productionOrder,
+                component: () => import("../pages/ProductionOrder/ProductionOrder.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.productionOrder,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.productionOrder,
+                        ).icon || "",
+                },
+            },
 ],
     },
     {

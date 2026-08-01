@@ -8,59 +8,41 @@
             :initial-values="initialValues"
             @submit="onSubmit"
         >
-            <div v-if="permission?.edit">
-                <v-row v-if="!isEditing">
-                    <v-col cols="12">
-                        <div class="d-flex ga-2 justify-end">
-                            <v-btn
-                                color="primary"
-                                class="d-flex align-center"
-                                @click="isEditing = !isEditing"
-                            >
-                                <v-icon
-                                    icon="mdi-pencil"
-                                    size="18"
-                                    class="mr-1"
-                                />
-                                {{ $t("system_config.edit_button") }}
-                            </v-btn>
-                        </div>
-                    </v-col>
-                </v-row>
-                <v-row v-else>
-                    <v-col cols="12">
-                        <div class="d-flex ga-2 justify-end">
-                            <v-btn
-                                variant="tonal"
-                                class="d-flex align-center"
-                                @click="cancelEdit"
-                            >
-                                <v-icon
-                                    icon="mdi-close"
-                                    size="18"
-                                    class="mr-1"
-                                />
-                                {{ $t("system_config.cancel_button") }}
-                            </v-btn>
-                            <v-btn
-                                :loading="saving"
-                                color="primary"
-                                class="d-flex align-center"
-                                type="submit"
-                            >
-                                <v-icon
-                                    icon="mdi-check"
-                                    size="18"
-                                    class="mr-1"
-                                />
-                                {{ $t("system_config.save_button") }}
-                            </v-btn>
-                        </div>
-                    </v-col>
-                </v-row>
+            <div
+                v-if="permission?.edit"
+                class="d-flex ga-2 justify-end general-settings-fixed-actions"
+            >
+                <v-btn
+                    v-if="!isEditing"
+                    color="primary"
+                    class="d-flex align-center"
+                    @click="isEditing = !isEditing"
+                >
+                    <v-icon icon="mdi-pencil" size="18" class="mr-1" />
+                    {{ $t("system_config.edit_button") }}
+                </v-btn>
+                <template v-else>
+                    <v-btn
+                        variant="tonal"
+                        class="d-flex align-center"
+                        @click="cancelEdit"
+                    >
+                        <v-icon icon="mdi-close" size="18" class="mr-1" />
+                        {{ $t("system_config.cancel_button") }}
+                    </v-btn>
+                    <v-btn
+                        :loading="saving"
+                        color="primary"
+                        class="d-flex align-center"
+                        type="submit"
+                    >
+                        <v-icon icon="mdi-check" size="18" class="mr-1" />
+                        {{ $t("system_config.save_button") }}
+                    </v-btn>
+                </template>
             </div>
 
-            <v-divider class="my-5" />
+            <v-divider class="mt-15 mb-5" />
 
             <v-sheet
                 color="primary"
@@ -1006,4 +988,16 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.general-settings-fixed-actions {
+    position: fixed;
+    top: calc(var(--v-layout-top, 64px) + 16px);
+    right: 32px;
+    width: max-content;
+    z-index: 2999;
+    background: rgb(var(--v-theme-surface));
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+}
+</style>

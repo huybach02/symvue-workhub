@@ -26,4 +26,5 @@ export const NAME_ROUTES_CONFIG = {
     businessProduct: "system.businessProduct",
     warehouse: "system.warehouse",
     stockReceipt: "system.stockReceipt",
+    productionOrder: "system.productionOrder",
 };

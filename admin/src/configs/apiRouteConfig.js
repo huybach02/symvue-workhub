@@ -40,4 +40,5 @@ export const API_ROUTES_CONFIG = {
     businessProduct: "/business-product",
     warehouse: "/warehouse",
     stockReceipt: "/stock-receipt",
+    productionOrder: "/production-order",
 };

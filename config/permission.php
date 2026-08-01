@@ -186,6 +186,29 @@ return [
         ],
     ],
     [
+        "name" => "requests:stock:production",
+        "actions" => [
+            "index" => true,
+            "create" => true,
+            "show" => true,
+            "edit" => true,
+            "delete" => true,
+            "approve" => true,
+            "reject" => true,
+            "cancel" => true,
+        ],
+        "actionLabel" => [
+            "index" => t("permission.actions.index"),
+            "create" => t("permission.actions.create"),
+            "show" => t("permission.actions.show"),
+            "edit" => t("permission.actions.edit"),
+            "delete" => t("permission.actions.delete"),
+            "approve" => t("permission.actions.approve"),
+            "reject" => t("permission.actions.reject"),
+            "cancel" => t("permission.actions.cancel"),
+        ],
+    ],
+    [
         "name" => "attendance",
         "actions" => [
             "index" => true,
@@ -347,6 +370,24 @@ return [
     ],
     [
         "name" => "stock-receipt",
+        "actions" => [
+            "index" => true,
+            "create" => true,
+            "show" => true,
+            "edit" => true,
+            "delete" => true,
+            "showMenu" => true
+        ],
+        "actionLabel" => [
+            "index" => t("permission.actions.index"),
+            "create" => t("permission.actions.create"),
+            "show" => t("permission.actions.show"),
+            "edit" => t("permission.actions.edit"),
+            "delete" => t("permission.actions.delete"),
+            "showMenu" => t("permission.actions.showMenu"),
+        ],
+    ],    [
+        "name" => "production-order",
         "actions" => [
             "index" => true,
             "create" => true,

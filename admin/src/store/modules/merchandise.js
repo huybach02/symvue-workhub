@@ -132,6 +132,26 @@ const actions = {
 
         return Array.from(mergeById.values());
     },
+    /**
+     * Thành phẩm sản xuất nội bộ:
+     * - type = finished_product + finishedProductSource = production
+     */
+    async fetchProductionMerchandiseOptions() {
+        return getDataSelect(API_ROUTES_CONFIG.merchandise, {
+            f: [
+                {
+                    field: "type",
+                    operator: "equal",
+                    value: "finished_product",
+                },
+                {
+                    field: "finishedProductSource",
+                    operator: "equal",
+                    value: "production",
+                },
+            ],
+        });
+    },
 };
 
 export default {

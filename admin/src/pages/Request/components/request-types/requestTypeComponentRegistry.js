@@ -1,7 +1,10 @@
 import { leaveRequestSchema } from "@/utils/schemas/request/leaveRequest";
 import { stockInRequestSchema } from "@/utils/schemas/request/stockInRequest";
+import { productionRequestSchema } from "@/utils/schemas/request/productionRequest";
 import RequestLeaveDetailFields from "./leave/RequestLeaveDetailFields.vue";
 import RequestLeaveFormFields from "./leave/RequestLeaveFormFields.vue";
+import RequestProductionDetailFields from "./production/RequestProductionDetailFields.vue";
+import RequestProductionFormFields from "./production/RequestProductionFormFields.vue";
 import RequestStockInDetailFields from "./stock-in/RequestStockInDetailFields.vue";
 import RequestStockInFormFields from "./stock-in/RequestStockInFormFields.vue";
 
@@ -57,6 +60,58 @@ export const REQUEST_TYPE_COMPONENT_REGISTRY = {
                                     currency: item.currency ?? "VND",
                                     factorToBase: item.factorToBase ?? null,
                                     note: item.note ?? "",
+                                }))
+                              : [],
+                      }))
+                    : [],
+            };
+        },
+    },
+    "stock:production": {
+        formComponent: RequestProductionFormFields,
+        detailComponent: RequestProductionDetailFields,
+        validationSchema: productionRequestSchema,
+        initialValues: {
+            items: [],
+        },
+        mapPayloadToForm(payload = {}) {
+            return {
+                items: Array.isArray(payload.items)
+                    ? payload.items.map((item) => ({
+                          lineId: item.lineId ?? crypto.randomUUID(),
+                          finishedProductId: item.finishedProductId ?? null,
+                          finishedProductName: item.finishedProductName ?? "",
+                          quantity:
+                              item.quantity === null ||
+                              item.quantity === undefined
+                                  ? null
+                                  : Number(item.quantity),
+                          outputUnitId: item.outputUnitId ?? null,
+                          outputUnitName: item.outputUnitName ?? "",
+                          expectedWastePercent:
+                              item.expectedWastePercent === null ||
+                              item.expectedWastePercent === undefined
+                                  ? null
+                                  : Number(item.expectedWastePercent),
+                          materials: Array.isArray(item.materials)
+                              ? item.materials.map((material) => ({
+                                    ingredientId:
+                                        material.ingredientId ?? null,
+                                    ingredientName:
+                                        material.ingredientName ?? "",
+                                    quantity:
+                                        material.quantity === null ||
+                                        material.quantity === undefined
+                                            ? null
+                                            : Number(material.quantity),
+                                    unitId: material.unitId ?? null,
+                                    unitName: material.unitName ?? "",
+                                    wasteRate:
+                                        material.wasteRate === null ||
+                                        material.wasteRate === undefined
+                                            ? null
+                                            : Number(material.wasteRate),
+                                    note: material.note ?? "",
                                 }))
                               : [],
                       }))

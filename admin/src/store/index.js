@@ -20,6 +20,7 @@ import merchandise from "./modules/merchandise";
 import businessProduct from "./modules/businessProduct";
 import warehouse from "./modules/warehouse";
 import stockReceipt from "./modules/stockReceipt";
+import productionOrder from "./modules/productionOrder";
 
 const store = createStore({
     state() {
@@ -58,6 +59,7 @@ const store = createStore({
         businessProduct,
         warehouse,
         stockReceipt,
+        productionOrder,
 },
 });
 

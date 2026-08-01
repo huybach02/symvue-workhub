@@ -41,12 +41,6 @@
 
                     <div class="d-flex justify-end ga-2 mt-4">
                         <v-btn
-                            color="grey"
-                            @click="$emit('update:modelValue', false)"
-                        >
-                            {{ $t("button.cancel") }}
-                        </v-btn>
-                        <v-btn
                             color="primary"
                             type="submit"
                             :loading="$store.state.isLoading"

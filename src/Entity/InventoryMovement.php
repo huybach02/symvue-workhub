@@ -25,6 +25,16 @@ class InventoryMovement
     #[ORM\Column(length: 30, options: ['comment' => 'Loại biến động kho'])]
     private ?string $movementType = null;
 
+    #[ORM\Column(length: 30, nullable: true, options: ['comment' => 'Loại nghiệp vụ nguồn'])]
+    private ?string $sourceType = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'production_order_item_id', referencedColumnName: 'id', nullable: true, options: ['comment' => 'Thành phẩm sản xuất liên quan'])]
+    private ?ProductionOrderItem $productionOrderItem = null;
+
+    #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => 'Metadata nguồn chi tiết'])]
+    private ?array $sourceRef = null;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'warehouse_id', referencedColumnName: 'id', nullable: false, options: ['comment' => 'Kho chịu ảnh hưởng'])]
     private ?Warehouse $warehouse = null;
@@ -82,6 +92,42 @@ class InventoryMovement
     public function setMovementType(string $movementType): static
     {
         $this->movementType = $movementType;
+        return $this;
+    }
+
+    public function getSourceType(): ?string
+    {
+        return $this->sourceType;
+    }
+
+    public function setSourceType(?string $sourceType): static
+    {
+        $this->sourceType = $sourceType;
+
+        return $this;
+    }
+
+    public function getProductionOrderItem(): ?ProductionOrderItem
+    {
+        return $this->productionOrderItem;
+    }
+
+    public function setProductionOrderItem(?ProductionOrderItem $productionOrderItem): static
+    {
+        $this->productionOrderItem = $productionOrderItem;
+
+        return $this;
+    }
+
+    public function getSourceRef(): ?array
+    {
+        return $this->sourceRef;
+    }
+
+    public function setSourceRef(?array $sourceRef): static
+    {
+        $this->sourceRef = $sourceRef;
+
         return $this;
     }
 
@@ -222,6 +268,9 @@ class InventoryMovement
         return [
             'id' => $this->id,
             'movement_type' => $this->movementType,
+            'source_type' => $this->sourceType,
+            'production_order_item_id' => $this->productionOrderItem?->getId(),
+            'source_ref' => $this->sourceRef,
             'warehouse_id' => $this->warehouse?->getId(),
             'merchandise_id' => $this->merchandise?->getId(),
             'lot_id' => $this->lot?->getId(),

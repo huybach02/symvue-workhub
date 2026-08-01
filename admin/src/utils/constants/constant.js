@@ -149,6 +149,10 @@ export const constant = {
         {
             type: "stock:stock-in",
             width: 1600,
+        },
+        {
+            type: "stock:production",
+            width: 1600,
         }
     ],
     CURRENCIES: [
