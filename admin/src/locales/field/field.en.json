@@ -132,6 +132,8 @@
     "total_amount": "Total Amount",
     "grand_total": "Grand Total",
     "warehouse_receive_from_provider": "Warehouse receiving merchandise from providers",
+    "warehouse_production_material": "Warehouse for issuing raw materials for production",
+    "warehouse_production_finished_goods": "Warehouse for storing finished goods from production",
     "received_quantity": "Received quantity",
     "accepted_quantity": "Accepted quantity",
     "rejected_quantity": "Rejected quantity",

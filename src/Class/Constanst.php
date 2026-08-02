@@ -399,3 +399,21 @@ enum ActorType: string
     case System = 'SYSTEM';
     case Job = 'JOB';
 }
+
+enum ProductionOrderStatus: string
+{
+    case Created = 'CREATED';
+    case Started = 'STARTED';
+    case InProgress = 'IN_PROGRESS';
+    case Completed = 'COMPLETED';
+    case Cancelled = 'CANCELLED';
+}
+
+enum ProductionEventType: string
+{
+    case Created = 'CREATED';
+    case StatusChanged = 'STATUS_CHANGED';
+    case Started = 'STARTED';
+    case Completed = 'COMPLETED';
+    case Cancelled = 'CANCELLED';
+}

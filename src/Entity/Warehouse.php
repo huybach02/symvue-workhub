@@ -148,7 +148,13 @@ class Warehouse
             "status" => $this->status,
             "note" => $this->note,
             "branch_id" => $this->branch?->getId(),
-            "branch" => $this->branch?->jsonSerialize(),
+            "branch" => $this->branch
+                ? [
+                    "id" => $this->branch->getId(),
+                    "code" => $this->branch->getCode(),
+                    "name" => $this->branch->getName(),
+                ]
+                : null,
             "created_at" => $this->createdAt->format("Y-m-d H:i:s"),
             "updated_at" => $this->updatedAt->format("Y-m-d H:i:s"),
         ];

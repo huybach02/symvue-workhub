@@ -836,6 +836,54 @@
                         />
                     </VeeField>
                 </v-col>
+
+                <v-col cols="12" md="4">
+                    <VeeField
+                        v-slot="{ field, errorMessage, handleChange, handleBlur }"
+                        name="productionMaterialWarehouseId"
+                    >
+                        <div class="mb-2">
+                            {{ $t("field.warehouse_production_material") }}
+                            <span class="text-red"> * </span>
+                        </div>
+                        <v-autocomplete
+                            :model-value="field.value"
+                            :error-messages="errorMessage"
+                            :items="warehouseOptionsString"
+                            item-title="label"
+                            item-value="value"
+                            variant="outlined"
+                            :readonly="!isEditing"
+                            persistent-placeholder
+                            @update:model-value="handleChange"
+                            @blur="handleBlur"
+                        />
+                    </VeeField>
+                </v-col>
+
+                <v-col cols="12" md="4">
+                    <VeeField
+                        v-slot="{ field, errorMessage, handleChange, handleBlur }"
+                        name="productionFinishedGoodsWarehouseId"
+                    >
+                        <div class="mb-2">
+                            {{ $t("field.warehouse_production_finished_goods") }}
+                            <span class="text-red"> * </span>
+                        </div>
+                        <v-autocomplete
+                            :model-value="field.value"
+                            :error-messages="errorMessage"
+                            :items="warehouseOptionsString"
+                            item-title="label"
+                            item-value="value"
+                            variant="outlined"
+                            :readonly="!isEditing"
+                            persistent-placeholder
+                            @update:model-value="handleChange"
+                            @blur="handleBlur"
+                        />
+                    </VeeField>
+                </v-col>
             </v-row>
         </VeeForm>
     </div>

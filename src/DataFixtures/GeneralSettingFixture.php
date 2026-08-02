@@ -154,6 +154,16 @@ class GeneralSettingFixture extends Fixture implements FixtureGroupInterface
                 "gia_tri" => "",
                 "mo_ta" => "Kho nhập Nguyên liệu/Thành phẩm từ nhà cung cấp",
             ],
+            [
+                "ten_cau_hinh" => "PRODUCTION_MATERIAL_WAREHOUSE_ID",
+                "gia_tri" => "",
+                "mo_ta" => "Kho xuất nguyên liệu để sản xuất",
+            ],
+            [
+                "ten_cau_hinh" => "PRODUCTION_FINISHED_GOODS_WAREHOUSE_ID",
+                "gia_tri" => "",
+                "mo_ta" => "Kho lưu thành phẩm sản xuất",
+            ],
         ];
 
         foreach ($data as $item) {

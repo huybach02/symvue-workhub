@@ -468,7 +468,8 @@
             "materials_title": "Nguyên liệu tạo thành",
             "empty_materials": "Thành phẩm chưa được cấu hình công thức nguyên liệu.",
             "items_required": "Vui lòng thêm ít nhất 1 thành phẩm sản xuất",
-            "materials_required": "Thành phẩm phải có ít nhất 1 nguyên liệu tạo thành"
+            "materials_required": "Thành phẩm phải có ít nhất 1 nguyên liệu tạo thành",
+            "create_order_button": "Tạo lệnh sản xuất"
         },
         "create_button": "Thêm mới",
         "my_requests": "Đề xuất của tôi",

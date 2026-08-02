@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Class\CustomResponse;
 use App\DTO\ProductionOrderDTO;
+use App\Entity\User;
 use App\Service\ProductionOrderService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -71,8 +72,14 @@ final class ProductionOrderController extends AbstractController
     public function create(
         #[MapRequestPayload(validationGroups: ['create'])] ProductionOrderDTO $productionOrderDTO
     ): JsonResponse {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
         try {
-            $data = $this->productionOrderService->create($productionOrderDTO);
+            $data = $this->productionOrderService->create(
+                $productionOrderDTO,
+                $currentUser,
+            );
             return CustomResponse::success($data, t('success.created'));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());

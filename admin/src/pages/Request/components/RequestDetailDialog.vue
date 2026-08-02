@@ -287,6 +287,16 @@
                     </v-btn>
 
                     <v-btn
+                        v-if="showCreateProductionOrderButton"
+                        color="success"
+                        prepend-icon="mdi-factory"
+                        :loading="isCreatingOrder"
+                        @click="handleCreateProductionOrder"
+                    >
+                        {{ $t("request.production.create_order_button") || "Tạo lệnh sản xuất" }}
+                    </v-btn>
+
+                    <v-btn
                         v-if="item?.permissions?.canEdit && permission?.edit"
                         color="warning"
                         prepend-icon="mdi-pencil-outline"
@@ -410,6 +420,7 @@ export default {
             showConfirmDelete: false,
             isDeleting: false,
             isCreatingReceipt: false,
+            isCreatingOrder: false,
         };
     },
     computed: {
@@ -423,6 +434,14 @@ export default {
         showCreateReceiptButton() {
             return (
                 this.item?.type === "stock:stock-in" &&
+                this.item?.status === "approved" &&
+                this.currentUser?.id === this.item?.requester?.id &&
+                !this.item?.targetRefId
+            );
+        },
+        showCreateProductionOrderButton() {
+            return (
+                this.item?.type === "stock:production" &&
                 this.item?.status === "approved" &&
                 this.currentUser?.id === this.item?.requester?.id &&
                 !this.item?.targetRefId
@@ -447,6 +466,9 @@ export default {
         ...mapActions("stockReceipt", {
             createStockReceipt: "createItem",
         }),
+        ...mapActions("productionOrder", {
+            createProductionOrder: "createItem",
+        }),
         async handleCreateStockReceipt() {
             this.isCreatingReceipt = true;
             await this.createStockReceipt({
@@ -455,6 +477,15 @@ export default {
             this.$emit("refresh");
 
             this.isCreatingReceipt = false;
+        },
+        async handleCreateProductionOrder() {
+            this.isCreatingOrder = true;
+            await this.createProductionOrder({
+                requestId: this.item.id,
+            });
+            this.$emit("refresh");
+
+            this.isCreatingOrder = false;
         },
         getRequestStatusColor(status) {
             return (

@@ -13,17 +13,45 @@ class Warehoue
     ) {}
 
     public function getReceivingWarehouse(): \App\Entity\Warehouse {
+        return $this->getConfiguredWarehouse(
+            'RECEIVE_FROM_PROVIDER_WAREHOUSE_ID',
+            'Chưa cấu hình kho nhận hàng từ nhà cung cấp',
+            'Kho nhận hàng từ nhà cung cấp không tồn tại',
+        );
+    }
+
+    public function getProductionMaterialWarehouse(): \App\Entity\Warehouse {
+        return $this->getConfiguredWarehouse(
+            'PRODUCTION_MATERIAL_WAREHOUSE_ID',
+            'Chưa cấu hình kho xuất nguyên liệu để sản xuất',
+            'Kho xuất nguyên liệu để sản xuất không tồn tại',
+        );
+    }
+
+    public function getProductionFinishedGoodsWarehouse(): \App\Entity\Warehouse {
+        return $this->getConfiguredWarehouse(
+            'PRODUCTION_FINISHED_GOODS_WAREHOUSE_ID',
+            'Chưa cấu hình kho lưu thành phẩm sản xuất',
+            'Kho lưu thành phẩm sản xuất không tồn tại',
+        );
+    }
+
+    private function getConfiguredWarehouse(
+        string $configKey,
+        string $missingConfigMessage,
+        string $notFoundMessage,
+    ): \App\Entity\Warehouse {
         $configs = $this->generalSettingRepository->getAllConfig();
-        $warehouseId = $configs['RECEIVE_FROM_PROVIDER_WAREHOUSE_ID'] ?? null;
+        $warehouseId = $configs[$configKey] ?? null;
 
         if (!$warehouseId) {
-            throw new \Exception('Chưa cấu hình kho nhận hàng từ nhà cung cấp');
+            throw new \Exception($missingConfigMessage);
         }
 
         $warehouse = $this->warehouseRepository->find((int) $warehouseId);
 
         if ($warehouse === null) {
-            throw new \Exception('Kho nhận hàng từ nhà cung cấp không tồn tại');
+            throw new \Exception($notFoundMessage);
         }
 
         return $warehouse;

@@ -5,11 +5,13 @@
         @submit="onSubmit"
     >
         <VeeField v-slot="{ field, errorMessage }" name="email">
+            <div class="mb-2">
+                {{ $t("field.email") }} <span class="text-red"> * </span>
+            </div>
             <v-text-field
                 v-bind="field"
                 :error-messages="errorMessage"
-                class="mb-4"
-                :label="$t('field.email')"
+                class="mb-2"
                 prepend-inner-icon="mdi-account"
                 variant="outlined"
                 persistent-placeholder
@@ -17,11 +19,13 @@
         </VeeField>
 
         <VeeField v-slot="{ field, errorMessage }" name="password">
+            <div class="mb-2">
+                {{ $t("field.password") }} <span class="text-red"> * </span>
+            </div>
             <v-text-field
                 v-bind="field"
                 :error-messages="errorMessage"
                 type="password"
-                :label="$t('field.password')"
                 prepend-inner-icon="mdi-lock"
                 variant="outlined"
                 persistent-placeholder

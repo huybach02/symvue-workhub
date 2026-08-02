@@ -136,6 +136,8 @@
     "total_amount": "Thành tiền",
     "grand_total": "Tổng cộng toàn bộ đề xuất",
     "warehouse_receive_from_provider": "Kho nhập Nguyên liệu/Thành phẩm từ nhà cung cấp",
+    "warehouse_production_material": "Kho xuất nguyên liệu để sản xuất",
+    "warehouse_production_finished_goods": "Kho lưu thành phẩm sản xuất",
     "received_quantity": "Số lượng nhận",
     "accepted_quantity": "Số lượng chấp nhận",
     "rejected_quantity": "Số lượng từ chối",

@@ -120,4 +120,16 @@ export const cauHinhChungSchema = yup.object({
             required: true,
         },
     ),
+    productionMaterialWarehouseId: buildStringRule(
+        t("field.warehouse_production_material"),
+        {
+            required: true,
+        },
+    ),
+    productionFinishedGoodsWarehouseId: buildStringRule(
+        t("field.warehouse_production_finished_goods"),
+        {
+            required: true,
+        },
+    ),
 });

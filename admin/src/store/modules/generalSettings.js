@@ -30,6 +30,8 @@ const defaultValues = {
     checkOutReminderMinutesBefore: 0,
     currency: "VND",
     receiveFromProviderWarehouseId: "",
+    productionMaterialWarehouseId: "",
+    productionFinishedGoodsWarehouseId: "",
 };
 
 const configMapping = {
@@ -60,6 +62,9 @@ const configMapping = {
     CHECK_OUT_REMINDER_MINUTES_BEFORE: "checkOutReminderMinutesBefore",
     CURRENCY: "currency",
     RECEIVE_FROM_PROVIDER_WAREHOUSE_ID: "receiveFromProviderWarehouseId",
+    PRODUCTION_MATERIAL_WAREHOUSE_ID: "productionMaterialWarehouseId",
+    PRODUCTION_FINISHED_GOODS_WAREHOUSE_ID:
+        "productionFinishedGoodsWarehouseId",
 };
 
 const booleanFields = [
@@ -74,6 +79,8 @@ const stringFields = [
     "ipAddress",
     "currency",
     "receiveFromProviderWarehouseId",
+    "productionMaterialWarehouseId",
+    "productionFinishedGoodsWarehouseId",
 ];
 
 const decimalFields = ["latitude", "longitude"];

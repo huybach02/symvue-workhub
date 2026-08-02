@@ -5,13 +5,15 @@
         @submit="onSubmit"
     >
         <VeeField v-slot="{ field, errorMessage }" name="email">
+            <div class="mb-2">
+                {{ $t("field.email") }} <span class="text-red"> * </span>
+            </div>
             <v-text-field
                 v-model="field.value"
                 :error-messages="errorMessage"
                 class="mb-4"
                 variant="outlined"
                 type="email"
-                :label="$t('field.email')"
                 @update:model-value="field.onChange"
             />
         </VeeField>

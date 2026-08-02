@@ -133,5 +133,13 @@ class GeneralSettingDTO
         #[Assert\NotBlank(allowNull: true)]
         #[Assert\Type(type: "string")]
         public readonly ?string $receiveFromProviderWarehouseId = null,
+
+        #[Assert\NotBlank(allowNull: true)]
+        #[Assert\Type(type: "string")]
+        public readonly ?string $productionMaterialWarehouseId = null,
+
+        #[Assert\NotBlank(allowNull: true)]
+        #[Assert\Type(type: "string")]
+        public readonly ?string $productionFinishedGoodsWarehouseId = null,
     ) {}
 }

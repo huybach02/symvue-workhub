@@ -65,6 +65,8 @@ final class GeneralSettingService
                 'checkOutReminderMinutesBefore' => 'CHECK_OUT_REMINDER_MINUTES_BEFORE',
                 'currency' => 'CURRENCY',
                 'receiveFromProviderWarehouseId' => 'RECEIVE_FROM_PROVIDER_WAREHOUSE_ID',
+                'productionMaterialWarehouseId' => 'PRODUCTION_MATERIAL_WAREHOUSE_ID',
+                'productionFinishedGoodsWarehouseId' => 'PRODUCTION_FINISHED_GOODS_WAREHOUSE_ID',
             ];
 
             $cauHinhChungList = $this->cauHinhChungRepository->findAll();
