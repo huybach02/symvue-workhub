@@ -30,6 +30,52 @@
     "enter_new_password": "Enter new password (minimum 6 characters)",
     "enter_confirm_password": "Confirm new password"
   },
+  "production_order": {
+    "title": "Production Order",
+    "detail_title": "Production Order Details",
+    "columns": {
+      "id": "ID",
+      "code": "Order code",
+      "title": "Title",
+      "request": "Source request",
+      "material_warehouse": "Material warehouse",
+      "finished_goods_warehouse": "Finished goods warehouse",
+      "started_at": "Started at",
+      "completed_at": "Completed at"
+    },
+    "status": {
+      "CREATED": "Created",
+      "MATERIAL_ISSUED": "Materials issued",
+      "STARTED": "Started",
+      "IN_PROGRESS": "In progress",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    },
+    "detail": {
+      "finished_products": "Finished products",
+      "no_finished_products": "This production order has no finished products",
+      "planned_quantity": "Planned quantity",
+      "base_quantity": "Base quantity",
+      "accepted_quantity": "Accepted quantity",
+      "waste_rate": "Expected waste",
+      "materials": "Materials",
+      "material": "Material",
+      "unit": "Unit",
+      "no_materials": "This finished product has no materials"
+    },
+    "event": {
+      "title": "Activity history",
+      "tooltip": "Production order activity history",
+      "no_events": "No activity history",
+      "types": {
+        "CREATED": "Production order created",
+        "STATUS_CHANGED": "Status changed",
+        "STARTED": "Production started",
+        "COMPLETED": "Production completed",
+        "CANCELLED": "Production order cancelled"
+      }
+    }
+  },
   "profile": {
     "signature": {
       "title": "Signature Information",

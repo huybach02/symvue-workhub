@@ -43,6 +43,7 @@
                                     v-else
                                     :items="col.items"
                                     :title="col.title"
+                                    :path="col.path"
                                     class="flex-grow-1"
                                     @update="(val) => onFilter(col.key, val)"
                                 />
@@ -64,25 +65,10 @@
                 </template>
 
                 <template #[`item.action`]="{ item }">
-                    <div class="d-flex align-center justify-space-between ga-1">
+                    <div class="d-flex align-center justify-center ga-2">
                         <v-tooltip
                             v-if="permission?.show"
-                            :text="$t('button.update')" 
-                            location="top"
-                        >
-                            <template #activator="{ props: tooltipProps }">
-                                <CreateEditProductionOrder
-                                    v-bind="tooltipProps"
-                                    :path="path"
-                                    mode="update"
-                                    :item="item"
-                                    @reload="$emit('reload', { ...query })"
-                                />
-                            </template>
-                        </v-tooltip>
-                        <v-tooltip 
-                            v-if="permission?.delete"
-                            :text="$t('button.delete')" 
+                            :text="$t('button.detail')"
                             location="top"
                         >
                             <template #activator="{ props: tooltipProps }">
@@ -91,26 +77,77 @@
                                     icon
                                     size="small"
                                     variant="outlined"
-                                    color="error"
-                                    @click="openDeleteDialog(item.id)"
+                                    color="primary"
+                                    @click="openDetail(item)"
                                 >
-                                    <v-icon>mdi-delete</v-icon>
+                                    <v-icon>mdi-eye</v-icon>
+                                </v-btn>
+                            </template>
+                        </v-tooltip>
+                        <v-tooltip
+                            v-if="permission?.show"
+                            :text="$t('production_order.event.tooltip')"
+                            location="top"
+                        >
+                            <template #activator="{ props: tooltipProps }">
+                                <v-btn
+                                    v-bind="tooltipProps"
+                                    icon
+                                    size="small"
+                                    variant="outlined"
+                                    color="info"
+                                    @click="openEvent(item)"
+                                >
+                                    <v-icon>mdi-history</v-icon>
                                 </v-btn>
                             </template>
                         </v-tooltip>
                     </div>
                 </template>
 
+                <template #[`item.requestId`]="{ item }">
+                    <div v-if="item.request" class="d-flex flex-column">
+                        <span>{{ item.request.code || item.request.id }}</span>
+                        <span class="text-caption text-medium-emphasis">
+                            {{ item.request.title || "--" }}
+                        </span>
+                    </div>
+                    <span v-else>--</span>
+                </template>
+
+                <template #[`item.materialWarehouseId`]="{ item }">
+                    <div
+                        v-if="item.materialWarehouse"
+                        class="d-flex flex-column"
+                    >
+                        <span>{{ item.materialWarehouse.name || "--" }}</span>
+                        <span class="text-caption text-medium-emphasis">
+                            {{ item.materialWarehouse.code || "--" }}
+                        </span>
+                    </div>
+                    <span v-else>--</span>
+                </template>
+
+                <template #[`item.finishedGoodsWarehouseId`]="{ item }">
+                    <div
+                        v-if="item.finishedGoodsWarehouse"
+                        class="d-flex flex-column"
+                    >
+                        <span>{{
+                            item.finishedGoodsWarehouse.name || "--"
+                        }}</span>
+                        <span class="text-caption text-medium-emphasis">
+                            {{ item.finishedGoodsWarehouse.code || "--" }}
+                        </span>
+                    </div>
+                    <span v-else>--</span>
+                </template>
+
                 <template #[`item.status`]="{ item }">
-                    <v-chip
-                        :color="item.status === 1 ? 'success' : 'error'"
+                    <v-chip :color="getStatusColor(item.status)"
                         size="small"
                     >
-                        {{
-                            item.status === 1
-                                ? $t("status_values.active")
-                                : $t("status_values.inactive")
-                        }}
+                        {{ getStatusLabel(item.status) }}
                     </v-chip>
                 </template>
 
@@ -137,16 +174,14 @@
             @update:page="onPageChange"
             @update:items-per-page="onLimitChange"
         />
-        <ConfirmDialog
-            v-model="showConfirmDelete"
-            :message="
-                $t('media_library.delete_confirm_message', {
-                    count: 1,
-                })
-            "
-            :loading="isDeleting"
-            @confirm="handleDelete"
-            @cancel="showConfirmDelete = false"
+        <DetailProductionOrder
+            v-model="detailDialog"
+            :item="selectedDetailItem"
+            @reload="$emit('reload', { ...query })"
+        />
+        <ProductionOrderEventDialog
+            v-model="eventDialog"
+            :item="selectedEventItem"
         />
     </div>
 </template>
@@ -158,16 +193,18 @@ import FilterSelect from "@/components/filters/FilterSelect.vue";
 import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
-import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import CreateEditProductionOrder from "./CreateEditProductionOrder.vue";
-import { mapActions, mapGetters } from "vuex";
+import DetailProductionOrder from "./DetailProductionOrder.vue";
+import ProductionOrderEventDialog from "./ProductionOrderEventDialog.vue";
+import { mapGetters } from "vuex";
+import FilterAutoComplete from "@/components/filters/FilterAutoComplete.vue";
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 
 export default {
     name: "ProductionOrderList",
     components: {
         FilterPagination,
-        ConfirmDialog,
-        CreateEditProductionOrder,
+        DetailProductionOrder,
+        ProductionOrderEventDialog,
     },
     props: {
         path: {
@@ -204,9 +241,10 @@ export default {
     },
     data() {
         return {
-            showConfirmDelete: false,
-            isDeleting: false,
-            deletingId: null,
+            selectedDetailItem: null,
+            detailDialog: false,
+            selectedEventItem: null,
+            eventDialog: false,
             headers: [
                 {
                     key: "action",
@@ -218,45 +256,111 @@ export default {
                 {
                     title: this.$t("production_order.columns.id"),
                     key: "id",
-                    width: 80,
+                    width: 100,
                     filterComponent: markRaw(FilterText),
                 },
                 {
-                    title: this.$t("production_order.columns.name"),
-                    key: "name",
-                    width: 200,
+                    title: this.$t("production_order.columns.code"),
+                    key: "code",
+                    width: 150,
                     filterComponent: markRaw(FilterText),
+                },
+                {
+                    title: this.$t("production_order.columns.title"),
+                    key: "title",
+                    width: 450,
+                    filterComponent: markRaw(FilterText),
+                },
+                {
+                    title: this.$t("production_order.columns.request"),
+                    key: "requestId",
+                    width: 180,
+                    filterComponent: markRaw(FilterText),
+                },
+                {
+                    title: this.$t(
+                        "production_order.columns.material_warehouse",
+                    ),
+                    key: "materialWarehouseId",
+                    width: 240,
+                    filterComponent: markRaw(FilterAutoComplete),
+                    path: API_ROUTES_CONFIG.warehouse,
+                    sortable: false,
+                },
+                {
+                    title: this.$t(
+                        "production_order.columns.finished_goods_warehouse",
+                    ),
+                    key: "finishedGoodsWarehouseId",
+                    width: 240,
+                    filterComponent: markRaw(FilterAutoComplete),
+                    path: API_ROUTES_CONFIG.warehouse,
+                    sortable: false,
                 },
                 {
                     title: this.$t("base.status"),
                     key: "status",
-                    width: 100,
+                    width: 170,
                     filterComponent: markRaw(FilterSelect),
                     items: [
                         {
-                            title: this.$t("status_values.active"),
-                            value: "1",
+                            title: this.$t("production_order.status.CREATED"),
+                            value: "CREATED",
                         },
                         {
-                            title: this.$t("status_values.inactive"),
-                            value: "0",
+                            title: this.$t(
+                                "production_order.status.MATERIAL_ISSUED",
+                            ),
+                            value: "MATERIAL_ISSUED",
+                        },
+                        {
+                            title: this.$t("production_order.status.STARTED"),
+                            value: "STARTED",
+                        },
+                        {
+                            title: this.$t(
+                                "production_order.status.IN_PROGRESS",
+                            ),
+                            value: "IN_PROGRESS",
+                        },
+                        {
+                            title: this.$t("production_order.status.COMPLETED"),
+                            value: "COMPLETED",
+                        },
+                        {
+                            title: this.$t("production_order.status.CANCELLED"),
+                            value: "CANCELLED",
                         },
                     ],
-                    value: (item) =>
-                        item.status === 1
-                            ? this.$t("status_values.active")
-                            : this.$t("status_values.inactive"),
+                },
+                {
+                    title: this.$t("production_order.columns.started_at"),
+                    key: "startedAt",
+                    width: 180,
+                    filterComponent: markRaw(FilterDateRange),
+                },
+                {
+                    title: this.$t("production_order.columns.completed_at"),
+                    key: "completedAt",
+                    width: 180,
+                    filterComponent: markRaw(FilterDateRange),
+                },
+                {
+                    title: this.$t("base.note"),
+                    key: "note",
+                    width: 240,
+                    filterComponent: markRaw(FilterText),
                 },
                 {
                     title: this.$t("base.created_at"),
                     key: "createdAt",
-                    width: 150,
+                    width: 180,
                     filterComponent: markRaw(FilterDateRange),
                 },
                 {
                     title: this.$t("base.updated_at"),
                     key: "updatedAt",
-                    width: 150,
+                    width: 180,
                     filterComponent: markRaw(FilterDateRange),
                 },
             ],
@@ -271,18 +375,30 @@ export default {
         },
     },
     methods: {
-        ...mapActions("productionOrder", ["deleteItem"]),
-        openDeleteDialog(id) {
-            this.deletingId = id;
-            this.showConfirmDelete = true;
+        getStatusLabel(status) {
+            return (
+                this.$t("production_order.status." + status) || status || "--"
+            );
         },
-        async handleDelete() {
-            this.isDeleting = true;
-            await this.deleteItem(this.deletingId);
-            this.isDeleting = false;
-            this.showConfirmDelete = false;
-            this.deletingId = null;
-            this.$emit("reload", { ...this.query });
+        getStatusColor(status) {
+            return (
+                {
+                    CREATED: "grey",
+                    MATERIAL_ISSUED: "deep-purple",
+                    STARTED: "info",
+                    IN_PROGRESS: "warning",
+                    COMPLETED: "success",
+                    CANCELLED: "error",
+                }[status] || "primary"
+            );
+        },
+        openDetail(item) {
+            this.selectedDetailItem = item;
+            this.detailDialog = true;
+        },
+        openEvent(item) {
+            this.selectedEventItem = item;
+            this.eventDialog = true;
         },
     },
 };

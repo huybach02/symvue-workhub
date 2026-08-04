@@ -403,6 +403,7 @@ enum ActorType: string
 enum ProductionOrderStatus: string
 {
     case Created = 'CREATED';
+    case MaterialIssued = 'MATERIAL_ISSUED';
     case Started = 'STARTED';
     case InProgress = 'IN_PROGRESS';
     case Completed = 'COMPLETED';

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Class\CustomResponse;
 use App\DTO\ProductionOrderDTO;
+use App\DTO\ProductionOrderItemStatusDTO;
 use App\Entity\User;
 use App\Service\ProductionOrderService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -63,6 +64,27 @@ final class ProductionOrderController extends AbstractController
         try {
             $data = $this->productionOrderService->findById($id);
             return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/production-order/item/{id}/status', methods: ['PUT'])]
+    public function updateItemStatus(
+        int $id,
+        #[MapRequestPayload] ProductionOrderItemStatusDTO $dto,
+    ): JsonResponse {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        try {
+            $data = $this->productionOrderService->updateItemStatus(
+                $id,
+                $dto->status,
+                $currentUser,
+            );
+
+            return CustomResponse::success($data, t('success.updated'));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }

@@ -70,6 +70,13 @@ const actions = {
 
         return data;
     },
+    async updateItemStatus(_, { id, status }) {
+        return putData(
+            API_ROUTES_CONFIG.productionOrder + "/item/" + id + "/status",
+            null,
+            { status },
+        );
+    },
     async createItem(_, values) {
         return postData(API_ROUTES_CONFIG.productionOrder, values);
     },

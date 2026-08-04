@@ -25,6 +25,7 @@ use App\Repository\MerchandiseRecipeRepository;
 use App\Repository\MerchandiseRepository;
 use App\Repository\MerchandiseUnitRepository;
 use App\Repository\ProductionOrderRepository;
+use App\Repository\ProductionOrderItemRepository;
 use App\Repository\UnitRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -32,6 +33,7 @@ class ProductionOrderService
 {
     public function __construct(
         private readonly ProductionOrderRepository $productionOrderRepository,
+        private readonly ProductionOrderItemRepository $productionOrderItemRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly WarehouseHelper $warehouseHelper,
         private readonly MerchandiseRepository $merchandiseRepository,
@@ -45,7 +47,30 @@ class ProductionOrderService
     {
         $qb = $this->productionOrderRepository->createQueryBuilder('e');
 
-        $result = FilterWithPagination::findWithPagination($qb, $params, 'e');
+        $relationFields = [
+            'requestId' => [
+                'joinField' => 'e.request',
+                'alias' => 'request_filter',
+                'targetField' => 'code',
+            ],
+            'materialWarehouseId' => [
+                'joinField' => 'e.materialWarehouse',
+                'alias' => 'material_warehouse_filter',
+                'targetField' => 'id',
+            ],
+            'finishedGoodsWarehouseId' => [
+                'joinField' => 'e.finishedGoodsWarehouse',
+                'alias' => 'finished_goods_warehouse_filter',
+                'targetField' => 'id',
+            ],
+        ];
+
+        $result = FilterWithPagination::findWithPagination(
+            $qb,
+            $params,
+            'e',
+            $relationFields,
+        );
 
         // Map collection to JSON
         $result['collection'] = array_map(
@@ -79,6 +104,75 @@ class ProductionOrderService
         }
 
         return $item->jsonSerialize();
+    }
+
+    public function updateItemStatus(
+        int $itemId,
+        string $status,
+        User $currentUser,
+    ): array {
+        $this->entityManager->beginTransaction();
+
+        try {
+            $item = $this->productionOrderItemRepository->find(
+                $itemId,
+                \Doctrine\DBAL\LockMode::PESSIMISTIC_WRITE,
+            );
+
+            if (!$item) {
+                throw new \Exception('Thành phẩm trong lệnh sản xuất không tồn tại');
+            }
+
+            $productionOrder = $item->getProductionOrder();
+            if (!$productionOrder) {
+                throw new \Exception('Thành phẩm chưa thuộc lệnh sản xuất');
+            }
+
+            $fromStatus = $item->getStatus();
+            $this->assertNextProductionOrderItemStatus($fromStatus, $status);
+
+            $item->setStatus($status);
+
+            $this->recordProductionEvent(
+                productionOrder: $productionOrder,
+                productionOrderItem: $item,
+                eventType: ProductionEventType::StatusChanged->value,
+                actor: $currentUser,
+                message: sprintf(
+                    'Cập nhật trạng thái thành phẩm từ %s sang %s',
+                    $fromStatus,
+                    $status,
+                ),
+                fromStatus: $fromStatus,
+                toStatus: $status,
+            );
+
+            $fromOrderStatus = $productionOrder->getStatus();
+            $this->syncProductionOrderStatusFromItems($productionOrder);
+
+            if ($fromOrderStatus !== $productionOrder->getStatus()) {
+                $this->recordProductionEvent(
+                    productionOrder: $productionOrder,
+                    eventType: ProductionEventType::StatusChanged->value,
+                    actor: $currentUser,
+                    message: sprintf(
+                        'Tổng hợp trạng thái lệnh sản xuất từ %s sang %s',
+                        $fromOrderStatus,
+                        $productionOrder->getStatus(),
+                    ),
+                    fromStatus: $fromOrderStatus,
+                    toStatus: $productionOrder->getStatus(),
+                );
+            }
+
+            $this->entityManager->flush();
+            $this->entityManager->commit();
+
+            return $item->jsonSerialize();
+        } catch (\Throwable $th) {
+            $this->entityManager->rollback();
+            throw $th;
+        }
     }
 
     public function create(ProductionOrderDTO $dto, User $currentUser): array
@@ -450,12 +544,14 @@ class ProductionOrderService
         string $eventType,
         User $actor,
         string $message,
+        ?ProductionOrderItem $productionOrderItem = null,
         ?string $fromStatus = null,
         ?string $toStatus = null,
         ?array $meta = null,
     ): void {
         $event = new ProductionEvent();
         $event->setProductionOrder($productionOrder);
+        $event->setProductionOrderItem($productionOrderItem);
         $event->setEventType($eventType);
         $event->setActor($actor);
         $event->setMessage($message);
@@ -471,5 +567,84 @@ class ProductionOrderService
         }
 
         $this->entityManager->persist($event);
+    }
+
+    private function assertNextProductionOrderItemStatus(
+        string $currentStatus,
+        string $targetStatus,
+    ): void {
+        $statusOrder = [
+            ProductionOrderStatus::Created->value,
+            ProductionOrderStatus::MaterialIssued->value,
+            ProductionOrderStatus::Started->value,
+            ProductionOrderStatus::InProgress->value,
+            ProductionOrderStatus::Completed->value,
+        ];
+
+        $currentIndex = array_search($currentStatus, $statusOrder, true);
+        $targetIndex = array_search($targetStatus, $statusOrder, true);
+
+        if (
+            $currentIndex === false ||
+            $targetIndex === false ||
+            $targetIndex !== $currentIndex + 1
+        ) {
+            throw new \Exception(
+                'Chuyển trạng thái thành phẩm không đúng trình tự hợp lệ',
+            );
+        }
+    }
+
+    private function syncProductionOrderStatusFromItems(
+        ProductionOrder $productionOrder,
+    ): void {
+        $items = $productionOrder->getItems()->toArray();
+        if ($items === []) {
+            return;
+        }
+
+        $statuses = array_map(
+            static fn(ProductionOrderItem $item): string => $item->getStatus(),
+            $items,
+        );
+
+        $nextStatus = ProductionOrderStatus::Created->value;
+
+        if (
+            count(array_filter(
+                $statuses,
+                static fn(string $status): bool =>
+                    $status === ProductionOrderStatus::Completed->value,
+            )) === count($statuses)
+        ) {
+            $nextStatus = ProductionOrderStatus::Completed->value;
+        } elseif (in_array(
+            ProductionOrderStatus::Completed->value,
+            $statuses,
+            true,
+        )) {
+            // Có thành phẩm đã hoàn thành nhưng vẫn còn thành phẩm chưa xong.
+            $nextStatus = ProductionOrderStatus::InProgress->value;
+        } elseif (in_array(
+            ProductionOrderStatus::InProgress->value,
+            $statuses,
+            true,
+        )) {
+            $nextStatus = ProductionOrderStatus::InProgress->value;
+        } elseif (in_array(
+            ProductionOrderStatus::Started->value,
+            $statuses,
+            true,
+        )) {
+            $nextStatus = ProductionOrderStatus::Started->value;
+        } elseif (in_array(
+            ProductionOrderStatus::MaterialIssued->value,
+            $statuses,
+            true,
+        )) {
+            $nextStatus = ProductionOrderStatus::MaterialIssued->value;
+        }
+
+        $productionOrder->setStatus($nextStatus);
     }
 }

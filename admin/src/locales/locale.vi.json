@@ -948,10 +948,49 @@
         }
     },
     "production_order": {
-        "title": "ProductionOrder",
+        "title": "Lệnh sản xuất",
+        "detail_title": "Chi tiết lệnh sản xuất",
         "columns": {
             "id": "ID",
-            "name": "Tên"
+            "code": "Mã lệnh",
+            "title": "Tiêu đề",
+            "request": "Đề xuất nguồn",
+            "material_warehouse": "Kho xuất nguyên liệu",
+            "finished_goods_warehouse": "Kho nhập thành phẩm",
+            "started_at": "Bắt đầu",
+            "completed_at": "Hoàn thành"
+        },
+        "status": {
+            "CREATED": "Khởi tạo",
+            "MATERIAL_ISSUED": "Đã xuất kho nguyên liệu",
+            "STARTED": "Đã bắt đầu",
+            "IN_PROGRESS": "Đang sản xuất",
+            "COMPLETED": "Hoàn thành",
+            "CANCELLED": "Đã hủy"
+        },
+        "detail": {
+            "finished_products": "Danh sách thành phẩm",
+            "no_finished_products": "Lệnh sản xuất chưa có thành phẩm",
+            "planned_quantity": "Số lượng kế hoạch",
+            "base_quantity": "Số lượng quy đổi",
+            "accepted_quantity": "Số lượng đã đạt",
+            "waste_rate": "Hao hụt dự kiến",
+            "materials": "Danh sách nguyên liệu",
+            "material": "Nguyên liệu",
+            "unit": "Đơn vị",
+            "no_materials": "Thành phẩm chưa có nguyên liệu"
+        },
+        "event": {
+            "title": "Lịch sử thao tác",
+            "tooltip": "Lịch sử thao tác lệnh sản xuất",
+            "no_events": "Chưa có lịch sử thao tác",
+            "types": {
+                "CREATED": "Tạo lệnh sản xuất",
+                "STATUS_CHANGED": "Thay đổi trạng thái",
+                "STARTED": "Bắt đầu sản xuất",
+                "COMPLETED": "Hoàn thành sản xuất",
+                "CANCELLED": "Hủy lệnh sản xuất"
+            }
         }
     }
 }
