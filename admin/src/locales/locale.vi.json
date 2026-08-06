@@ -965,6 +965,7 @@
             "MATERIAL_ISSUED": "Đã xuất kho nguyên liệu",
             "STARTED": "Đã bắt đầu",
             "IN_PROGRESS": "Đang sản xuất",
+            "INSPECTING": "Đang kiểm hàng",
             "COMPLETED": "Hoàn thành",
             "CANCELLED": "Đã hủy"
         },

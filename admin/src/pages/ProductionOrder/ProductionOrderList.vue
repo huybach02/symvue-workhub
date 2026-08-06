@@ -324,6 +324,12 @@ export default {
                             value: "IN_PROGRESS",
                         },
                         {
+                            title: this.$t(
+                                "production_order.status.INSPECTING",
+                            ),
+                            value: "INSPECTING",
+                        },
+                        {
                             title: this.$t("production_order.status.COMPLETED"),
                             value: "COMPLETED",
                         },
@@ -387,6 +393,7 @@ export default {
                     MATERIAL_ISSUED: "deep-purple",
                     STARTED: "info",
                     IN_PROGRESS: "warning",
+                    INSPECTING: "teal",
                     COMPLETED: "success",
                     CANCELLED: "error",
                 }[status] || "primary"

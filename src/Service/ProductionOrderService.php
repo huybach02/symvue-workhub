@@ -114,24 +114,37 @@ class ProductionOrderService
         $this->entityManager->beginTransaction();
 
         try {
-            $item = $this->productionOrderItemRepository->find(
-                $itemId,
-                \Doctrine\DBAL\LockMode::PESSIMISTIC_WRITE,
-            );
+            $item = $this->productionOrderItemRepository->find($itemId);
 
             if (!$item) {
                 throw new \Exception('Thành phẩm trong lệnh sản xuất không tồn tại');
             }
 
-            $productionOrder = $item->getProductionOrder();
+            $productionOrder = $this->productionOrderRepository->find(
+                $item->getProductionOrder()?->getId(),
+                \Doctrine\DBAL\LockMode::PESSIMISTIC_WRITE,
+            );
+
             if (!$productionOrder) {
                 throw new \Exception('Thành phẩm chưa thuộc lệnh sản xuất');
             }
+
+            $item = $this->productionOrderItemRepository->find(
+                $itemId,
+                \Doctrine\DBAL\LockMode::PESSIMISTIC_WRITE,
+            );
 
             $fromStatus = $item->getStatus();
             $this->assertNextProductionOrderItemStatus($fromStatus, $status);
 
             $item->setStatus($status);
+
+            if ($status === ProductionOrderStatus::Started->value && $item->getStartedAt() === null) {
+                $item->setStartedAt(new \DateTime());
+            }
+            if ($status === ProductionOrderStatus::Completed->value && $item->getCompletedAt() === null) {
+                $item->setCompletedAt(new \DateTime());
+            }
 
             $this->recordProductionEvent(
                 productionOrder: $productionOrder,
@@ -578,6 +591,7 @@ class ProductionOrderService
             ProductionOrderStatus::MaterialIssued->value,
             ProductionOrderStatus::Started->value,
             ProductionOrderStatus::InProgress->value,
+            ProductionOrderStatus::Inspecting->value,
             ProductionOrderStatus::Completed->value,
         ];
 
@@ -598,53 +612,51 @@ class ProductionOrderService
     private function syncProductionOrderStatusFromItems(
         ProductionOrder $productionOrder,
     ): void {
-        $items = $productionOrder->getItems()->toArray();
+        $items = $this->productionOrderItemRepository->findBy(
+            ['productionOrder' => $productionOrder],
+            ['sortOrder' => 'ASC'],
+        );
         if ($items === []) {
             return;
         }
 
-        $statuses = array_map(
-            static fn(ProductionOrderItem $item): string => $item->getStatus(),
-            $items,
-        );
-
-        $nextStatus = ProductionOrderStatus::Created->value;
-
-        if (
-            count(array_filter(
-                $statuses,
-                static fn(string $status): bool =>
-                    $status === ProductionOrderStatus::Completed->value,
-            )) === count($statuses)
-        ) {
-            $nextStatus = ProductionOrderStatus::Completed->value;
-        } elseif (in_array(
-            ProductionOrderStatus::Completed->value,
-            $statuses,
-            true,
-        )) {
-            // Có thành phẩm đã hoàn thành nhưng vẫn còn thành phẩm chưa xong.
-            $nextStatus = ProductionOrderStatus::InProgress->value;
-        } elseif (in_array(
-            ProductionOrderStatus::InProgress->value,
-            $statuses,
-            true,
-        )) {
-            $nextStatus = ProductionOrderStatus::InProgress->value;
-        } elseif (in_array(
-            ProductionOrderStatus::Started->value,
-            $statuses,
-            true,
-        )) {
-            $nextStatus = ProductionOrderStatus::Started->value;
-        } elseif (in_array(
+        $statusOrder = [
+            ProductionOrderStatus::Created->value,
             ProductionOrderStatus::MaterialIssued->value,
-            $statuses,
-            true,
-        )) {
-            $nextStatus = ProductionOrderStatus::MaterialIssued->value;
+            ProductionOrderStatus::Started->value,
+            ProductionOrderStatus::InProgress->value,
+            ProductionOrderStatus::Inspecting->value,
+            ProductionOrderStatus::Completed->value,
+        ];
+
+        $minIndex = null;
+        foreach ($items as $item) {
+            $index = array_search($item->getStatus(), $statusOrder, true);
+            if ($index === false) {
+                $index = 0;
+            }
+            $minIndex = $minIndex === null ? $index : min($minIndex, $index);
         }
 
-        $productionOrder->setStatus($nextStatus);
+        $productionOrder->setStatus($statusOrder[$minIndex]);
+
+        $startedStatuses = [
+            ProductionOrderStatus::Started->value,
+            ProductionOrderStatus::InProgress->value,
+            ProductionOrderStatus::Inspecting->value,
+            ProductionOrderStatus::Completed->value,
+        ];
+        if (
+            in_array($statusOrder[$minIndex], $startedStatuses, true)
+            && $productionOrder->getStartedAt() === null
+        ) {
+            $productionOrder->setStartedAt(new \DateTime());
+        }
+        if (
+            $statusOrder[$minIndex] === ProductionOrderStatus::Completed->value
+            && $productionOrder->getCompletedAt() === null
+        ) {
+            $productionOrder->setCompletedAt(new \DateTime());
+        }
     }
 }

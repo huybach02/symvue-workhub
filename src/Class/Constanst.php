@@ -406,6 +406,7 @@ enum ProductionOrderStatus: string
     case MaterialIssued = 'MATERIAL_ISSUED';
     case Started = 'STARTED';
     case InProgress = 'IN_PROGRESS';
+    case Inspecting = 'INSPECTING';
     case Completed = 'COMPLETED';
     case Cancelled = 'CANCELLED';
 }

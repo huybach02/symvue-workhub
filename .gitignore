@@ -28,3 +28,5 @@
 .php-version
 
 .env
+
+/.commandcode

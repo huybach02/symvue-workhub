@@ -15,6 +15,7 @@ final readonly class ProductionOrderItemStatusDTO
             'MATERIAL_ISSUED',
             'STARTED',
             'IN_PROGRESS',
+            'INSPECTING',
             'COMPLETED',
         ])]
         public ?string $status = null,

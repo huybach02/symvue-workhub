@@ -15,7 +15,19 @@
                 fill-dot
             >
                 <div class="text-center mt-n4">
+                    <div
+                        v-if="displayOnly"
+                        class="text-caption font-weight-bold text-none"
+                        :class="
+                            status === step.value
+                                ? 'text-primary'
+                                : 'text-grey-darken-1'
+                        "
+                    >
+                        {{ $t(step.key) || step.label || step.value }}
+                    </div>
                     <v-tooltip
+                        v-else
                         location="top"
                         :text="getStepTooltip(step.value)"
                     >
@@ -23,7 +35,7 @@
                             <v-btn
                                 v-bind="tooltipProps"
                                 size="small"
-                                class="text-caption font-weight-bold text-none"
+                                class="text-caption font-weight-bold text-none stepper-step-btn"
                                 :variant="
                                     status === step.value ? 'tonal' : 'text'
                                 "
@@ -76,6 +88,10 @@ export default {
             default: () => ({}),
         },
         disabled: {
+            type: Boolean,
+            default: false,
+        },
+        displayOnly: {
             type: Boolean,
             default: false,
         },
@@ -162,5 +178,9 @@ export default {
 <style scoped>
 .border-b {
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.stepper-step-btn.v-btn--disabled {
+    opacity: 1;
 }
 </style>

@@ -48,6 +48,7 @@
       "MATERIAL_ISSUED": "Materials issued",
       "STARTED": "Started",
       "IN_PROGRESS": "In progress",
+      "INSPECTING": "Inspecting",
       "COMPLETED": "Completed",
       "CANCELLED": "Cancelled"
     },
