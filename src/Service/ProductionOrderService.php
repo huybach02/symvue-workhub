@@ -40,6 +40,7 @@ class ProductionOrderService
         private readonly UnitRepository $unitRepository,
         private readonly MerchandiseRecipeRepository $merchandiseRecipeRepository,
         private readonly MerchandiseUnitRepository $merchandiseUnitRepository,
+        private readonly ProductionMaterialIssueService $materialIssueService,
     ) {
     }
 
@@ -136,6 +137,11 @@ class ProductionOrderService
 
             $fromStatus = $item->getStatus();
             $this->assertNextProductionOrderItemStatus($fromStatus, $status);
+
+            // Xuất kho nguyên liệu trước khi chuyển trạng thái MATERIAL_ISSUED.
+            if ($status === ProductionOrderStatus::MaterialIssued->value) {
+                $this->materialIssueService->issueMaterialsForItem($item, $currentUser);
+            }
 
             $item->setStatus($status);
 

@@ -418,4 +418,11 @@ enum ProductionEventType: string
     case Started = 'STARTED';
     case Completed = 'COMPLETED';
     case Cancelled = 'CANCELLED';
+    case MaterialsIssued = 'MATERIALS_ISSUED';
 }
+
+enum InventoryMovementSourceType: string
+{
+    case ProductionMaterialIssue = 'PRODUCTION_MATERIAL_ISSUE';
+}
+
