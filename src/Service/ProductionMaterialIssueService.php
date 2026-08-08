@@ -14,6 +14,7 @@ use App\Entity\ProductionOrder;
 use App\Entity\ProductionOrderItem;
 use App\Entity\ProductionOrderMaterial;
 use App\Entity\User;
+use App\Exception\InsufficientMaterialException;
 use App\Repository\InventoryBalanceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -46,8 +47,24 @@ class ProductionMaterialIssueService
 
         $this->assertMaterialsValid($materials);
 
+        // Sort canonical theo ingredient ID để mọi transaction lock balance theo
+        // cùng một thứ tự, tránh deadlock giữa các lệnh sản xuất song song.
+        usort(
+            $materials,
+            fn (
+                ProductionOrderMaterial $a,
+                ProductionOrderMaterial $b,
+            ) => $a->getIngredient()->getId() <=> $b->getIngredient()->getId(),
+        );
+
         $postedAt = new \DateTime();
-        $allocationPlan = $this->buildAllocationPlan($materials, $warehouse, $postedAt);
+        // HSD 07/08 vẫn được dùng hết ngày 07/08 nên so sánh theo đầu ngày
+        $today = (clone $postedAt)->setTime(0, 0, 0);
+        $allocationPlan = $this->buildAllocationPlan(
+            $materials,
+            $warehouse,
+            $today,
+        );
 
         $totalCost = '0.0000';
         $movementCount = 0;
@@ -112,7 +129,7 @@ class ProductionMaterialIssueService
             }
 
             $material->setPricingSnapshot($pricingSnapshot);
-            $material->setPlannedCost($materialTotalCost);
+            $material->setActualCost($materialTotalCost);
         }
 
         return [
@@ -157,7 +174,7 @@ class ProductionMaterialIssueService
     private function buildAllocationPlan(
         array $materials,
         \App\Entity\Warehouse $warehouse,
-        \DateTimeInterface $postedAt,
+        \DateTimeInterface $today,
     ): array {
         $allocationPlan = [];
         $shortages = [];
@@ -167,7 +184,7 @@ class ProductionMaterialIssueService
             $availableBalances = $this->inventoryBalanceRepository->findAvailableForIssue(
                 $warehouse,
                 $material->getIngredient(),
-                $postedAt,
+                $today,
             );
 
             $availableTotal = '0.000000';
@@ -206,10 +223,10 @@ class ProductionMaterialIssueService
         }
 
         if ($shortages !== []) {
-            throw new \Exception(json_encode([
-                'message' => 'Thiếu nguyên liệu để xuất kho, vui lòng kiểm tra lại tồn kho',
-                'shortages' => $shortages,
-            ], JSON_UNESCAPED_UNICODE));
+            throw new InsufficientMaterialException(
+                'Thiếu nguyên liệu để xuất kho, vui lòng kiểm tra lại tồn kho',
+                $shortages,
+            );
         }
 
         return $allocationPlan;

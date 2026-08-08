@@ -29,7 +29,7 @@ class InventoryBalanceRepository extends ServiceEntityRepository
     /**
      * Tìm các balance tồn khả dụng theo kho + nguyên liệu để xuất kho.
      *
-     * - Chỉ lấy lot AVAILABLE, chưa hết hạn (expiryDate >= now).
+     * - Chỉ lấy lot AVAILABLE, chưa hết hạn (expiryDate >= đầu ngày hôm nay).
      * - Tồn khả dụng = onHand - reserved - blocked.
      * - Sắp xếp FEFO: expiryDate ASC, receivedAt ASC, id ASC.
      * - Khóa PESSIMISTIC_WRITE các balance trả về để tránh xuất kho đồng thời.
@@ -39,18 +39,22 @@ class InventoryBalanceRepository extends ServiceEntityRepository
     public function findAvailableForIssue(
         Warehouse $warehouse,
         Merchandise $merchandise,
-        \DateTimeInterface $now,
+        \DateTimeInterface $today,
     ): array {
         $qb = $this->createQueryBuilder('b')
             ->innerJoin('b.lot', 'lot')
             ->where('b.warehouse = :warehouse')
             ->andWhere('b.merchandise = :merchandise')
             ->andWhere('lot.status = :lotStatus')
-            ->andWhere('lot.expiryDate >= :now')
+            ->andWhere('lot.expiryDate >= :today')
             ->setParameter('warehouse', $warehouse)
             ->setParameter('merchandise', $merchandise)
             ->setParameter('lotStatus', InventoryLotStatus::Available->value)
-            ->setParameter('now', $now)
+            ->setParameter(
+                'today',
+                $today,
+                \Doctrine\DBAL\Types\Types::DATE_MUTABLE,
+            )
             ->orderBy('lot.expiryDate', 'ASC')
             ->addOrderBy('lot.receivedAt', 'ASC')
             ->addOrderBy('lot.id', 'ASC');
@@ -74,7 +78,10 @@ class InventoryBalanceRepository extends ServiceEntityRepository
 
     /**
      * Giá nhập đơn vị của lot = unitCostBase của movement STOCK_IN gốc
-     * (lot được nhập vào kho qua luồng phiếu nhập kho). Fallback '0.0000' nếu chưa có.
+     * (lot được nhập vào kho qua luồng phiếu nhập kho).
+     *
+     * Ném RuntimeException nếu lot chưa có STOCK_IN hoặc thiếu giá vốn,
+     * tránh xuất kho với giá 0 gây sai lệch costing.
      */
     public function findUnitCostBaseForLot(InventoryLot $lot): string
     {
@@ -91,6 +98,17 @@ class InventoryBalanceRepository extends ServiceEntityRepository
             ->setMaxResults(1)
             ->getOneOrNullResult();
 
-        return $row['unitCostBase'] ?? '0.0000';
+        if (
+            !$row
+            || $row['unitCostBase'] === null
+            || MathHelper::comp($row['unitCostBase'], '0') < 0
+        ) {
+            throw new \RuntimeException(sprintf(
+                'Lot %s chưa có giá vốn nhập kho hợp lệ',
+                $lot->getInternalCode() ?? (string) $lot->getId(),
+            ));
+        }
+
+        return $row['unitCostBase'];
     }
 }

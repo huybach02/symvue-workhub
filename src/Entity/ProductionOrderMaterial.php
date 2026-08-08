@@ -65,6 +65,9 @@ class ProductionOrderMaterial implements \JsonSerializable
     #[ORM\Column(type: Types::DECIMAL, precision: 20, scale: 4, options: ['default' => '0.0000', 'comment' => 'Tổng cost kế hoạch'])]
     private string $plannedCost = '0.0000';
 
+    #[ORM\Column(type: Types::DECIMAL, precision: 20, scale: 4, nullable: true, options: ['comment' => 'Tổng cost thực tế khi xuất kho'])]
+    private ?string $actualCost = null;
+
     #[ORM\Column(type: Types::INTEGER, options: ['default' => 0, 'comment' => 'Thứ tự hiển thị'])]
     private int $sortOrder = 0;
 
@@ -220,6 +223,18 @@ class ProductionOrderMaterial implements \JsonSerializable
         return $this;
     }
 
+    public function getActualCost(): ?string
+    {
+        return $this->actualCost;
+    }
+
+    public function setActualCost(string $actualCost): static
+    {
+        $this->actualCost = $actualCost;
+
+        return $this;
+    }
+
     public function getSortOrder(): int
     {
         return $this->sortOrder;
@@ -263,6 +278,7 @@ class ProductionOrderMaterial implements \JsonSerializable
             'baseUnit' => $this->baseUnit?->jsonSerialize(),
             'pricingSnapshot' => $this->pricingSnapshot,
             'plannedCost' => formatDecimal($this->plannedCost),
+            'actualCost' => formatDecimal($this->actualCost),
             'sortOrder' => $this->sortOrder,
             'note' => $this->note,
             'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),

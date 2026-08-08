@@ -414,9 +414,12 @@ class ProductionOrderService
         $orderItem->setPlannedQuantity($plannedQuantity);
         $orderItem->setPlannedUnit($plannedUnit);
         $orderItem->setPlannedFactorToBase($plannedFactorToBase);
-        $orderItem->setPlannedBaseQuantity(
-            MathHelper::mul($plannedQuantity, $plannedFactorToBase, 6),
+        $plannedBaseQuantity = MathHelper::mul(
+            $plannedQuantity,
+            $plannedFactorToBase,
+            6,
         );
+        $orderItem->setPlannedBaseQuantity($plannedBaseQuantity);
         $orderItem->setBaseUnit($baseUnit);
         $wastePercent = $itemData["expectedWastePercent"] ?? null;
         $orderItem->setExpectedWastePercent(
@@ -425,7 +428,11 @@ class ProductionOrderService
         $orderItem->setSortOrder($sortOrder);
         $this->entityManager->persist($orderItem);
 
-        $this->addMaterialsFromRecipe($orderItem, $recipe, $plannedQuantity);
+        $this->addMaterialsFromRecipe(
+            $orderItem,
+            $recipe,
+            $plannedBaseQuantity,
+        );
     }
 
     /**
@@ -434,9 +441,12 @@ class ProductionOrderService
     private function addMaterialsFromRecipe(
         ProductionOrderItem $orderItem,
         MerchandiseRecipe $recipe,
-        string $plannedOutputQuantity,
+        string $plannedOutputBaseQuantity,
     ): void {
-        $scale = $this->computeRecipeScale($recipe, $plannedOutputQuantity);
+        $scale = $this->computeRecipeScale(
+            $recipe,
+            $plannedOutputBaseQuantity,
+        );
 
         foreach ($recipe->getItems() as $recipeItem) {
             $ingredient = $recipeItem->getIngredient();
@@ -487,7 +497,8 @@ class ProductionOrderService
                 MathHelper::mul($plannedQuantity, $plannedFactorToBase, 6),
             );
             $orderMaterial->setBaseUnit($baseUnit);
-            // Tạm thời để trống; giá trị thực tế lấy từ lô nguyên liệu khi xuất kho (FIFO)
+            // Pricing thực tế sẽ được snapshot khi xuất kho; plannedCost hiện
+            // chưa có nguồn giá dự kiến nên để 0, actualCost được ghi khi issue.
             $orderMaterial->setPricingSnapshot([]);
             $orderMaterial->setPlannedCost('0.0000');
             $orderMaterial->setSortOrder($recipeItem->getSortOrder() ?? 0);
@@ -498,11 +509,24 @@ class ProductionOrderService
 
     private function computeRecipeScale(
         MerchandiseRecipe $recipe,
-        string $plannedOutputQuantity,
+        string $plannedOutputBaseQuantity,
     ): string {
-        $outputQuantity = $recipe->getOutputQuantity() ?? '1.0000';
+        $recipeOutputBaseQuantity = $recipe->getOutputBaseQuantitySnapshot();
 
-        return MathHelper::div($plannedOutputQuantity, $outputQuantity, 6);
+        if (
+            $recipeOutputBaseQuantity === null
+            || MathHelper::comp($recipeOutputBaseQuantity, '0') <= 0
+        ) {
+            throw new \Exception(
+                'Base quantity output của công thức không hợp lệ',
+            );
+        }
+
+        return MathHelper::div(
+            $plannedOutputBaseQuantity,
+            $recipeOutputBaseQuantity,
+            6,
+        );
     }
 
     private function computeMaterialPlannedQuantity(

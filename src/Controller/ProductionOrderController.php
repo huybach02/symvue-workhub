@@ -6,6 +6,7 @@ use App\Class\CustomResponse;
 use App\DTO\ProductionOrderDTO;
 use App\DTO\ProductionOrderItemStatusDTO;
 use App\Entity\User;
+use App\Exception\InsufficientMaterialException;
 use App\Service\ProductionOrderService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -85,6 +86,8 @@ final class ProductionOrderController extends AbstractController
             );
 
             return CustomResponse::success($data, t('success.updated'));
+        } catch (InsufficientMaterialException $e) {
+            return CustomResponse::error($e->getMessage(), $e->getShortages());
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
