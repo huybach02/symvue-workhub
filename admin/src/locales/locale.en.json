@@ -30,6 +30,20 @@
     "enter_new_password": "Enter new password (minimum 6 characters)",
     "enter_confirm_password": "Confirm new password"
   },
+  "request": {
+    "production": {
+      "open_shortages": "This finished product has outstanding production shortages",
+      "received_progress": "Received",
+      "minimum_target": "Minimum target",
+      "supplement_minimum": "Minimum supplement",
+      "supplement_full": "Full supplement",
+      "new_requirement": "New requirement",
+      "supplement_quantity": "Supplement",
+      "production_target": "Production target",
+      "supplement_for": "Supplement order {code} · Finished product: {product}",
+      "target_includes_supplements": "Production target includes supplements for {count} shortage orders."
+    }
+  },
   "production_order": {
     "title": "Production Order",
     "detail_title": "Production Order Details",
@@ -49,6 +63,7 @@
       "STARTED": "Started",
       "IN_PROGRESS": "In progress",
       "INSPECTING": "Inspecting",
+      "WAITING_SUPPLEMENT": "Waiting for supplement",
       "COMPLETED": "Completed",
       "CANCELLED": "Cancelled"
     },
@@ -64,6 +79,58 @@
       "unit": "Unit",
       "no_materials": "This finished product has no materials"
     },
+    "shortage": {
+      "waiting": "Finished product is waiting for supplement",
+      "planned": "Planned",
+      "minimum_target": "Minimum target",
+      "direct_received": "Directly received",
+      "external_fulfilled": "Fulfilled externally",
+      "minimum_remaining": "Minimum supplement needed",
+      "effective": "Effective output",
+      "supplement_resolved": "Finished product was supplemented by another production order",
+      "supplemented_from": "Supplemented by order {code} · Finished product: {product}",
+      "target_includes_supplement": "Production target includes supplements",
+      "requirement": "Actual requirement",
+      "production_target": "Production target",
+      "supplement_for": "Supplement order {code} · Finished product: {product}",
+      "supplement_minimum": "Minimum supplement",
+      "supplement_full": "Full supplement"
+    },
+    "inspection": {
+      "title": "Finished goods inspection: {product}",
+      "expected": "Expected",
+      "balanced": "Balanced",
+      "shortage": "Shortage",
+      "surplus": "Surplus",
+      "planned": "Planned",
+      "production_target": "Production target",
+      "planned_supplement": "Planned supplement",
+      "minimum_target": "Minimum target",
+      "previous_received": "Previously received",
+      "external_fulfilled": "Fulfilled externally",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "lot": "Lot #{index}",
+      "received_current": "Received this time",
+      "accepted_current": "Accepted this time",
+      "production_lot_code": "Production lot code",
+      "total_inspection": "Inspection summary",
+      "total_received": "Total received this time",
+      "total_accepted": "Total accepted this time",
+      "total_rejected": "Total rejected this time",
+      "effective_after": "Effective after inspection",
+      "shortage_resolution": "Shortage resolution",
+      "shortage_description": "Effective output after inspection is below the minimum target. Please choose a resolution.",
+      "accept_shortage": "Accept shortage",
+      "supplement_later": "Supplement later",
+      "shortage_required": "Please select a shortage resolution.",
+      "add_lot": "Add lot",
+      "confirm": "Confirm inspection",
+      "inspect_receive": "Inspect / receive goods",
+      "accepted_must_not_exceed": "Accepted quantity cannot exceed received quantity",
+      "expiry_after_manufacture": "Expiry date must be after manufacture date",
+      "duplicate_lot_dates": "Manufacture and expiry date pairs must not be duplicated"
+    },
     "event": {
       "title": "Activity history",
       "tooltip": "Production order activity history",
@@ -73,7 +140,13 @@
         "STATUS_CHANGED": "Status changed",
         "STARTED": "Production started",
         "COMPLETED": "Production completed",
-        "CANCELLED": "Production order cancelled"
+        "CANCELLED": "Production order cancelled",
+        "INSPECTION_POSTED": "Inspection posted",
+        "INVENTORY_POSTED": "Finished goods received",
+        "WAITING_SUPPLEMENT": "Waiting for supplement",
+        "SHORTAGE_ACCEPTED": "Shortage accepted",
+        "SHORTAGE_ALLOCATED": "Shortage allocated",
+        "SHORTAGE_RESOLVED": "Shortage resolved"
       }
     }
   },

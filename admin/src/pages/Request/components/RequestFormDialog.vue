@@ -128,8 +128,18 @@ export default {
         },
     },
     watch: {
-        modelValue(isOpen) {
+        async modelValue(isOpen) {
             if (!isOpen) {
+                return;
+            }
+
+            const values = this.requestTypeConfig?.prepareFormValues
+                ? await this.requestTypeConfig.prepareFormValues(
+                      this.currentFormValues,
+                      this.$store,
+                  )
+                : this.currentFormValues;
+            if (!this.modelValue) {
                 return;
             }
 
@@ -139,7 +149,7 @@ export default {
                 }
 
                 this.$refs.formRef.resetForm({
-                    values: this.currentFormValues,
+                    values,
                 });
             });
         },

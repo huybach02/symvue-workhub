@@ -1,5 +1,5 @@
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import { getDataById, getListData } from "@/services/bases/getData";
+import { getAllData, getDataById, getListData } from "@/services/bases/getData";
 import { deleteData } from "@/services/bases/deleteData";
 import { postData } from "@/services/bases/postData";
 import { putData } from "@/services/bases/updateData";
@@ -9,6 +9,7 @@ const state = {
     totalItems: 0,
     loading: false,
     detailsById: {},
+    openShortages: [],
 };
 
 const getters = {
@@ -16,6 +17,7 @@ const getters = {
     totalItems: (state) => state.totalItems,
     loading: (state) => state.loading,
     itemById: (state) => (id) => state.detailsById[id] ?? null,
+    openShortages: (state) => state.openShortages,
 };
 
 const mutations = {
@@ -31,6 +33,9 @@ const mutations = {
             ...state.detailsById,
             [id]: data,
         };
+    },
+    SET_OPEN_SHORTAGES(state, items) {
+        state.openShortages = items;
     },
 };
 
@@ -75,6 +80,20 @@ const actions = {
             API_ROUTES_CONFIG.productionOrder + "/item/" + id + "/status",
             null,
             { status },
+        );
+    },
+    async fetchOpenShortages({ commit }, merchandiseId) {
+        const items = await getAllData(
+            API_ROUTES_CONFIG.productionOrder + "/open-shortages",
+            { merchandiseId },
+        );
+        commit("SET_OPEN_SHORTAGES", Array.isArray(items) ? items : []);
+        return Array.isArray(items) ? items : [];
+    },
+    async inspectItem(_, { id, values }) {
+        return postData(
+            API_ROUTES_CONFIG.productionOrder + "/item/" + id + "/inspect",
+            values,
         );
     },
     async createItem(_, values) {

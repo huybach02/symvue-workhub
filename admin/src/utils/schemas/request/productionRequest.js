@@ -69,6 +69,15 @@ const productionItemSchema = yup.object({
         .array()
         .of(productionMaterialSchema)
         .min(1, t("request.production.materials_required")),
+    supplementSelections: yup
+        .array()
+        .of(
+            yup.object({
+                productionOrderItemId: yup.number().positive().integer().required(),
+                mode: yup.string().oneOf(["MINIMUM", "FULL"]).required(),
+            }),
+        )
+        .default([]),
 });
 
 export const productionRequestSchema = yup.object({

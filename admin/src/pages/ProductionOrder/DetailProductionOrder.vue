@@ -197,7 +197,7 @@
                     </v-card-title>
                     <StatusStepper
                         :status="detailData.status"
-                        :steps="statusSteps"
+                        :steps="statusStepsFor(detailData.status)"
                         :disabled="true"
                         :display-only="true"
                     />
@@ -267,15 +267,16 @@
 
                                 <StatusStepper
                                     :status="orderItem.status"
-                                    :steps="statusSteps"
+                                    :steps="statusStepsFor(orderItem.status)"
                                     :loading-value="
                                         updatingItemId === orderItem.id
                                             ? targetStatus
                                             : null
                                     "
                                     :disabled="
-                                        updatingItemId !== null &&
-                                        updatingItemId !== orderItem.id
+                                        (updatingItemId !== null &&
+                                            updatingItemId !== orderItem.id) ||
+                                        ['INSPECTING', 'WAITING_SUPPLEMENT', 'COMPLETED'].includes(orderItem.status)
                                     "
                                     @change="
                                         (status) =>
@@ -286,6 +287,87 @@
                                 <v-divider />
 
                                 <div class="pa-4">
+                                    <v-alert
+                                        v-if="orderItem.status === 'COMPLETED' && supplementHistory(orderItem).length"
+                                        type="success"
+                                        variant="outlined"
+                                        class="mb-4"
+                                    >
+                                        <div class="font-weight-bold mb-3">{{ $t("production_order.shortage.supplement_resolved") }}</div>
+                                        <div class="d-flex flex-wrap ga-2">
+                                            <v-chip color="primary" variant="tonal">
+                                                {{ $t("production_order.shortage.planned") }}: <strong class="ml-1">{{ quantityWithUnit(orderItem, orderItem.plannedBaseQuantity) }}</strong>
+                                            </v-chip>
+                                            <v-chip color="success" variant="tonal">
+                                                {{ $t("production_order.shortage.direct_received") }}: <strong class="ml-1">{{ quantityWithUnit(orderItem, orderItem.acceptedBaseQuantity) }}</strong>
+                                            </v-chip>
+                                            <v-chip color="info" variant="tonal">
+                                                {{ $t("production_order.shortage.external_fulfilled") }}: <strong class="ml-1">{{ quantityWithUnit(orderItem, externalFulfilled(orderItem)) }}</strong>
+                                            </v-chip>
+                                            <v-chip color="success" variant="flat">
+                                                {{ $t("production_order.shortage.effective") }}: <strong class="ml-1">{{ quantityWithUnit(orderItem, effectiveAccepted(orderItem)) }}</strong>
+                                            </v-chip>
+                                        </div>
+                                        <div v-for="history in supplementHistory(orderItem)" :key="`${history.sourceInspectionId}-${history.sourceProductionOrderItemId}`" class="d-flex flex-wrap ga-2 mt-2">
+                                            <v-chip color="secondary" variant="tonal">
+                                                {{ $t("production_order.shortage.supplemented_from", { code: history.sourceProductionOrderCode || `#${history.sourceProductionOrderItemId}`, product: supplementSourceProduct(history) }) }}: {{ quantityWithUnit(orderItem, history.quantityBase) }}
+                                            </v-chip>
+                                        </div>
+                                    </v-alert>
+                                    <v-alert
+                                        v-if="orderItem.status === 'WAITING_SUPPLEMENT'"
+                                        type="warning"
+                                        variant="outlined"
+                                        class="mb-4"
+                                    >
+                                        <div class="font-weight-bold mb-3">{{ $t("production_order.shortage.waiting") }}</div>
+                                        <div class="d-flex flex-wrap ga-2">
+                                            <v-chip color="primary" variant="tonal">
+                                                {{ $t("production_order.shortage.planned") }}: <strong class="ml-1">{{ quantityWithUnit(orderItem, orderItem.plannedBaseQuantity) }}</strong>
+                                            </v-chip>
+                                            <v-chip color="secondary" variant="tonal">
+                                                {{ $t("production_order.shortage.minimum_target") }}: <strong class="ml-1">{{ quantityWithUnit(orderItem, minimumTarget(orderItem)) }}</strong>
+                                            </v-chip>
+                                            <v-chip color="success" variant="tonal">
+                                                {{ $t("production_order.shortage.direct_received") }}: <strong class="ml-1">{{ quantityWithUnit(orderItem, orderItem.acceptedBaseQuantity) }}</strong>
+                                            </v-chip>
+                                            <v-chip color="info" variant="tonal">
+                                                {{ $t("production_order.shortage.external_fulfilled") }}: <strong class="ml-1">{{ quantityWithUnit(orderItem, externalFulfilled(orderItem)) }}</strong>
+                                            </v-chip>
+                                            <v-chip color="warning" variant="flat">
+                                                {{ $t("production_order.shortage.minimum_remaining") }}: <strong class="ml-1">{{ quantityWithUnit(orderItem, minimumRemaining(orderItem)) }}</strong>
+                                            </v-chip>
+                                        </div>
+                                    </v-alert>
+                                    <v-alert
+                                        v-if="orderItem.supplementData?.plans?.length"
+                                        type="info"
+                                        variant="outlined"
+                                        class="mb-4"
+                                    >
+                                        <div class="font-weight-bold">{{ $t("production_order.shortage.target_includes_supplement") }}</div>
+                                        <div class="d-flex flex-wrap ga-2 mt-2">
+                                            <v-chip color="primary" variant="tonal">
+                                                {{ $t("production_order.shortage.requirement") }}: <strong class="ml-1">{{ quantityWithUnit(orderItem, orderItem.plannedBaseQuantity) }}</strong>
+                                            </v-chip>
+                                            <v-chip color="info" variant="tonal">
+                                                {{ $t("production_order.shortage.production_target") }}: <strong class="ml-1">{{ quantityWithUnit(orderItem, orderItem.supplementData.productionTargetBaseQuantity) }}</strong>
+                                            </v-chip>
+                                        </div>
+                                        <div v-for="plan in orderItem.supplementData.plans" :key="plan.productionOrderItemId" class="d-flex flex-wrap ga-2 mt-2">
+                                            <v-chip color="secondary" variant="tonal">
+                                                {{ $t("production_order.shortage.supplement_for", { code: plan.sourceProductionOrderCode || `#${plan.productionOrderItemId}`, product: supplementSourceProduct(plan) }) }}: {{ quantityWithUnit(orderItem, plan.plannedBaseQuantity) }} ({{ supplementModeLabel(plan.mode) }})
+                                            </v-chip>
+                                        </div>
+                                    </v-alert>
+                                    <v-btn
+                                        v-if="['INSPECTING', 'WAITING_SUPPLEMENT'].includes(orderItem.status)"
+                                        color="primary"
+                                        size="small"
+                                        class="mb-4"
+                                        prepend-icon="mdi-clipboard-check-outline"
+                                        @click="openInspection(orderItem)"
+                                    >{{ $t("production_order.inspection.inspect_receive") }}</v-btn>
                                     <v-row dense class="mb-2">
                                         <v-col cols="12" sm="6" md="3">
                                             <div
@@ -546,6 +628,11 @@
                 </v-card>
             </v-card-text>
         </v-card>
+        <InspectProductionItemDialog
+            v-model="inspectionDialog"
+            :item="inspectionItem"
+            @posted="loadDetail(); $emit('reload')"
+        />
     </v-dialog>
 </template>
 
@@ -553,11 +640,13 @@
 import { mapActions } from "vuex";
 import { functionHelper } from "@/helpers/functionHelper";
 import StatusStepper from "@/components/StatusStepper.vue";
+import InspectProductionItemDialog from "./InspectProductionItemDialog.vue";
 
 export default {
     name: "DetailProductionOrder",
     components: {
         StatusStepper,
+        InspectProductionItemDialog,
     },
     inheritAttrs: false,
     props: {
@@ -577,6 +666,8 @@ export default {
             loadingDetail: false,
             updatingItemId: null,
             targetStatus: null,
+            inspectionDialog: false,
+            inspectionItem: null,
             statusSteps: [
                 {
                     value: "CREATED",
@@ -688,6 +779,49 @@ export default {
                 this.targetStatus = null;
             }
         },
+        openInspection(orderItem) {
+            this.inspectionItem = orderItem;
+            this.inspectionDialog = true;
+        },
+        statusStepsFor(status) {
+            if (status !== "WAITING_SUPPLEMENT") {
+                return this.statusSteps;
+            }
+
+            const inspectingIndex = this.statusSteps.findIndex(
+                (step) => step.value === "INSPECTING",
+            );
+            const steps = [...this.statusSteps];
+            steps.splice(inspectingIndex + 1, 0, {
+                value: "WAITING_SUPPLEMENT",
+                key: "production_order.status.WAITING_SUPPLEMENT",
+            });
+
+            return steps;
+        },
+        minimumTarget(orderItem) {
+            return this.formatQuantity(
+                Number(orderItem.plannedBaseQuantity || 0) * (1 - Number(orderItem.expectedWastePercent || 0) / 100),
+            );
+        },
+        externalFulfilled(orderItem) {
+            return this.formatQuantity(orderItem.shortageData?.externalFulfilledBaseQuantity || 0);
+        },
+        effectiveAccepted(orderItem) {
+            return this.formatQuantity(
+                Number(orderItem.acceptedBaseQuantity || 0)
+                + Number(orderItem.shortageData?.externalFulfilledBaseQuantity || 0),
+            );
+        },
+        supplementHistory(orderItem) {
+            const history = orderItem.shortageData?.supplementHistory;
+            return Array.isArray(history) ? history : [];
+        },
+        minimumRemaining(orderItem) {
+            const minimum = Number(orderItem.plannedBaseQuantity || 0) * (1 - Number(orderItem.expectedWastePercent || 0) / 100);
+            const effective = Number(orderItem.acceptedBaseQuantity || 0) + Number(orderItem.shortageData?.externalFulfilledBaseQuantity || 0);
+            return this.formatQuantity(Math.max(minimum - effective, 0));
+        },
         productName(orderItem) {
             return (
                 orderItem.finishedProduct?.name ||
@@ -745,11 +879,38 @@ export default {
                 this.unitName(orderItem.baseUnit),
             ].join(" ");
         },
+        quantityWithUnit(orderItem, quantity) {
+            const unit = orderItem.baseUnit?.name || orderItem.productSnapshot?.baseUnitName || "";
+            return [this.formatQuantity(quantity), unit].filter(Boolean).join(" ");
+        },
+        supplementSourceProduct(plan) {
+            const code = plan.sourceFinishedProductCode
+                ? `[${plan.sourceFinishedProductCode}]`
+                : "";
+            return [code, plan.sourceFinishedProductName]
+                .filter(Boolean)
+                .join(" ") || `#${plan.productionOrderItemId}`;
+        },
+        supplementModeLabel(mode) {
+            return this.$t(
+                mode === "FULL"
+                    ? "production_order.shortage.supplement_full"
+                    : "production_order.shortage.supplement_minimum",
+            );
+        },
         wasteRateLabel(orderItem) {
             return [orderItem.expectedWastePercent || 0, "%"].join("");
         },
         formatNumber(value) {
             return functionHelper.formatNumber(value);
+        },
+        formatQuantity(value) {
+            const quantity = Number(value);
+            if (!Number.isFinite(quantity)) {
+                return "--";
+            }
+
+            return quantity.toFixed(6).replace(/\.?0+$/, "");
         },
         getStatusLabel(status) {
             return (

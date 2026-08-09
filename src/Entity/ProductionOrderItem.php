@@ -79,6 +79,9 @@ class ProductionOrderItem implements \JsonSerializable
     #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => 'Thông tin đóng thiếu'])]
     private ?array $shortageData = null;
 
+    #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => 'Snapshot mục tiêu sản xuất và kế hoạch bù'])]
+    private ?array $supplementData = null;
+
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => 'Thời điểm bắt đầu'])]
     private ?\DateTimeInterface $startedAt = null;
 
@@ -312,6 +315,18 @@ class ProductionOrderItem implements \JsonSerializable
         return $this;
     }
 
+    public function getSupplementData(): ?array
+    {
+        return $this->supplementData;
+    }
+
+    public function setSupplementData(?array $supplementData): static
+    {
+        $this->supplementData = $supplementData;
+
+        return $this;
+    }
+
     public function getStartedAt(): ?\DateTimeInterface
     {
         return $this->startedAt;
@@ -454,6 +469,7 @@ class ProductionOrderItem implements \JsonSerializable
             'acceptedBaseQuantity' => formatDecimal($this->acceptedBaseQuantity),
             'closedShortBaseQuantity' => formatDecimal($this->closedShortBaseQuantity),
             'shortageData' => $this->shortageData,
+            'supplementData' => $this->supplementData,
             'startedAt' => $this->startedAt?->format('Y-m-d H:i:s'),
             'completedAt' => $this->completedAt?->format('Y-m-d H:i:s'),
             'sortOrder' => $this->sortOrder,

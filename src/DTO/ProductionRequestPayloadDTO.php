@@ -100,6 +100,25 @@ final readonly class ProductionRequestPayloadDTO
                     }
                 }
             }
+
+            $selections = $item['supplementSelections'] ?? [];
+            if (!is_array($selections)) {
+                $context->buildViolation('Danh sách lệnh cần bù không hợp lệ')
+                    ->atPath(sprintf('items[%d].supplementSelections', $index))
+                    ->addViolation();
+            } else {
+                foreach ($selections as $selectionIndex => $selection) {
+                    if (!is_array($selection)
+                        || !is_numeric($selection['productionOrderItemId'] ?? null)
+                        || (int) $selection['productionOrderItemId'] <= 0
+                        || !in_array($selection['mode'] ?? null, ['MINIMUM', 'FULL'], true)
+                    ) {
+                        $context->buildViolation('Thông tin bù lệnh sản xuất không hợp lệ')
+                            ->atPath(sprintf('items[%d].supplementSelections[%d]', $index, $selectionIndex))
+                            ->addViolation();
+                    }
+                }
+            }
         }
     }
 
@@ -142,6 +161,13 @@ final readonly class ProductionRequestPayloadDTO
                 'outputUnitName' => trim((string) ($item['outputUnitName'] ?? '')),
                 'expectedWastePercent' => is_numeric($item['expectedWastePercent'] ?? null) ? (float) $item['expectedWastePercent'] : null,
                 'materials' => $materials,
+                'supplementSelections' => array_values(array_map(
+                    static fn(array $selection): array => [
+                        'productionOrderItemId' => (int) ($selection['productionOrderItemId'] ?? 0),
+                        'mode' => (string) ($selection['mode'] ?? ''),
+                    ],
+                    array_filter($item['supplementSelections'] ?? [], 'is_array'),
+                )),
             ];
         }
 

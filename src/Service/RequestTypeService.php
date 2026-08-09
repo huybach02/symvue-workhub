@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Class\MathHelper;
+use App\Class\ProductionOrderStatus;
 use App\Class\Request\RequestConstant;
 use App\DTO\LeaveRequestPayloadDTO;
 use App\DTO\ProductionRequestPayloadDTO;
 use App\DTO\StockInRequestPayloadDTO;
 use App\Entity\LeaveSchedule;
+use App\Entity\MerchandiseRecipe;
 use App\Entity\Request;
 use App\Entity\User;
 use App\Entity\MerchandiseProvider;
@@ -19,6 +22,7 @@ use App\Repository\UserRepository;
 use App\Repository\UserPositionRepository;
 use App\Repository\ProviderRepository;
 use App\Repository\MerchandiseRepository;
+use App\Repository\ProductionOrderItemRepository;
 use App\Repository\UnitRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -37,6 +41,7 @@ class RequestTypeService
         private readonly ProviderRepository $providerRepository,
         private readonly MerchandiseRepository $merchandiseRepository,
         private readonly UnitRepository $unitRepository,
+        private readonly ProductionOrderItemRepository $productionOrderItemRepository,
     ) {
     }
 
@@ -272,44 +277,132 @@ class RequestTypeService
             return $payload;
         }
 
-        foreach ($payload['items'] as &$item) {
-            $finishedProductId = $item['finishedProductId'] ?? null;
-            if ($finishedProductId) {
-                $product = $this->merchandiseRepository->find($finishedProductId);
-                if ($product) {
-                    $item['finishedProductName'] = sprintf('[%s] %s', $product->getCode(), $product->getName());
-                }
-            }
-
-            $outputUnitId = $item['outputUnitId'] ?? null;
-            if ($outputUnitId) {
-                $unit = $this->unitRepository->find($outputUnitId);
-                if ($unit) {
-                    $item['outputUnitName'] = $unit->getName();
-                }
-            }
-
-            if (!empty($item['materials']) && is_array($item['materials'])) {
-                foreach ($item['materials'] as &$material) {
-                    $ingredientId = $material['ingredientId'] ?? null;
-                    if ($ingredientId) {
-                        $ingredient = $this->merchandiseRepository->find($ingredientId);
-                        if ($ingredient) {
-                            $material['ingredientName'] = sprintf('[%s] %s', $ingredient->getCode(), $ingredient->getName());
-                        }
-                    }
-
-                    $unitId = $material['unitId'] ?? null;
-                    if ($unitId) {
-                        $mUnit = $this->unitRepository->find($unitId);
-                        if ($mUnit) {
-                            $material['unitName'] = $mUnit->getName();
-                        }
-                    }
+        $merchandiseUnitRepository = $this->entityManager->getRepository(MerchandiseUnit::class);
+        $recipeRepository = $this->entityManager->getRepository(MerchandiseRecipe::class);
+        $supplementTargetIds = [];
+        foreach ($payload['items'] as $item) {
+            foreach ($item['supplementSelections'] ?? [] as $selection) {
+                $targetId = (int) ($selection['productionOrderItemId'] ?? 0);
+                if ($targetId > 0) {
+                    $supplementTargetIds[$targetId] = $targetId;
                 }
             }
         }
 
+        $supplementTargets = [];
+        foreach ($this->productionOrderItemRepository->findByIdsWithDetails($supplementTargetIds) as $target) {
+            $supplementTargets[$target->getId()] = $target;
+        }
+
+        foreach ($payload['items'] as &$item) {
+            $finishedProductId = (int) ($item['finishedProductId'] ?? 0);
+            $product = $finishedProductId > 0
+                ? $this->merchandiseRepository->find($finishedProductId)
+                : null;
+            if ($product) {
+                $item['finishedProductName'] = sprintf('[%s] %s', $product->getCode(), $product->getName());
+            }
+
+            $outputUnitId = (int) ($item['outputUnitId'] ?? 0);
+            $unit = $outputUnitId > 0 ? $this->unitRepository->find($outputUnitId) : null;
+            if ($unit) {
+                $item['outputUnitName'] = $unit->getName();
+            }
+            if ($product) {
+                $item['baseUnitName'] = $product->getBaseUnit()?->getName() ?? '';
+                $merchandiseUnit = $unit ? $merchandiseUnitRepository->findOneBy([
+                    'merchandise' => $product,
+                    'unit' => $unit,
+                ]) : null;
+                $recipe = $recipeRepository->findOneBy(['finishedProduct' => $product]);
+                $item['outputFactorToBase'] = $merchandiseUnit?->getFactorToBase()
+                    ?? $recipe?->getOutputFactorToBaseSnapshot()
+                    ?? '1.000000';
+            }
+
+            if (!empty($item['materials']) && is_array($item['materials'])) {
+                foreach ($item['materials'] as &$material) {
+                    $ingredientId = (int) ($material['ingredientId'] ?? 0);
+                    $ingredient = $ingredientId > 0
+                        ? $this->merchandiseRepository->find($ingredientId)
+                        : null;
+                    if ($ingredient) {
+                        $material['ingredientName'] = sprintf('[%s] %s', $ingredient->getCode(), $ingredient->getName());
+                    }
+
+                    $materialUnitId = (int) ($material['unitId'] ?? 0);
+                    $materialUnit = $materialUnitId > 0
+                        ? $this->unitRepository->find($materialUnitId)
+                        : null;
+                    if ($materialUnit) {
+                        $material['unitName'] = $materialUnit->getName();
+                    }
+                }
+                unset($material);
+            }
+
+            if (!empty($item['supplementSelections']) && is_array($item['supplementSelections'])) {
+                foreach ($item['supplementSelections'] as &$selection) {
+                    $targetId = (int) ($selection['productionOrderItemId'] ?? 0);
+                    $target = $supplementTargets[$targetId] ?? null;
+                    if (!$target
+                        || $target->getStatus() !== ProductionOrderStatus::WaitingSupplement->value
+                        || $target->getFinishedProduct()?->getId() !== $finishedProductId
+                    ) {
+                        throw new \Exception('Lệnh sản xuất cần bù không còn hợp lệ');
+                    }
+
+                    $planned = $target->getPlannedBaseQuantity() ?? '0.000000';
+                    $minimum = MathHelper::sub(
+                        $planned,
+                        MathHelper::mul(
+                            $planned,
+                            MathHelper::div($target->getExpectedWastePercent(), '100', 8),
+                            6,
+                        ),
+                        6,
+                    );
+                    $shortageData = $target->getShortageData() ?? [];
+                    $effective = MathHelper::add(
+                        $target->getAcceptedBaseQuantity(),
+                        (string) ($shortageData['externalFulfilledBaseQuantity'] ?? '0.000000'),
+                        6,
+                    );
+                    $minimumRemaining = MathHelper::sub($minimum, $effective, 6);
+                    $fullRemaining = MathHelper::sub($planned, $effective, 6);
+                    $minimumRemaining = MathHelper::comp($minimumRemaining, '0') > 0
+                        ? $minimumRemaining
+                        : '0.000000';
+                    $fullRemaining = MathHelper::comp($fullRemaining, '0') > 0
+                        ? $fullRemaining
+                        : '0.000000';
+                    $requestedQuantity = ($selection['mode'] ?? null) === 'FULL'
+                        ? $fullRemaining
+                        : $minimumRemaining;
+                    if (MathHelper::comp($requestedQuantity, '0') <= 0) {
+                        throw new \Exception('Lệnh sản xuất đã được bù đủ');
+                    }
+
+                    $selection += [
+                        'requestedSupplementBaseQuantity' => $requestedQuantity,
+                        'sourceProductionOrderCode' => $target->getProductionOrder()?->getCode(),
+                        'sourceFinishedProductCode' => $target->getFinishedProduct()?->getCode(),
+                        'sourceFinishedProductName' => $target->getFinishedProduct()?->getName(),
+                        'baseUnitName' => $target->getBaseUnit()?->getName(),
+                        'outputFactorToBase' => $target->getPlannedFactorToBase() ?? '1.000000',
+                        'plannedBaseQuantity' => $planned,
+                        'acceptedBaseQuantity' => $target->getAcceptedBaseQuantity(),
+                        'minimumAcceptableBaseQuantity' => $minimum,
+                        'minimumRemainingBaseQuantity' => $minimumRemaining,
+                        'fullRemainingBaseQuantity' => $fullRemaining,
+                    ];
+                }
+                unset($selection);
+            }
+        }
+        unset($item);
+
         return $payload;
     }
+
 }

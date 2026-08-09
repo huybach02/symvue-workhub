@@ -88,6 +88,17 @@ export const REQUEST_TYPE_COMPONENT_REGISTRY = {
                                   : Number(item.quantity),
                           outputUnitId: item.outputUnitId ?? null,
                           outputUnitName: item.outputUnitName ?? "",
+                          baseUnitName:
+                              item.baseUnitName
+                              ?? item.supplementSelections?.[0]?.baseUnitName
+                              ?? item.outputUnitName
+                              ?? "",
+                          outputFactorToBase:
+                              Number(
+                                  item.outputFactorToBase
+                                  ?? item.supplementSelections?.[0]
+                                      ?.outputFactorToBase,
+                              ) || 1,
                           expectedWastePercent:
                               item.expectedWastePercent === null ||
                               item.expectedWastePercent === undefined
@@ -114,9 +125,68 @@ export const REQUEST_TYPE_COMPONENT_REGISTRY = {
                                     note: material.note ?? "",
                                 }))
                               : [],
+                          supplementSelections: Array.isArray(
+                              item.supplementSelections,
+                          )
+                              ? item.supplementSelections.map((selection) => ({
+                                    ...selection,
+                                    mode: selection.mode ?? "MINIMUM",
+                                }))
+                              : [],
+                          openShortages: Array.isArray(
+                              item.supplementSelections,
+                          )
+                              ? item.supplementSelections.map((selection) => ({
+                                    ...selection,
+                                    productionOrderCode:
+                                        selection.sourceProductionOrderCode,
+                                }))
+                              : [],
                       }))
                     : [],
             };
+        },
+        async prepareFormValues(values = {}, store) {
+            if (!Array.isArray(values.items)) {
+                return values;
+            }
+
+            const items = await Promise.all(
+                values.items.map(async (item) => {
+                    if (!item.finishedProductId) {
+                        return item;
+                    }
+
+                    const currentShortages = await store.dispatch(
+                        "productionOrder/fetchOpenShortages",
+                        item.finishedProductId,
+                    );
+                    const shortagesById = new Map(
+                        (currentShortages || []).map((shortage) => [
+                            Number(shortage.productionOrderItemId),
+                            shortage,
+                        ]),
+                    );
+                    for (const snapshot of item.openShortages || []) {
+                        const targetId = Number(
+                            snapshot.productionOrderItemId,
+                        );
+                        if (!shortagesById.has(targetId)) {
+                            shortagesById.set(
+                                targetId,
+                                snapshot,
+                            );
+                        }
+                    }
+
+                    return {
+                        ...item,
+                        openShortages: Array.from(shortagesById.values()),
+                    };
+                }),
+            );
+
+            return { ...values, items };
         },
     },
 };

@@ -407,6 +407,7 @@ enum ProductionOrderStatus: string
     case Started = 'STARTED';
     case InProgress = 'IN_PROGRESS';
     case Inspecting = 'INSPECTING';
+    case WaitingSupplement = 'WAITING_SUPPLEMENT';
     case Completed = 'COMPLETED';
     case Cancelled = 'CANCELLED';
 }
@@ -419,10 +420,16 @@ enum ProductionEventType: string
     case Completed = 'COMPLETED';
     case Cancelled = 'CANCELLED';
     case MaterialsIssued = 'MATERIALS_ISSUED';
+    case InspectionPosted = 'INSPECTION_POSTED';
+    case InventoryPosted = 'INVENTORY_POSTED';
+    case WaitingSupplement = 'WAITING_SUPPLEMENT';
+    case ShortageAccepted = 'SHORTAGE_ACCEPTED';
+    case ShortageAllocated = 'SHORTAGE_ALLOCATED';
+    case ShortageResolved = 'SHORTAGE_RESOLVED';
 }
 
 enum InventoryMovementSourceType: string
 {
     case ProductionMaterialIssue = 'PRODUCTION_MATERIAL_ISSUE';
+    case ProductionGoodsReceipt = 'PRODUCTION_GOODS_RECEIPT';
 }
-

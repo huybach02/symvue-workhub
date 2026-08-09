@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Class\CustomResponse;
 use App\DTO\ProductionOrderDTO;
 use App\DTO\ProductionOrderItemStatusDTO;
+use App\DTO\ProductionItemInspectDTO;
 use App\Entity\User;
 use App\Exception\InsufficientMaterialException;
 use App\Service\ProductionOrderService;
+use App\Service\ProductionInspectionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -19,6 +23,7 @@ final class ProductionOrderController extends AbstractController
 {
     public function __construct(
         private readonly ProductionOrderService $productionOrderService,
+        private readonly ProductionInspectionService $productionInspectionService,
     ) {}
 
     #[Route('/production-order', methods: ['GET'])]
@@ -88,6 +93,41 @@ final class ProductionOrderController extends AbstractController
             return CustomResponse::success($data, t('success.updated'));
         } catch (InsufficientMaterialException $e) {
             return CustomResponse::error($e->getMessage(), $e->getShortages());
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/production-order/item/{id}/inspect', methods: ['POST'])]
+    public function inspectItem(
+        int $id,
+        #[MapRequestPayload(validationGroups: ['create'])] ProductionItemInspectDTO $dto,
+    ): JsonResponse {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        try {
+            return CustomResponse::success(
+                $this->productionInspectionService->inspect($id, $dto, $currentUser),
+                'Đã kiểm hàng và nhập kho thành phẩm',
+            );
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/production-order/open-shortages', methods: ['GET'])]
+    public function openShortages(Request $request): JsonResponse
+    {
+        $merchandiseId = (int) $request->query->get('merchandiseId', 0);
+        if ($merchandiseId <= 0) {
+            return CustomResponse::error('Vui lòng chọn thành phẩm');
+        }
+
+        try {
+            return CustomResponse::success(
+                $this->productionOrderService->findOpenShortages($merchandiseId),
+            );
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }

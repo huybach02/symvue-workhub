@@ -172,6 +172,48 @@
                                 </v-col>
                             </v-row>
 
+                            <v-alert
+                                v-if="item.openShortages?.length"
+                                type="warning"
+                                variant="tonal"
+                                class="mb-4"
+                            >
+                                <div class="font-weight-bold mb-2">
+                                    {{ $t("request.production.open_shortages") }}
+                                </div>
+                                <div
+                                    v-for="shortage in item.openShortages"
+                                    :key="shortage.productionOrderItemId"
+                                    class="border rounded pa-3 mb-2 bg-white"
+                                >
+                                    <v-checkbox
+                                        :model-value="isShortageSelected(item, shortage)"
+                                        density="compact"
+                                        hide-details
+                                        :label="shortage.productionOrderCode"
+                                        @update:model-value="toggleShortage(item, shortage, $event, fieldItems.value, onChangeItems)"
+                                    />
+                                    <div class="text-body-2 ml-8">
+                                        {{ $t("request.production.received_progress") }}: {{ quantityWithUnit({ baseUnitName: shortage.baseUnitName || item.baseUnitName || item.outputUnitName }, shortage.acceptedBaseQuantity) }} / {{ quantityWithUnit({ baseUnitName: shortage.baseUnitName || item.baseUnitName || item.outputUnitName }, shortage.plannedBaseQuantity) }}
+                                        · {{ $t("request.production.minimum_target") }}: {{ quantityWithUnit({ baseUnitName: shortage.baseUnitName || item.baseUnitName || item.outputUnitName }, shortage.minimumAcceptableBaseQuantity) }}
+                                    </div>
+                                    <v-radio-group
+                                        v-if="isShortageSelected(item, shortage)"
+                                        :model-value="selectedShortageMode(item, shortage)"
+                                        inline
+                                        hide-details
+                                        class="ml-8 mt-1"
+                                        @update:model-value="setShortageMode(item, shortage, $event, fieldItems.value, onChangeItems)"
+                                    >
+                                        <v-radio :label="$t('request.production.supplement_minimum')" value="MINIMUM" />
+                                        <v-radio :label="$t('request.production.supplement_full')" value="FULL" />
+                                    </v-radio-group>
+                                </div>
+                                <div class="mt-3 text-body-2">
+                                    {{ $t("request.production.new_requirement") }} {{ quantityWithUnit({ baseUnitName: item.outputUnitName }, item.quantity) }} · {{ $t("request.production.supplement_quantity") }} {{ quantityWithUnit({ baseUnitName: supplementUnitName(item) }, selectedSupplementBase(item)) }} · <strong>{{ $t("request.production.production_target") }} {{ quantityWithUnit({ baseUnitName: item.outputUnitName }, productionTarget(item)) }}</strong>
+                                </div>
+                            </v-alert>
+
                             <div
                                 class="d-flex align-center ga-2 text-subtitle-2 font-weight-bold mb-3 mt-2"
                             >
@@ -341,6 +383,7 @@ export default {
             "fetchProductionMerchandiseOptions",
             "fetchItemDetail",
         ]),
+        ...mapActions("productionOrder", ["fetchOpenShortages"]),
 
         async loadFinishedProducts() {
             this.loadingFinishedProducts = true;
@@ -364,6 +407,8 @@ export default {
                 outputUnitName: "",
                 expectedWastePercent: null,
                 materials: [],
+                supplementSelections: [],
+                openShortages: [],
             };
         },
 
@@ -416,6 +461,8 @@ export default {
                 item.outputUnitId = null;
                 item.outputUnitName = "";
                 item.materials = [];
+                item.openShortages = [];
+                item.supplementSelections = [];
                 onChange(items);
                 return;
             }
@@ -432,6 +479,10 @@ export default {
 
             item.outputUnitId = recipe?.outputUnitId ?? null;
             item.outputUnitName = recipe?.outputUnit?.name ?? "";
+            item.baseUnitName = detail?.baseUnit?.name ?? item.outputUnitName;
+            item.outputFactorToBase = Number(recipe?.outputFactorToBaseSnapshot) || 1;
+            item.supplementSelections = [];
+            item.openShortages = await this.fetchOpenShortages(finishedProductId);
 
             await this.rebuildMaterials(item, items, onChange);
         },
@@ -450,6 +501,56 @@ export default {
                     ? null
                     : Number(value);
             onChange(items);
+        },
+
+        isShortageSelected(item, shortage) {
+            return (item.supplementSelections || []).some(
+                (selection) => selection.productionOrderItemId === shortage.productionOrderItemId,
+            );
+        },
+        selectedShortageMode(item, shortage) {
+            return (item.supplementSelections || []).find(
+                (selection) => selection.productionOrderItemId === shortage.productionOrderItemId,
+            )?.mode || "MINIMUM";
+        },
+        toggleShortage(item, shortage, selected, items, onChange) {
+            const selections = [...(item.supplementSelections || [])];
+            const index = selections.findIndex(
+                (selection) => selection.productionOrderItemId === shortage.productionOrderItemId,
+            );
+            if (selected && index < 0) {
+                selections.push({ productionOrderItemId: shortage.productionOrderItemId, mode: "MINIMUM" });
+            } else if (!selected && index >= 0) {
+                selections.splice(index, 1);
+            }
+            item.supplementSelections = selections;
+            return this.rebuildMaterials(item, items, onChange);
+        },
+        setShortageMode(item, shortage, mode, items, onChange) {
+            item.supplementSelections = (item.supplementSelections || []).map(
+                (selection) => selection.productionOrderItemId === shortage.productionOrderItemId
+                    ? { ...selection, mode }
+                    : selection,
+            );
+            return this.rebuildMaterials(item, items, onChange);
+        },
+        selectedSupplementBase(item) {
+            return (item.supplementSelections || []).reduce((total, selection) => {
+                const shortage = (item.openShortages || []).find(
+                    (candidate) => candidate.productionOrderItemId === selection.productionOrderItemId,
+                );
+                return total + Number(
+                    selection.mode === "FULL"
+                        ? shortage?.fullRemainingBaseQuantity || 0
+                        : shortage?.minimumRemainingBaseQuantity || 0,
+                );
+            }, 0);
+        },
+        productionTarget(item) {
+            return Number(item.quantity || 0) + this.selectedSupplementBase(item) / (Number(item.outputFactorToBase) || 1);
+        },
+        supplementUnitName(item) {
+            return item.openShortages?.[0]?.baseUnitName || item.baseUnitName || item.outputUnitName || "";
         },
 
         async ensureMerchandiseDetail(merchandiseId) {
@@ -483,7 +584,7 @@ export default {
                 return;
             }
 
-            const scale = this.getScale(recipe, item.quantity);
+            const scale = this.getScale(recipe, this.productionTarget(item));
             item.materials = recipe.items.map((recipeItem) => ({
                 ingredientId: recipeItem.ingredientId ?? null,
                 ingredientName: this.getIngredientLabel(recipeItem),
@@ -529,6 +630,11 @@ export default {
             return Number(value).toLocaleString("en-US", {
                 maximumFractionDigits: 4,
             });
+        },
+        quantityWithUnit(item, value) {
+            return [this.formatQuantity(value), item?.baseUnitName]
+                .filter(Boolean)
+                .join(" ");
         },
     },
 };

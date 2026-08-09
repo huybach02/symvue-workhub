@@ -104,7 +104,7 @@ class ProductionOrderService
             throw new \Exception(t('error.not_found'));
         }
 
-        return $item->jsonSerialize();
+        return $this->enrichSupplementPlans($item->jsonSerialize());
     }
 
     public function updateItemStatus(
@@ -428,10 +428,20 @@ class ProductionOrderService
         $orderItem->setSortOrder($sortOrder);
         $this->entityManager->persist($orderItem);
 
+        $supplementData = $this->buildSupplementData(
+            $finishedProduct,
+            $itemData['supplementSelections'] ?? [],
+            $plannedBaseQuantity,
+        );
+        $productionTargetBaseQuantity = $supplementData['productionTargetBaseQuantity'];
+        if ($supplementData['plans'] !== []) {
+            $orderItem->setSupplementData($supplementData);
+        }
+
         $this->addMaterialsFromRecipe(
             $orderItem,
             $recipe,
-            $plannedBaseQuantity,
+            $productionTargetBaseQuantity,
         );
     }
 
@@ -622,7 +632,6 @@ class ProductionOrderService
             ProductionOrderStatus::Started->value,
             ProductionOrderStatus::InProgress->value,
             ProductionOrderStatus::Inspecting->value,
-            ProductionOrderStatus::Completed->value,
         ];
 
         $currentIndex = array_search($currentStatus, $statusOrder, true);
@@ -639,7 +648,161 @@ class ProductionOrderService
         }
     }
 
-    private function syncProductionOrderStatusFromItems(
+    /**
+     * Snapshot phần bù khi lập lệnh để BOM luôn dựa trên target đã duyệt.
+     * Không reserve shortage: inspection sẽ tính lại shortage thực tế trước khi phân bổ.
+     */
+    private function buildSupplementData(
+        Merchandise $finishedProduct,
+        mixed $selections,
+        string $plannedBaseQuantity,
+    ): array {
+        $plans = [];
+        $supplementBase = '0.000000';
+        $seenIds = [];
+
+        foreach (is_array($selections) ? $selections : [] as $selection) {
+            $targetId = (int) ($selection['productionOrderItemId'] ?? 0);
+            $mode = $selection['mode'] ?? null;
+            if ($targetId <= 0 || isset($seenIds[$targetId])) {
+                continue;
+            }
+            $seenIds[$targetId] = true;
+            if (!in_array($mode, ['MINIMUM', 'FULL'], true)) {
+                throw new \Exception('Cách bù thiếu không hợp lệ');
+            }
+
+            $target = $this->productionOrderItemRepository->find($targetId);
+            if (
+                !$target ||
+                $target->getStatus() !== ProductionOrderStatus::WaitingSupplement->value ||
+                $target->getFinishedProduct()?->getId() !== $finishedProduct->getId()
+            ) {
+                continue;
+            }
+
+            $remaining = $this->getShortageRemaining($target, $mode);
+            if (MathHelper::comp($remaining, '0') <= 0) {
+                continue;
+            }
+            $plans[] = [
+                'productionOrderItemId' => $target->getId(),
+                'mode' => $mode,
+                'plannedBaseQuantity' => $remaining,
+            ];
+            $supplementBase = MathHelper::add($supplementBase, $remaining, 6);
+        }
+
+        return [
+            'productionTargetBaseQuantity' => MathHelper::add($plannedBaseQuantity, $supplementBase, 6),
+            'plans' => $plans,
+        ];
+    }
+
+    private function enrichSupplementPlans(array $productionOrder): array
+    {
+        $sourceItemIds = [];
+        foreach ($productionOrder['items'] ?? [] as $orderItem) {
+            foreach ($orderItem['supplementData']['plans'] ?? [] as $plan) {
+                $sourceItemId = (int) ($plan['productionOrderItemId'] ?? 0);
+                if ($sourceItemId > 0) {
+                    $sourceItemIds[$sourceItemId] = $sourceItemId;
+                }
+            }
+            foreach ($orderItem['shortageData']['supplementHistory'] ?? [] as $history) {
+                $sourceItemId = (int) ($history['sourceProductionOrderItemId'] ?? 0);
+                if ($sourceItemId > 0) {
+                    $sourceItemIds[$sourceItemId] = $sourceItemId;
+                }
+            }
+        }
+
+        if ($sourceItemIds === []) {
+            return $productionOrder;
+        }
+
+        $sourceItems = $this->productionOrderItemRepository->findByIdsWithDetails(
+            array_values($sourceItemIds),
+        );
+        $sourceItemsById = [];
+        foreach ($sourceItems as $sourceItem) {
+            $sourceItemsById[$sourceItem->getId()] = $sourceItem;
+        }
+
+        foreach ($productionOrder['items'] ?? [] as $itemIndex => $orderItem) {
+            foreach ($orderItem['supplementData']['plans'] ?? [] as $planIndex => $plan) {
+                $sourceItem = $sourceItemsById[(int) ($plan['productionOrderItemId'] ?? 0)] ?? null;
+                if (!$sourceItem) {
+                    continue;
+                }
+
+                $enrichedPlan = &$productionOrder['items'][$itemIndex]['supplementData']['plans'][$planIndex];
+                $enrichedPlan['sourceProductionOrderCode'] = $sourceItem->getProductionOrder()?->getCode();
+                $enrichedPlan['sourceFinishedProductCode'] = $sourceItem->getFinishedProduct()?->getCode();
+                $enrichedPlan['sourceFinishedProductName'] = $sourceItem->getFinishedProduct()?->getName();
+                unset($enrichedPlan);
+            }
+            foreach ($orderItem['shortageData']['supplementHistory'] ?? [] as $historyIndex => $history) {
+                $sourceItem = $sourceItemsById[(int) ($history['sourceProductionOrderItemId'] ?? 0)] ?? null;
+                if (!$sourceItem) {
+                    continue;
+                }
+
+                $enrichedHistory = &$productionOrder['items'][$itemIndex]['shortageData']['supplementHistory'][$historyIndex];
+                $enrichedHistory['sourceProductionOrderCode'] = $sourceItem->getProductionOrder()?->getCode();
+                $enrichedHistory['sourceFinishedProductCode'] = $sourceItem->getFinishedProduct()?->getCode();
+                $enrichedHistory['sourceFinishedProductName'] = $sourceItem->getFinishedProduct()?->getName();
+                unset($enrichedHistory);
+            }
+        }
+
+        return $productionOrder;
+    }
+
+    private function getShortageRemaining(
+        ProductionOrderItem $item,
+        string $mode,
+    ): string {
+        $planned = $item->getPlannedBaseQuantity() ?? '0';
+        $minimum = MathHelper::sub(
+            $planned,
+            MathHelper::mul($planned, MathHelper::div($item->getExpectedWastePercent(), '100', 8), 6),
+            6,
+        );
+        $shortageData = $item->getShortageData() ?? [];
+        $external = (string) ($shortageData['externalFulfilledBaseQuantity'] ?? '0');
+        $effective = MathHelper::add($item->getAcceptedBaseQuantity(), $external, 6);
+        $target = $mode === 'FULL' ? $planned : $minimum;
+        $remaining = MathHelper::sub($target, $effective, 6);
+
+        return MathHelper::comp($remaining, '0') > 0 ? $remaining : '0.000000';
+    }
+
+    public function findOpenShortages(int $merchandiseId): array
+    {
+        $items = $this->productionOrderItemRepository
+            ->findWaitingSupplementByMerchandiseId($merchandiseId);
+
+        return array_map(function (ProductionOrderItem $item): array {
+            $minimumRemaining = $this->getShortageRemaining($item, 'MINIMUM');
+            $fullRemaining = $this->getShortageRemaining($item, 'FULL');
+            $shortageData = $item->getShortageData() ?? [];
+
+            return [
+                'productionOrderId' => $item->getProductionOrder()?->getId(),
+                'productionOrderCode' => $item->getProductionOrder()?->getCode(),
+                'productionOrderItemId' => $item->getId(),
+                'plannedBaseQuantity' => $item->getPlannedBaseQuantity(),
+                'acceptedBaseQuantity' => $item->getAcceptedBaseQuantity(),
+                'baseUnitName' => $item->getBaseUnit()?->getName(),
+                'minimumAcceptableBaseQuantity' => $shortageData['minimumAcceptableBaseQuantity'] ?? MathHelper::sub($item->getPlannedBaseQuantity() ?? '0', MathHelper::mul($item->getPlannedBaseQuantity() ?? '0', MathHelper::div($item->getExpectedWastePercent(), '100', 8), 6), 6),
+                'minimumRemainingBaseQuantity' => $minimumRemaining,
+                'fullRemainingBaseQuantity' => $fullRemaining,
+            ];
+        }, $items);
+    }
+
+    public function syncProductionOrderStatusFromItems(
         ProductionOrder $productionOrder,
     ): void {
         $items = $this->productionOrderItemRepository->findBy(
@@ -656,19 +819,29 @@ class ProductionOrderService
             ProductionOrderStatus::Started->value,
             ProductionOrderStatus::InProgress->value,
             ProductionOrderStatus::Inspecting->value,
-            ProductionOrderStatus::Completed->value,
         ];
-
-        $minIndex = null;
+        $activeStatuses = [];
+        $hasWaitingSupplement = false;
         foreach ($items as $item) {
-            $index = array_search($item->getStatus(), $statusOrder, true);
-            if ($index === false) {
-                $index = 0;
+            if ($item->getStatus() === ProductionOrderStatus::WaitingSupplement->value) {
+                $hasWaitingSupplement = true;
+                continue;
             }
-            $minIndex = $minIndex === null ? $index : min($minIndex, $index);
+            if ($item->getStatus() === ProductionOrderStatus::Completed->value) {
+                continue;
+            }
+            $index = array_search($item->getStatus(), $statusOrder, true);
+            if ($index !== false) {
+                $activeStatuses[] = $index;
+            }
         }
-
-        $productionOrder->setStatus($statusOrder[$minIndex]);
+        if ($activeStatuses !== []) {
+            $productionOrder->setStatus($statusOrder[min($activeStatuses)]);
+        } elseif ($hasWaitingSupplement) {
+            $productionOrder->setStatus(ProductionOrderStatus::WaitingSupplement->value);
+        } else {
+            $productionOrder->setStatus(ProductionOrderStatus::Completed->value);
+        }
 
         $startedStatuses = [
             ProductionOrderStatus::Started->value,
@@ -677,13 +850,13 @@ class ProductionOrderService
             ProductionOrderStatus::Completed->value,
         ];
         if (
-            in_array($statusOrder[$minIndex], $startedStatuses, true)
+            in_array($productionOrder->getStatus(), $startedStatuses, true)
             && $productionOrder->getStartedAt() === null
         ) {
             $productionOrder->setStartedAt(new \DateTime());
         }
         if (
-            $statusOrder[$minIndex] === ProductionOrderStatus::Completed->value
+            $productionOrder->getStatus() === ProductionOrderStatus::Completed->value
             && $productionOrder->getCompletedAt() === null
         ) {
             $productionOrder->setCompletedAt(new \DateTime());

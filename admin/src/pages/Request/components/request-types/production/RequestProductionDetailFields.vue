@@ -119,6 +119,40 @@
                         </div>
                     </v-card-title>
 
+                    <v-alert
+                        v-if="productionItem.supplementSelections?.length"
+                        type="info"
+                        variant="outlined"
+                        class="mx-4 mb-3"
+                    >
+                        <div class="font-weight-bold mb-2">
+                            {{
+                                $t(
+                                    "request.production.target_includes_supplements",
+                                    {
+                                        count: productionItem.supplementSelections.length,
+                                    },
+                                )
+                            }}
+                        </div>
+                        <div class="d-flex flex-wrap ga-2">
+                            <v-chip color="primary" variant="tonal">
+                                {{ $t("request.production.new_requirement") }}: <strong class="ml-1">{{ quantityWithUnit(productionItem.quantity, productionItem.outputUnitName) }}</strong>
+                            </v-chip>
+                            <v-chip color="secondary" variant="tonal">
+                                {{ $t("request.production.supplement_quantity") }}: <strong class="ml-1">{{ quantityWithUnit(selectedSupplementBase(productionItem), supplementUnitName(productionItem)) }}</strong>
+                            </v-chip>
+                            <v-chip color="info" variant="tonal">
+                                {{ $t("request.production.production_target") }}: <strong class="ml-1">{{ quantityWithUnit(productionTarget(productionItem), productionItem.outputUnitName) }}</strong>
+                            </v-chip>
+                        </div>
+                        <div v-for="selection in productionItem.supplementSelections" :key="selection.productionOrderItemId" class="d-flex flex-wrap ga-2 mt-2">
+                            <v-chip color="secondary" variant="tonal">
+                                {{ $t("request.production.supplement_for", { code: selection.sourceProductionOrderCode || `#${selection.productionOrderItemId}`, product: supplementSourceProduct(selection) }) }}: {{ quantityWithUnit(selectionQuantity(selection), selection.baseUnitName || productionItem.outputUnitName) }} ({{ supplementModeLabel(selection.mode) }})
+                            </v-chip>
+                        </div>
+                    </v-alert>
+
                     <v-divider />
 
                     <v-table density="comfortable">
@@ -253,6 +287,51 @@ export default {
             return Number(value).toLocaleString("en-US", {
                 maximumFractionDigits: 4,
             });
+        },
+        quantityWithUnit(value, unitName) {
+            return [this.formatNumber(value), unitName].filter(Boolean).join(" ");
+        },
+        selectionQuantity(selection) {
+            return Number(
+                selection.requestedSupplementBaseQuantity
+                ?? (selection.mode === "FULL"
+                    ? selection.fullRemainingBaseQuantity
+                    : selection.minimumRemainingBaseQuantity),
+            ) || 0;
+        },
+        selectedSupplementBase(productionItem) {
+            return (productionItem.supplementSelections || []).reduce(
+                (total, selection) => total + this.selectionQuantity(selection),
+                0,
+            );
+        },
+        supplementUnitName(productionItem) {
+            return productionItem.supplementSelections?.[0]?.baseUnitName
+                || productionItem.outputUnitName
+                || "";
+        },
+        productionTarget(productionItem) {
+            const factor = Number(
+                productionItem.outputFactorToBase
+                ?? productionItem.supplementSelections?.[0]?.outputFactorToBase,
+            ) || 1;
+            return Number(productionItem.quantity || 0)
+                + this.selectedSupplementBase(productionItem) / factor;
+        },
+        supplementSourceProduct(selection) {
+            const code = selection.sourceFinishedProductCode
+                ? `[${selection.sourceFinishedProductCode}]`
+                : "";
+            return [code, selection.sourceFinishedProductName]
+                .filter(Boolean)
+                .join(" ") || `#${selection.productionOrderItemId}`;
+        },
+        supplementModeLabel(mode) {
+            return this.$t(
+                mode === "FULL"
+                    ? "request.production.supplement_full"
+                    : "request.production.supplement_minimum",
+            );
         },
     },
 };

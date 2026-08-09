@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ProductionItemInspectionRepository::class)]
 #[ORM\Table(name: 'production_item_inspection')]
 #[ORM\UniqueConstraint(name: 'UNIQ_PRODUCTION_ITEM_INSPECTION_CODE', fields: ['code'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_PRODUCTION_ITEM_INSPECTION_REQUEST', fields: ['productionOrderItem', 'clientRequestUuid'])]
 class ProductionItemInspection implements \JsonSerializable
 {
     use TimestampableTrait;
