@@ -6,6 +6,7 @@ namespace App\Tests\Service;
 
 use App\Class\ProductionOrderStatus;
 use App\DTO\ProductionItemInspectLotDTO;
+use App\Entity\InventoryLot;
 use App\Entity\InventoryMovement;
 use App\Entity\Merchandise;
 use App\Entity\ProductionGoodsReceipt;
@@ -155,11 +156,11 @@ final class ProductionInspectionServiceTest extends TestCase
         ]);
     }
 
-    public function testProductionStockInMovementReceivesCalculatedUnitCost(): void
+    public function testProductionStockInMovementsReceiveCostAndSequentialLotCodes(): void
     {
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $persistedEntities = [];
-        $entityManager->expects(self::exactly(3))
+        $entityManager->expects(self::exactly(6))
             ->method('persist')
             ->willReturnCallback(static function (object $entity) use (&$persistedEntities): void {
                 $persistedEntities[] = $entity;
@@ -189,6 +190,13 @@ final class ProductionInspectionServiceTest extends TestCase
                 'expiryDate' => '2026-09-30',
                 'productionLotCode' => null,
                 'note' => null,
+            ], [
+                'clientLineUuid' => 'line-2',
+                'acceptedQuantity' => '1.100000',
+                'manufactureDate' => '2026-09-01',
+                'expiryDate' => '2026-10-01',
+                'productionLotCode' => null,
+                'note' => null,
             ]],
             '10.0000',
             new \DateTime('2026-08-31 12:00:00'),
@@ -199,9 +207,18 @@ final class ProductionInspectionServiceTest extends TestCase
             $persistedEntities,
             static fn (object $entity): bool => $entity instanceof InventoryMovement,
         ));
-        self::assertCount(1, $movements);
+        $lots = array_values(array_filter(
+            $persistedEntities,
+            static fn (object $entity): bool => $entity instanceof InventoryLot,
+        ));
+        self::assertCount(2, $lots);
+        self::assertSame('LOT-PNKSX-TEST-01', $lots[0]->getInternalCode());
+        self::assertSame('LOT-PNKSX-TEST-02', $lots[1]->getInternalCode());
+        self::assertCount(2, $movements);
         self::assertSame('10.0000', $movements[0]->getUnitCostBase());
         self::assertSame('2.900000', $movements[0]->getQuantityBaseDelta());
+        self::assertSame('10.0000', $movements[1]->getUnitCostBase());
+        self::assertSame('1.100000', $movements[1]->getQuantityBaseDelta());
     }
 
     public function testNormalizeLotsRejectsDuplicateManufactureAndExpiryDates(): void

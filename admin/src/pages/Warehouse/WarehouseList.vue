@@ -13,7 +13,9 @@
                 :loading="loading"
                 @update:options="onOptions"
             >
-                <template #headers="{ columns, isSorted, getSortIcon, toggleSort }">
+                <template
+                    #headers="{ columns, isSorted, getSortIcon, toggleSort }"
+                >
                     <tr>
                         <th
                             v-for="col in columns"
@@ -33,9 +35,10 @@
                                 class="d-flex align-center justify-space-between py-2"
                             >
                                 <template v-if="!col.filterComponent">
-                                    <span class="v-data-table-header__content">{{
-                                        col.title
-                                    }}</span>
+                                    <span
+                                        class="v-data-table-header__content"
+                                        >{{ col.title }}</span
+                                    >
                                 </template>
 
                                 <component
@@ -67,35 +70,18 @@
                     <div class="d-flex align-center justify-space-between ga-1">
                         <v-tooltip
                             v-if="permission?.show"
-                            :text="$t('button.update')" 
-                            location="top"
-                        >
-                            <template #activator="{ props: tooltipProps }">
-                                <CreateEditWarehouse
-                                    v-bind="tooltipProps"
-                                    :path="path"
-                                    mode="update"
-                                    :item="item"
-                                    @reload="$emit('reload', { ...query })"
-                                />
-                            </template>
-                        </v-tooltip>
-                        <v-tooltip 
-                            v-if="permission?.delete"
-                            :text="$t('button.delete')" 
+                            :text="$t('warehouse.inventory.view_detail')"
                             location="top"
                         >
                             <template #activator="{ props: tooltipProps }">
                                 <v-btn
                                     v-bind="tooltipProps"
-                                    icon
+                                    icon="mdi-eye-outline"
                                     size="small"
                                     variant="outlined"
-                                    color="error"
-                                    @click="openDeleteDialog(item.id)"
-                                >
-                                    <v-icon>mdi-delete</v-icon>
-                                </v-btn>
+                                    color="info"
+                                    @click="openInventoryDialog(item)"
+                                />
                             </template>
                         </v-tooltip>
                     </div>
@@ -103,11 +89,11 @@
 
                 <template #[`item.status`]="{ item }">
                     <v-chip
-                        :color="item.status === 1 ? 'success' : 'error'"
+                        :color="item.status ? 'success' : 'error'"
                         size="small"
                     >
                         {{
-                            item.status === 1
+                            item.status
                                 ? $t("status_values.active")
                                 : $t("status_values.inactive")
                         }}
@@ -148,6 +134,10 @@
             @confirm="handleDelete"
             @cancel="showConfirmDelete = false"
         />
+        <WarehouseInventoryDialog
+            v-model="showInventoryDialog"
+            :warehouse="selectedWarehouse"
+        />
     </div>
 </template>
 
@@ -159,7 +149,7 @@ import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterPagination from "@/components/filters/FilterPagination.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import CreateEditWarehouse from "./CreateEditWarehouse.vue";
+import WarehouseInventoryDialog from "./WarehouseInventoryDialog.vue";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
@@ -167,7 +157,7 @@ export default {
     components: {
         FilterPagination,
         ConfirmDialog,
-        CreateEditWarehouse,
+        WarehouseInventoryDialog,
     },
     props: {
         path: {
@@ -181,7 +171,6 @@ export default {
     },
     emits: ["reload"],
     setup(props, { emit }) {
-        // Sử dụng hook useFilterPagination
         const {
             query,
             sortArray,
@@ -207,12 +196,14 @@ export default {
             showConfirmDelete: false,
             isDeleting: false,
             deletingId: null,
+            showInventoryDialog: false,
+            selectedWarehouse: null,
             headers: [
                 {
                     key: "action",
-                    width: 110,
-                    minWidth: 110,
-                    maxWidth: 110,
+                    width: 50,
+                    minWidth: 50,
+                    maxWidth: 50,
                     sortable: false,
                 },
                 {
@@ -235,17 +226,13 @@ export default {
                     items: [
                         {
                             title: this.$t("status_values.active"),
-                            value: "1",
+                            value: true,
                         },
                         {
                             title: this.$t("status_values.inactive"),
-                            value: "0",
+                            value: false,
                         },
                     ],
-                    value: (item) =>
-                        item.status === 1
-                            ? this.$t("status_values.active")
-                            : this.$t("status_values.inactive"),
                 },
                 {
                     title: this.$t("base.created_at"),
@@ -275,6 +262,10 @@ export default {
         openDeleteDialog(id) {
             this.deletingId = id;
             this.showConfirmDelete = true;
+        },
+        openInventoryDialog(item) {
+            this.selectedWarehouse = item;
+            this.showInventoryDialog = true;
         },
         async handleDelete() {
             this.isDeleting = true;

@@ -146,12 +146,12 @@ export const menuSidebar = [
                 value: NAME_ROUTES_CONFIG.stockReceipt,
                 to: { name: NAME_ROUTES_CONFIG.stockReceipt },
             },
+            {
+                title: i18n.global.t("sidebar.production_order"),
+                icon: "mdi-factory",
+                value: NAME_ROUTES_CONFIG.productionOrder,
+                to: { name: NAME_ROUTES_CONFIG.productionOrder },
+            },
         ],
-    },
-    {
-        title: i18n.global.t("sidebar.production_order"),
-        icon: "mdi-view-dashboard",
-        value: NAME_ROUTES_CONFIG.productionOrder,
-        to: { name: NAME_ROUTES_CONFIG.productionOrder },
     },
 ];

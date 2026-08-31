@@ -12,14 +12,6 @@
                     />
                 </div>
             </v-col>
-            <v-col cols="12" md="7">
-                <CreateEditWarehouse
-                    v-if="permission?.create"
-                    :path="path"
-                    mode="create"
-                    @reload="getDanhSach"
-                />
-            </v-col>
         </v-row>
         <v-row>
             <v-col cols="12">
@@ -37,7 +29,6 @@
 <script>
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 import WarehouseList from "./WarehouseList.vue";
-import CreateEditWarehouse from "./CreateEditWarehouse.vue";
 import ExportDataExcel from "@/components/ExportDataExcel.vue";
 import ImportDataExcel from "@/components/ImportDataExcel.vue";
 import { usePermission } from "@/hooks/usePermission";
@@ -47,7 +38,6 @@ export default {
     name: "Warehouse",
     components: {
         WarehouseList,
-        CreateEditWarehouse,
         ExportDataExcel,
         ImportDataExcel,
     },

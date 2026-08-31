@@ -80,7 +80,7 @@
         "warehouse_management": "Warehouse Management",
         "warehouse": "Warehouse",
         "stock_receipt": "Stock Receipt",
-        "production_order": "ProductionOrder"
+        "production_order": "Production Order"
     },
     "gender": {
         "male": "Male",

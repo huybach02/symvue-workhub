@@ -80,7 +80,7 @@
         "warehouse_management": "Quản lý kho",
         "warehouse": "Kho",
         "stock_receipt": "Nhập kho",
-        "production_order": "ProductionOrder"
+        "production_order": "Lệnh sản xuất"
     },
     "gender": {
         "male": "Nam",

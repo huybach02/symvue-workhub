@@ -26,17 +26,7 @@ final class WarehouseController extends AbstractController
 
         try {
             $result = $this->warehouseService->findAll($params);
-            return CustomResponse::success([
-                'collection' => $result['collection'],
-                'total' => $result['total'],
-                'pagination' => [
-                    'current_page' => $result['current_page'],
-                    'last_page' => $result['last_page'],
-                    'from' => $result['from'],
-                    'to' => $result['to'],
-                    'total_current' => $result['total_current'],
-                ]
-            ]);
+            return CustomResponse::success($this->formatPaginatedResult($result));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
@@ -62,6 +52,32 @@ final class WarehouseController extends AbstractController
         try {
             $data = $this->warehouseService->findById($id);
             return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/warehouse/{id}/inventory-balances', methods: ['GET'])]
+    public function getInventoryBalances(int $id, Request $request): JsonResponse
+    {
+        try {
+            $params = validateFilterParams($request->query->all());
+            $result = $this->warehouseService->findInventoryBalances($id, $params);
+
+            return CustomResponse::success($this->formatPaginatedResult($result));
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/warehouse/{id}/inventory-movements', methods: ['GET'])]
+    public function getInventoryMovements(int $id, Request $request): JsonResponse
+    {
+        try {
+            $params = validateFilterParams($request->query->all());
+            $result = $this->warehouseService->findInventoryMovements($id, $params);
+
+            return CustomResponse::success($this->formatPaginatedResult($result));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
@@ -101,6 +117,21 @@ final class WarehouseController extends AbstractController
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }
+    }
+
+    private function formatPaginatedResult(array $result): array
+    {
+        return [
+            'collection' => $result['collection'],
+            'total' => $result['total'],
+            'pagination' => [
+                'current_page' => $result['current_page'],
+                'last_page' => $result['last_page'],
+                'from' => $result['from'],
+                'to' => $result['to'],
+                'total_current' => $result['total_current'],
+            ],
+        ];
     }
 
     // #[Route('/warehouse/export', methods: ['GET'])]

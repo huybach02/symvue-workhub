@@ -44,6 +44,53 @@
       "target_includes_supplements": "Production target includes supplements for {count} shortage orders."
     }
   },
+  "warehouse": {
+    "title": "Warehouse",
+    "columns": {
+      "id": "ID",
+      "name": "Name"
+    },
+    "inventory": {
+      "title": "Warehouse inventory details",
+      "view_detail": "View warehouse details",
+      "balance_tab": "Inventory balance",
+      "movement_tab": "Inventory movement",
+      "merchandise": "Merchandise",
+      "lot": "Lot",
+      "lot_status": "Lot status",
+      "expiry_date": "Expiry date",
+      "on_hand": "On hand",
+      "reserved": "Reserved",
+      "blocked": "Blocked",
+      "available": "Available",
+      "unit": "Unit",
+      "posted_at": "Posted at",
+      "movement_type": "Movement type",
+      "quantity_delta": "Quantity delta",
+      "unit_cost": "Unit cost",
+      "source_type": "Source type",
+      "posted_by": "Posted by",
+      "note": "Note",
+      "movement_types": {
+        "STOCK_IN": "Stock in",
+        "STOCK_OUT": "Stock out",
+        "ADJUSTMENT": "Adjustment",
+        "TRANSFER_IN": "Transfer in",
+        "TRANSFER_OUT": "Transfer out",
+        "REVERSAL": "Reversal"
+      },
+      "lot_statuses": {
+        "AVAILABLE": "Available",
+        "BLOCKED": "Blocked",
+        "EXPIRED": "Expired",
+        "DEPLETED": "Depleted"
+      },
+      "source_types": {
+        "PRODUCTION_MATERIAL_ISSUE": "Production material issue",
+        "PRODUCTION_GOODS_RECEIPT": "Production goods receipt"
+      }
+    }
+  },
   "production_order": {
     "title": "Production Order",
     "detail_title": "Production Order Details",

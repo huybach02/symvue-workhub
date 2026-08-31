@@ -255,12 +255,18 @@ final class ProductionInspectionService
             throw new \Exception('Dữ liệu thành phẩm hoặc kho nhập không hợp lệ');
         }
 
+        $lotSequence = 0;
         foreach ($lots as $lotData) {
             if (MathHelper::comp($lotData['acceptedQuantity'], '0') <= 0) {
                 continue;
             }
+            ++$lotSequence;
             $lot = new InventoryLot();
-            $lot->setInternalCode(sprintf('LOT-%s-%s', $goodsReceipt->getCode(), strtoupper(str_replace('-', '', (string) $lotData['clientLineUuid']))));
+            $lot->setInternalCode(sprintf(
+                'LOT-%s-%03d',
+                $goodsReceipt->getCode(),
+                $lotSequence,
+            ));
             $lot->setOriginType('PRODUCTION');
             $lot->setMerchandise($product);
             $lot->setProvider(null);

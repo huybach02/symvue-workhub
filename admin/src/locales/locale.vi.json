@@ -847,10 +847,50 @@
         }
     },
     "warehouse": {
-        "title": "Warehouse",
+        "title": "Kho",
         "columns": {
             "id": "ID",
             "name": "Tên"
+        },
+        "inventory": {
+            "title": "Chi tiết tồn kho",
+            "view_detail": "Xem chi tiết kho",
+            "balance_tab": "Số dư tồn kho",
+            "movement_tab": "Biến động tồn kho",
+            "merchandise": "Hàng hóa",
+            "lot": "Lô hàng",
+            "lot_status": "Trạng thái lô",
+            "expiry_date": "Hạn sử dụng",
+            "on_hand": "Tồn thực tế",
+            "reserved": "Đã giữ chỗ",
+            "blocked": "Đã khóa",
+            "available": "Có thể sử dụng",
+            "unit": "Đơn vị",
+            "posted_at": "Thời điểm ghi nhận",
+            "movement_type": "Loại biến động",
+            "quantity_delta": "Số lượng biến động",
+            "unit_cost": "Giá vốn / đơn vị",
+            "source_type": "Nguồn nghiệp vụ",
+            "posted_by": "Người thực hiện",
+            "note": "Ghi chú",
+            "movement_types": {
+                "STOCK_IN": "Nhập kho",
+                "STOCK_OUT": "Xuất kho",
+                "ADJUSTMENT": "Điều chỉnh",
+                "TRANSFER_IN": "Chuyển kho vào",
+                "TRANSFER_OUT": "Chuyển kho ra",
+                "REVERSAL": "Đảo giao dịch"
+            },
+            "lot_statuses": {
+                "AVAILABLE": "Khả dụng",
+                "BLOCKED": "Đã khóa",
+                "EXPIRED": "Hết hạn",
+                "DEPLETED": "Đã hết"
+            },
+            "source_types": {
+                "PRODUCTION_MATERIAL_ISSUE": "Xuất nguyên liệu sản xuất",
+                "PRODUCTION_GOODS_RECEIPT": "Nhập thành phẩm sản xuất"
+            }
         }
     },
     "stock_receipt": {

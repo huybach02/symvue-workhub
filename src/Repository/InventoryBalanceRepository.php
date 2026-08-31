@@ -14,6 +14,7 @@ use App\Entity\Merchandise;
 use App\Entity\Warehouse;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\LockMode;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -24,6 +25,20 @@ class InventoryBalanceRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, InventoryBalance::class);
+    }
+
+    public function createForWarehouseQueryBuilder(Warehouse $warehouse): QueryBuilder
+    {
+        return $this->createQueryBuilder('balance')
+            ->addSelect('merchandise', 'lot', 'baseUnit')
+            ->innerJoin('balance.merchandise', 'merchandise')
+            ->innerJoin('balance.lot', 'lot')
+            ->leftJoin('merchandise.baseUnit', 'baseUnit')
+            ->andWhere('balance.warehouse = :warehouse')
+            ->setParameter('warehouse', $warehouse)
+            ->orderBy('merchandise.code', 'ASC')
+            ->addOrderBy('lot.expiryDate', 'ASC')
+            ->addOrderBy('balance.id', 'ASC');
     }
 
     /**
