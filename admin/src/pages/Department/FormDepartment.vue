@@ -11,6 +11,38 @@
             <v-row>
                 <v-col cols="12">
                     <v-row>
+                        <v-col cols="12" md="4">
+                            <VeeField
+                                v-slot="{
+                                    field,
+                                    errorMessage,
+                                    handleChange,
+                                    handleBlur,
+                                }"
+                                name="branchId"
+                            >
+                                <div class="mb-2">
+                                    {{ $t("field.branch") }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-autocomplete
+                                    :model-value="field.value"
+                                    :items="branchOptions"
+                                    item-title="label"
+                                    item-value="value"
+                                    :error-messages="errorMessage"
+                                    :loading="branchOptionsLoading"
+                                    :disabled="mode === 'update'"
+                                    variant="outlined"
+                                    clearable
+                                    :placeholder="`${$t('base.enter')} ${$t('field.branch')}`"
+                                    @update:model-value="
+                                        onBranchChange($event, handleChange)
+                                    "
+                                    @blur="handleBlur"
+                                />
+                            </VeeField>
+                        </v-col>
                         <!-- <v-col cols="12" md="4">
                             <VeeField
                                 v-slot="{
@@ -179,6 +211,7 @@ export default {
         return {
             validationSchema: boPhanSchema,
             initialValues: {
+                branchId: null,
                 tenBoPhan: "",
                 maBoPhan: "",
                 status: 1,
@@ -186,10 +219,16 @@ export default {
             },
             permissionsData: [],
             selectedQuanLyBoPhan: null,
+            selectedBranchId: null,
+            departmentName: "",
         };
     },
     computed: {
         ...mapGetters("department", ["userOptions"]),
+        ...mapGetters("branch", {
+            branchOptions: "options",
+            branchOptionsLoading: "optionsLoading",
+        }),
         nguoiDungOptions() {
             return this.userOptions;
         },
@@ -205,6 +244,8 @@ export default {
             handler(value) {
                 if (value) {
                     this.selectedQuanLyBoPhan = value.quanLyBoPhan;
+                    this.selectedBranchId = value.branchId;
+                    this.departmentName = value.tenBoPhan ?? "";
                     this.$nextTick(() => {
                         if (this.$refs.formRef) {
                             this.$refs.formRef.setValues(value);
@@ -218,17 +259,39 @@ export default {
     },
     created() {
         this.getUser();
+        this.fetchBranchOptions();
     },
     methods: {
         ...mapActions("department", ["fetchUserOptions"]),
+        ...mapActions("branch", { fetchBranchOptions: "fetchOptions" }),
+        onBranchChange(value, handleChange) {
+            this.selectedBranchId = value;
+            handleChange(value);
+
+            if (this.mode === "create") {
+                this.updateDepartmentCode();
+            }
+        },
         onTenBoPhanChange(event, handleChange) {
             const tenBoPhan = event.target.value;
+            this.departmentName = tenBoPhan;
             handleChange(tenBoPhan);
 
-            if (tenBoPhan && this.$refs.formRef) {
-                const maBoPhan = functionHelper.generateMa(tenBoPhan);
-                this.$refs.formRef.setFieldValue("maBoPhan", maBoPhan);
+            this.updateDepartmentCode();
+        },
+        updateDepartmentCode() {
+            if (this.mode !== "create" || !this.$refs.formRef) {
+                return;
             }
+
+            const branch = this.branchOptions.find(
+                (item) => item.value === this.selectedBranchId,
+            );
+            const localCode = functionHelper.generateMa(this.departmentName);
+            const departmentCode =
+                branch?.code && localCode ? `${branch.code}_${localCode}` : localCode;
+
+            this.$refs.formRef.setFieldValue("maBoPhan", departmentCode);
         },
         handleSubmit(values) {
             const submitData = {

@@ -100,10 +100,11 @@ final class DepartmentController extends AbstractController
     public function getDataSelect(Request $request): JsonResponse
     {
         $params = $request->query->all();
+        $branchId = $request->query->getInt("branchId") ?: null;
         $params = validateFilterParams($params);
 
         try {
-            $data = $this->boPhanService->getDataSelect($params);
+            $data = $this->boPhanService->getDataSelect($params, $branchId);
             return CustomResponse::success($data);
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());

@@ -153,6 +153,10 @@
                     </div>
                 </template>
 
+                <template #[`item.branch.id`]="{ item }">
+                    {{ item.branch?.name || "--" }}
+                </template>
+
                 <template #[`item.quanLyBoPhan`]="{ item }">
                     <div class="d-flex flex-column ga-2 py-3">
                         <v-chip
@@ -290,6 +294,14 @@ export default {
                     key: "tenBoPhan",
                     width: 200,
                     filterComponent: markRaw(FilterText),
+                },
+                {
+                    title: this.$t("field.branch"),
+                    key: "branch.id",
+                    width: 220,
+                    filterComponent: markRaw(FilterAutoComplete),
+                    path: API_ROUTES_CONFIG.branch,
+                    sortable: false,
                 },
                 {
                     title: this.$t("bo_phan.columns.chucVuQuanLy"),

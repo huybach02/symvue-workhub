@@ -10,6 +10,11 @@ import * as yup from "yup";
 const t = (key) => i18n.global.t(key);
 
 export const userPositionSchema = yup.object({
+    branchId: buildNumberRule(t("field.branch"), {
+        required: true,
+        min: 1,
+        integer: true,
+    }),
     departmentId: buildNumberRule(t("field.bo_phan"), {
         required: true,
         min: 1,

@@ -13,6 +13,7 @@ use App\Entity\Position;
 use App\Entity\User;
 use App\Entity\UserHasCustomPermission;
 use App\Entity\UserPermission;
+use App\Repository\BranchRepository;
 use App\Repository\DepartmentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -20,6 +21,7 @@ class DepartmentService
 {
     public function __construct(
         private readonly DepartmentRepository $boPhanRepository,
+        private readonly BranchRepository $branchRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly CacheService $cacheService,
         private readonly int $userPermissionLockTtl,
@@ -36,6 +38,11 @@ class DepartmentService
             $params,
             "bp",
             [
+                "branch.id" => [
+                    "alias" => "branch",
+                    "joinField" => "bp.branch",
+                    "targetField" => "id",
+                ],
                 "positionManager.name" => [
                     "alias" => "qlbp",
                     "joinField" => "bp.positions",
@@ -90,23 +97,35 @@ class DepartmentService
     {
         $item = new Department();
 
+        $branch = $this->branchRepository->find($dto->branchId);
+        if (!$branch || !$branch->getCode()) {
+            throw new \Exception(t("error.not_found"));
+        }
+
+        $departmentCode = generateScopedCode(
+            $branch->getCode(),
+            $dto->tenBoPhan,
+        );
+
         $checkExistMaBoPhan = $this->entityManager
             ->getRepository(Department::class)
             ->findOneBy([
-                "maBoPhan" => $dto->maBoPhan,
+                "branch" => $branch,
+                "maBoPhan" => $departmentCode,
             ]);
 
         if ($checkExistMaBoPhan) {
             throw new \Exception(
                 t("error.bo_phan_exist", [
                     "%name%" => $dto->tenBoPhan,
-                    "%ma_bo_phan%" => $dto->maBoPhan,
+                    "%ma_bo_phan%" => $departmentCode,
                 ]),
             );
         }
 
+        $item->setBranch($branch);
         $item->setTenBoPhan($dto->tenBoPhan);
-        $item->setMaBoPhan($dto->maBoPhan);
+        $item->setMaBoPhan($departmentCode);
         $item->setStatus($dto->status);
         $item->setGhiChu($dto->ghiChu);
 
@@ -124,8 +143,11 @@ class DepartmentService
             throw new \Exception(t("error.not_found"));
         }
 
+        if ($item->getBranch()?->getId() !== $dto->branchId) {
+            throw new \Exception(t("error.department_branch_immutable"));
+        }
+
         $item->setTenBoPhan($dto->tenBoPhan);
-        $item->setMaBoPhan($dto->maBoPhan);
         $item->setStatus($dto->status);
         $item->setGhiChu($dto->ghiChu);
 
@@ -159,9 +181,14 @@ class DepartmentService
         $this->entityManager->flush();
     }
 
-    public function getDataSelect(array $params): array
+    public function getDataSelect(array $params, ?int $branchId = null): array
     {
         $qb = $this->boPhanRepository->createQueryBuilder("bp");
+
+        if ($branchId !== null) {
+            $qb->andWhere("IDENTITY(bp.branch) = :branchId")
+                ->setParameter("branchId", $branchId);
+        }
 
         $result = FilterWithPagination::findWithPagination($qb, $params, "bp");
 
@@ -171,6 +198,8 @@ class DepartmentService
             return [
                 "label" => $data["tenBoPhan"] . " (" . $data["maBoPhan"] . ")",
                 "value" => $data["id"],
+                "branchId" => $data["branchId"],
+                "code" => $data["maBoPhan"],
             ];
         }, $result["collection"]);
 
@@ -202,7 +231,31 @@ class DepartmentService
         $position = new Position();
         $position->setDepartment($boPhan);
 
-        $position->setCode($dto->code);
+        $departmentCode = $boPhan->getMaBoPhan();
+        if (!$departmentCode) {
+            throw new \Exception(t("error.param_invalid"));
+        }
+
+        $positionCode = generateScopedCode(
+            $departmentCode,
+            $dto->name,
+        );
+
+        $existingPosition = $this->entityManager
+            ->getRepository(Position::class)
+            ->findOneBy([
+                "department" => $boPhan,
+                "code" => $positionCode,
+            ]);
+
+        if ($existingPosition) {
+            throw new \Exception(t("error.position_exist", [
+                "%name%" => $dto->name,
+                "%code%" => $positionCode,
+            ]));
+        }
+
+        $position->setCode($positionCode);
         $position->setName($dto->name);
         $position->setDescription($dto->description);
         $position->setEmploymentType($dto->employmentType);
@@ -237,7 +290,6 @@ class DepartmentService
             throw new \Exception(t("error.not_found"));
         }
 
-        $position->setCode($dto->code);
         $position->setName($dto->name);
         $position->setDescription($dto->description);
         $position->setEmploymentType($dto->employmentType);

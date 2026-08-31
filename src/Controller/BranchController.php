@@ -42,6 +42,20 @@ final class BranchController extends AbstractController
         }
     }
 
+    #[Route('/branch/select', methods: ['GET'])]
+    public function getDataSelect(Request $request): JsonResponse
+    {
+        $params = validateFilterParams($request->query->all());
+
+        try {
+            return CustomResponse::success(
+                $this->branchService->getDataSelect($params),
+            );
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
     #[Route('/branch/{id}', methods: ['GET'], priority: -1)]
     public function getOne(int $id): JsonResponse
     {

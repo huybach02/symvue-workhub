@@ -5,6 +5,11 @@ import { i18n } from "@/plugins/i18n";
 const t = (key) => i18n.global.t(key);
 
 export const userTemporaryPositionSchema = yup.object({
+    branchId: buildNumberRule(t("field.branch"), {
+        required: true,
+        min: 1,
+        integer: true,
+    }),
     departmentId: buildNumberRule(t("field.department"), {
         required: true,
         min: 1,

@@ -520,22 +520,18 @@ export default {
                     this.$refs.formRef.resetForm({
                         values: {
                             ...this.initialValues,
-                            code: functionHelper.generateMa(
-                                this.initialValues.name,
-                            ),
+                            code: this.buildPositionCode(this.initialValues.name),
                         },
                     });
                     this.allowanceItems = [this.createEmptyAllowance()];
                     return;
                 }
 
-                const code = functionHelper.generateMa(this.item.name ?? "");
-
                 this.$refs.formRef.resetForm({
                     values: {
                         ...this.initialValues,
                         ...this.item,
-                        code,
+                        code: this.item.code,
                     },
                 });
                 this.allowanceItems = this.normalizeAllowances(
@@ -551,10 +547,22 @@ export default {
                 return;
             }
 
+            if (this.item) {
+                return;
+            }
+
             this.$refs.formRef.setFieldValue(
                 "code",
-                functionHelper.generateMa(name),
+                this.buildPositionCode(name),
             );
+        },
+        buildPositionCode(name) {
+            const localCode = functionHelper.generateMa(name ?? "");
+            const departmentCode = this.department?.maBoPhan;
+
+            return departmentCode && localCode
+                ? `${departmentCode}_${localCode}`
+                : localCode;
         },
         createEmptyAllowance() {
             return {

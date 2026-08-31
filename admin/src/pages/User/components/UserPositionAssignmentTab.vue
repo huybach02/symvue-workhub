@@ -28,9 +28,11 @@
                         :item="form"
                         :loading="saving"
                         :currency="displayPosition?.currency || 'VND'"
+                        :branch-options="branchOptions"
                         :department-options="departmentOptions"
                         :position-options="positionOptions"
                         :submit-button-text="$t('button.update')"
+                        @branch-change="handleBranchChange"
                         @department-change="handleDepartmentChange"
                         @position-change="handlePositionChange"
                         @submit="submitForm"
@@ -76,10 +78,14 @@ export default {
     },
     computed: {
         ...mapGetters("user", [
-            "departmentOptions",
+            "departmentOptionsByBranch",
             "positionOptionsByDepartment",
             "userPositionByUserId",
         ]),
+        ...mapGetters("branch", { branchOptions: "options" }),
+        departmentOptions() {
+            return this.departmentOptionsByBranch(this.form.branchId);
+        },
         positionOptions() {
             return this.positionOptionsByDepartment(this.form.departmentId);
         },
@@ -104,8 +110,10 @@ export default {
             "fetchUserPosition",
             "updateUserPosition",
         ]),
+        ...mapActions("branch", { fetchBranchOptions: "fetchOptions" }),
         createDefaultForm() {
             return {
+                branchId: null,
                 departmentId: null,
                 positionId: null,
                 salary: null,
@@ -127,7 +135,7 @@ export default {
 
             try {
                 const [, userPosition] = await Promise.all([
-                    this.fetchDepartmentOptions(),
+                    this.fetchBranchOptions(),
                     this.fetchUserPosition(this.item.id),
                 ]);
 
@@ -147,6 +155,10 @@ export default {
                             : [{ name: "", amount: null }],
                 };
 
+                if (this.form.branchId) {
+                    await this.loadDepartments(this.form.branchId, false);
+                }
+
                 if (this.form.departmentId) {
                     await this.loadPositions(this.form.departmentId, false);
                     this.selectedPosition =
@@ -156,6 +168,35 @@ export default {
                 }
             } finally {
                 this.loading = false;
+            }
+        },
+        async loadDepartments(branchId, resetDepartment = true) {
+            if (!branchId) {
+                this.form = {
+                    ...this.form,
+                    branchId: null,
+                    departmentId: null,
+                    positionId: null,
+                    positionSnapshot: null,
+                };
+                this.selectedPosition = null;
+                return;
+            }
+
+            await this.fetchDepartmentOptions({
+                branchId,
+                force: true,
+            });
+
+            if (resetDepartment) {
+                this.form = {
+                    ...this.form,
+                    branchId,
+                    departmentId: null,
+                    positionId: null,
+                    positionSnapshot: null,
+                };
+                this.selectedPosition = null;
             }
         },
         async loadPositions(departmentId, resetPosition = true) {
@@ -193,6 +234,17 @@ export default {
                 positionOptions.find(
                     (position) => position.id === this.form.positionId,
                 ) || null;
+        },
+        async handleBranchChange(value) {
+            this.form = {
+                ...this.form,
+                branchId: value,
+                departmentId: null,
+                positionId: null,
+                positionSnapshot: null,
+            };
+
+            await this.loadDepartments(value);
         },
         async handleDepartmentChange(value) {
             this.form = {

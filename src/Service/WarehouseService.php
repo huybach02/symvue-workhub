@@ -10,11 +10,14 @@ use App\Entity\InventoryLot;
 use App\Entity\InventoryMovement;
 use App\Entity\Merchandise;
 use App\Entity\Unit;
+use App\Entity\User;
+use App\Entity\UserPosition;
 use App\Entity\Warehouse;
 use App\Repository\InventoryBalanceRepository;
 use App\Repository\InventoryMovementRepository;
 use App\Repository\WarehouseRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 
 class WarehouseService
 {
@@ -25,9 +28,10 @@ class WarehouseService
         private readonly EntityManagerInterface $entityManager,
     ) {}
 
-    public function findAll(array $params): array
+    public function findAll(array $params, User $currentUser): array
     {
         $qb = $this->warehouseRepository->createQueryBuilder('e');
+        $this->restrictToAssignedBranches($qb, $currentUser);
 
         $result = FilterWithPagination::findWithPagination($qb, $params, 'e');
 
@@ -40,10 +44,11 @@ class WarehouseService
         return $result;
     }
 
-    public function getDataSelect(array $params): array
+    public function getDataSelect(array $params, User $currentUser): array
     {
         $qb = $this->warehouseRepository->createQueryBuilder('e')
             ->andWhere('e.status = true');
+        $this->restrictToAssignedBranches($qb, $currentUser);
 
         $result = FilterWithPagination::findWithPagination($qb, $params, 'e');
 
@@ -55,20 +60,20 @@ class WarehouseService
         }, $result['collection']);
     }
 
-    public function findById(int $id): array
+    public function findById(int $id, User $currentUser): array
     {
-        $item = $this->warehouseRepository->find($id);
-        
-        if (!$item) {
-            throw new \Exception(t('error.not_found'));
-        }
+        $item = $this->getWarehouseOrFail($id, $currentUser);
 
         return $item->jsonSerialize();
     }
 
-    public function findInventoryBalances(int $id, array $params): array
+    public function findInventoryBalances(
+        int $id,
+        array $params,
+        User $currentUser,
+    ): array
     {
-        $warehouse = $this->getWarehouseOrFail($id);
+        $warehouse = $this->getWarehouseOrFail($id, $currentUser);
         $qb = $this->inventoryBalanceRepository
             ->createForWarehouseQueryBuilder($warehouse);
 
@@ -108,9 +113,13 @@ class WarehouseService
         return $result;
     }
 
-    public function findInventoryMovements(int $id, array $params): array
+    public function findInventoryMovements(
+        int $id,
+        array $params,
+        User $currentUser,
+    ): array
     {
-        $warehouse = $this->getWarehouseOrFail($id);
+        $warehouse = $this->getWarehouseOrFail($id, $currentUser);
         $qb = $this->inventoryMovementRepository
             ->createForWarehouseQueryBuilder($warehouse);
 
@@ -186,15 +195,56 @@ class WarehouseService
         $this->entityManager->flush();
     }
 
-    private function getWarehouseOrFail(int $id): Warehouse
+    private function getWarehouseOrFail(
+        int $id,
+        User $currentUser,
+    ): Warehouse
     {
-        $warehouse = $this->warehouseRepository->find($id);
+        $qb = $this->warehouseRepository
+            ->createQueryBuilder('warehouse')
+            ->andWhere('warehouse.id = :warehouseId')
+            ->setParameter('warehouseId', $id);
 
-        if (!$warehouse) {
+        $this->restrictToAssignedBranches($qb, $currentUser, 'warehouse');
+
+        $warehouse = $qb->getQuery()->getOneOrNullResult();
+
+        if (!$warehouse instanceof Warehouse) {
             throw new \Exception(t('error.not_found'));
         }
 
         return $warehouse;
+    }
+
+    private function restrictToAssignedBranches(
+        QueryBuilder $qb,
+        User $currentUser,
+        string $warehouseAlias = 'e',
+    ): void {
+        if (isAdmin($currentUser)) {
+            return;
+        }
+
+        $currentTimestamp = time();
+        $assignmentQb = $this->entityManager
+            ->createQueryBuilder()
+            ->select('1')
+            ->from(UserPosition::class, 'assignedPosition')
+            ->innerJoin('assignedPosition.department', 'assignedDepartment')
+            ->andWhere('assignedPosition.member = :warehouseCurrentUser')
+            ->andWhere('assignedPosition.status = 1')
+            ->andWhere(sprintf('assignedDepartment.branch = %s.branch', $warehouseAlias))
+            ->andWhere(
+                '(assignedPosition.startTemp IS NULL OR assignedPosition.startTemp <= :warehouseCurrentTimestamp)',
+            )
+            ->andWhere(
+                '(assignedPosition.endTemp IS NULL OR assignedPosition.endTemp > :warehouseCurrentTimestamp)',
+            );
+
+        $qb
+            ->andWhere($qb->expr()->exists($assignmentQb->getDQL()))
+            ->setParameter('warehouseCurrentUser', $currentUser)
+            ->setParameter('warehouseCurrentTimestamp', $currentTimestamp);
     }
 
     private function serializeBalance(InventoryBalance $balance): array

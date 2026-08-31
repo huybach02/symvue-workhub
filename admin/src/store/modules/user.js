@@ -17,8 +17,8 @@ const state = {
     provinceData: {},
     wardDataByProvince: {},
     employeeCode: "",
-    departmentOptions: [],
-    departmentOptionsLoading: false,
+    departmentOptionsByBranch: {},
+    departmentOptionsLoadingByBranch: {},
     positionOptionsByDepartment: {},
     positionOptionsLoadingByDepartment: {},
     userPositionByUserId: {},
@@ -36,8 +36,10 @@ const getters = {
     wardDataByProvince: (state) => (provinceId) =>
         state.wardDataByProvince[provinceId] ?? {},
     employeeCode: (state) => state.employeeCode,
-    departmentOptions: (state) => state.departmentOptions,
-    departmentOptionsLoading: (state) => state.departmentOptionsLoading,
+    departmentOptionsByBranch: (state) => (branchId) =>
+        state.departmentOptionsByBranch[branchId] ?? [],
+    departmentOptionsLoadingByBranch: (state) => (branchId) =>
+        Boolean(state.departmentOptionsLoadingByBranch[branchId]),
     positionOptionsByDepartment: (state) => (departmentId) =>
         state.positionOptionsByDepartment[departmentId] ?? [],
     positionOptionsLoadingByDepartment: (state) => (departmentId) =>
@@ -78,11 +80,17 @@ const mutations = {
     SET_EMPLOYEE_CODE(state, employeeCode) {
         state.employeeCode = employeeCode;
     },
-    SET_DEPARTMENT_OPTIONS(state, departments) {
-        state.departmentOptions = departments;
+    SET_DEPARTMENT_OPTIONS(state, { branchId, departments }) {
+        state.departmentOptionsByBranch = {
+            ...state.departmentOptionsByBranch,
+            [branchId]: departments,
+        };
     },
-    SET_DEPARTMENT_OPTIONS_LOADING(state, value) {
-        state.departmentOptionsLoading = value;
+    SET_DEPARTMENT_OPTIONS_LOADING(state, { branchId, value }) {
+        state.departmentOptionsLoadingByBranch = {
+            ...state.departmentOptionsLoadingByBranch,
+            [branchId]: value,
+        };
     },
     SET_POSITION_OPTIONS_LOADING(state, { departmentId, value }) {
         state.positionOptionsLoadingByDepartment = {
@@ -197,21 +205,34 @@ const actions = {
 
         return employeeCode;
     },
-    async fetchDepartmentOptions({ commit, state }, { force = false } = {}) {
-        if (!force && state.departmentOptions.length) {
-            return state.departmentOptions;
+    async fetchDepartmentOptions(
+        { commit, state },
+        { branchId, force = false },
+    ) {
+        if (!branchId) {
+            return [];
         }
 
-        commit("SET_DEPARTMENT_OPTIONS_LOADING", true);
+        const cachedData = state.departmentOptionsByBranch[branchId];
+        if (!force && cachedData) {
+            return cachedData;
+        }
+
+        commit("SET_DEPARTMENT_OPTIONS_LOADING", { branchId, value: true });
 
         try {
             const departments =
-                (await getDataSelect(API_ROUTES_CONFIG.department)) ?? [];
-            commit("SET_DEPARTMENT_OPTIONS", departments);
+                (await getDataSelect(API_ROUTES_CONFIG.department, {
+                    branchId,
+                })) ?? [];
+            commit("SET_DEPARTMENT_OPTIONS", { branchId, departments });
 
             return departments;
         } finally {
-            commit("SET_DEPARTMENT_OPTIONS_LOADING", false);
+            commit("SET_DEPARTMENT_OPTIONS_LOADING", {
+                branchId,
+                value: false,
+            });
         }
     },
     async fetchDepartmentPositions(

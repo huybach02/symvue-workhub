@@ -16,13 +16,50 @@
 
             <v-card-text>
                 <VeeForm
+                    v-slot="{ setFieldValue, handleSubmit }"
                     :initial-values="initialValues"
                     :validation-schema="validationSchema"
                     as="div"
-                    v-slot="{ setFieldValue, handleSubmit }"
                 >
                     <v-row>
-                        <v-col cols="12" md="6">
+                        <v-col cols="12" md="4">
+                            <VeeField
+                                v-slot="{
+                                    field,
+                                    errorMessage,
+                                    handleChange,
+                                    handleBlur,
+                                }"
+                                name="branchId"
+                            >
+                                <div class="mb-2">
+                                    {{ $t("field.branch") }}
+                                    <span class="text-red"> * </span>
+                                </div>
+                                <v-autocomplete
+                                    :model-value="field.value"
+                                    :items="branchOptions"
+                                    item-title="label"
+                                    item-value="value"
+                                    :error-messages="errorMessage"
+                                    variant="outlined"
+                                    clearable
+                                    :loading="branchOptionsLoading"
+                                    :placeholder="`${$t('base.enter')} ${$t('field.branch')}`"
+                                    @update:model-value="
+                                        handleBranchChange(
+                                            $event,
+                                            handleChange,
+                                            handleBlur,
+                                            setFieldValue,
+                                        )
+                                    "
+                                    @blur="handleBlur"
+                                />
+                            </VeeField>
+                        </v-col>
+
+                        <v-col cols="12" md="4">
                             <VeeField
                                 v-slot="{
                                     field,
@@ -45,6 +82,7 @@
                                     variant="outlined"
                                     clearable
                                     :loading="departmentOptionsLoading"
+                                    :disabled="!selectedBranchId"
                                     :placeholder="`${$t('base.enter')} ${$t('field.bo_phan')}`"
                                     @update:model-value="
                                         handleDepartmentChange(
@@ -59,7 +97,7 @@
                             </VeeField>
                         </v-col>
 
-                        <v-col cols="12" md="6">
+                        <v-col cols="12" md="4">
                             <VeeField
                                 v-slot="{
                                     field,
@@ -258,6 +296,7 @@ export default {
     data() {
         return {
             initialValues: {
+                branchId: null,
                 departmentId: null,
                 positionId: null,
                 startTempDate: "",
@@ -265,17 +304,22 @@ export default {
                 endTempDate: "",
                 endTempTime: "",
             },
+            selectedBranchId: null,
             selectedDepartmentId: null,
             validationSchema: userTemporaryPositionSchema,
         };
     },
     computed: {
         ...mapGetters("user", [
-            "departmentOptions",
-            "departmentOptionsLoading",
+            "departmentOptionsByBranch",
+            "departmentOptionsLoadingByBranch",
             "positionOptionsByDepartment",
             "positionOptionsLoadingByDepartment",
         ]),
+        ...mapGetters("branch", {
+            branchOptions: "options",
+            branchOptionsLoading: "optionsLoading",
+        }),
         model: {
             get() {
                 return this.modelValue;
@@ -287,6 +331,12 @@ export default {
         positionOptions() {
             return this.positionOptionsByDepartment(this.selectedDepartmentId);
         },
+        departmentOptions() {
+            return this.departmentOptionsByBranch(this.selectedBranchId);
+        },
+        departmentOptionsLoading() {
+            return this.departmentOptionsLoadingByBranch(this.selectedBranchId);
+        },
         positionOptionsLoading() {
             return this.positionOptionsLoadingByDepartment(
                 this.selectedDepartmentId,
@@ -294,15 +344,23 @@ export default {
         },
     },
     created() {
-        this.loadDepartmentOptions();
+        this.fetchBranchOptions();
     },
     methods: {
         ...mapActions("user", [
             "fetchDepartmentOptions",
             "fetchDepartmentPositions",
         ]),
-        async loadDepartmentOptions() {
-            await this.fetchDepartmentOptions();
+        ...mapActions("branch", { fetchBranchOptions: "fetchOptions" }),
+        async loadDepartmentOptions(branchId) {
+            if (!branchId) {
+                return;
+            }
+
+            await this.fetchDepartmentOptions({
+                branchId,
+                force: true,
+            });
         },
         async loadPositionOptions(departmentId) {
             if (!departmentId) {
@@ -313,6 +371,20 @@ export default {
                 departmentId,
                 force: true,
             });
+        },
+        async handleBranchChange(
+            value,
+            handleChange,
+            handleBlur,
+            setFieldValue,
+        ) {
+            this.selectedBranchId = value;
+            this.selectedDepartmentId = null;
+            handleChange(value);
+            handleBlur();
+            setFieldValue("departmentId", null);
+            setFieldValue("positionId", null);
+            await this.loadDepartmentOptions(value);
         },
         async handleDepartmentChange(
             value,
@@ -331,7 +403,9 @@ export default {
             handleBlur();
         },
         submitTemporaryPosition(values) {
-            this.$emit("submit", values);
+            const payload = { ...values };
+            delete payload.branchId;
+            this.$emit("submit", payload);
         },
     },
 };

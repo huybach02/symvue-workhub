@@ -690,8 +690,20 @@ if (!function_exists("generateCodeFromName")) {
     function generateCodeFromName(string $name): string
     {
         $normalized = removeVietnameseDiacritics($name);
+        $normalized = preg_replace('/[^a-zA-Z0-9]+/', '_', $normalized) ?? '';
 
-        return strtoupper(str_replace(" ", "_", $normalized));
+        return strtoupper(trim($normalized, '_'));
+    }
+}
+
+if (!function_exists("generateScopedCode")) {
+    function generateScopedCode(string $parentCode, string $name): string
+    {
+        return sprintf(
+            "%s_%s",
+            trim($parentCode, "_"),
+            generateCodeFromName($name),
+        );
     }
 }
 

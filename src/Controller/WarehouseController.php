@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Class\CustomResponse;
 use App\DTO\WarehouseDTO;
+use App\Entity\User;
 use App\Service\WarehouseService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,11 +22,13 @@ final class WarehouseController extends AbstractController
     #[Route('/warehouse', methods: ['GET'])]
     public function getAll(Request $request): JsonResponse
     {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
         $params = $request->query->all();
         $params = validateFilterParams($params);
 
         try {
-            $result = $this->warehouseService->findAll($params);
+            $result = $this->warehouseService->findAll($params, $currentUser);
             return CustomResponse::success($this->formatPaginatedResult($result));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
@@ -35,11 +38,13 @@ final class WarehouseController extends AbstractController
     #[Route('/warehouse/select', methods: ['GET'])]
     public function select(Request $request): JsonResponse
     {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
         $params = $request->query->all();
         $params = validateFilterParams($params);
 
         try {
-            $data = $this->warehouseService->getDataSelect($params);
+            $data = $this->warehouseService->getDataSelect($params, $currentUser);
             return CustomResponse::success($data);
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
@@ -49,8 +54,11 @@ final class WarehouseController extends AbstractController
     #[Route('/warehouse/{id}', methods: ['GET'], priority: -1)]
     public function getOne(int $id): JsonResponse
     {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
         try {
-            $data = $this->warehouseService->findById($id);
+            $data = $this->warehouseService->findById($id, $currentUser);
             return CustomResponse::success($data);
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
@@ -60,9 +68,16 @@ final class WarehouseController extends AbstractController
     #[Route('/warehouse/{id}/inventory-balances', methods: ['GET'])]
     public function getInventoryBalances(int $id, Request $request): JsonResponse
     {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
         try {
             $params = validateFilterParams($request->query->all());
-            $result = $this->warehouseService->findInventoryBalances($id, $params);
+            $result = $this->warehouseService->findInventoryBalances(
+                $id,
+                $params,
+                $currentUser,
+            );
 
             return CustomResponse::success($this->formatPaginatedResult($result));
         } catch (\Throwable $th) {
@@ -73,9 +88,16 @@ final class WarehouseController extends AbstractController
     #[Route('/warehouse/{id}/inventory-movements', methods: ['GET'])]
     public function getInventoryMovements(int $id, Request $request): JsonResponse
     {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
         try {
             $params = validateFilterParams($request->query->all());
-            $result = $this->warehouseService->findInventoryMovements($id, $params);
+            $result = $this->warehouseService->findInventoryMovements(
+                $id,
+                $params,
+                $currentUser,
+            );
 
             return CustomResponse::success($this->formatPaginatedResult($result));
         } catch (\Throwable $th) {

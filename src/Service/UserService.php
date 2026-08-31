@@ -436,28 +436,39 @@ class UserService
         $userPosition = $this->entityManager
             ->getRepository(UserPosition::class)
             ->find($id);
-        if (!$userPosition) {
+        if (!$userPosition || (int) $userPosition->getIsPrimary() !== 0) {
             throw new \Exception(t("error.not_found"));
         }
 
-        $this->entityManager->remove($userPosition);
-        $this->entityManager->flush();
+        $memberId = $userPosition->getMember()?->getId();
+        $departmentId = $userPosition->getDepartment()?->getId();
+        $positionId = $userPosition->getPosition()?->getId();
+
+        if (!$memberId || !$departmentId || !$positionId) {
+            throw new \Exception(t("error.not_found"));
+        }
 
         $userPermission = $this->entityManager
             ->getRepository(UserPermission::class)
             ->findOneBy([
-                "userId" => $userPosition->getMember()->getId(),
-                "departmentId" => $userPosition->getDepartment()->getId(),
-                "positionId" => $userPosition->getPosition()->getId(),
-                "isPrimary" => false,
+                "userId" => $memberId,
+                "departmentId" => $departmentId,
+                "positionId" => $positionId,
+                "startTemp" => $userPosition->getStartTemp(),
+                "endTemp" => $userPosition->getEndTemp(),
             ]);
+
+        $data = $userPosition->jsonSerialize();
+        $this->entityManager->remove($userPosition);
 
         if ($userPermission) {
             $this->entityManager->remove($userPermission);
-            $this->entityManager->flush();
         }
 
-        return $userPosition->jsonSerialize();
+        $this->entityManager->flush();
+        $this->boPhanService->mergeUserPermissions($memberId);
+
+        return $data;
     }
 
     public function uploadUserContracts(int $userId, Request $request): array
@@ -528,12 +539,17 @@ class UserService
             throw new \Exception(t("error.not_found"));
         }
 
+        $startTempValue = $startTemp > 0 ? $startTemp : null;
+        $endTempValue = $endTemp > 0 ? $endTemp : null;
+
         $userPermission = $this->entityManager
             ->getRepository(UserPermission::class)
             ->findOneBy([
                 "userId" => $user->getId(),
                 "departmentId" => $department->getId(),
                 "positionId" => $position->getId(),
+                "startTemp" => $startTempValue,
+                "endTemp" => $endTempValue,
             ]);
 
         if (!$userPermission) {
@@ -548,10 +564,8 @@ class UserService
         $userPermission->setPositionId($position->getId());
         $userPermission->setPhanQuyen($permissions);
 
-        if ($startTemp > 0 && $endTemp > 0) {
-            $userPermission->setStartTemp($startTemp);
-            $userPermission->setEndTemp($endTemp);
-        }
+        $userPermission->setStartTemp($startTempValue);
+        $userPermission->setEndTemp($endTempValue);
 
         $this->entityManager->persist($userPermission);
         $this->entityManager->flush();
@@ -581,6 +595,8 @@ class UserService
                 "userId" => $user->getId(),
                 "departmentId" => $oldDepartment->getId(),
                 "positionId" => $oldPosition->getId(),
+                "startTemp" => null,
+                "endTemp" => null,
             ]);
 
         if (!$oldUserPermission) {

@@ -15,8 +15,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Entity(repositoryClass: PositionRepository::class)]
 #[ORM\Table(name: '`position`')]
 #[ORM\UniqueConstraint(
-    name: 'UNIQ_POSITION_CODE',
-    fields: ['code'],
+    name: 'UNIQ_POSITION_DEPARTMENT_CODE',
+    columns: ['department_id', 'code'],
     options: ['where' => 'deleted_at IS NULL']
 )]
 #[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]

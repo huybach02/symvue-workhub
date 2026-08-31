@@ -8,7 +8,33 @@
         @submit="handleSubmit"
     >
         <v-row>
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="4">
+                <VeeField
+                    v-slot="{ field, errorMessage, handleChange, handleBlur }"
+                    name="branchId"
+                >
+                    <div class="mb-2">
+                        {{ $t("field.branch") }}
+                        <span class="text-red"> * </span>
+                    </div>
+                    <v-autocomplete
+                        :model-value="field.value"
+                        :items="branchOptions"
+                        item-title="label"
+                        item-value="value"
+                        :error-messages="errorMessage"
+                        variant="outlined"
+                        clearable
+                        :placeholder="`${$t('base.enter')} ${$t('field.branch')}`"
+                        @update:model-value="
+                            handleBranchChange($event, handleChange)
+                        "
+                        @blur="handleBlur"
+                    />
+                </VeeField>
+            </v-col>
+
+            <v-col cols="12" md="4">
                 <VeeField
                     v-slot="{ field, errorMessage, handleChange, handleBlur }"
                     name="departmentId"
@@ -25,6 +51,7 @@
                         :error-messages="errorMessage"
                         variant="outlined"
                         clearable
+                        :disabled="!selectedBranchId"
                         :placeholder="`${$t('base.enter')} ${$t('field.bo_phan')}`"
                         @update:model-value="
                             handleDepartmentChange($event, handleChange)
@@ -34,7 +61,7 @@
                 </VeeField>
             </v-col>
 
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="4">
                 <VeeField
                     v-slot="{ field, errorMessage, handleChange, handleBlur }"
                     name="positionId"
@@ -364,6 +391,10 @@ export default {
             type: String,
             default: "VND",
         },
+        branchOptions: {
+            type: Array,
+            default: () => [],
+        },
         departmentOptions: {
             type: Array,
             default: () => [],
@@ -373,7 +404,7 @@ export default {
             default: () => [],
         },
     },
-    emits: ["submit", "department-change", "position-change"],
+    emits: ["submit", "branch-change", "department-change", "position-change"],
     data() {
         const { bindFormattedNumberField, bindFormattedNumberModel } =
             useFormatInputNumber();
@@ -384,12 +415,14 @@ export default {
             validationSchema: userPositionSchema,
             initialValues: this.getInitialValues(this.item),
             allowanceItems: this.normalizeAllowances(this.item?.allowances),
+            selectedBranchId: this.item?.branchId ?? null,
             selectedDepartmentId: this.item?.departmentId ?? null,
         };
     },
     computed: {
         formKey() {
             return [
+                this.item?.branchId ?? "new",
                 this.item?.departmentId ?? "new",
                 this.item?.positionId ?? "new",
                 this.item?.probationFrom ?? "empty",
@@ -408,6 +441,7 @@ export default {
     methods: {
         getInitialValues(item = null) {
             return {
+                branchId: item?.branchId ?? null,
                 departmentId: item?.departmentId ?? null,
                 positionId: item?.positionId ?? null,
                 salary: item?.salary ?? null,
@@ -441,6 +475,7 @@ export default {
             this.allowanceItems = this.normalizeAllowances(
                 this.item?.allowances,
             );
+            this.selectedBranchId = this.item?.branchId ?? null;
             this.selectedDepartmentId = this.item?.departmentId ?? null;
 
             this.$nextTick(() => {
@@ -452,6 +487,18 @@ export default {
                     values: this.initialValues,
                 });
             });
+        },
+        handleBranchChange(value, handleChange) {
+            this.selectedBranchId = value;
+            this.selectedDepartmentId = null;
+            handleChange(value);
+
+            if (this.$refs.formRef) {
+                this.$refs.formRef.setFieldValue("departmentId", null);
+                this.$refs.formRef.setFieldValue("positionId", null);
+            }
+
+            this.$emit("branch-change", value);
         },
         handleDepartmentChange(value, handleChange) {
             this.selectedDepartmentId = value;

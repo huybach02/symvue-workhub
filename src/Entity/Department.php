@@ -15,8 +15,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Entity(repositoryClass: DepartmentRepository::class)]
 #[ORM\Table(name: 'department')]
 #[ORM\UniqueConstraint(
-    name: 'UNIQ_DEPARTMENT_MA_BO_PHAN',
-    fields: ['maBoPhan'],
+    name: 'UNIQ_DEPARTMENT_BRANCH_CODE',
+    columns: ['branch_id', 'ma_bo_phan'],
     options: ['where' => 'deleted_at IS NULL']
 )]
 #[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
@@ -36,6 +36,10 @@ class Department
 
     #[ORM\Column(length: 255)]
     private ?string $tenBoPhan = null;
+
+    #[ORM\ManyToOne(inversedBy: 'departments')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Branch $branch = null;
 
     #[ORM\Column(options: ["default" => 1])]
     private ?int $status = 1;
@@ -99,6 +103,18 @@ class Department
         return $this;
     }
 
+    public function getBranch(): ?Branch
+    {
+        return $this->branch;
+    }
+
+    public function setBranch(Branch $branch): static
+    {
+        $this->branch = $branch;
+
+        return $this;
+    }
+
     public function getStatus(): ?int
     {
         return $this->status;
@@ -148,6 +164,12 @@ class Department
             'id' => $this->id,
             'maBoPhan' => $this->maBoPhan,
             'tenBoPhan' => $this->tenBoPhan,
+            'branchId' => $this->branch?->getId(),
+            'branch' => $this->branch ? [
+                'id' => $this->branch->getId(),
+                'code' => $this->branch->getCode(),
+                'name' => $this->branch->getName(),
+            ] : null,
             'positionCount' => $this->positions->count(),
             'status' => $this->status,
             'ghiChu' => $this->ghiChu,

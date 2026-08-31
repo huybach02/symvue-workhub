@@ -1,10 +1,16 @@
 import * as yup from "yup";
-import { buildStringRule } from "../validationBuilder";
+import { buildNumberRule, buildStringRule } from "../validationBuilder";
 import { i18n } from "@/plugins/i18n";
 
 const t = (key) => i18n.global.t(key);
 
 export const boPhanSchema = yup.object({
+    branchId: buildNumberRule(t("field.branch"), {
+        required: true,
+        min: 1,
+        integer: true,
+    }),
+
     tenBoPhan: buildStringRule(t("field.ten_bo_phan"), {
         required: true,
         min: 2,

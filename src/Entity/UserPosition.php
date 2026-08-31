@@ -368,6 +368,7 @@ class UserPosition
     {
         return [
             "id" => $this->id,
+            "branchId" => $this->department?->getBranch()?->getId(),
             "departmentId" => $this->department?->getId(),
             "department" => $this->department?->jsonSerialize(),
             "positionId" => $this->position?->getId(),

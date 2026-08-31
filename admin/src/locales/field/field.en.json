@@ -141,6 +141,7 @@
     "manufacture_date": "Manufacture date",
     "expiry_date": "Expiry date",
     "supplier_lot_code": "Supplier lot code",
-    "internal_lot_code": "Internal lot code"
+    "internal_lot_code": "Internal lot code",
+    "branch": "Branch"
   }
 }

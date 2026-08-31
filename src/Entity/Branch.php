@@ -6,6 +6,8 @@ use App\Repository\BranchRepository;
 use App\Traits\ModifierTrait;
 use App\Traits\SoftDeleteableTrait;
 use App\Traits\TimestampableTrait;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -55,6 +57,17 @@ class Branch
 
     #[ORM\OneToOne(mappedBy: 'branch', cascade: ['persist', 'remove'])]
     private ?Warehouse $warehouse = null;
+
+    /**
+     * @var Collection<int, Department>
+     */
+    #[ORM\OneToMany(targetEntity: Department::class, mappedBy: 'branch')]
+    private Collection $departments;
+
+    public function __construct()
+    {
+        $this->departments = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -179,6 +192,24 @@ class Branch
         return $this;
     }
 
+    /**
+     * @return Collection<int, Department>
+     */
+    public function getDepartments(): Collection
+    {
+        return $this->departments;
+    }
+
+    public function addDepartment(Department $department): static
+    {
+        if (!$this->departments->contains($department)) {
+            $this->departments->add($department);
+            $department->setBranch($this);
+        }
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
         return [
@@ -192,6 +223,7 @@ class Branch
             'status' => $this->status ? 1 : 0,
             'note' => $this->note,
             'warehouse' => $this->getWarehouse()?->jsonSerialize(),
+            'departmentCount' => $this->departments->count(),
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];

@@ -7,6 +7,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 class DepartmentDTO
 {
     public function __construct(
+        #[Assert\NotBlank(groups: ['create', 'update'])]
+        #[Assert\Positive(groups: ['create', 'update'])]
+        public readonly ?int $branchId = null,
+
         // #[Assert\NotBlank(groups: ['create', 'update'])]
         // public readonly ?int $quanLyBoPhanId = null,
 

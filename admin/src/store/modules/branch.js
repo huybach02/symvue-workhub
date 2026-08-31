@@ -1,5 +1,9 @@
 import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
-import { getDataById, getListData } from "@/services/bases/getData";
+import {
+    getDataById,
+    getDataSelect,
+    getListData,
+} from "@/services/bases/getData";
 import { deleteData } from "@/services/bases/deleteData";
 import { postData } from "@/services/bases/postData";
 import { putData } from "@/services/bases/updateData";
@@ -9,6 +13,8 @@ const state = {
     totalItems: 0,
     loading: false,
     detailsById: {},
+    options: [],
+    optionsLoading: false,
 };
 
 const getters = {
@@ -16,6 +22,8 @@ const getters = {
     totalItems: (state) => state.totalItems,
     loading: (state) => state.loading,
     itemById: (state) => (id) => state.detailsById[id] ?? null,
+    options: (state) => state.options,
+    optionsLoading: (state) => state.optionsLoading,
 };
 
 const mutations = {
@@ -31,6 +39,12 @@ const mutations = {
             ...state.detailsById,
             [id]: data,
         };
+    },
+    SET_OPTIONS(state, options) {
+        state.options = options;
+    },
+    SET_OPTIONS_LOADING(state, value) {
+        state.optionsLoading = value;
     },
 };
 
@@ -70,14 +84,48 @@ const actions = {
 
         return data;
     },
-    async createItem(_, values) {
-        return postData(API_ROUTES_CONFIG.branch, values);
+    async fetchOptions({ commit, state }, { force = false } = {}) {
+        if (!force && state.options.length) {
+            return state.options;
+        }
+
+        commit("SET_OPTIONS_LOADING", true);
+
+        try {
+            const options = (await getDataSelect(API_ROUTES_CONFIG.branch)) ?? [];
+            commit("SET_OPTIONS", options);
+
+            return options;
+        } finally {
+            commit("SET_OPTIONS_LOADING", false);
+        }
     },
-    async updateItem(_, { id, values }) {
-        return putData(API_ROUTES_CONFIG.branch, id, values);
+    async createItem({ dispatch }, values) {
+        const response = await postData(API_ROUTES_CONFIG.branch, values);
+
+        if (response) {
+            await dispatch("fetchOptions", { force: true });
+        }
+
+        return response;
     },
-    async deleteItem(_, id) {
-        return deleteData(API_ROUTES_CONFIG.branch, id);
+    async updateItem({ dispatch }, { id, values }) {
+        const response = await putData(API_ROUTES_CONFIG.branch, id, values);
+
+        if (response) {
+            await dispatch("fetchOptions", { force: true });
+        }
+
+        return response;
+    },
+    async deleteItem({ dispatch }, id) {
+        const response = await deleteData(API_ROUTES_CONFIG.branch, id);
+
+        if (response?.success) {
+            await dispatch("fetchOptions", { force: true });
+        }
+
+        return response;
     },
 };
 

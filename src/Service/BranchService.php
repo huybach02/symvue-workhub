@@ -43,6 +43,29 @@ class BranchService
         return $item->jsonSerialize();
     }
 
+    public function getDataSelect(array $params): array
+    {
+        $qb = $this->branchRepository
+            ->createQueryBuilder('branch')
+            ->andWhere('branch.status = :status')
+            ->setParameter('status', true);
+
+        $result = FilterWithPagination::findWithPagination(
+            $qb,
+            $params,
+            'branch',
+        );
+
+        return array_map(
+            static fn(Branch $branch): array => [
+                'label' => sprintf('%s (%s)', $branch->getName(), $branch->getCode()),
+                'value' => $branch->getId(),
+                'code' => $branch->getCode(),
+            ],
+            $result['collection'],
+        );
+    }
+
     public function create(BranchDTO $dto): array
     {
         $item = new Branch();
@@ -83,9 +106,6 @@ class BranchService
             throw new \Exception(t('error.not_found'));
         }
 
-        $branchCode = generateCodeFromName($dto->name);
-
-        $item->setCode($branchCode);
         $item->setName($dto->name);
         $item->setEmail($dto->email);
         $item->setPhone($dto->phone);
@@ -94,7 +114,6 @@ class BranchService
         $item->setNote($dto->note);
 
         $warehouse = $item->getWarehouse();
-        $warehouse->setCode($branchCode . '_WAREHOUSE');
         $warehouse->setName($dto->name . ' Warehouse');
         $warehouse->setStatus($dto->status);
         $warehouse->setNote($dto->note);
@@ -112,8 +131,12 @@ class BranchService
             throw new \Exception(t('error.not_found'));
         }
 
-        if ($item->getType() !== WarehouseType::Main->value) {
+        if ($item->getType() === WarehouseType::Main->value) {
             throw new \Exception(t('error.cannot_delete_record'));
+        }
+
+        if (!$item->getDepartments()->isEmpty()) {
+            throw new \Exception(t('error.branch_has_department'));
         }
 
         $this->entityManager->remove($item);

@@ -145,6 +145,7 @@
     "manufacture_date": "Ngày sản xuất",
     "expiry_date": "Hạn sử dụng",
     "supplier_lot_code": "Mã lô NCC",
-    "internal_lot_code": "Mã lot nội bộ"
+    "internal_lot_code": "Mã lot nội bộ",
+    "branch": "Chi nhánh"
   }
 }
