@@ -352,7 +352,7 @@ class RequestTypeService
                         throw new \Exception('Lệnh sản xuất cần bù không còn hợp lệ');
                     }
 
-                    $planned = $target->getPlannedBaseQuantity() ?? '0.000000';
+                    $planned = $target->getPlannedBaseQuantity() ?? '0';
                     $minimum = MathHelper::sub(
                         $planned,
                         MathHelper::mul(
@@ -365,17 +365,17 @@ class RequestTypeService
                     $shortageData = $target->getShortageData() ?? [];
                     $effective = MathHelper::add(
                         $target->getAcceptedBaseQuantity(),
-                        (string) ($shortageData['externalFulfilledBaseQuantity'] ?? '0.000000'),
+                        (string) ($shortageData['externalFulfilledBaseQuantity'] ?? '0'),
                         6,
                     );
                     $minimumRemaining = MathHelper::sub($minimum, $effective, 6);
                     $fullRemaining = MathHelper::sub($planned, $effective, 6);
                     $minimumRemaining = MathHelper::comp($minimumRemaining, '0') > 0
                         ? $minimumRemaining
-                        : '0.000000';
+                        : MathHelper::zero(6);
                     $fullRemaining = MathHelper::comp($fullRemaining, '0') > 0
                         ? $fullRemaining
-                        : '0.000000';
+                        : MathHelper::zero(6);
                     $requestedQuantity = ($selection['mode'] ?? null) === 'FULL'
                         ? $fullRemaining
                         : $minimumRemaining;

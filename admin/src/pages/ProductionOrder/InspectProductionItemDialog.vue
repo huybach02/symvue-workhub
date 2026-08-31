@@ -175,13 +175,20 @@ export default {
         totalReceived() { return this.lots.reduce((total, lot) => total + (Number(lot.receivedQuantity) || 0), 0); },
         totalAccepted() { return this.lots.reduce((total, lot) => total + (Number(lot.acceptedQuantity) || 0), 0); },
         totalRejected() { return this.lots.reduce((total, lot) => total + this.lotRejected(lot), 0); },
+        acceptedAfter() { return Number(this.item?.acceptedBaseQuantity || 0) + this.totalAccepted; },
         effectiveAfter() { return Number(this.item?.acceptedBaseQuantity || 0) + this.externalFulfilled + this.totalAccepted; },
         hasShortage() { return this.effectiveAfter < this.minimumTarget; },
+        hasIncompleteProductionTarget() { return this.hasPlannedSupplement && this.acceptedAfter < this.productionTarget; },
         balanceStatus() {
             if (this.hasShortage) return "shortage";
-            return this.effectiveAfter > Number(this.item?.plannedBaseQuantity || 0) ? "surplus" : "balanced";
+            if (this.hasIncompleteProductionTarget) return "partial_target";
+            const balanceTarget = this.hasPlannedSupplement
+                ? this.productionTarget
+                : Number(this.item?.plannedBaseQuantity || 0);
+            const actual = this.hasPlannedSupplement ? this.acceptedAfter : this.effectiveAfter;
+            return actual > balanceTarget ? "surplus" : "balanced";
         },
-        balanceColor() { return { shortage: "error", surplus: "warning", balanced: "success" }[this.balanceStatus] || "grey"; },
+        balanceColor() { return { shortage: "error", partial_target: "warning", surplus: "warning", balanced: "success" }[this.balanceStatus] || "grey"; },
         balanceLabel() { return this.$t(`production_order.inspection.${this.balanceStatus}`); },
     },
     watch: {

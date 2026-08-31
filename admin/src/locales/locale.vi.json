@@ -1015,6 +1015,7 @@
             "expected": "Yêu cầu",
             "balanced": "Đủ",
             "shortage": "Thiếu",
+            "partial_target": "Chưa đạt mục tiêu sản xuất",
             "surplus": "Thừa",
             "planned": "Kế hoạch",
             "production_target": "Mục tiêu sản xuất",

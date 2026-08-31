@@ -101,6 +101,7 @@
       "expected": "Expected",
       "balanced": "Balanced",
       "shortage": "Shortage",
+      "partial_target": "Production target pending",
       "surplus": "Surplus",
       "planned": "Planned",
       "production_target": "Production target",

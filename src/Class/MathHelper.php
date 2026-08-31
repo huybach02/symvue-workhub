@@ -13,6 +13,14 @@ use Brick\Math\RoundingMode;
 class MathHelper
 {
     /**
+     * Trả về số 0 theo đúng scale yêu cầu.
+     */
+    public static function zero(int $scale = 6): string
+    {
+        return (string) BigDecimal::zero()->toScale($scale);
+    }
+
+    /**
      * Phép nhân: $a * $b (Thay thế bcmul)
      */
     public static function mul(string|int|float $a, string|int|float $b, int $scale = 6): string

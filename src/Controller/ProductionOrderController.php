@@ -107,9 +107,10 @@ final class ProductionOrderController extends AbstractController
         $currentUser = $this->getUser();
 
         try {
+            $result = $this->productionInspectionService->inspect($id, $dto, $currentUser);
             return CustomResponse::success(
-                $this->productionInspectionService->inspect($id, $dto, $currentUser),
-                'Đã kiểm hàng và nhập kho thành phẩm',
+                $result,
+                t('success.updated'),
             );
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());

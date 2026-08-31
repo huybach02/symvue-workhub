@@ -29,14 +29,14 @@ use Doctrine\ORM\EntityManagerInterface;
 final class ProductionInspectionService
 {
     private const QUANTITY_SCALE = 6;
+    private const COST_SCALE = 4;
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ProductionOrderItemRepository $productionOrderItemRepository,
         private readonly ProductionItemInspectionRepository $inspectionRepository,
         private readonly ProductionOrderService $productionOrderService,
-    ) {
-    }
+    ) {}
 
     public function inspect(
         int $itemId,
@@ -75,6 +75,11 @@ final class ProductionInspectionService
             $postedAt = new \DateTime();
             $metricsBefore = $this->metrics($item);
             [$lots, $acceptedCurrent] = $this->normalizeLots($dto->lots);
+            $costing = $this->calculateMaterialCosting(
+                $item,
+                $metricsBefore['productionTarget'],
+                $acceptedCurrent,
+            );
 
             $inspection = new ProductionItemInspection();
             $inspection->setCode(generateSequentialCode($this->entityManager, 'KHSX', 'production_item_inspection'));
@@ -84,28 +89,44 @@ final class ProductionInspectionService
             // Cần flush để lấy id phục vụ sourceRef của lot; kết quả cuối cùng sẽ
             // được ghi đè sau khi đã post kho và phân bổ shortage trong transaction này.
             $inspection->setResolution('PENDING');
-            $inspection->setRemainingBaseQuantityBefore($metricsBefore['fullRemaining']);
-            $inspection->setRemainingBaseQuantityAfter($metricsBefore['fullRemaining']);
+            $inspection->setRemainingBaseQuantityBefore($metricsBefore['completionRemaining']);
+            $inspection->setRemainingBaseQuantityAfter($metricsBefore['completionRemaining']);
             $inspection->setLots($lots);
             $inspection->setPostedAt($postedAt);
             $this->entityManager->persist($inspection);
 
-            $goodsReceipt = $this->createGoodsReceipt($inspection, $order, $acceptedCurrent, $postedAt);
+            $goodsReceipt = $this->createGoodsReceipt(
+                $inspection,
+                $order,
+                $acceptedCurrent,
+                $costing['receiptTotalCost'],
+                $postedAt,
+            );
             $this->entityManager->persist($goodsReceipt);
             // Cần id inspection/receipt để sourceRef của lot bất biến và truy vết được.
             $this->entityManager->flush();
 
-            $this->postAcceptedLotsToInventory($item, $inspection, $goodsReceipt, $lots, $postedAt, $currentUser);
+            $this->postAcceptedLotsToInventory(
+                $item,
+                $inspection,
+                $goodsReceipt,
+                $lots,
+                $costing['unitCostBase'],
+                $postedAt,
+                $currentUser,
+            );
             $item->setAcceptedBaseQuantity(MathHelper::add($item->getAcceptedBaseQuantity(), $acceptedCurrent, self::QUANTITY_SCALE));
 
             $allocations = $this->allocateSurplusToSelectedShortages($item, $inspection, $postedAt, $currentUser);
             $metricsAfter = $this->metrics($item);
             $resolution = $this->resolveCurrentItem($item, $dto->shortageResolution, $metricsAfter, $postedAt);
             $inspection->setResolution($resolution);
-            $inspection->setRemainingBaseQuantityAfter($metricsAfter['fullRemaining']);
+            $inspection->setRemainingBaseQuantityAfter($metricsAfter['completionRemaining']);
             $inspection->setResolutionData([
                 'minimumAcceptableBaseQuantity' => $metricsAfter['minimum'],
                 'effectiveAcceptedBaseQuantity' => $metricsAfter['effective'],
+                'productionTargetBaseQuantity' => $metricsAfter['productionTarget'],
+                'productionTargetRemainingBaseQuantity' => $metricsAfter['productionTargetRemaining'],
                 'shortageResolution' => $dto->shortageResolution,
                 'supplementAllocations' => $allocations,
             ]);
@@ -145,8 +166,9 @@ final class ProductionInspectionService
     private function normalizeLots(array $lotDtos): array
     {
         $lots = [];
-        $acceptedTotal = '0.000000';
+        $acceptedTotal = MathHelper::zero(self::QUANTITY_SCALE);
         $lineUuids = [];
+        $datePairs = [];
 
         foreach ($lotDtos as $lotDto) {
             if (!$lotDto instanceof ProductionItemInspectLotDTO || isset($lineUuids[$lotDto->clientLineUuid])) {
@@ -163,6 +185,15 @@ final class ProductionInspectionService
             if ($expiryDate <= $manufactureDate) {
                 throw new \Exception('Hạn sử dụng phải sau ngày sản xuất');
             }
+            $datePair = sprintf(
+                '%s|%s',
+                $manufactureDate->format('Y-m-d'),
+                $expiryDate->format('Y-m-d'),
+            );
+            if (isset($datePairs[$datePair])) {
+                throw new \Exception('Ngày sản xuất và hạn sử dụng của lô bị trùng');
+            }
+            $datePairs[$datePair] = true;
             if (MathHelper::comp(MathHelper::sub($received, $accepted, self::QUANTITY_SCALE), '0') > 0 && trim((string) $lotDto->rejectionReason) === '') {
                 throw new \Exception('Lý do từ chối là bắt buộc khi có hàng không đạt');
             }
@@ -183,24 +214,39 @@ final class ProductionInspectionService
         return [$lots, $acceptedTotal];
     }
 
-    private function createGoodsReceipt(ProductionItemInspection $inspection, ProductionOrder $order, string $acceptedTotal, \DateTimeInterface $postedAt): ProductionGoodsReceipt
-    {
+    private function createGoodsReceipt(
+        ProductionItemInspection $inspection,
+        ProductionOrder $order,
+        string $acceptedTotal,
+        string $totalCost,
+        \DateTimeInterface $postedAt,
+    ): ProductionGoodsReceipt {
         $warehouse = $order->getFinishedGoodsWarehouse();
         $receipt = new ProductionGoodsReceipt();
         $receipt->setCode(generateSequentialCode($this->entityManager, 'PNKSX', 'production_goods_receipt'));
         $receipt->setProductionItemInspection($inspection);
         $receipt->setWarehouse($warehouse);
         $receipt->setWarehouseSnapshot($order->getWarehouseSnapshot()['finishedGoodsWarehouse'] ?? [
-            'id' => $warehouse?->getId(), 'code' => $warehouse?->getCode(), 'name' => $warehouse?->getName(),
+            'id' => $warehouse?->getId(),
+            'code' => $warehouse?->getCode(),
+            'name' => $warehouse?->getName(),
         ]);
         $receipt->setTotalAcceptedBaseQuantity($acceptedTotal);
+        $receipt->setTotalCost($totalCost);
         $receipt->setPostedAt($postedAt);
 
         return $receipt;
     }
 
-    private function postAcceptedLotsToInventory(ProductionOrderItem $item, ProductionItemInspection $inspection, ProductionGoodsReceipt $goodsReceipt, array $lots, \DateTimeInterface $postedAt, User $actor): void
-    {
+    private function postAcceptedLotsToInventory(
+        ProductionOrderItem $item,
+        ProductionItemInspection $inspection,
+        ProductionGoodsReceipt $goodsReceipt,
+        array $lots,
+        string $unitCostBase,
+        \DateTimeInterface $postedAt,
+        User $actor,
+    ): void {
         $order = $item->getProductionOrder();
         $warehouse = $order?->getFinishedGoodsWarehouse();
         $product = $item->getFinishedProduct();
@@ -242,7 +288,7 @@ final class ProductionInspectionService
             $movement->setLot($lot);
             $movement->setQuantityBaseDelta($lotData['acceptedQuantity']);
             $movement->setBaseUnit($baseUnit);
-            $movement->setUnitCostBase(null);
+            $movement->setUnitCostBase($unitCostBase);
             $movement->setNote('Nhập kho từ phiếu ' . $goodsReceipt->getCode());
             $movement->setPostedAt($postedAt);
             $movement->setPostedBy($actor);
@@ -255,6 +301,57 @@ final class ProductionInspectionService
             $balance->setOnHandBaseQuantity($lotData['acceptedQuantity']);
             $this->entityManager->persist($balance);
         }
+    }
+
+    /**
+     * @return array{actualMaterialCost: string, unitCostBase: string, receiptTotalCost: string}
+     */
+    private function calculateMaterialCosting(
+        ProductionOrderItem $item,
+        string $productionTarget,
+        string $acceptedCurrent,
+    ): array {
+        if (MathHelper::comp($productionTarget, '0', self::QUANTITY_SCALE) <= 0) {
+            throw new \Exception('Mục tiêu sản xuất phải lớn hơn 0 để tính giá vốn thành phẩm');
+        }
+
+        $materials = $item->getMaterials();
+        if ($materials->isEmpty()) {
+            throw new \Exception('Thành phẩm không có dữ liệu chi phí nguyên liệu thực tế');
+        }
+
+        $actualMaterialCost = '0.0000';
+        foreach ($materials as $material) {
+            $actualCost = $material->getActualCost();
+            if ($actualCost === null || MathHelper::comp($actualCost, '0', self::COST_SCALE) < 0) {
+                $materialName = $material->getIngredient()?->getName() ?? (string) $material->getId();
+                throw new \Exception(sprintf(
+                    'Nguyên liệu %s chưa có giá vốn thực tế hợp lệ',
+                    $materialName,
+                ));
+            }
+            $actualMaterialCost = MathHelper::add(
+                $actualMaterialCost,
+                $actualCost,
+                self::COST_SCALE,
+            );
+        }
+
+        $unitCostBase = MathHelper::div(
+            $actualMaterialCost,
+            $productionTarget,
+            self::COST_SCALE,
+        );
+
+        return [
+            'actualMaterialCost' => $actualMaterialCost,
+            'unitCostBase' => $unitCostBase,
+            'receiptTotalCost' => MathHelper::mul(
+                $acceptedCurrent,
+                $unitCostBase,
+                self::COST_SCALE,
+            ),
+        ];
     }
 
     /** @return array<int, array{targetProductionOrderItemId: int, quantityBase: string}> */
@@ -277,12 +374,12 @@ final class ProductionInspectionService
                 break;
             }
             $targetId = (int) ($plan['productionOrderItemId'] ?? 0);
-            $mode = $plan['mode'] ?? 'MINIMUM';
+            $mode = ($plan['mode'] ?? null) === 'FULL' ? 'FULL' : 'MINIMUM';
             $target = $targetId > 0 ? $this->productionOrderItemRepository->find($targetId, LockMode::PESSIMISTIC_WRITE) : null;
             if (!$target || $target->getStatus() !== ProductionOrderStatus::WaitingSupplement->value || $target->getFinishedProduct()?->getId() !== $source->getFinishedProduct()?->getId()) {
                 continue;
             }
-            $needed = $this->remainingForMode($target, $mode === 'FULL' ? 'FULL' : 'MINIMUM');
+            $needed = $this->remainingForMode($target, $mode);
             if (MathHelper::comp($needed, '0') <= 0) {
                 continue;
             }
@@ -298,11 +395,18 @@ final class ProductionInspectionService
             ]]);
             $target->setShortageData($shortageData);
             $targetMetrics = $this->metrics($target);
-            if (MathHelper::comp($targetMetrics['effective'], $targetMetrics['minimum']) >= 0) {
-                $target->setStatus(ProductionOrderStatus::Completed->value);
-                $target->setCompletedAt($postedAt);
+            $remaining = $this->remainingForMode($target, $mode);
+            if (MathHelper::comp($remaining, '0') <= 0) {
                 $target->setClosedShortBaseQuantity($targetMetrics['fullRemaining']);
-                $this->recordEvent($target->getProductionOrder(), $target, ProductionEventType::ShortageResolved->value, $actor, 'Thiếu hàng đã được bù từ lệnh sản xuất khác', $inspection, null, ProductionOrderStatus::WaitingSupplement->value, ProductionOrderStatus::Completed->value, ['quantityBase' => $quantity]);
+                $resolvedStatus = ProductionOrderStatus::Completed->value;
+                if ($this->hasIncompleteProductionTarget($targetMetrics)) {
+                    $resolvedStatus = ProductionOrderStatus::Inspecting->value;
+                    $target->setCompletedAt(null);
+                } else {
+                    $target->setCompletedAt($postedAt);
+                }
+                $target->setStatus($resolvedStatus);
+                $this->recordEvent($target->getProductionOrder(), $target, ProductionEventType::ShortageResolved->value, $actor, 'Thiếu hàng đã được bù từ lệnh sản xuất khác', $inspection, null, ProductionOrderStatus::WaitingSupplement->value, $resolvedStatus, ['quantityBase' => $quantity]);
             } else {
                 $this->recordEvent($target->getProductionOrder(), $target, ProductionEventType::ShortageAllocated->value, $actor, 'Đã bù một phần thiếu hàng từ lệnh sản xuất khác', $inspection, null, null, null, ['quantityBase' => $quantity]);
             }
@@ -316,7 +420,7 @@ final class ProductionInspectionService
 
     private function alreadyAllocatedFromSource(ProductionOrderItem $item): string
     {
-        $total = '0.000000';
+        $total = MathHelper::zero(self::QUANTITY_SCALE);
         foreach ($this->inspectionRepository->findBy(['productionOrderItem' => $item]) as $inspection) {
             $resolutionData = $inspection->getResolutionData() ?? [];
             foreach (($resolutionData['supplementAllocations'] ?? []) as $allocation) {
@@ -330,8 +434,20 @@ final class ProductionInspectionService
     private function resolveCurrentItem(ProductionOrderItem $item, ?string $shortageResolution, array $metrics, \DateTimeInterface $postedAt): string
     {
         if (MathHelper::comp($metrics['effective'], $metrics['planned']) >= 0) {
+            if ($this->hasIncompleteProductionTarget($metrics)) {
+                $item->setStatus(ProductionOrderStatus::Inspecting->value);
+                $item->setCompletedAt(null);
+
+                return 'PARTIAL_TARGET';
+            }
             $resolution = 'FULL';
         } elseif (MathHelper::comp($metrics['effective'], $metrics['minimum']) >= 0) {
+            if ($this->hasIncompleteProductionTarget($metrics)) {
+                $item->setStatus(ProductionOrderStatus::Inspecting->value);
+                $item->setCompletedAt(null);
+
+                return 'PARTIAL_TARGET';
+            }
             $resolution = 'WITHIN_TOLERANCE';
             $item->setClosedShortBaseQuantity($metrics['fullRemaining']);
         } elseif ($shortageResolution === 'SUPPLEMENT_LATER') {
@@ -340,7 +456,7 @@ final class ProductionInspectionService
             $shortageData = $item->getShortageData() ?? [];
             $shortageData['resolution'] = 'SUPPLEMENT_LATER';
             $shortageData['minimumAcceptableBaseQuantity'] = $metrics['minimum'];
-            $shortageData['externalFulfilledBaseQuantity'] = (string) ($shortageData['externalFulfilledBaseQuantity'] ?? '0.000000');
+            $shortageData['externalFulfilledBaseQuantity'] = (string) ($shortageData['externalFulfilledBaseQuantity'] ?? MathHelper::zero(self::QUANTITY_SCALE));
             $shortageData['supplementHistory'] = $shortageData['supplementHistory'] ?? [];
             $item->setShortageData($shortageData);
 
@@ -353,6 +469,12 @@ final class ProductionInspectionService
             $shortageData['minimumAcceptableBaseQuantity'] = $metrics['minimum'];
             $shortageData['acceptedAt'] = $postedAt->format('Y-m-d H:i:s');
             $item->setShortageData($shortageData);
+            if ($this->hasIncompleteProductionTarget($metrics)) {
+                $item->setStatus(ProductionOrderStatus::Inspecting->value);
+                $item->setCompletedAt(null);
+
+                return $resolution;
+            }
         } else {
             throw new \Exception('Vui lòng chọn cách xử lý phần thiếu hàng');
         }
@@ -365,22 +487,48 @@ final class ProductionInspectionService
         return $resolution;
     }
 
-    /** @return array{planned: string, minimum: string, effective: string, fullRemaining: string} */
     private function metrics(ProductionOrderItem $item): array
     {
-        $planned = $item->getPlannedBaseQuantity() ?? '0.000000';
+        $planned = $item->getPlannedBaseQuantity() ?? '0';
         $minimum = MathHelper::sub($planned, MathHelper::mul($planned, MathHelper::div($item->getExpectedWastePercent(), '100', 8), self::QUANTITY_SCALE), self::QUANTITY_SCALE);
         $shortageData = $item->getShortageData() ?? [];
-        $external = (string) ($shortageData['externalFulfilledBaseQuantity'] ?? '0.000000');
-        $effective = MathHelper::add($item->getAcceptedBaseQuantity(), $external, self::QUANTITY_SCALE);
+        $external = (string) ($shortageData['externalFulfilledBaseQuantity'] ?? '0');
+        $accepted = $item->getAcceptedBaseQuantity();
+        $effective = MathHelper::add($accepted, $external, self::QUANTITY_SCALE);
         $fullRemaining = MathHelper::sub($planned, $effective, self::QUANTITY_SCALE);
+        $supplementData = $item->getSupplementData() ?? [];
+        $plans = $supplementData['plans'] ?? [];
+        $productionTarget = (string) ($supplementData['productionTargetBaseQuantity'] ?? $planned);
+        $hasPlannedSupplement = is_array($plans)
+            && $plans !== []
+            && MathHelper::comp($productionTarget, $planned) > 0;
+        $productionTargetRemaining = MathHelper::sub($productionTarget, $accepted, self::QUANTITY_SCALE);
+        $productionTargetRemaining = MathHelper::comp($productionTargetRemaining, '0') > 0
+            ? $productionTargetRemaining
+            : MathHelper::zero(self::QUANTITY_SCALE);
+        $fullRemaining = MathHelper::comp($fullRemaining, '0') > 0
+            ? $fullRemaining
+            : MathHelper::zero(self::QUANTITY_SCALE);
 
         return [
             'planned' => $planned,
             'minimum' => $minimum,
             'effective' => $effective,
-            'fullRemaining' => MathHelper::comp($fullRemaining, '0') > 0 ? $fullRemaining : '0.000000',
+            'fullRemaining' => $fullRemaining,
+            'accepted' => $accepted,
+            'productionTarget' => $productionTarget,
+            'productionTargetRemaining' => $productionTargetRemaining,
+            'completionRemaining' => $hasPlannedSupplement
+                ? $productionTargetRemaining
+                : $fullRemaining,
+            'hasPlannedSupplement' => $hasPlannedSupplement,
         ];
+    }
+
+    private function hasIncompleteProductionTarget(array $metrics): bool
+    {
+        return $metrics['hasPlannedSupplement']
+            && MathHelper::comp($metrics['accepted'], $metrics['productionTarget']) < 0;
     }
 
     private function remainingForMode(ProductionOrderItem $item, string $mode): string
@@ -388,7 +536,7 @@ final class ProductionInspectionService
         $metrics = $this->metrics($item);
         $remaining = MathHelper::sub($mode === 'FULL' ? $metrics['planned'] : $metrics['minimum'], $metrics['effective'], self::QUANTITY_SCALE);
 
-        return MathHelper::comp($remaining, '0') > 0 ? $remaining : '0.000000';
+        return MathHelper::comp($remaining, '0') > 0 ? $remaining : MathHelper::zero(self::QUANTITY_SCALE);
     }
 
     private function recordResolutionEvent(ProductionOrder $order, ProductionOrderItem $item, string $resolution, User $actor, ProductionItemInspection $inspection): void

@@ -775,7 +775,7 @@ class StockReceiptService
             }
             $processedItemIds[$receiptItem->getId()] = true;
 
-            $itemAcceptedBase = "0.000000";
+            $itemAcceptedBase = MathHelper::zero(self::QUANTITY_SCALE);
             $processedDatePairs = [];
 
             foreach ($itemDto->lots as $lotDto) {
@@ -813,7 +813,7 @@ class StockReceiptService
                 );
 
                 $expectedBase =
-                    $receiptItem->getExpectedBaseQuantity() ?? "0.000000";
+                    $receiptItem->getExpectedBaseQuantity() ?? "0";
                 if (
                     MathHelper::comp(
                         $itemAcceptedBase,
@@ -979,8 +979,8 @@ class StockReceiptService
         $hasShortage = false;
 
         foreach ($providerItems as $itemId => $item) {
-            $acceptedBase = $acceptedBaseByItem[$itemId] ?? "0.000000";
-            $expectedBase = $item->getExpectedBaseQuantity() ?? "0.000000";
+            $acceptedBase = $acceptedBaseByItem[$itemId] ?? "0";
+            $expectedBase = $item->getExpectedBaseQuantity() ?? "0";
             $shortageBase = MathHelper::sub(
                 $expectedBase,
                 $acceptedBase,
@@ -1517,7 +1517,7 @@ class StockReceiptService
             // Quy đổi số thiếu từ base unit về đơn vị yêu cầu gốc
             $shortageInExpected =
                 MathHelper::comp($factor, "0", self::FACTOR_SCALE) === 0
-                    ? "0.000000"
+                    ? MathHelper::zero(self::QUANTITY_SCALE)
                     : MathHelper::div(
                         $shortageBase,
                         $factor,

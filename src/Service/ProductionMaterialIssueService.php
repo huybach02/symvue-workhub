@@ -187,7 +187,7 @@ class ProductionMaterialIssueService
                 $today,
             );
 
-            $availableTotal = '0.000000';
+            $availableTotal = MathHelper::zero(6);
 
             foreach ($availableBalances as $balance) {
                 $available = MathHelper::sub(

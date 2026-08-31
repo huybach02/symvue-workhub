@@ -658,7 +658,7 @@ class ProductionOrderService
         string $plannedBaseQuantity,
     ): array {
         $plans = [];
-        $supplementBase = '0.000000';
+        $supplementBase = MathHelper::zero(6);
         $seenIds = [];
 
         foreach (is_array($selections) ? $selections : [] as $selection) {
@@ -775,7 +775,7 @@ class ProductionOrderService
         $target = $mode === 'FULL' ? $planned : $minimum;
         $remaining = MathHelper::sub($target, $effective, 6);
 
-        return MathHelper::comp($remaining, '0') > 0 ? $remaining : '0.000000';
+        return MathHelper::comp($remaining, '0') > 0 ? $remaining : MathHelper::zero(6);
     }
 
     public function findOpenShortages(int $merchandiseId): array
