@@ -33,6 +33,7 @@ class PermissionListener
         'api/auth/logout',
         'api/auth/change-password',
         'api/auth/forgot-password',
+        'api/auth/verify-otp',
         'api/mercure/notification-list',
         'api/profile',
     ];
