@@ -1,18 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\CachePersist;
 use App\Repository\CachePersistRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Predis\Client;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 
 class CacheService
 {
     public function __construct(
-        private readonly CacheItemPoolInterface $cache,
         private readonly LoggerInterface $logger,
         private readonly CachePersistRepository $cachePersistRepository,
         private readonly EntityManagerInterface $entityManager,
@@ -24,10 +24,7 @@ class CacheService
         try {
             $encodedValue = $this->encodeValue($value);
 
-            $cacheItem = $this->cache->getItem($key);
-            $cacheItem->set($value);
-            $cacheItem->expiresAfter($ttlSeconds);
-            $this->cache->save($cacheItem);
+            $this->redis->setex($key, $ttlSeconds, $encodedValue);
 
             if (!$persistToDatabase) {
                 return;
@@ -56,10 +53,10 @@ class CacheService
     public function get(string $key, mixed $default = null): mixed
     {
         try {
-            $cacheItem = $this->cache->getItem($key);
+            $cachedValue = $this->redis->get($key);
 
-            if ($cacheItem->isHit()) {
-                return $cacheItem->get();
+            if ($cachedValue !== null) {
+                return $this->decodeValue($cachedValue);
             }
 
             $cachePersist = $this->cachePersistRepository->findOneBy(['key' => $key]);
@@ -79,9 +76,11 @@ class CacheService
 
             $decodedValue = $this->decodeValue($cachePersist->getValue());
 
-            $cacheItem->set($decodedValue);
-            $cacheItem->expiresAfter($remainingTtl);
-            $this->cache->save($cacheItem);
+            $this->redis->setex(
+                $key,
+                $remainingTtl,
+                $this->encodeValue($decodedValue),
+            );
 
             return $decodedValue;
         } catch (\Throwable $e) {
@@ -102,7 +101,7 @@ class CacheService
     public function delete(string $key): void
     {
         try {
-            $this->cache->deleteItem($key);
+            $this->redis->del($key);
 
             $cachePersist = $this->cachePersistRepository->findOneBy(['key' => $key]);
 
