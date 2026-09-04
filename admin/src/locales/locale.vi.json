@@ -481,6 +481,21 @@
             "materials_required": "Thành phẩm phải có ít nhất 1 nguyên liệu tạo thành",
             "create_order_button": "Tạo lệnh sản xuất"
         },
+        "stock_transfer": {
+            "source_warehouse": "Kho nguồn",
+            "destination_warehouse": "Kho đích",
+            "destination_required": "Vui lòng chọn kho đích",
+            "items_title": "Lô thành phẩm cần chuyển",
+            "add_item": "Thêm lô hàng",
+            "empty_items": "Chưa có lô hàng cần chuyển.",
+            "items_required": "Vui lòng chọn ít nhất 1 lô hàng cần chuyển",
+            "select_lot": "Vui lòng chọn lô hàng",
+            "lot": "Lô hàng",
+            "available": "Tồn khả dụng",
+            "expiry_date": "Hạn sử dụng",
+            "reason": "Lý do chuyển kho",
+            "execute_button": "Thực hiện chuyển kho"
+        },
         "create_button": "Thêm mới",
         "my_requests": "Đề xuất của tôi",
         "my_requests_short": "của tôi",

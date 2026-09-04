@@ -297,6 +297,16 @@
                     </v-btn>
 
                     <v-btn
+                        v-if="showExecuteStockTransferButton"
+                        color="success"
+                        prepend-icon="mdi-swap-horizontal-bold"
+                        :loading="isExecutingTransfer"
+                        @click="handleExecuteStockTransfer"
+                    >
+                        {{ $t("request.stock_transfer.execute_button") }}
+                    </v-btn>
+
+                    <v-btn
                         v-if="item?.permissions?.canEdit && permission?.edit"
                         color="warning"
                         prepend-icon="mdi-pencil-outline"
@@ -421,6 +431,7 @@ export default {
             isDeleting: false,
             isCreatingReceipt: false,
             isCreatingOrder: false,
+            isExecutingTransfer: false,
         };
     },
     computed: {
@@ -442,6 +453,14 @@ export default {
         showCreateProductionOrderButton() {
             return (
                 this.item?.type === "stock:production" &&
+                this.item?.status === "approved" &&
+                this.currentUser?.id === this.item?.requester?.id &&
+                !this.item?.targetRefId
+            );
+        },
+        showExecuteStockTransferButton() {
+            return (
+                this.item?.type === "stock:stock-transfer" &&
                 this.item?.status === "approved" &&
                 this.currentUser?.id === this.item?.requester?.id &&
                 !this.item?.targetRefId
@@ -469,6 +488,9 @@ export default {
         ...mapActions("productionOrder", {
             createProductionOrder: "createItem",
         }),
+        ...mapActions("stockTransfer", {
+            executeStockTransfer: "execute",
+        }),
         async handleCreateStockReceipt() {
             this.isCreatingReceipt = true;
             await this.createStockReceipt({
@@ -486,6 +508,15 @@ export default {
             this.$emit("refresh");
 
             this.isCreatingOrder = false;
+        },
+        async handleExecuteStockTransfer() {
+            this.isExecutingTransfer = true;
+            try {
+                await this.executeStockTransfer(this.item.id);
+                this.$emit("refresh");
+            } finally {
+                this.isExecutingTransfer = false;
+            }
         },
         getRequestStatusColor(status) {
             return (

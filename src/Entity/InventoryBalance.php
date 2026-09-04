@@ -12,6 +12,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: InventoryBalanceRepository::class)]
 #[ORM\Table(name: 'inventory_balance')]
+#[ORM\UniqueConstraint(
+    name: 'UNIQ_INVENTORY_BALANCE_WAREHOUSE_MERCHANDISE_LOT',
+    fields: ['warehouse', 'merchandise', 'lot'],
+)]
 class InventoryBalance
 {
     use TimestampableTrait;

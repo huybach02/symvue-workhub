@@ -1,12 +1,15 @@
 import { leaveRequestSchema } from "@/utils/schemas/request/leaveRequest";
 import { stockInRequestSchema } from "@/utils/schemas/request/stockInRequest";
 import { productionRequestSchema } from "@/utils/schemas/request/productionRequest";
+import { stockTransferRequestSchema } from "@/utils/schemas/request/stockTransferRequest";
 import RequestLeaveDetailFields from "./leave/RequestLeaveDetailFields.vue";
 import RequestLeaveFormFields from "./leave/RequestLeaveFormFields.vue";
 import RequestProductionDetailFields from "./production/RequestProductionDetailFields.vue";
 import RequestProductionFormFields from "./production/RequestProductionFormFields.vue";
 import RequestStockInDetailFields from "./stock-in/RequestStockInDetailFields.vue";
 import RequestStockInFormFields from "./stock-in/RequestStockInFormFields.vue";
+import RequestStockTransferDetailFields from "./stock-transfer/RequestStockTransferDetailFields.vue";
+import RequestStockTransferFormFields from "./stock-transfer/RequestStockTransferFormFields.vue";
 
 export const REQUEST_TYPE_COMPONENT_REGISTRY = {
     leave: {
@@ -65,6 +68,42 @@ export const REQUEST_TYPE_COMPONENT_REGISTRY = {
                       }))
                     : [],
             };
+        },
+    },
+    "stock:stock-transfer": {
+        formComponent: RequestStockTransferFormFields,
+        detailComponent: RequestStockTransferDetailFields,
+        validationSchema: stockTransferRequestSchema,
+        initialValues: {
+            destinationWarehouseId: null,
+            items: [],
+            reason: "",
+            note: "",
+        },
+        mapPayloadToForm(payload = {}) {
+            return {
+                destinationWarehouseId:
+                    payload.destinationWarehouseId
+                    ?? payload.destinationWarehouse?.id
+                    ?? null,
+                items: Array.isArray(payload.items)
+                    ? payload.items.map((item) => ({
+                          lineId: item.lineId ?? crypto.randomUUID(),
+                          sourceBalanceId: item.sourceBalanceId ?? null,
+                          quantity:
+                              item.quantity === null
+                              || item.quantity === undefined
+                                  ? null
+                                  : Number(item.quantity),
+                      }))
+                    : [],
+                reason: payload.reason ?? "",
+                note: payload.note ?? "",
+            };
+        },
+        async prepareFormValues(values = {}, store) {
+            await store.dispatch("stockTransfer/fetchContext");
+            return values;
         },
     },
     "stock:production": {

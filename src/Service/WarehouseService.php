@@ -273,6 +273,8 @@ class WarehouseService
             'id' => $movement->getId(),
             'movementType' => $movement->getMovementType(),
             'sourceType' => $movement->getSourceType(),
+            'sourceRef' => $movement->getSourceRef(),
+            'stockTransferId' => $movement->getStockTransfer()?->getId(),
             'merchandise' => $this->serializeMerchandise($movement->getMerchandise()),
             'lot' => $this->serializeLot($movement->getLot()),
             'quantityBaseDelta' => formatDecimal($movement->getQuantityBaseDelta()),

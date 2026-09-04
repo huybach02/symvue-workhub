@@ -5,6 +5,15 @@ declare(strict_types=1);
 use App\Entity\Request;
 
 return [
+    [
+        'pattern' => '#^stock-transfer(?:/context)?$#',
+        'methods' => ['GET', 'POST'],
+        'action' => 'create',
+        'permission' => [
+            'type' => 'static',
+            'name' => 'requests:stock:stock-transfer',
+        ],
+    ],
     // Vi du 1 - hierarchical:
     // Khi permission cha/con dung chung 1 API, can suy ra permission con tu context.
     // GET /api/requests?type=leave

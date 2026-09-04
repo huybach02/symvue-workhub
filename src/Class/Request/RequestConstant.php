@@ -10,6 +10,7 @@ final class RequestConstant
     public const TYPE_LEAVE = 'leave';
     public const TYPE_STOCK_IN = 'stock:stock-in'; // Nhập kho
     public const TYPE_STOCK_OUT = 'stock:stock-out'; // Xuất kho
+    public const TYPE_STOCK_TRANSFER = 'stock:stock-transfer'; // Chuyển kho thành phẩm
     public const TYPE_PRODUCTION = 'stock:production'; // Đề xuất sản xuất
 
     // Request status
@@ -38,6 +39,7 @@ final class RequestConstant
         return [
             self::TYPE_LEAVE,
             self::TYPE_STOCK_IN,
+            self::TYPE_STOCK_TRANSFER,
             self::TYPE_PRODUCTION,
         ];
     }
@@ -58,6 +60,13 @@ final class RequestConstant
                 'description' => 'Tạo và gửi đề xuất nhập kho',
                 'icon' => 'mdi-inbox-arrow-down',
                 'color' => 'warning',
+            ],
+            [
+                'code' => self::TYPE_STOCK_TRANSFER,
+                'title' => 'Chuyển kho thành phẩm',
+                'description' => 'Tạo và gửi đề xuất chuyển thành phẩm sang kho khác',
+                'icon' => 'mdi-swap-horizontal-bold',
+                'color' => 'primary',
             ],
             [
                 'code' => self::TYPE_PRODUCTION,

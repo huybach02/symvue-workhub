@@ -42,6 +42,47 @@ class InventoryBalanceRepository extends ServiceEntityRepository
     }
 
     /**
+     * @return InventoryBalance[]
+     */
+    public function findTransferableFinishedGoods(
+        Warehouse $warehouse,
+        \DateTimeInterface $today,
+    ): array {
+        $balances = $this->createQueryBuilder('balance')
+            ->addSelect('merchandise', 'lot', 'baseUnit')
+            ->innerJoin('balance.merchandise', 'merchandise')
+            ->innerJoin('balance.lot', 'lot')
+            ->leftJoin('merchandise.baseUnit', 'baseUnit')
+            ->andWhere('balance.warehouse = :warehouse')
+            ->andWhere('merchandise.type = :merchandiseType')
+            ->andWhere('lot.status = :lotStatus')
+            ->andWhere('lot.expiryDate >= :today')
+            ->setParameter('warehouse', $warehouse)
+            ->setParameter('merchandiseType', 'finished_product')
+            ->setParameter('lotStatus', InventoryLotStatus::Available->value)
+            ->setParameter('today', $today, \Doctrine\DBAL\Types\Types::DATE_MUTABLE)
+            ->orderBy('merchandise.code', 'ASC')
+            ->addOrderBy('lot.expiryDate', 'ASC')
+            ->addOrderBy('balance.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return array_values(array_filter(
+            $balances,
+            static fn (InventoryBalance $balance): bool => MathHelper::comp(
+                MathHelper::sub(
+                    $balance->getOnHandBaseQuantity(),
+                    MathHelper::add(
+                        $balance->getReservedBaseQuantity(),
+                        $balance->getBlockedBaseQuantity(),
+                    ),
+                ),
+                '0',
+            ) > 0,
+        ));
+    }
+
+    /**
      * Tìm các balance tồn khả dụng theo kho + nguyên liệu để xuất kho.
      *
      * - Chỉ lấy lot AVAILABLE, chưa hết hạn (expiryDate >= đầu ngày hôm nay).

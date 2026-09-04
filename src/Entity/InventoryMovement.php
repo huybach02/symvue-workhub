@@ -36,6 +36,10 @@ class InventoryMovement
     private ?array $sourceRef = null;
 
     #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'stock_transfer_id', referencedColumnName: 'id', nullable: true)]
+    private ?StockTransfer $stockTransfer = null;
+
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'warehouse_id', referencedColumnName: 'id', nullable: false, options: ['comment' => 'Kho chịu ảnh hưởng'])]
     private ?Warehouse $warehouse = null;
 
@@ -127,6 +131,18 @@ class InventoryMovement
     public function setSourceRef(?array $sourceRef): static
     {
         $this->sourceRef = $sourceRef;
+
+        return $this;
+    }
+
+    public function getStockTransfer(): ?StockTransfer
+    {
+        return $this->stockTransfer;
+    }
+
+    public function setStockTransfer(?StockTransfer $stockTransfer): static
+    {
+        $this->stockTransfer = $stockTransfer;
 
         return $this;
     }
@@ -271,6 +287,7 @@ class InventoryMovement
             'source_type' => $this->sourceType,
             'production_order_item_id' => $this->productionOrderItem?->getId(),
             'source_ref' => $this->sourceRef,
+            'stock_transfer_id' => $this->stockTransfer?->getId(),
             'warehouse_id' => $this->warehouse?->getId(),
             'merchandise_id' => $this->merchandise?->getId(),
             'lot_id' => $this->lot?->getId(),

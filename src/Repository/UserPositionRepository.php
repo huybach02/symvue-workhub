@@ -26,6 +26,30 @@ class UserPositionRepository extends ServiceEntityRepository
         );
     }
 
+    public function findActivePrimaryPositionByUser(User $user): ?UserPosition
+    {
+        $currentTimestamp = time();
+
+        $result = $this->createQueryBuilder('userPosition')
+            ->addSelect('department', 'branch', 'warehouse')
+            ->innerJoin('userPosition.department', 'department')
+            ->innerJoin('department.branch', 'branch')
+            ->leftJoin('branch.warehouse', 'warehouse')
+            ->andWhere('userPosition.member = :user')
+            ->andWhere('userPosition.isPrimary = 1')
+            ->andWhere('userPosition.status = 1')
+            ->andWhere('(userPosition.startTemp IS NULL OR userPosition.startTemp <= :currentTimestamp)')
+            ->andWhere('(userPosition.endTemp IS NULL OR userPosition.endTemp > :currentTimestamp)')
+            ->setParameter('user', $user)
+            ->setParameter('currentTimestamp', $currentTimestamp)
+            ->orderBy('userPosition.id', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $result instanceof UserPosition ? $result : null;
+    }
+
     public function findPrimaryManagerByDepartmentExcludingUser(
         Department $department,
         User $excludedUser

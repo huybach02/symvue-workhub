@@ -432,4 +432,5 @@ enum InventoryMovementSourceType: string
 {
     case ProductionMaterialIssue = 'PRODUCTION_MATERIAL_ISSUE';
     case ProductionGoodsReceipt = 'PRODUCTION_GOODS_RECEIPT';
+    case StockTransfer = 'STOCK_TRANSFER';
 }

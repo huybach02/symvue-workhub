@@ -10,6 +10,7 @@ use App\Class\Request\RequestConstant;
 use App\DTO\LeaveRequestPayloadDTO;
 use App\DTO\ProductionRequestPayloadDTO;
 use App\DTO\StockInRequestPayloadDTO;
+use App\DTO\StockTransferRequestPayloadDTO;
 use App\Entity\LeaveSchedule;
 use App\Entity\MerchandiseRecipe;
 use App\Entity\Request;
@@ -42,6 +43,7 @@ class RequestTypeService
         private readonly MerchandiseRepository $merchandiseRepository,
         private readonly UnitRepository $unitRepository,
         private readonly ProductionOrderItemRepository $productionOrderItemRepository,
+        private readonly StockTransferService $stockTransferService,
     ) {
     }
 
@@ -63,6 +65,11 @@ class RequestTypeService
                 StockInRequestPayloadDTO::class,
                 t('request.error.invalid_stock_in_payload_format')
             ),
+            RequestConstant::TYPE_STOCK_TRANSFER => $this->mapAndValidatePayloadDto(
+                $payload,
+                StockTransferRequestPayloadDTO::class,
+                'Dữ liệu đề xuất chuyển kho không hợp lệ',
+            ),
             RequestConstant::TYPE_PRODUCTION => $this->mapAndValidatePayloadDto(
                 $payload,
                 ProductionRequestPayloadDTO::class,
@@ -83,6 +90,7 @@ class RequestTypeService
                 ]
             ),
             RequestConstant::TYPE_STOCK_IN => t('request.title.stock_in_default'),
+            RequestConstant::TYPE_STOCK_TRANSFER => 'Đề xuất chuyển kho thành phẩm',
             RequestConstant::TYPE_PRODUCTION => t('request.title.production_default'),
             default => t('request.title.default'),
         };
@@ -102,6 +110,10 @@ class RequestTypeService
                 t('request.payload.stock_in_default'),
                 count($payload->providers ?? []),
                 t('request.payload.stock_in_provider_count')
+            )),
+            RequestConstant::TYPE_STOCK_TRANSFER => trim(sprintf(
+                'Chuyển kho thành phẩm | %d lô hàng',
+                count($payload->items ?? []),
             )),
             RequestConstant::TYPE_PRODUCTION => trim(sprintf(
                 '%s | %d %s',
@@ -146,10 +158,13 @@ class RequestTypeService
     }
 
     // Snapshots một số data để lưu trữ và hiển thị trong detail
-    public function enrichPayload(string $type, array $payload): array
+    public function enrichPayload(string $type, array $payload, ?User $requester = null): array
     {
         return match ($type) {
             RequestConstant::TYPE_STOCK_IN => $this->enrichStockInPayloadNames($payload),
+            RequestConstant::TYPE_STOCK_TRANSFER => $requester
+                ? $this->stockTransferService->enrichRequestPayload($payload, $requester)
+                : throw new \Exception('Không xác định được người tạo đề xuất chuyển kho'),
             RequestConstant::TYPE_PRODUCTION => $this->enrichProductionPayloadNames($payload),
             default => $payload,
         };

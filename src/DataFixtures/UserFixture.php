@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
+use App\Entity\Branch;
+use App\Entity\Department;
+use App\Entity\Position;
 use App\Entity\User;
+use App\Entity\UserPosition;
+use App\Entity\Warehouse;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UserFixture extends Fixture implements FixtureGroupInterface
+class UserFixture extends Fixture implements FixtureGroupInterface, DependentFixtureInterface
 {
     private const NUMBER_OF_USERS = 100;
 
@@ -23,6 +29,13 @@ class UserFixture extends Fixture implements FixtureGroupInterface
     public static function getGroups(): array
     {
         return ['user'];
+    }
+
+    public function getDependencies(): array
+    {
+        return [
+            MainBranchAndWarehouseFixture::class,
+        ];
     }
 
     public function load(ObjectManager $manager): void
@@ -54,6 +67,40 @@ class UserFixture extends Fixture implements FixtureGroupInterface
         $admin->setIsFirstLogin(0);
         $admin->setEmailVerifiedAt(new \DateTime());
         $manager->persist($admin);
+
+        $mainBranch = $manager->getRepository(Branch::class)->findOneBy(['code' => 'MAIN_BRANCH']);
+        $mainWarehouse = $manager->getRepository(Warehouse::class)->findOneBy(['code' => 'MAIN_WAREHOUSE']);
+
+        if (!$mainBranch instanceof Branch || !$mainWarehouse instanceof Warehouse) {
+            throw new \RuntimeException('Không tìm thấy MAIN_BRANCH hoặc MAIN_WAREHOUSE.');
+        }
+
+        if ($mainWarehouse->getBranch()?->getId() !== $mainBranch->getId()) {
+            throw new \RuntimeException('MAIN_WAREHOUSE không thuộc MAIN_BRANCH.');
+        }
+
+        $adminDepartment = new Department();
+        $adminDepartment->setMaBoPhan('MAIN_ADMIN_DEPARTMENT');
+        $adminDepartment->setTenBoPhan('Ban quản trị hệ thống');
+        $adminDepartment->setBranch($mainBranch);
+        $adminDepartment->setStatus(1);
+        $manager->persist($adminDepartment);
+
+        $adminPosition = new Position();
+        $adminPosition->setCode('MAIN_ADMIN_POSITION');
+        $adminPosition->setName('Quản trị viên hệ thống');
+        $adminPosition->setDepartment($adminDepartment);
+        $adminPosition->setStatus(1);
+        $adminPosition->setIsManager(1);
+        $manager->persist($adminPosition);
+
+        $adminUserPosition = new UserPosition();
+        $adminUserPosition->setMember($admin);
+        $adminUserPosition->setDepartment($adminDepartment);
+        $adminUserPosition->setPosition($adminPosition);
+        $adminUserPosition->setStatus(1);
+        $adminUserPosition->setIsPrimary(1);
+        $manager->persist($adminUserPosition);
 
         // Tạo danh sách vai trò
         $roles = ['USER', 'MANAGER', 'STAFF'];

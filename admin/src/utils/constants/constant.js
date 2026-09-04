@@ -151,9 +151,13 @@ export const constant = {
             width: 1600,
         },
         {
+            type: "stock:stock-transfer",
+            width: 1400,
+        },
+        {
             type: "stock:production",
             width: 1600,
-        }
+        },
     ],
     CURRENCIES: [
         { value: "VND", title: "VND (Đồng Việt Nam)" },

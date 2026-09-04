@@ -159,7 +159,11 @@ class RequestService
 
         $requestType = $request->getType() ?? '';
         $payloadDto = $this->requestTypeService->validatePayload($requestType, $dto->payload);
-        $payload = $this->requestTypeService->enrichPayload($requestType, $payloadDto->toArray());
+        $payload = $this->requestTypeService->enrichPayload(
+            $requestType,
+            $payloadDto->toArray(),
+            $currentUser,
+        );
         $approver = $this->userService->findDirectManager($currentUser);
         $primaryPosition = $this->userPositionRepository->findLatestPrimaryPositionByUser($currentUser);
         $revisionNo = $request->getRevisionNo() + 1;
@@ -364,7 +368,11 @@ class RequestService
         ?int $sourceRefId = null,
     ): Request {
         $payloadDto = $this->requestTypeService->validatePayload($type, $payload);
-        $payloadData = $this->requestTypeService->enrichPayload($type, $payloadDto->toArray());
+        $payloadData = $this->requestTypeService->enrichPayload(
+            $type,
+            $payloadDto->toArray(),
+            $requester,
+        );
         $approver = $this->userService->findDirectManager($requester);
         $primaryPosition = $this->userPositionRepository->findLatestPrimaryPositionByUser($requester);
         $now = new \DateTime();
