@@ -62,18 +62,18 @@ final class RequestConstant
                 'color' => 'warning',
             ],
             [
-                'code' => self::TYPE_STOCK_TRANSFER,
-                'title' => 'Chuyển kho thành phẩm',
-                'description' => 'Tạo và gửi đề xuất chuyển thành phẩm sang kho khác',
-                'icon' => 'mdi-swap-horizontal-bold',
-                'color' => 'primary',
-            ],
-            [
                 'code' => self::TYPE_PRODUCTION,
                 'title' => 'Sản xuất',
                 'description' => 'Tạo và gửi đề xuất sản xuất thành phẩm nội bộ',
                 'icon' => 'mdi-factory',
                 'color' => 'info',
+            ],
+            [
+                'code' => self::TYPE_STOCK_TRANSFER,
+                'title' => 'Chuyển kho thành phẩm',
+                'description' => 'Tạo và gửi đề xuất chuyển thành phẩm sang kho khác',
+                'icon' => 'mdi-swap-horizontal-bold',
+                'color' => 'primary',
             ],
         ];
     }

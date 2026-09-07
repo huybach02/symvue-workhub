@@ -1,216 +1,1123 @@
 {
-  "loading": "Loading...",
-  "system_management": "System Management",
-  "status_values": {
-    "active": "Active",
-    "inactive": "Inactive",
-    "blocked": "Blocked"
-  },
-  "auth": {
-    "login": "Login",
-    "remember_me": "Remember me",
-    "sign_in": "Sign in",
-    "forgot_password": "Forgot password",
-    "profile": "Profile",
-    "logout": "Logout",
-    "verify_otp": "Verify OTP",
-    "verify_otp_description": "Enter the 6-digit OTP code sent to your email",
-    "otp_code": "OTP Code",
-    "resend_otp": "Resend OTP",
-    "back_to_login": "Back to login",
-    "change_password": "Change new password",
-    "current_password": "Current password",
-    "new_password": "New password",
-    "confirm_password": "Confirm new password",
-    "change_password_btn": "Change password",
-    "personal_info": "Personal information",
-    "security": "Security",
-    "save_changes": "Save changes",
-    "enter_current_password": "Enter current password",
-    "enter_new_password": "Enter new password (minimum 6 characters)",
-    "enter_confirm_password": "Confirm new password"
-  },
-  "request": {
-    "production": {
-      "open_shortages": "This finished product has outstanding production shortages",
-      "received_progress": "Received",
-      "minimum_target": "Minimum target",
-      "supplement_minimum": "Minimum supplement",
-      "supplement_full": "Full supplement",
-      "new_requirement": "New requirement",
-      "supplement_quantity": "Supplement",
-      "production_target": "Production target",
-      "supplement_for": "Supplement order {code} · Finished product: {product}",
-      "target_includes_supplements": "Production target includes supplements for {count} shortage orders."
+    "loading": "Loading...",
+    "system_management": "System Management",
+    "status_values": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "blocked": "Blocked"
+    },
+    "auth": {
+        "login": "Login",
+        "remember_me": "Remember me",
+        "sign_in": "Sign in",
+        "forgot_password": "Forgot password",
+        "profile": "Profile",
+        "logout": "Logout",
+        "verify_otp": "Verify OTP",
+        "verify_otp_description": "Enter the 6-digit OTP code sent to your email",
+        "otp_code": "OTP Code",
+        "resend_otp": "Resend OTP",
+        "back_to_login": "Back to login",
+        "change_password": "Change new password",
+        "current_password": "Current password",
+        "new_password": "New password",
+        "confirm_password": "Confirm new password",
+        "change_password_btn": "Change password",
+        "personal_info": "Personal information",
+        "security": "Security",
+        "save_changes": "Save changes",
+        "enter_current_password": "Enter current password",
+        "enter_new_password": "Enter new password (minimum 6 characters)",
+        "enter_confirm_password": "Confirm new password"
+    },
+    "profile": {
+        "signature": {
+            "title": "Signature Information",
+            "setup": "Setup Signature",
+            "save": "Save Signature",
+            "cancel": "Cancel",
+            "clear": "Clear",
+            "undo": "Undo",
+            "saved_success": "Signature setup successfully",
+            "deleted_success": "Signature deleted successfully",
+            "error_empty": "Please draw a signature before saving",
+            "delete_confirm": "Are you sure you want to delete this signature?",
+            "delete_btn": "Delete Signature"
+        }
+    },
+    "language": {
+        "en": "English",
+        "vi": "Vietnamese"
+    },
+    "dashboard": {
+        "actions": {
+            "send_test_notification": "Send test notification",
+            "show_attendance_qr": "Show attendance QR"
+        },
+        "attendance_qr": {
+            "title": "Attendance QR",
+            "subtitle": "Open camera to scan code and verify attendance location."
+        },
+        "logs": {
+            "send_notification_error": "[Mercure] Error sending notification:",
+            "open_qr_error": "Cannot open attendance QR page:"
+        }
+    },
+    "system_config": {
+        "login_fail_setting": "Failed login settings",
+        "max_login_fail": "Maximum failed login attempts",
+        "lock_account_time": "Account temporary lock duration (minutes)",
+        "two_factor_setting": "Two-factor authentication settings",
+        "enable_two_factor": "Enable/Disable two-factor authentication",
+        "otp_expire_time": "OTP expiration time (minutes)",
+        "device_verify_time": "Device re-verification period (days)",
+        "working_time_setting": "Working hours check settings",
+        "enable_working_time_check": "Enable/Disable working hours check",
+        "max_device_login": "Maximum logged-in devices",
+        "edit_button": "Edit",
+        "save_button": "Save configuration",
+        "cancel_button": "Cancel",
+        "check_in_setting": "Attendance settings",
+        "check_in_grace_minutes": "Grace period for late check-in (minutes)",
+        "late_limit_minutes": "Maximum late limit (minutes)",
+        "check_in_earliest_minutes": "Earliest allowable check-in (minutes)",
+        "check_out_grace_minutes": "Grace period for early check-out (minutes)",
+        "check_out_latest_minutes": "Latest allowable check-out (minutes)",
+        "latitude": "Latitude (degrees)",
+        "longitude": "Longitude (degrees)",
+        "radius_meters": "Valid radius (meters)",
+        "address_display": "Display address",
+        "ip_address": "Valid IP address",
+        "qr_ttl_seconds": "QR code expiration time (minutes)",
+        "photo_retention_days": "Attendance photo retention period (days)",
+        "max_devices_per_employee": "Maximum attendance devices per employee (devices)",
+        "same_device_max_employees": "Maximum employees per device (employees)",
+        "remind_missing_check_in": "Remind for check-in time?",
+        "remind_missing_check_out": "Remind for check-out time?",
+        "check_in_reminder_minutes_before": "Remind before check-in time? (minutes)",
+        "check_out_reminder_minutes_before": "Remind before check-out time? (minutes)",
+        "group_time_setting": "Attendance Time",
+        "group_location_setting": "Location & Connection",
+        "group_device_setting": "Device & Security",
+        "group_reminder_setting": "Attendance Reminders",
+        "get_current_location": "Get current location",
+        "geolocation_not_supported": "Browser does not support geolocation",
+        "geolocation_permission_denied": "Location access permission denied",
+        "geolocation_unavailable": "Current location unavailable",
+        "geolocation_timeout": "Location request timed out",
+        "get_current_ip": "Get current IP address",
+        "detect_ip_failed": "Unable to detect IP address: {message}",
+        "notification_test": "System notification test",
+        "currency_setting": "System currency configuration",
+        "warehouse_settings": "Warehouse settings"
+    },
+    "thoi_gian_lam_viec": {
+        "fulltime": "Fixed working hours",
+        "parttime": "Shift-based working hours",
+        "action": "Action",
+        "thoi_gian_cap_nhat": "Updated time",
+        "edit_button": "Edit",
+        "save_button": "Save configuration",
+        "cancel_button": "Cancel",
+        "edit": "Edit working hours",
+        "thu": "Day",
+        "gio_bat_dau": "Start time",
+        "gio_ket_thuc": "End time",
+        "ghi_chu": "Note",
+        "apply_scope": "Application scope",
+        "apply_existing_schedules": "Apply to existing work schedules on the system (overwrite existing data)",
+        "apply_new_schedules_only": "Apply to new work schedules only",
+        "apply_scope_required": "Please select application scope",
+        "overnight_next_day_suffix": "+1 day",
+        "overnight_continuation_until": "Continues until {time}",
+        "overnight_notice": "Overnight shift: starts today and ends the next day."
+    },
+    "ca_lam_viec": {
+        "ten_ca": "Shift name",
+        "create": "Add work shift",
+        "edit": "Edit work shift",
+        "cancel_button": "Cancel",
+        "save_button": "Save work shift"
+    },
+    "media_library": {
+        "title": "Media library",
+        "select_from_library": "Select images from library",
+        "selected_images": "Selected images",
+        "upload_images": "Upload images",
+        "no_images": "No images yet. Please upload new images.",
+        "no_images_in_trash": "No images in trash.",
+        "delete_button": "Delete ({count} images)",
+        "confirm_select_button": "Confirm selection ({count} images)",
+        "delete_confirm_message": "Are you sure you want to delete these {count} items?",
+        "select_all": "Select all",
+        "deselect_all": "Deselect all",
+        "restore_button": "Restore ({count} images)",
+        "delete_permanently_button": "Permanently delete ({count} images)",
+        "restore_confirm_title": "Confirm restore",
+        "restore_confirm_message": "Are you sure you want to restore these {count} images?",
+        "delete_permanently_confirm_title": "Confirm permanent deletion",
+        "delete_permanently_confirm_message": "Are you sure you want to permanently delete these {count} images? This action cannot be undone!",
+        "restore_action": "Restore",
+        "delete_permanently_action": "Permanently delete",
+        "tab_library": "Media library",
+        "tab_trash": "Trash"
+    },
+    "confirm_dialog": {
+        "default_title": "Confirmation",
+        "default_message": "Are you sure you want to perform this action?",
+        "confirm_button": "Confirm",
+        "cancel_button": "Cancel"
+    },
+    "filter": {
+        "date_range": {
+            "title": "Date range",
+            "select_type": "Select date type",
+            "from_date": "From date",
+            "to_date": "To date",
+            "date": "Date",
+            "types": {
+                "equal_to": "Date",
+                "less_than": "Before date",
+                "greater_than": "After date",
+                "less_than_or_equal_to": "On or before date",
+                "greater_than_or_equal_to": "On or after date",
+                "between": "Between dates"
+            },
+            "display": {
+                "from": "From",
+                "to": "To"
+            },
+            "error": {
+                "invalid_range": "Start date must be less than or equal to end date"
+            }
+        },
+        "pagination": {
+            "showing": "Showing",
+            "to": "to",
+            "of": "of",
+            "records": "records",
+            "no_data": "No data available",
+            "items_per_page": "Showing:",
+            "first": "First",
+            "last": "Last"
+        }
+    },
+    "user": {
+        "title": "Personnel",
+        "columns": {
+            "id": "ID",
+            "avatar": "Avatar",
+            "name": "Full name",
+            "email": "Email",
+            "phone": "Phone",
+            "role": "Role",
+            "ma_nhan_vien": "Employee code"
+        },
+        "roles": {
+            "admin": "Admin",
+            "user": "User",
+            "manager": "Manager",
+            "staff": "Staff"
+        }
+    },
+    "lich_su_import": {
+        "title": "Import history",
+        "columns": {
+            "id": "ID",
+            "fileName": "File name",
+            "entityType": "Data type",
+            "status": "Status",
+            "totalRows": "Total rows",
+            "successRows": "Successful rows",
+            "errorRows": "Error rows",
+            "errorDetails": "Error details",
+            "createdAt": "Created at",
+            "row": "Row",
+            "rawData": "Raw data",
+            "errors": "Errors"
+        }
+    },
+    "bo_phan": {
+        "title": "Department",
+        "columns": {
+            "id": "ID",
+            "maBoPhan": "Department code",
+            "tenBoPhan": "Department name",
+            "status": "Status",
+            "quanLyBoPhan": "Department manager",
+            "chucVuQuanLy": "Managing position",
+            "phanQuyen": "Permissions"
+        },
+        "vai_tro": {
+            "title": "Role",
+            "manager": "Manager",
+            "employee": "Member"
+        },
+        "actions": {
+            "index": "View list",
+            "create": "Add new",
+            "show": "View details",
+            "edit": "Edit",
+            "delete": "Delete",
+            "export": "Export file",
+            "import": "Import file",
+            "showMenu": "Show menu",
+            "all": "All"
+        },
+        "button": {
+            "update": "Update permissions",
+            "resetPermissionDefault": "Reset default department permissions",
+            "delete": "Delete department",
+            "viewPosition": "Job Positions and Contracts",
+            "userList": "Member list",
+            "addPosition": "Add position",
+            "savePermissionByPosition": "Save permissions by position",
+            "addPositionAllowance": "Add allowance",
+            "positionAndPermission": "Positions and Permissions"
+        },
+        "text": {
+            "departmentOfUser": "Department/Unit of personnel",
+            "isMemberOf": "Is member of",
+            "isManagerOf": "Is manager of",
+            "department": "Department/Unit",
+            "notBelongsToAnyDepartment": "Personnel has not been assigned to any department",
+            "default": "Default",
+            "userList": "Member list of department {tenBoPhan}",
+            "viewMembers": "View member list",
+            "noMembers": "The department has no members yet",
+            "manager": "Manager",
+            "totalMembers": "Total: {count} members",
+            "removeMemberConfirm": "Are you sure you want to remove {name} from department '{tenBoPhan}'?",
+            "positionPermissionDialogTitle": "Positions and permissions of department {tenBoPhan}",
+            "positionList": "Position list",
+            "totalPositions": "Total: {count} positions",
+            "noPositions": "The department has no positions yet.",
+            "permissionByPosition": "Positions and permissions for position",
+            "permissionRequiresPosition": "Please create at least 1 position to configure permissions.",
+            "deletePositionConfirm": "Are you sure you want to delete position {name}?",
+            "positionManagerDescription": "Enable this option if this position has department management permissions.",
+            "allowancesHint": "Enter allowances, separated by commas",
+            "permission": "Permissions",
+            "notHasPositionManager": "This department has no position responsible for management. Please create/select a position responsible for managing this department",
+            "hasPositionManager": "This department is currently managed by Position {positionManager} (Code: {positionManagerCode})"
+        },
+        "employmentType": {
+            "fullTime": "Full time",
+            "partTime": "Part time",
+            "intern": "Intern",
+            "contractor": "Contractor"
+        }
+    },
+    "thong_bao": {
+        "title": "Notifications",
+        "columns": {
+            "id": "ID",
+            "title": "Title",
+            "body": "Content",
+            "type": "Notification type",
+            "fromUser": "From",
+            "sendTo": "Send to",
+            "createdAt": "Created at"
+        },
+        "options": {
+            "sendTo": {
+                "all": "Entire system",
+                "department": "Department/Unit",
+                "user": "Personnel"
+            },
+            "type": {
+                "primary": "Default notification",
+                "info": "Information",
+                "warning": "Warning",
+                "error": "Emergency"
+            }
+        }
+    },
+    "chat": {
+        "text": "Messages",
+        "total": "Total",
+        "unseen": "Unread",
+        "search_conversation": "Search conversation",
+        "conversation": "Conversation",
+        "not_conversation": "No conversations",
+        "new_chat": "Start new chat",
+        "not_found_user": "User not found",
+        "has_sent_image": "Sent {count} images",
+        "has_sent_file": "Sent {count} files",
+        "has_sent_images_and_files": "Sent {imageCount} images and {fileCount} files",
+        "group": "Group",
+        "choose_conversation": "Select a conversation",
+        "to_start_chat": "to start chatting",
+        "attach_file": "Attach files (max 10 files)",
+        "send_image": "Send images (max 10 images)",
+        "enter_message": "Type a message...",
+        "enter_to_send_shift_to_wrap": "Press Enter to send message, Shift + Enter for new line"
+    },
+    "position": {
+        "text": "Position",
+        "position_and_contract": "Job Position and Contract of {name}",
+        "position": "Position",
+        "contract": "Contract",
+        "user_permission": "User permissions",
+        "choose_position_to_view": " Select a position to view detailed information",
+        "position_detail": "Job detail information",
+        "salary": "Negotiated salary",
+        "insurance_salary": "Social insurance salary",
+        "insurance_code": "Social insurance code",
+        "probation_from": "Probation start date",
+        "probation_to": "Probation end date",
+        "effective_from": "Official employment start date (100% salary)",
+        "effective_to": "Official employment end date (100% salary)",
+        "allowances_optional": "Additional allowances (if any)",
+        "position_and_permission": "Positions and permissions of user {name}",
+        "add_temp_position": "Add temporary position",
+        "please_update_position": "Please update job position first",
+        "primary": "Primary",
+        "temporary": "Temporary",
+        "startTemp": "Temporary start date",
+        "endTemp": "Temporary end date",
+        "view_permission": "View permissions",
+        "permission_of_position": "Permissions of position {name}",
+        "delete_temporary_position": "Delete temporary position",
+        "expired": "Expired",
+        "notification": "You have configured custom permissions for {count} modules: {listModuleCustomPermission}. These items will prioritize specific settings over automatic system permissions."
+    },
+    "contract": {
+        "text": "Contract",
+        "please_update_position": "Please update job position before uploading contract to system",
+        "upload_contract": "Upload contract",
+        "format_contract": "Contract file must be in doc, docx, or pdf format",
+        "contract_list": "Contract list",
+        "total_contracts": "Total contracts: {count}",
+        "no_contract": "No contracts yet",
+        "file_name": "File name",
+        "file_format": "Format",
+        "file_size": "File size",
+        "uploaded_at": "Uploaded date"
+    },
+    "work_schedule": {
+        "title": "Work schedule",
+        "columns": {
+            "id": "ID",
+            "name": "Name"
+        },
+        "confirm_delete": "Confirm delete work schedule? This action cannot be undone.",
+        "special_days_title": "Handling weekends & holidays",
+        "keep_weekend_holiday": "Keep weekend/holiday schedule",
+        "work_weekend_holiday": "Work overtime on weekends/holidays",
+        "days_will_keep_off": "The following days will remain scheduled off:",
+        "select_days_to_work": "Select days to work (at least 1 day):",
+        "please_select_at_least_one_day": "Please select at least 1 day to work",
+        "fixed_schedule": "Fixed work schedule",
+        "override_schedule": "Override work schedule",
+        "leave_schedule": "Leave schedule",
+        "holiday_schedule": "Holiday schedule",
+        "add_override_schedule": "Add override schedule",
+        "delete_override_schedule": "Delete work schedule",
+        "please_select_time_and_members": "Please select time and members",
+        "add_fulltime_schedule": "Add fixed work schedule",
+        "danh_sach_nhan_su": "Personnel list",
+        "chon_nhan_su_ap_dung": "Select applicable personnel",
+        "nhan_su": "Personnel"
+    },
+    "request": {
+        "title": {
+            "leave": "Leave request",
+            "leave_range": "Leave request from {startDate} to {endDate}",
+            "stock_in": "Stock-in request on {stockInDate}",
+            "stock_in_default": "Stock-in request",
+            "production_default": "Production request",
+            "default": "Request"
+        },
+        "payload": {
+            "leave_type_default": "Leave",
+            "stock_in_default": "Stock in",
+            "stock_in_provider_count": "suppliers",
+            "production_default": "Finished goods production",
+            "production_item_count": "products"
+        },
+        "management_title": "Request management",
+        "description": "Manage your requests and requests waiting for your approval.",
+        "drawer_title": "Request type",
+        "create_title": "Create request",
+        "edit_title": "Update request",
+        "unsupported_type": "Unsupported request type",
+        "stock_in": {
+            "providers_title": "Suppliers",
+            "add_provider": "Add new supplier",
+            "empty_providers": "No suppliers yet. Click Add new supplier to get started.",
+            "provider_untitled": "Supplier #{index}",
+            "provider_detail_title": "Supplier #{index}: {name}",
+            "items_title": "Materials/Finished goods",
+            "add_item": "Add new material/finished goods",
+            "empty_items": "No items yet. Click Add new material/finished goods to add items.",
+            "select_merchandise": "Select material/finished goods",
+            "select_unit": "Select unit",
+            "providers_required": "Please add at least 1 supplier",
+            "items_required": "Please add at least 1 material/finished goods",
+            "create_receipt_button": "Create stock receipt",
+            "receipt_created_success": "Stock receipt created successfully!"
+        },
+        "production": {
+            "items_title": "Finished production products",
+            "add_item": "Add finished production product",
+            "empty_items": "No finished production products yet. Click Add finished production product to get started.",
+            "item_untitled": "Finished product #{index}",
+            "select_finished_product": "Select finished production product",
+            "output_unit_auto": "Automatic according to formula",
+            "materials_title": "Ingredients / Raw materials",
+            "empty_materials": "Finished product has not been configured with a bill of materials.",
+            "open_shortages": "This finished product has outstanding production shortages",
+            "received_progress": "Received",
+            "minimum_target": "Minimum target",
+            "supplement_minimum": "Minimum supplement",
+            "supplement_full": "Full supplement",
+            "new_requirement": "New requirement",
+            "supplement_quantity": "Supplement",
+            "production_target": "Production target",
+            "supplement_for": "Supplement order {code} · Finished product: {product}",
+            "target_includes_supplements": "Production target includes supplements for {count} shortage orders.",
+            "items_required": "Please add at least 1 finished production product",
+            "materials_required": "Finished product must have at least 1 ingredient / raw material",
+            "create_order_button": "Create production order"
+        },
+        "stock_transfer": {
+            "source_warehouse": "Source warehouse",
+            "destination_warehouse": "Destination warehouse",
+            "destination_required": "Please select destination warehouse",
+            "items_title": "Product lots to transfer",
+            "add_item": "Add lot",
+            "empty_items": "No product lots to transfer.",
+            "items_required": "Please select at least 1 lot to transfer",
+            "select_lot": "Please select lot",
+            "lot": "Lot",
+            "available": "Available stock",
+            "expiry_date": "Expiration date",
+            "reason": "Transfer reason",
+            "execute_button": "Execute stock transfer"
+        },
+        "create_button": "Add new",
+        "my_requests": "My requests",
+        "my_requests_short": "mine",
+        "approval_requests": "Request approvals",
+        "pending_approval": "Pending my approval",
+        "pending_approval_short": "pending approval",
+        "approved_requests": "Approved",
+        "column_title": "Title",
+        "column_code": "Request code",
+        "request_type": "Request type",
+        "detail_info": "Request details",
+        "timeline": "Processing history",
+        "requester": "Requester",
+        "approver": "Current approver",
+        "last_reject_reason": "Latest rejection reason",
+        "approval_action": "Approval action",
+        "approval_note": "Note / Rejection reason",
+        "approve_button": "Approve",
+        "approve_confirm_title": "Confirm approval",
+        "approve_confirm_message": "Are you sure you want to approve this request?",
+        "reject_button": "Reject",
+        "reject_confirm_title": "Confirm rejection",
+        "reject_confirm_message": "Are you sure you want to reject this request?",
+        "cancel_button": "Cancel request",
+        "cancel_confirm_title": "Confirm cancel request",
+        "cancel_confirm_message": "Are you sure you want to cancel this request?",
+        "delete_confirm_title": "Confirm delete request",
+        "delete_confirm_message": "Are you sure you want to delete this request?",
+        "reject_comment_required": "Please enter rejection reason",
+        "status": {
+            "pending": "Pending",
+            "rejected": "Rejected",
+            "approved": "Approved",
+            "cancelled": "Cancelled"
+        },
+        "event": {
+            "created": "Request created",
+            "submitted": "Request submitted",
+            "edited": "Request edited",
+            "resubmitted": "Request resubmitted",
+            "approved": "Request approved",
+            "rejected": "Request rejected",
+            "cancelled": "Request cancelled",
+            "effect_applied": "Related data applied",
+            "deleted": "Request deleted"
+        }
+    },
+    "attendance": {
+        "title": "Attendance",
+        "sections": {
+            "full_time": "Fixed working hours",
+            "part_time": "Shift-based working hours"
+        },
+        "filters": {
+            "work_date": "Attendance date",
+            "work_date_placeholder": "Select attendance date",
+            "employee_placeholder": "Search by name or employee code"
+        },
+        "labels": {
+            "check_in": "Check in",
+            "check_out": "Check out",
+            "shift_count": "{count} shifts",
+            "shift_schedule": "Shift {start} - {end}",
+            "view_log": "View log"
+        },
+        "employee": {
+            "unknown": "Unknown"
+        },
+        "logs": {
+            "title": "Attendance logs",
+            "count": "{count} logs",
+            "entry": "Log {index}",
+            "empty": "No attendance logs yet",
+            "sections": {
+                "common": "General information",
+                "entries": "Log list"
+            },
+            "labels": {
+                "log_id": "ID: {id}",
+                "gps_accuracy_meter": "GPS accuracy: {value} m",
+                "grouped_hint": "Identical details have been grouped into the general section."
+            },
+            "fields": {
+                "validation_status": "Validation status",
+                "validation_reason": "Reason",
+                "qr_token": "Scanned QR",
+                "ip_address": "IP address",
+                "device_id": "Device ID",
+                "latitude": "Latitude",
+                "longtitude": "Longitude",
+                "gps_accuracy_meter": "GPS accuracy"
+            },
+            "validation_status": {
+                "valid": "Valid",
+                "invalid": "Invalid"
+            },
+            "validation_reasons": {
+                "qr_code_valid": "Valid QR",
+                "qr_code_invalid": "Invalid QR",
+                "ip_address_valid": "Valid IP",
+                "ip_address_invalid": "Invalid IP",
+                "location_valid": "Valid location",
+                "location_invalid": "Invalid location"
+            }
+        },
+        "status": {
+            "unknown": "No data",
+            "scheduled": "Scheduled",
+            "on_time": "On time",
+            "late": "Late",
+            "early_leave": "Left early",
+            "absent": "Absent",
+            "late_check_out": "Late check-out",
+            "early_check_in": "Early check-in"
+        },
+        "empty": {
+            "no_data": "No attendance data"
+        },
+        "columns": {
+            "id": "ID",
+            "name": "Name"
+        },
+        "qr_scan": {
+            "open_button": "Open QR scanner",
+            "title": "Attendance QR Scan",
+            "subtitle": "Grant permission and align the QR code within the frame.",
+            "grant_button": "Grant permission",
+            "start_scanner": "Start scanner",
+            "retry_button": "Scan again",
+            "close_button": "Close",
+            "permissions": {
+                "camera": "Camera",
+                "location": "Location"
+            },
+            "status": {
+                "verifying": "Verifying",
+                "processing": "Getting location",
+                "scanning": "Scanning",
+                "ready": "Ready",
+                "waiting_permission": "Waiting for permission"
+            },
+            "messages": {
+                "verifying": "Verifying attendance",
+                "processing": "Getting current location",
+                "need_permissions": "Camera and location permissions required",
+                "scanner_inactive": "Scanner is not active"
+            },
+            "permission_status": {
+                "granted": "Granted",
+                "prompt": "Not granted",
+                "denied": "Denied",
+                "unsupported": "Not supported",
+                "unknown": "Unknown"
+            },
+            "permission_text": {
+                "granted": "Permission granted.",
+                "prompt": "Permission required to proceed.",
+                "denied": "Browser is denying permission.",
+                "unsupported": "Device not supported.",
+                "unknown": "Cannot determine current permission state."
+            },
+            "success": {
+                "with_address": "Successfully checked in/out at {address}.",
+                "default": "Attendance verified successfully."
+            },
+            "errors": {
+                "camera_access": "Cannot access camera. Please check camera permissions.",
+                "scanner_start": "Cannot start scanner. Please check camera permissions.",
+                "location_after_scan": "Scanned successfully but failed to get location: {message}",
+                "verify_failed": "Attendance verification failed. Please click Scan again to retry."
+            }
+        }
+    },
+    "branch": {
+        "title": "Branch",
+        "columns": {
+            "id": "ID",
+            "name": "Name",
+            "code": "Code",
+            "phone": "Phone number",
+            "email": "Email",
+            "address": "Address"
+        }
+    },
+    "category": {
+        "title": "Category",
+        "columns": {
+            "id": "ID",
+            "name": "Name"
+        },
+        "tabs": {
+            "ingredient": "Ingredient category",
+            "finished_product": "Finished product category",
+            "business_product": "Commercial product category"
+        },
+        "parent_category": "Parent category",
+        "select_parent_category": "Select parent category",
+        "select_category": "Select category",
+        "search_placeholder": "Search category",
+        "no_parent_category": "No parent category"
+    },
+    "unit": {
+        "title": "Unit of measurement",
+        "columns": {
+            "id": "ID",
+            "name": "Name",
+            "code": "Code",
+            "symbol": "Symbol"
+        }
+    },
+    "provider": {
+        "title": "Supplier",
+        "columns": {
+            "id": "ID",
+            "code": "Supplier code",
+            "name": "Supplier name",
+            "phone": "Phone number",
+            "email": "Email",
+            "address": "Address",
+            "taxNumber": "Tax code",
+            "bankName": "Bank name",
+            "bankNumber": "Bank account number",
+            "note": "Note",
+            "status": "Status"
+        }
+    },
+    "merchandise": {
+        "title": "Merchandise",
+        "finished_product": "Finished product",
+        "ingredient": "Ingredient",
+        "is_single_unit": "Single unit only",
+        "is_single_unit_desc_active": "This item only uses a single unit (no unit conversions).",
+        "is_single_unit_desc_inactive": "Check this if the item does not have alternative unit conversions.",
+        "conversion_preview": "Unit conversion preview",
+        "single_unit_preview_desc": "Item is configured to use only 1 unit of measurement.",
+        "configured_conversions": "Configured conversions",
+        "no_conversions_configured": "No conversion units configured.",
+        "computed_base_rates": "Conversion to base unit",
+        "unlinked": "Unlinked",
+        "select_base_unit_to_preview": "Please select a base unit to preview.",
+        "conversions_config": "Unit conversions configuration",
+        "no_conversions": "No unit conversions configured.",
+        "please_configure_valid_conversions": "Please configure base unit and unit conversions completely!",
+        "please_check_required_fields": "Please check and fill in all required fields!",
+        "provider_config": "Supplier configuration",
+        "provider_title_unselected": "Supplier #{index} (Not selected)",
+        "provider_title_default": "Supplier #{index}",
+        "default_prices_config": "Configure default price per unit",
+        "no_providers": "No suppliers configured yet.",
+        "default": "Default",
+        "set_default": "Set default",
+        "errors": {
+            "default_provider_required": "Please select a default supplier!",
+            "default_provider_price_required": "Default supplier must have at least one unit price!",
+            "price_default_required": "Please select a default price unit!"
+        },
+        "finished_product_source": {
+            "supplier": "Purchased from supplier",
+            "supplier_desc": "Manage supplier stock-in configurations and default purchase prices.",
+            "production": "Internal production",
+            "production_desc": "Manage bill of materials and waste rates for finished goods production."
+        },
+        "recipe": {
+            "title": "Bill of materials",
+            "output": "Output finished product",
+            "output_unit": "Finished product unit",
+            "add_ingredient": "Add ingredient",
+            "ingredient": "Ingredient",
+            "quantity": "Quantity",
+            "unit": "Unit",
+            "waste_rate": "Waste rate (%)",
+            "notes": "Notes",
+            "preview": "Preview recipe",
+            "preview_empty_desc": "Please enter all ingredients to display diagram.",
+            "ingredient_code": "Code",
+            "waste_rate_label": "Waste",
+            "select_ingredient": "Select ingredient",
+            "select_unit": "Select unit",
+            "ingredient_required": "Ingredient is required",
+            "quantity_positive": "Quantity > 0",
+            "unit_required": "Unit is required",
+            "waste_rate_non_negative": "Waste rate >= 0",
+            "notes_placeholder": "Ingredient notes",
+            "empty_recipe_desc": "Recipe has no ingredients yet. Please click add ingredient.",
+            "recipe_items_required": "Production recipe must have at least 1 ingredient line!"
+        },
+        "tabs": {
+            "info": "General information",
+            "unit": "Unit of measurement",
+            "provider": "Supplier",
+            "finished_product_source": "Finished product source"
+        },
+        "columns": {
+            "id": "ID",
+            "code": "Item code",
+            "name": "Item name",
+            "type": "Type",
+            "profit": "Profit margin (%)",
+            "description": "Description",
+            "notes": "Notes",
+            "stock_alert_quantity": "Stock alert quantity",
+            "base_unit": "Base unit"
+        },
+        "prices": {
+            "unit": "Unit",
+            "original_price": "Original price",
+            "discount_rate": "Discount (%)",
+            "discount_amount": "Discount amount",
+            "price_after_discount": "Price after discount",
+            "effective_from": "Effective from",
+            "effective_to": "Effective to"
+        }
+    },
+    "business_product": {
+        "title": "Commercial products",
+        "variants_management": "Product variants management",
+        "variant_recipe": "Set product recipe for variant",
+        "add_finished_product": "Add finished product component",
+        "empty_variants": "No variants configured for this product",
+        "empty_variants_desc": "Please click 'Add new variant' to start configuration.",
+        "tabs": {
+            "price_setting": "Price configuration"
+        },
+        "columns": {
+            "id": "ID",
+            "code": "Code",
+            "name": "Name",
+            "category": "Category",
+            "target_profit_margin": "Target profit margin (%)",
+            "variant_count": "Variant count",
+            "finished_product_count": "Finished goods count",
+            "variant_prices": "Variant prices"
+        },
+        "recipe": {
+            "finished_product": "Finished product",
+            "quantity": "Quantity",
+            "unit": "Unit of measurement",
+            "waste_rate": "Waste rate (%)",
+            "waste_rate_non_negative": "Waste rate >= 0",
+            "notes": "Notes",
+            "select_finished_product": "Select finished product",
+            "select_unit": "Select unit",
+            "notes_placeholder": "Notes...",
+            "empty_desc": "No finished products in the recipe of this variant yet.",
+            "items_required": "Must have at least 1 finished product component!",
+            "quantity_positive": "Quantity > 0"
+        },
+        "variants_required": "Must have at least 1 variant!",
+        "price": {
+            "selling_price": "Selling price",
+            "currency": "Currency",
+            "effective_from": "Effective from",
+            "effective_to": "Effective to",
+            "is_current": "Current effective price",
+            "note": "Note",
+            "placeholder_price": "Enter selling price",
+            "placeholder_note": "Enter price notes...",
+            "empty_variants_desc": "Please return to previous tab to add a variant.",
+            "formula_suggestion": "Suggested price from recipe:",
+            "formula_suggestion_desc": "Based on material quantity and target profit margin",
+            "cost_price": "Cost price:",
+            "target_profit_margin": "Target profit margin (%)",
+            "suggested_price": "Suggested price:"
+        }
+    },
+    "warehouse": {
+        "title": "Warehouse",
+        "columns": {
+            "id": "ID",
+            "name": "Name"
+        },
+        "inventory": {
+            "title": "Warehouse inventory details",
+            "view_detail": "View warehouse details",
+            "balance_tab": "Inventory balance",
+            "movement_tab": "Inventory movement",
+            "merchandise": "Merchandise",
+            "lot": "Lot",
+            "lot_status": "Lot status",
+            "expiry_date": "Expiry date",
+            "on_hand": "On hand",
+            "reserved": "Reserved",
+            "blocked": "Blocked",
+            "available": "Available",
+            "unit": "Unit",
+            "posted_at": "Posted at",
+            "movement_type": "Movement type",
+            "quantity_delta": "Quantity delta",
+            "unit_cost": "Unit cost",
+            "source_type": "Source type",
+            "posted_by": "Posted by",
+            "note": "Note",
+            "movement_types": {
+                "STOCK_IN": "Stock in",
+                "STOCK_OUT": "Stock out",
+                "ADJUSTMENT": "Adjustment",
+                "TRANSFER_IN": "Transfer in",
+                "TRANSFER_OUT": "Transfer out",
+                "REVERSAL": "Reversal"
+            },
+            "lot_statuses": {
+                "AVAILABLE": "Available",
+                "BLOCKED": "Blocked",
+                "EXPIRED": "Expired",
+                "DEPLETED": "Depleted"
+            },
+            "source_types": {
+                "PRODUCTION_MATERIAL_ISSUE": "Production material issue",
+                "PRODUCTION_GOODS_RECEIPT": "Production goods receipt"
+            }
+        }
+    },
+    "stock_receipt": {
+        "title": "Goods receipt",
+        "detail_title": "Goods receipt details",
+        "columns": {
+            "id": "ID",
+            "code": "Receipt code",
+            "title": "Title",
+            "warehouse": "Receiving warehouse",
+            "request": "Source request",
+            "fulfillment_status": "Fulfillment"
+        },
+        "status": {
+            "CREATED": "Created",
+            "IN_PROGRESS": "In progress",
+            "PARTIALLY_COMPLETED": "Partially completed",
+            "COMPLETED": "Completed",
+            "CANCELLED": "Cancelled"
+        },
+        "provider_status": {
+            "CREATED": "Created",
+            "AWAITING_SHIPMENT": "Awaiting shipment",
+            "IN_TRANSIT": "In transit",
+            "ARRIVED": "Arrived at warehouse",
+            "INSPECTING": "Inspecting",
+            "WAITING_SUPPLEMENT": "Waiting for supplement",
+            "COMPLETED": "Completed",
+            "CANCELLED": "Cancelled"
+        },
+        "fulfillment": {
+            "PENDING": "Pending",
+            "FULL": "Full",
+            "PARTIAL_CLOSED": "Partially closed",
+            "BACKORDER_OPEN": "Backorder open",
+            "BACKORDER_CREATED": "Backorder created"
+        },
+        "stepper_tooltip": {
+            "current": "Current status",
+            "completed": "Completed",
+            "next": "Click to advance to this status",
+            "locked": "Cannot perform this step yet"
+        },
+        "inspection": {
+            "title": "Goods inspection",
+            "lots_title": "Lot list",
+            "lot_label": "Lot #{index}",
+            "add_lot": "Add lot",
+            "no_lots": "No lots yet. Please add at least one lot.",
+            "lots_required": "Each item requires at least one lot.",
+            "items_required": "Inspection item list cannot be empty.",
+            "expected": "Expected",
+            "total_received": "Total received",
+            "total_accepted": "Total accepted",
+            "total_rejected": "Total rejected",
+            "shortage": "Shortage",
+            "surplus": "Surplus",
+            "balanced": "Balanced",
+            "internal_lot_auto": "Auto generated",
+            "base_convert": "Base conversion",
+            "total_convert_summary": "Item conversion summary:",
+            "base_convert_hint": "Base conversion: received {received} · accepted {accepted} · rejected {rejected} {unit}",
+            "received_eq_accepted_rejected": "Received quantity must equal accepted + rejected quantity.",
+            "expiry_after_manufacture": "Expiry date must be after manufacture date.",
+            "duplicate_lot_dates": "Manufacture and expiry date pairs cannot be duplicated for the same item.",
+            "shortage_resolution": "Shortage resolution",
+            "shortage_description": "Total accepted quantity is less than requested quantity. Please choose how to handle the shortage.",
+            "accept_shortage": "Accept shortage (close receipt with received quantity)",
+            "create_backorder": "Create backorder for shortage",
+            "shortage_required": "Please select a shortage resolution.",
+            "shortage_resolution_invalid": "Invalid shortage resolution.",
+            "submit": "Confirm inspection"
+        },
+        "event": {
+            "title": "Operation history",
+            "tooltip": "Operation history",
+            "no_events": "No operation history",
+            "types": {
+                "CREATED": "Goods receipt created",
+                "STATUS_CHANGED": "Status changed",
+                "INSPECTION_STARTED": "Inspection started",
+                "INSPECTION_SAVED": "Inspection saved",
+                "INVENTORY_POSTED": "Posted to inventory",
+                "SHORTAGE_ACCEPTED": "Shortage accepted",
+                "BACKORDER_CREATED": "Backorder created",
+                "CANCELLED": "Receipt cancelled",
+                "REVERSED": "Reversed"
+            }
+        },
+        "inspection_history": {
+            "title": "Inspection history",
+            "tooltip": "Inspection history",
+            "no_data": "No inspection data",
+            "provider": "Supplier",
+            "inspected_at": "Inspection time",
+            "inspected_by": "Inspector",
+            "item_name": "Item name",
+            "expected_qty": "Expected quantity",
+            "received_qty": "Received quantity",
+            "accepted_qty": "Accepted quantity",
+            "rejected_qty": "Rejected quantity",
+            "rejection_reason": "Rejection reason",
+            "mfg_exp_date": "MFG / EXP date",
+            "supplier_lot": "Supplier lot code",
+            "note": "Note"
+        }
+    },
+    "production_order": {
+        "title": "Production Order",
+        "detail_title": "Production Order Details",
+        "columns": {
+            "id": "ID",
+            "code": "Order code",
+            "title": "Title",
+            "request": "Source request",
+            "material_warehouse": "Material warehouse",
+            "finished_goods_warehouse": "Finished goods warehouse",
+            "started_at": "Started at",
+            "completed_at": "Completed at"
+        },
+        "status": {
+            "CREATED": "Created",
+            "MATERIAL_ISSUED": "Materials issued",
+            "STARTED": "Started",
+            "IN_PROGRESS": "In progress",
+            "INSPECTING": "Inspecting",
+            "WAITING_SUPPLEMENT": "Waiting for supplement",
+            "COMPLETED": "Completed",
+            "CANCELLED": "Cancelled"
+        },
+        "detail": {
+            "finished_products": "Finished products",
+            "no_finished_products": "This production order has no finished products",
+            "planned_quantity": "Planned quantity",
+            "base_quantity": "Base quantity",
+            "accepted_quantity": "Accepted quantity",
+            "waste_rate": "Expected waste",
+            "materials": "Materials",
+            "material": "Material",
+            "unit": "Unit",
+            "no_materials": "This finished product has no materials"
+        },
+        "shortage": {
+            "waiting": "Finished product is waiting for supplement",
+            "planned": "Planned",
+            "minimum_target": "Minimum target",
+            "direct_received": "Directly received",
+            "external_fulfilled": "Fulfilled externally",
+            "minimum_remaining": "Minimum supplement needed",
+            "effective": "Effective output",
+            "supplement_resolved": "Finished product was supplemented by another production order",
+            "supplemented_from": "Supplemented by order {code} · Finished product: {product}",
+            "target_includes_supplement": "Production target includes supplements",
+            "requirement": "Actual requirement",
+            "production_target": "Production target",
+            "supplement_for": "Supplement order {code} · Finished product: {product}",
+            "supplement_minimum": "Minimum supplement",
+            "supplement_full": "Full supplement"
+        },
+        "inspection": {
+            "title": "Finished goods inspection: {product}",
+            "expected": "Expected",
+            "balanced": "Balanced",
+            "shortage": "Shortage",
+            "partial_target": "Production target pending",
+            "surplus": "Surplus",
+            "planned": "Planned",
+            "production_target": "Production target",
+            "planned_supplement": "Planned supplement",
+            "minimum_target": "Minimum target",
+            "previous_received": "Previously received",
+            "external_fulfilled": "Fulfilled externally",
+            "accepted": "Accepted",
+            "rejected": "Rejected",
+            "lot": "Lot #{index}",
+            "received_current": "Received this time",
+            "accepted_current": "Accepted this time",
+            "production_lot_code": "Production lot code",
+            "total_inspection": "Inspection summary",
+            "total_received": "Total received this time",
+            "total_accepted": "Total accepted this time",
+            "total_rejected": "Total rejected this time",
+            "effective_after": "Effective after inspection",
+            "shortage_resolution": "Shortage resolution",
+            "shortage_description": "Effective output after inspection is below the minimum target. Please choose a resolution.",
+            "accept_shortage": "Accept shortage",
+            "supplement_later": "Supplement later",
+            "shortage_required": "Please select a shortage resolution.",
+            "add_lot": "Add lot",
+            "confirm": "Confirm inspection",
+            "inspect_receive": "Inspect / receive goods",
+            "accepted_must_not_exceed": "Accepted quantity cannot exceed received quantity",
+            "expiry_after_manufacture": "Expiry date must be after manufacture date",
+            "duplicate_lot_dates": "Manufacture and expiry date pairs must not be duplicated"
+        },
+        "event": {
+            "title": "Activity history",
+            "tooltip": "Production order activity history",
+            "no_events": "No activity history",
+            "types": {
+                "CREATED": "Production order created",
+                "STATUS_CHANGED": "Status changed",
+                "STARTED": "Production started",
+                "COMPLETED": "Production completed",
+                "CANCELLED": "Production order cancelled",
+                "INSPECTION_POSTED": "Inspection posted",
+                "INVENTORY_POSTED": "Finished goods received",
+                "WAITING_SUPPLEMENT": "Waiting for supplement",
+                "SHORTAGE_ACCEPTED": "Shortage accepted",
+                "SHORTAGE_ALLOCATED": "Shortage allocated",
+                "SHORTAGE_RESOLVED": "Shortage resolved"
+            }
+        }
     }
-  },
-  "warehouse": {
-    "title": "Warehouse",
-    "columns": {
-      "id": "ID",
-      "name": "Name"
-    },
-    "inventory": {
-      "title": "Warehouse inventory details",
-      "view_detail": "View warehouse details",
-      "balance_tab": "Inventory balance",
-      "movement_tab": "Inventory movement",
-      "merchandise": "Merchandise",
-      "lot": "Lot",
-      "lot_status": "Lot status",
-      "expiry_date": "Expiry date",
-      "on_hand": "On hand",
-      "reserved": "Reserved",
-      "blocked": "Blocked",
-      "available": "Available",
-      "unit": "Unit",
-      "posted_at": "Posted at",
-      "movement_type": "Movement type",
-      "quantity_delta": "Quantity delta",
-      "unit_cost": "Unit cost",
-      "source_type": "Source type",
-      "posted_by": "Posted by",
-      "note": "Note",
-      "movement_types": {
-        "STOCK_IN": "Stock in",
-        "STOCK_OUT": "Stock out",
-        "ADJUSTMENT": "Adjustment",
-        "TRANSFER_IN": "Transfer in",
-        "TRANSFER_OUT": "Transfer out",
-        "REVERSAL": "Reversal"
-      },
-      "lot_statuses": {
-        "AVAILABLE": "Available",
-        "BLOCKED": "Blocked",
-        "EXPIRED": "Expired",
-        "DEPLETED": "Depleted"
-      },
-      "source_types": {
-        "PRODUCTION_MATERIAL_ISSUE": "Production material issue",
-        "PRODUCTION_GOODS_RECEIPT": "Production goods receipt"
-      }
-    }
-  },
-  "production_order": {
-    "title": "Production Order",
-    "detail_title": "Production Order Details",
-    "columns": {
-      "id": "ID",
-      "code": "Order code",
-      "title": "Title",
-      "request": "Source request",
-      "material_warehouse": "Material warehouse",
-      "finished_goods_warehouse": "Finished goods warehouse",
-      "started_at": "Started at",
-      "completed_at": "Completed at"
-    },
-    "status": {
-      "CREATED": "Created",
-      "MATERIAL_ISSUED": "Materials issued",
-      "STARTED": "Started",
-      "IN_PROGRESS": "In progress",
-      "INSPECTING": "Inspecting",
-      "WAITING_SUPPLEMENT": "Waiting for supplement",
-      "COMPLETED": "Completed",
-      "CANCELLED": "Cancelled"
-    },
-    "detail": {
-      "finished_products": "Finished products",
-      "no_finished_products": "This production order has no finished products",
-      "planned_quantity": "Planned quantity",
-      "base_quantity": "Base quantity",
-      "accepted_quantity": "Accepted quantity",
-      "waste_rate": "Expected waste",
-      "materials": "Materials",
-      "material": "Material",
-      "unit": "Unit",
-      "no_materials": "This finished product has no materials"
-    },
-    "shortage": {
-      "waiting": "Finished product is waiting for supplement",
-      "planned": "Planned",
-      "minimum_target": "Minimum target",
-      "direct_received": "Directly received",
-      "external_fulfilled": "Fulfilled externally",
-      "minimum_remaining": "Minimum supplement needed",
-      "effective": "Effective output",
-      "supplement_resolved": "Finished product was supplemented by another production order",
-      "supplemented_from": "Supplemented by order {code} · Finished product: {product}",
-      "target_includes_supplement": "Production target includes supplements",
-      "requirement": "Actual requirement",
-      "production_target": "Production target",
-      "supplement_for": "Supplement order {code} · Finished product: {product}",
-      "supplement_minimum": "Minimum supplement",
-      "supplement_full": "Full supplement"
-    },
-    "inspection": {
-      "title": "Finished goods inspection: {product}",
-      "expected": "Expected",
-      "balanced": "Balanced",
-      "shortage": "Shortage",
-      "partial_target": "Production target pending",
-      "surplus": "Surplus",
-      "planned": "Planned",
-      "production_target": "Production target",
-      "planned_supplement": "Planned supplement",
-      "minimum_target": "Minimum target",
-      "previous_received": "Previously received",
-      "external_fulfilled": "Fulfilled externally",
-      "accepted": "Accepted",
-      "rejected": "Rejected",
-      "lot": "Lot #{index}",
-      "received_current": "Received this time",
-      "accepted_current": "Accepted this time",
-      "production_lot_code": "Production lot code",
-      "total_inspection": "Inspection summary",
-      "total_received": "Total received this time",
-      "total_accepted": "Total accepted this time",
-      "total_rejected": "Total rejected this time",
-      "effective_after": "Effective after inspection",
-      "shortage_resolution": "Shortage resolution",
-      "shortage_description": "Effective output after inspection is below the minimum target. Please choose a resolution.",
-      "accept_shortage": "Accept shortage",
-      "supplement_later": "Supplement later",
-      "shortage_required": "Please select a shortage resolution.",
-      "add_lot": "Add lot",
-      "confirm": "Confirm inspection",
-      "inspect_receive": "Inspect / receive goods",
-      "accepted_must_not_exceed": "Accepted quantity cannot exceed received quantity",
-      "expiry_after_manufacture": "Expiry date must be after manufacture date",
-      "duplicate_lot_dates": "Manufacture and expiry date pairs must not be duplicated"
-    },
-    "event": {
-      "title": "Activity history",
-      "tooltip": "Production order activity history",
-      "no_events": "No activity history",
-      "types": {
-        "CREATED": "Production order created",
-        "STATUS_CHANGED": "Status changed",
-        "STARTED": "Production started",
-        "COMPLETED": "Production completed",
-        "CANCELLED": "Production order cancelled",
-        "INSPECTION_POSTED": "Inspection posted",
-        "INVENTORY_POSTED": "Finished goods received",
-        "WAITING_SUPPLEMENT": "Waiting for supplement",
-        "SHORTAGE_ACCEPTED": "Shortage accepted",
-        "SHORTAGE_ALLOCATED": "Shortage allocated",
-        "SHORTAGE_RESOLVED": "Shortage resolved"
-      }
-    }
-  },
-  "profile": {
-    "signature": {
-      "title": "Signature Information",
-      "setup": "Setup Signature",
-      "save": "Save Signature",
-      "cancel": "Cancel",
-      "clear": "Clear",
-      "undo": "Undo",
-      "saved_success": "Signature setup successfully",
-      "deleted_success": "Signature deleted successfully",
-      "error_empty": "Please draw a signature before saving",
-      "delete_confirm": "Are you sure you want to delete this signature?",
-      "delete_btn": "Delete Signature"
-    }
-  }
 }

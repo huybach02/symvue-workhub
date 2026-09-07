@@ -79,6 +79,7 @@ success:
     deleted: "Deleted successfully"
     imported: "Imported successfully"
     exported: "Exported successfully"
+    transferred: "Transferred successfully"
 thong_bao:
     type:
         all: "All system"
@@ -155,9 +156,9 @@ recipe_error:
     ingredient_required: "The ingredient at row %index% is required."
     ingredient_duplicate: "The ingredient at row %index% is duplicated in the recipe."
     ingredient_not_found: "The ingredient at row %index% does not exist."
-    not_an_ingredient: "The merchandise \"%name%\" is not an ingredient."
-    quantity_must_be_greater_than_zero: "The quantity of ingredient \"%name%\" must be greater than 0."
-    unit_required: "The unit of ingredient \"%name%\" is required."
-    unit_not_found: "The unit of ingredient \"%name%\" does not exist."
-    unit_not_configured: "The unit of ingredient \"%name%\" is not configured."
-    waste_rate_invalid: "The waste rate of ingredient \"%name%\" must be greater than or equal to 0."
+    not_an_ingredient: 'The merchandise "%name%" is not an ingredient.'
+    quantity_must_be_greater_than_zero: 'The quantity of ingredient "%name%" must be greater than 0.'
+    unit_required: 'The unit of ingredient "%name%" is required.'
+    unit_not_found: 'The unit of ingredient "%name%" does not exist.'
+    unit_not_configured: 'The unit of ingredient "%name%" is not configured.'
+    waste_rate_invalid: 'The waste rate of ingredient "%name%" must be greater than or equal to 0.'

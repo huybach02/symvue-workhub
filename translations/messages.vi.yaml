@@ -79,6 +79,7 @@ success:
     deleted: "Xóa thành công"
     imported: "Import thành công"
     exported: "Export thành công"
+    transferred: "Chuyển thành công"
 thong_bao:
     type:
         all: "Toàn hệ thống"
@@ -155,9 +156,9 @@ recipe_error:
     ingredient_required: "Mã nguyên liệu ở dòng %index% bắt buộc phải chọn."
     ingredient_duplicate: "Nguyên liệu ở dòng %index% bị trùng lặp trong công thức."
     ingredient_not_found: "Nguyên liệu ở dòng %index% không tồn tại."
-    not_an_ingredient: "Hàng hóa \"%name%\" không phải là Nguyên liệu."
-    quantity_must_be_greater_than_zero: "Định lượng nguyên liệu \"%name%\" phải lớn hơn 0."
-    unit_required: "Đơn vị tính nguyên liệu \"%name%\" bắt buộc phải chọn."
-    unit_not_found: "Đơn vị tính nguyên liệu \"%name%\" không tồn tại."
-    unit_not_configured: "Đơn vị tính của nguyên liệu \"%name%\" không nằm trong các đơn vị đã cấu hình."
-    waste_rate_invalid: "Hao hụt của nguyên liệu \"%name%\" phải lớn hơn hoặc bằng 0."
+    not_an_ingredient: 'Hàng hóa "%name%" không phải là Nguyên liệu.'
+    quantity_must_be_greater_than_zero: 'Định lượng nguyên liệu "%name%" phải lớn hơn 0.'
+    unit_required: 'Đơn vị tính nguyên liệu "%name%" bắt buộc phải chọn.'
+    unit_not_found: 'Đơn vị tính nguyên liệu "%name%" không tồn tại.'
+    unit_not_configured: 'Đơn vị tính của nguyên liệu "%name%" không nằm trong các đơn vị đã cấu hình.'
+    waste_rate_invalid: 'Hao hụt của nguyên liệu "%name%" phải lớn hơn hoặc bằng 0.'

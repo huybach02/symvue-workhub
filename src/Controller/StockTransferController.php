@@ -19,8 +19,7 @@ final class StockTransferController extends AbstractController
 {
     public function __construct(
         private readonly StockTransferService $stockTransferService,
-    ) {
-    }
+    ) {}
 
     #[Route('/stock-transfer/context', methods: ['GET'])]
     public function context(): JsonResponse
@@ -47,7 +46,7 @@ final class StockTransferController extends AbstractController
         try {
             return CustomResponse::success(
                 $this->stockTransferService->execute($dto, $currentUser),
-                'Thực hiện chuyển kho thành công',
+                t('success.transferred'),
             );
         } catch (\Throwable $throwable) {
             return CustomResponse::error($throwable->getMessage());
