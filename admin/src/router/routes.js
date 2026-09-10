@@ -347,6 +347,21 @@ export const routes = [
                         ).icon || "",
                 },
             },
+            {
+                path: "dining-table",
+                name: NAME_ROUTES_CONFIG.diningTable,
+                component: () => import("../pages/DiningTable/DiningTable.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.diningTable,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.diningTable,
+                        ).icon || "",
+                },
+            },
 ],
     },
     {

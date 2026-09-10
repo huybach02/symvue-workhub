@@ -1119,5 +1119,47 @@
                 "SHORTAGE_RESOLVED": "Đã xử lý thiếu"
             }
         }
+    },
+    "dining_table": {
+        "title": "Bàn ăn",
+        "create_range_btn": "Tạo danh sách bàn",
+        "create_range_title": "Tạo danh sách bàn theo khoảng",
+        "create_range_hint": "Hệ thống sẽ đảm bảo các bàn từ [Số bắt đầu] đến [Số kết thúc] tồn tại. Bàn đã có sẽ được giữ nguyên trạng thái và mã QR.",
+        "from_table": "Từ số bàn",
+        "to_table": "Đến số bàn",
+        "placeholder_from": "Ví dụ: 1",
+        "placeholder_to": "Ví dụ: 20",
+        "view_qr": "Xem mã QR",
+        "qr_modal_title": "Mã QR Bàn {number}",
+        "download_qr": "Tải mã QR",
+        "export_all_qr_pdf": "Tải tất cả mã QR (PDF)",
+        "export_pdf_success": "Xuất file PDF mã QR thành công!",
+        "export_pdf_error": "Có lỗi xảy ra khi xuất file PDF mã QR.",
+        "no_qr_code": "Bàn chưa có mã QR",
+        "toggle_active": "Kích hoạt bàn",
+        "toggle_inactive": "Ngừng hoạt động",
+        "cannot_deactivate_in_use": "Bàn đang có order đang hoạt động, không thể chuyển sang trạng thái Ngừng hoạt động",
+        "filter_all": "Tất cả",
+        "filter_active": "Đang hoạt động",
+        "filter_inactive": "Ngừng hoạt động",
+        "columns": {
+            "id": "ID",
+            "table_number": "Số bàn",
+            "status": "Trạng thái",
+            "is_using": "Tình trạng sử dụng",
+            "qr_code": "Mã QR",
+            "action": "Thao tác"
+        },
+        "using_status": {
+            "in_use": "Đang có khách",
+            "empty": "Bàn trống"
+        },
+        "validation": {
+            "from_required": "Vui lòng nhập số bàn bắt đầu",
+            "from_positive": "Số bàn bắt đầu phải là số nguyên dương",
+            "to_required": "Vui lòng nhập số bàn kết thúc",
+            "to_positive": "Số bàn kết thúc phải là số nguyên dương",
+            "to_gte_from": "Số bàn kết thúc phải lớn hơn hoặc bằng số bàn bắt đầu"
+        }
     }
 }

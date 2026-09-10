@@ -1119,5 +1119,47 @@
                 "SHORTAGE_RESOLVED": "Shortage resolved"
             }
         }
+    },
+    "dining_table": {
+        "title": "Dining Table",
+        "create_range_btn": "Create Table Range",
+        "create_range_title": "Ensure Table Range",
+        "create_range_hint": "The system ensures tables from [Start] to [End] exist. Existing tables will retain their status and QR code.",
+        "from_table": "Start table number",
+        "to_table": "End table number",
+        "placeholder_from": "e.g. 1",
+        "placeholder_to": "e.g. 20",
+        "view_qr": "View QR Code",
+        "qr_modal_title": "QR Code Table {number}",
+        "download_qr": "Download QR",
+        "export_all_qr_pdf": "Download All QR Codes (PDF)",
+        "export_pdf_success": "QR code PDF exported successfully!",
+        "export_pdf_error": "An error occurred while exporting QR code PDF.",
+        "no_qr_code": "No QR code available",
+        "toggle_active": "Activate table",
+        "toggle_inactive": "Deactivate table",
+        "cannot_deactivate_in_use": "Table has an active order and cannot be deactivated",
+        "filter_all": "All",
+        "filter_active": "Active",
+        "filter_inactive": "Inactive",
+        "columns": {
+            "id": "ID",
+            "table_number": "Table Number",
+            "status": "Status",
+            "is_using": "Usage Status",
+            "qr_code": "QR Code",
+            "action": "Action"
+        },
+        "using_status": {
+            "in_use": "In Use",
+            "empty": "Empty"
+        },
+        "validation": {
+            "from_required": "Start table number is required",
+            "from_positive": "Start table number must be a positive integer",
+            "to_required": "End table number is required",
+            "to_positive": "End table number must be a positive integer",
+            "to_gte_from": "End table number must be greater than or equal to start table number"
+        }
     }
 }

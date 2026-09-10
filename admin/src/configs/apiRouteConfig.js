@@ -42,4 +42,5 @@ export const API_ROUTES_CONFIG = {
     stockReceipt: "/stock-receipt",
     stockTransfer: "/stock-transfer",
     productionOrder: "/production-order",
+    diningTable: "/dining-table",
 };

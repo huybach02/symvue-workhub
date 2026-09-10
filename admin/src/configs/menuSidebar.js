@@ -154,4 +154,10 @@ export const menuSidebar = [
             },
         ],
     },
+    {
+        title: i18n.global.t("sidebar.dining_table"),
+        icon: "mdi-table-furniture",
+        value: NAME_ROUTES_CONFIG.diningTable,
+        to: { name: NAME_ROUTES_CONFIG.diningTable },
+    },
 ];
