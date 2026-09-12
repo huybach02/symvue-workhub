@@ -673,6 +673,7 @@
         "title": "Chi nhánh",
         "columns": {
             "id": "ID",
+            "image": "Hình ảnh",
             "name": "Tên",
             "code": "Mã",
             "phone": "Số điện thoại",
@@ -790,6 +791,7 @@
         },
         "columns": {
             "id": "ID",
+            "image": "Hình ảnh",
             "code": "Mã hàng hóa",
             "name": "Tên hàng hóa",
             "type": "Loại",
@@ -821,6 +823,7 @@
         },
         "columns": {
             "id": "ID",
+            "image": "Hình ảnh",
             "code": "Mã",
             "name": "Tên",
             "category": "Danh mục",

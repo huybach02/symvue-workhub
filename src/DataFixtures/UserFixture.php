@@ -6,6 +6,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Branch;
 use App\Entity\Department;
+use App\Entity\Image;
 use App\Entity\Position;
 use App\Entity\User;
 use App\Entity\UserPosition;
@@ -107,6 +108,8 @@ class UserFixture extends Fixture implements FixtureGroupInterface, DependentFix
         $roles = ['USER', 'MANAGER', 'STAFF'];
         $genders = ['male', 'female'];
 
+        $createdUsers = [$admin];
+
         $maNhanVien = 1;
         // Tạo các user ngẫu nhiên
         for ($i = 0; $i < self::NUMBER_OF_USERS; $i++) {
@@ -134,9 +137,6 @@ class UserFixture extends Fixture implements FixtureGroupInterface, DependentFix
             // $user->setWardId($faker->optional(0.6)->numerify('####'));
             $user->setAddress($faker->optional(0.6)->address());
 
-            // Hình ảnh (URL giả)
-            $user->setImage($faker->randomElement($images));
-
             // Trạng thái
             $user->setStatus($faker->randomElement([1])); // 0: inactive, 1: active
             $user->setIsNgoaiGio($faker->randomElement([0, 1])); // 0: cho phép, 1: không cho phép
@@ -144,6 +144,19 @@ class UserFixture extends Fixture implements FixtureGroupInterface, DependentFix
             $user->setIsFirstLogin($faker->randomElement([0, 1])); // 0: đã đổi pass, 1: lần đầu
 
             $manager->persist($user);
+            $createdUsers[] = $user;
+        }
+
+        $manager->flush();
+
+        // Tạo ảnh avatar qua entity Image cho các user
+        foreach ($createdUsers as $createdUser) {
+            $image = new Image();
+            $image->setPath($faker->randomElement($images));
+            $image->setEntityType(User::class);
+            $image->setEntityId($createdUser->getId());
+            $image->setType('avatar');
+            $manager->persist($image);
         }
 
         $manager->flush();

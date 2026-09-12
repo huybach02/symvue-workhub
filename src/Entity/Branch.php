@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Interface\ImageableInterface;
 use App\Repository\BranchRepository;
 use App\Traits\ModifierTrait;
 use App\Traits\SoftDeleteableTrait;
@@ -20,7 +21,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
     options: ['where' => 'deleted_at IS NULL']
 )]
 #[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
-class Branch
+class Branch implements ImageableInterface
 {
     use TimestampableTrait;
     use SoftDeleteableTrait;

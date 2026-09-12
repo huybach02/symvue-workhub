@@ -81,9 +81,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
     private ?string $birthday = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $image = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
@@ -374,18 +371,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
         return $this;
     }
 
-    public function getImage(): ?string
-    {
-        return $this->image;
-    }
-
-    public function setImage(?string $image): static
-    {
-        $this->image = $image;
-
-        return $this;
-    }
-
     public function getDescription(): ?string
     {
         return $this->description;
@@ -554,7 +539,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Imageab
             'ward' => $this->ward,
             'address' => $this->address,
             'birthday' => $this->birthday,
-            'image' => $this->image,
             'description' => $this->description,
             'status' => $this->status,
             'hinhThucLamViec' => $this->hinhThucLamViec,

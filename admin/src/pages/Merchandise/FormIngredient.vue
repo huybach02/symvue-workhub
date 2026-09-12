@@ -43,14 +43,14 @@
             <!-- Nút cancel và create/update -->
             <div class="sticky-actions-bar">
                 <div class="d-flex align-center justify-space-between w-100">
-                    <div style="flex-grow: 1; min-width: 0;" class="pr-4">
+                    <div style="flex-grow: 1; min-width: 0" class="pr-4">
                         <v-alert
                             v-if="submitCount > 0 && errors.providers"
                             type="error"
                             variant="tonal"
                             density="compact"
                             class="ma-0 py-1 text-truncate"
-                            style="max-width: 500px;"
+                            style="max-width: 500px"
                         >
                             {{ errors.providers }}
                         </v-alert>
@@ -132,6 +132,7 @@ export default {
                 stockAlertQuantity: 0,
                 description: "",
                 notes: "",
+                image: null,
                 status: 1,
                 baseUnitId: null,
                 conversions: [],
@@ -189,7 +190,16 @@ export default {
             if (this.activeTab === "info") {
                 await this.$refs.formRef.validate();
                 const errors = this.$refs.formRef.errors;
-                const hasInfoErrors = ["code", "name", "categoryId", "profit", "stockAlertQuantity", "description", "notes", "status"].some(field => !!errors[field]);
+                const hasInfoErrors = [
+                    "code",
+                    "name",
+                    "categoryId",
+                    "profit",
+                    "stockAlertQuantity",
+                    "description",
+                    "notes",
+                    "status",
+                ].some((field) => !!errors[field]);
                 if (hasInfoErrors) return;
                 this.activeTab = "unit";
             } else if (this.activeTab === "unit") {

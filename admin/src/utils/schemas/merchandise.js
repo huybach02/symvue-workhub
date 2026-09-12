@@ -3,6 +3,7 @@ import {
     buildStringRule,
     buildNumberRule,
     buildPercentageRule,
+    buildImageRule,
 } from "../validationBuilder";
 import { i18n } from "@/plugins/i18n";
 
@@ -40,6 +41,9 @@ export const merchandiseSchema = yup.object({
     notes: buildStringRule(t("field.merchandise_notes"), {
         required: false,
         max: 500,
+    }),
+    image: buildImageRule(t("field.image"), {
+        required: false,
     }),
     status: yup.number().required().oneOf([0, 1]),
     baseUnitId: yup.mixed().nullable().notRequired(),
@@ -100,12 +104,16 @@ export const merchandiseSchema = yup.object({
 
                 for (const prov of value) {
                     if (!prov.providerId) continue;
-                    const providerPrices = (prov.prices || []).filter((price) =>
-                        configuredUnitIds.length > 0
-                            ? configuredUnitIds.includes(Number(price.unitId))
-                            : true,
+                    const providerPrices = (prov.prices || []).filter(
+                        (price) =>
+                            configuredUnitIds.length > 0
+                                ? configuredUnitIds.includes(
+                                      Number(price.unitId),
+                                  )
+                                : true,
                     );
-                    const hasAnyPriceFilled = providerPrices.some(hasPriceValue);
+                    const hasAnyPriceFilled =
+                        providerPrices.some(hasPriceValue);
                     if (!hasAnyPriceFilled) {
                         continue;
                     }
@@ -117,14 +125,12 @@ export const merchandiseSchema = yup.object({
                                   Number(price.unitId),
                               );
 
-                    const isAllPricesFilled = targetUnitIds.every(
-                        (unitId) => {
-                            const priceItem = providerPrices.find(
-                                (p) => Number(p.unitId) === unitId,
-                            );
-                            return hasPriceValue(priceItem);
-                        },
-                    );
+                    const isAllPricesFilled = targetUnitIds.every((unitId) => {
+                        const priceItem = providerPrices.find(
+                            (p) => Number(p.unitId) === unitId,
+                        );
+                        return hasPriceValue(priceItem);
+                    });
 
                     if (!isAllPricesFilled) {
                         const hasDefaultPrice = providerPrices.some(

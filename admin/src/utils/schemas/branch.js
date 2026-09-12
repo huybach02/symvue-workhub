@@ -3,6 +3,7 @@ import {
     buildStringRule,
     buildEmailRule,
     buildPhoneRule,
+    buildImageRule,
 } from "../validationBuilder";
 import { i18n } from "@/plugins/i18n";
 
@@ -35,5 +36,9 @@ export const branchSchema = yup.object({
     note: buildStringRule(t("field.ghi_chu"), {
         required: false,
         max: 500,
+    }),
+
+    image: buildImageRule(t("field.image"), {
+        required: false,
     }),
 });

@@ -6,8 +6,8 @@
         >
             <v-avatar size="80" class="mr-4 border-lg border-white">
                 <v-img
-                    v-if="currentUser?.avatarUrl"
-                    :src="currentUser?.avatarUrl"
+                    v-if="currentUser?.image"
+                    :src="currentUser?.image"
                     alt="Avatar"
                 />
                 <v-icon v-else size="50">mdi-account</v-icon>

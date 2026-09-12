@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Class\CustomResponse;
 use App\Entity\User;
+use App\Repository\ImageRepository;
 use App\Service\AuthService;
 use App\Service\CacheService;
 use App\Service\DepartmentService;
@@ -21,6 +22,7 @@ final class AuthController extends AbstractController
         private readonly DeviceInfoService $deviceInfoService,
         private readonly CacheService $cacheService,
         private readonly DepartmentService $departmentService,
+        private readonly ImageRepository $imageRepository,
     ) {}
 
     #[Route("/auth/me", methods: ["GET"])]
@@ -33,6 +35,7 @@ final class AuthController extends AbstractController
         $userPermission = $this->departmentService->getCachedUserPermissions($user->getId());
 
         $userData = $user->jsonSerialize();
+        $userData['image'] = $this->imageRepository->getImages($user, "avatar");
         $userData['permissions'] = $userPermission;
 
         return CustomResponse::success($userData);

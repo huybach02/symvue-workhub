@@ -47,7 +47,12 @@ const actions = {
     },
     async updateProfile({ commit, state }, { data, callback }) {
         commit("setIsLoading", null, { root: true });
-        const resData = await putData(API_ROUTES_CONFIG.profile, null, data, callback);
+        const resData = await putData(
+            API_ROUTES_CONFIG.profile,
+            null,
+            data,
+            callback,
+        );
         if (resData) {
             commit("SET_USER", { ...state.user, ...resData });
         }
@@ -56,7 +61,11 @@ const actions = {
     },
     async changePasswordProfile({ commit }, { data, callback }) {
         commit("setIsLoading", null, { root: true });
-        const resData = await postData(API_ROUTES_CONFIG.changePasswordProfile, data, callback);
+        const resData = await postData(
+            API_ROUTES_CONFIG.changePasswordProfile,
+            data,
+            callback,
+        );
         commit("unsetIsLoading", null, { root: true });
         return resData;
     },

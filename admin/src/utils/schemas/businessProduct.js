@@ -3,6 +3,7 @@ import {
     buildStringRule,
     buildNumberRule,
     buildPercentageRule,
+    buildImageRule,
 } from "../validationBuilder";
 import { i18n } from "@/plugins/i18n";
 
@@ -23,9 +24,12 @@ export const businessProductSchema = yup.object({
         required: true,
         integer: true,
     }),
-    targetProfitMargin: buildPercentageRule(t("field.business_product_profit"), {
-        required: true,
-    }),
+    targetProfitMargin: buildPercentageRule(
+        t("field.business_product_profit"),
+        {
+            required: true,
+        },
+    ),
     description: buildStringRule(t("field.business_product_description"), {
         required: false,
         max: 500,
@@ -33,6 +37,9 @@ export const businessProductSchema = yup.object({
     notes: buildStringRule(t("field.business_product_notes"), {
         required: false,
         max: 500,
+    }),
+    image: buildImageRule(t("field.image"), {
+        required: false,
     }),
     status: yup.number().required().oneOf([0, 1]),
 });

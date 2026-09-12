@@ -27,6 +27,7 @@ use App\Repository\UnitRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\MerchandiseRecipe;
 use App\Entity\MerchandiseRecipeItem;
+use App\Repository\ImageRepository;
 use App\Repository\MerchandiseRecipeRepository;
 use App\Repository\MerchandiseRecipeItemRepository;
 
@@ -45,6 +46,7 @@ class MerchandiseService
         private readonly ProviderRepository $providerRepository,
         private readonly MerchandiseRecipeRepository $merchandiseRecipeRepository,
         private readonly MerchandiseRecipeItemRepository $merchandiseRecipeItemRepository,
+        private readonly ImageRepository $imageRepository,
     ) {}
 
     public function findAll(array $params): array
@@ -66,9 +68,13 @@ class MerchandiseService
             $relationFields,
         );
 
+        $merchandiseIds = array_map(fn(Merchandise $item) => (int) $item->getId(), $result["collection"]);
+        $imagesMap = $this->imageRepository->getImagesMap(Merchandise::class, $merchandiseIds, 'image');
+
         // Map collection to JSON
-        $result["collection"] = array_map(function (Merchandise $item) {
+        $result["collection"] = array_map(function (Merchandise $item) use ($imagesMap) {
             $data = $item->jsonSerialize();
+            $data["image"] = $imagesMap[(int) $item->getId()] ?? null;
             $data["conversions"] = $this->getConversionsData($item->getId());
             return $data;
         }, $result["collection"]);
@@ -149,8 +155,8 @@ class MerchandiseService
             $seenUnitIds[$unitId] = true;
             $label = trim(
                 (string) ($merchandiseUnit->getLabel() ?:
-                $unit?->getName() ?:
-                ""),
+                    $unit?->getName() ?:
+                    ""),
             );
 
             $units[] = [
@@ -197,8 +203,8 @@ class MerchandiseService
                     $seenUnitIds[$unitId] = true;
                     $label = trim(
                         (string) ($merchandiseUnit->getLabel() ?:
-                        $unit?->getName() ?:
-                        ""),
+                            $unit?->getName() ?:
+                            ""),
                     );
 
                     $units[] = [
@@ -226,6 +232,7 @@ class MerchandiseService
         }
 
         $data = $item->jsonSerialize();
+        $data["image"] = $this->imageRepository->getOneImage($item, 'image');
         $data["conversions"] = $this->getConversionsData($id);
         $data["providers"] = $this->getProvidersData($id);
         $data["recipe"] = $this->getRecipeData($id);
@@ -300,11 +307,16 @@ class MerchandiseService
                 }
             }
 
+            if (!empty($dto->image)) {
+                $this->imageRepository->addOneImage($item, $dto->image, 'image', false);
+            }
+
             $this->entityManager->flush();
 
             $conn->commit();
 
             $data = $item->jsonSerialize();
+            $data["image"] = $this->imageRepository->getOneImage($item, 'image');
             $data["conversions"] = $this->getConversionsData($item->getId());
             $data["providers"] = $this->getProvidersData($item->getId());
             $data["recipe"] = $this->getRecipeData($item->getId());
@@ -384,11 +396,17 @@ class MerchandiseService
                 }
             }
 
+            $this->imageRepository->removeImages($item, 'image');
+            if (!empty($dto->image)) {
+                $this->imageRepository->addOneImage($item, $dto->image, 'image', false);
+            }
+
             $this->entityManager->flush();
 
             $conn->commit();
 
             $data = $item->jsonSerialize();
+            $data["image"] = $this->imageRepository->getOneImage($item, 'image');
             $data["conversions"] = $this->getConversionsData($item->getId());
             $data["providers"] = $this->getProvidersData($item->getId());
             $data["recipe"] = $this->getRecipeData($item->getId());
@@ -651,9 +669,7 @@ class MerchandiseService
             ]);
             $providerUnitMap = [];
             foreach ($providerUnits as $pu) {
-                $providerUnitMap[
-                    $pu->getUnit()->getId()
-                ] = (float) $pu->getFactorToBase();
+                $providerUnitMap[$pu->getUnit()->getId()] = (float) $pu->getFactorToBase();
             }
 
             // Tái cấu trúc conversions cho provider
@@ -951,12 +967,8 @@ class MerchandiseService
                     $factorToBaseSnapshot = "1.0000";
 
                     if (isset($savedProviderUnits[$uId])) {
-                        $unitLabelSnapshot = $savedProviderUnits[
-                            $uId
-                        ]->getLabel();
-                        $factorToBaseSnapshot = $savedProviderUnits[
-                            $uId
-                        ]->getFactorToBase();
+                        $unitLabelSnapshot = $savedProviderUnits[$uId]->getLabel();
+                        $factorToBaseSnapshot = $savedProviderUnits[$uId]->getFactorToBase();
                     } else {
                         // Backup lấy từ MerchandiseUnit của Merchandise
                         $mUnit = $this->merchandiseUnitRepository->findOneBy([
@@ -977,23 +989,23 @@ class MerchandiseService
                     $priceVal =
                         $priceItem["price"] !== null &&
                         $priceItem["price"] !== ""
-                            ? (string) $priceItem["price"]
-                            : "0.00";
+                        ? (string) $priceItem["price"]
+                        : "0.00";
                     $discountRateVal =
                         $priceItem["discountRate"] !== null &&
                         $priceItem["discountRate"] !== ""
-                            ? (string) $priceItem["discountRate"]
-                            : "0.00";
+                        ? (string) $priceItem["discountRate"]
+                        : "0.00";
                     $discountAmountVal =
                         $priceItem["discountAmount"] !== null &&
                         $priceItem["discountAmount"] !== ""
-                            ? (string) $priceItem["discountAmount"]
-                            : "0.00";
+                        ? (string) $priceItem["discountAmount"]
+                        : "0.00";
                     $priceAfterDiscountVal =
                         $priceItem["priceAfterDiscount"] !== null &&
                         $priceItem["priceAfterDiscount"] !== ""
-                            ? (string) $priceItem["priceAfterDiscount"]
-                            : $priceVal;
+                        ? (string) $priceItem["priceAfterDiscount"]
+                        : $priceVal;
 
                     $mPrice->setPrice($priceVal);
                     $mPrice->setDiscountRate($discountRateVal);

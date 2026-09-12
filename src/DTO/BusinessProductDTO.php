@@ -36,6 +36,9 @@ class BusinessProductDTO
         public readonly ?string $notes = null,
 
         #[Assert\Length(max: 255, groups: ['create', 'update'])]
+        public readonly ?string $image = null,
+
+        #[Assert\Length(max: 255, groups: ['create', 'update'])]
         public readonly ?string $imageUrl = null,
 
         #[Assert\NotBlank(groups: ['create', 'update'])]

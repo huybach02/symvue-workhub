@@ -105,6 +105,25 @@
                     </div>
                 </template>
 
+                <template #[`item.image`]="{ item }">
+                    <div class="py-2">
+                        <v-avatar v-if="item.image" size="50" rounded="lg">
+                            <v-img :src="item.image" :alt="item.name" cover />
+                        </v-avatar>
+                        <v-avatar
+                            v-else
+                            color="grey-lighten-2"
+                            size="50"
+                            rounded="lg"
+                        >
+                            <v-icon
+                                icon="mdi-image-outline"
+                                color="grey-darken-1"
+                            />
+                        </v-avatar>
+                    </div>
+                </template>
+
                 <template #[`item.status`]="{ item }">
                     <v-chip
                         :color="item.status === 1 ? 'success' : 'error'"
@@ -169,6 +188,7 @@ import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import CreateEditMerchandise from "./CreateEditMerchandise.vue";
 import { mapActions, mapGetters } from "vuex";
+import FilterPlaceholder from "@/components/filters/FilterPlaceholder.vue";
 
 export default {
     name: "MerchandiseList",
@@ -244,6 +264,13 @@ export default {
                     key: "id",
                     width: 100,
                     filterComponent: markRaw(FilterText),
+                },
+                {
+                    title: this.$t("merchandise.columns.image"),
+                    key: "image",
+                    width: 100,
+                    sortable: false,
+                    filterComponent: markRaw(FilterPlaceholder),
                 },
                 {
                     title: this.$t("field.merchandise_code"),

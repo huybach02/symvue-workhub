@@ -104,6 +104,25 @@
                     </div>
                 </template>
 
+                <template #[`item.image`]="{ item }">
+                    <div class="py-2">
+                        <v-avatar v-if="item.image" size="50" rounded="lg">
+                            <v-img :src="item.image" :alt="item.name" cover />
+                        </v-avatar>
+                        <v-avatar
+                            v-else
+                            color="grey-lighten-2"
+                            size="50"
+                            rounded="lg"
+                        >
+                            <v-icon
+                                icon="mdi-storefront-outline"
+                                color="grey-darken-1"
+                            />
+                        </v-avatar>
+                    </div>
+                </template>
+
                 <template #[`item.status`]="{ item }">
                     <v-chip
                         :color="item.status === 1 ? 'success' : 'error'"
@@ -140,6 +159,7 @@
             @update:page="onPageChange"
             @update:items-per-page="onLimitChange"
         />
+
         <ConfirmDialog
             v-model="showConfirmDelete"
             :message="
@@ -160,6 +180,7 @@ import FilterText from "@/components/filters/FilterText.vue";
 import FilterSelect from "@/components/filters/FilterSelect.vue";
 import FilterDateRange from "@/components/filters/FilterDateRange.vue";
 import FilterPagination from "@/components/filters/FilterPagination.vue";
+import FilterPlaceholder from "@/components/filters/FilterPlaceholder.vue";
 import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import CreateEditBranch from "./CreateEditBranch.vue";
@@ -223,6 +244,13 @@ export default {
                     key: "id",
                     width: 120,
                     filterComponent: markRaw(FilterText),
+                },
+                {
+                    title: this.$t("branch.columns.image"),
+                    key: "image",
+                    width: 100,
+                    sortable: false,
+                    filterComponent: markRaw(FilterPlaceholder),
                 },
                 {
                     title: this.$t("branch.columns.code"),

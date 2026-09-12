@@ -4,9 +4,9 @@
             <v-btn icon v-bind="props" class="mr-2">
                 <v-avatar size="40" class="border-md">
                     <v-img
-                        v-if="currentUser?.avatarUrl"
+                        v-if="currentUser?.image"
                         alt="Avatar"
-                        :src="currentUser?.avatarUrl"
+                        :src="currentUser?.image"
                     />
                     <v-icon v-else size="30">mdi-account</v-icon>
                 </v-avatar>

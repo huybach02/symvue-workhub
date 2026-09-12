@@ -25,5 +25,8 @@ class BranchDTO
         public readonly ?int $status = null,
 
         public readonly ?string $note = null,
+
+        #[Assert\Length(max: 255, groups: ['create', 'update'])]
+        public readonly ?string $image = null,
     ) {}
 }

@@ -135,6 +135,7 @@ export default {
                 targetProfitMargin: null,
                 description: "",
                 notes: "",
+                image: null,
                 status: 1,
                 variants: [],
             },
@@ -151,6 +152,7 @@ export default {
                         if (this.$refs.formRef) {
                             const data = {
                                 ...value,
+                                image: value.image || null,
                                 variants: (value.variants || []).map((v) => ({
                                     ...v,
                                     priceConfig: v.priceConfig || {

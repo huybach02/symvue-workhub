@@ -12,7 +12,10 @@
                 <v-col cols="12">
                     <v-row>
                         <v-col cols="12" md="4">
-                            <VeeField v-slot="{ field, errorMessage }" name="name">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="name"
+                            >
                                 <div class="mb-2">
                                     {{ $t("field.name") }}
                                     <span class="text-red"> * </span>
@@ -27,7 +30,10 @@
                             </VeeField>
                         </v-col>
                         <v-col cols="12" md="4">
-                            <VeeField v-slot="{ field, errorMessage }" name="email">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="email"
+                            >
                                 <div class="mb-2">
                                     {{ $t("field.email") }}
                                     <span class="text-red"> * </span>
@@ -42,7 +48,10 @@
                             </VeeField>
                         </v-col>
                         <v-col cols="12" md="4">
-                            <VeeField v-slot="{ field, errorMessage }" name="phone">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="phone"
+                            >
                                 <div class="mb-2">
                                     {{ $t("field.so_dien_thoai") }}
                                     <span class="text-red"> * </span>
@@ -57,7 +66,10 @@
                             </VeeField>
                         </v-col>
                         <v-col cols="12" md="4">
-                            <VeeField v-slot="{ field, errorMessage }" name="address">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="address"
+                            >
                                 <div class="mb-2">
                                     {{ $t("field.dia_chi") }}
                                 </div>
@@ -96,8 +108,30 @@
                                 />
                             </VeeField>
                         </v-col>
+                        <v-col cols="12" md="4">
+                            <VeeField
+                                v-slot="{ handleChange, errorMessage, value }"
+                                name="image"
+                            >
+                                <ImageSelector
+                                    :label="$t('field.image')"
+                                    :required="false"
+                                    :is-multiple="false"
+                                    :model-value="value"
+                                    :error-message="errorMessage"
+                                    @selected="
+                                        handleChange(
+                                            $event?.path || $event || null,
+                                        )
+                                    "
+                                />
+                            </VeeField>
+                        </v-col>
                         <v-col cols="12">
-                            <VeeField v-slot="{ field, errorMessage }" name="note">
+                            <VeeField
+                                v-slot="{ field, errorMessage }"
+                                name="note"
+                            >
                                 <div class="mb-2">
                                     {{ $t("field.ghi_chu") }}
                                 </div>
@@ -138,12 +172,14 @@ import { Form as VeeForm, Field as VeeField } from "vee-validate";
 import { constant } from "@/utils/constants/constant";
 import { branchSchema } from "@/utils/schemas/branch";
 import LoadingForm from "@/components/LoadingForm.vue";
+import ImageSelector from "@/components/ImageSelector.vue";
 
 export default {
     components: {
         LoadingForm,
         VeeForm,
         VeeField,
+        ImageSelector,
     },
     props: {
         submitButtonText: {
@@ -168,6 +204,7 @@ export default {
                 email: "",
                 phone: "",
                 address: "",
+                image: null,
                 status: 1,
                 note: "",
             },

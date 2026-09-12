@@ -23,6 +23,7 @@ use App\Repository\FixedScheduleGroupRepository;
 use App\Repository\FixedScheduleOverrideRepository;
 use App\Repository\GeneralSettingRepository;
 use App\Repository\HolidayScheduleRepository;
+use App\Repository\ImageRepository;
 use App\Repository\LeaveScheduleRepository;
 use App\Repository\UserRepository;
 use App\Repository\WorkingTimeRepository;
@@ -48,6 +49,7 @@ class WorkScheduleService
         private readonly AttendanceRepository $attendanceRepository,
         private readonly GeneralSettingRepository $generalSettingRepository,
         private readonly AttendanceReminderService $attendanceReminderService,
+        private readonly ImageRepository $imageRepository,
     ) {}
 
     public function getHolidaySchedule(): array
@@ -1003,6 +1005,15 @@ class WorkScheduleService
             ? []
             : $this->workShiftAssignmentRepository->findByDateRange($start, $end, $allowedMemberIds);
 
+        $assignmentMemberIds = [];
+        foreach ($assignments as $assignment) {
+            $m = $assignment->getMember();
+            if ($m) {
+                $assignmentMemberIds[] = (int) $m->getId();
+            }
+        }
+        $memberImages = $this->imageRepository->getImagesMap(User::class, array_unique($assignmentMemberIds), 'avatar');
+
         // Lấy ra danh sách nhân sự cho từng ca của từng ngày
         foreach ($assignments as $assignment) {
             $member = $assignment->getMember();
@@ -1023,7 +1034,7 @@ class WorkScheduleService
                 'id' => $member->getId(),
                 'name' => $member->getName(),
                 'email' => $member->getEmail(),
-                'image' => $member->getImage(),
+                'image' => $memberImages[(int) $member->getId()] ?? null,
             ];
         }
 
@@ -1107,12 +1118,15 @@ class WorkScheduleService
         $members = $this->userRepository->getListParttimeMembersByDepartmentId($departmentId);
         $allowedMemberIds = [];
 
+        $allMemberIds = array_map(fn($m) => (int) $m->getId(), $members);
+        $memberImages = $this->imageRepository->getImagesMap(User::class, array_unique($allMemberIds), 'avatar');
+
         foreach ($members as $member) {
             $allowedMemberIds[$member->getId()] = true;
             $optionMembers[] = [
                 "title" => $member->getName(),
                 "value" => $member->getId(),
-                "image" => $member->getImage(),
+                "image" => $memberImages[(int) $member->getId()] ?? null,
                 "email" => $member->getEmail(),
             ];
         }
@@ -1128,7 +1142,7 @@ class WorkScheduleService
                 "id" => $member->getId(),
                 "name" => $member->getName(),
                 "email" => $member->getEmail(),
-                "image" => $member->getImage(),
+                "image" => $memberImages[(int) $member->getId()] ?? null,
                 "assignment" => $assignment->jsonSerialize(),
             ];
         }

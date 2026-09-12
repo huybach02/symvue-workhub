@@ -37,8 +37,7 @@ class UserService
         private readonly DepartmentService $boPhanService,
         private readonly UserPositionRepository $userPositionRepository,
         private readonly UserPermissionRepository $userPermissionRepository,
-    ) {
-    }
+    ) {}
 
     public function findAll(array $params): array
     {
@@ -46,10 +45,13 @@ class UserService
 
         $result = FilterWithPagination::findWithPagination($qb, $params, "u");
 
+        $userIds = array_map(fn(User $user) => (int) $user->getId(), $result["collection"]);
+        $imagesMap = $this->imageRepository->getImagesMap(User::class, $userIds, "avatar");
+
         // Map collection to JSON
-        $result["collection"] = array_map(function (User $user) {
+        $result["collection"] = array_map(function (User $user) use ($imagesMap) {
             $data = $user->jsonSerialize();
-            $data["image"] = $this->imageRepository->getImages($user, "avatar");
+            $data["image"] = $imagesMap[(int) $user->getId()] ?? null;
             return $data;
         }, $result["collection"]);
 
@@ -65,7 +67,7 @@ class UserService
         }
 
         $data = $item->jsonSerialize();
-        $data["image"] = $this->imageRepository->getImages($item, "avatar");
+        $data["image"] = $this->imageRepository->getOneImage($item, "avatar");
 
         return $data;
     }
@@ -113,11 +115,14 @@ class UserService
         $this->entityManager->persist($item);
         $this->entityManager->flush();
 
-        if ($dto->avatar) {
+        if (!empty($dto->avatar)) {
             $this->imageRepository->addOneImage($item, $dto->avatar, "avatar");
         }
 
-        return $item->jsonSerialize();
+        $data = $item->jsonSerialize();
+        $data["image"] = $this->imageRepository->getImages($item, "avatar");
+
+        return $data;
     }
 
     public function update(int $id, UserDTO $dto): array
@@ -146,14 +151,17 @@ class UserService
 
         $item->setStatus($dto->status);
 
-        $this->entityManager->flush();
-
-        if ($dto->avatar) {
-            $this->imageRepository->removeImages($item);
+        $this->imageRepository->removeImages($item, "avatar");
+        if (!empty($dto->avatar)) {
             $this->imageRepository->addOneImage($item, $dto->avatar, "avatar");
         }
 
-        return $item->jsonSerialize();
+        $this->entityManager->flush();
+
+        $data = $item->jsonSerialize();
+        $data["image"] = $this->imageRepository->getImages($item, "avatar");
+
+        return $data;
     }
 
     public function delete(int $id): void
@@ -765,12 +773,12 @@ class UserService
         $user->setWard($dto->ward);
         $user->setAddress($dto->address);
 
-        $this->entityManager->flush();
-
-        if ($dto->avatar) {
-            $this->imageRepository->removeImages($user);
+        $this->imageRepository->removeImages($user, "avatar");
+        if (!empty($dto->avatar)) {
             $this->imageRepository->addOneImage($user, $dto->avatar, "avatar");
         }
+
+        $this->entityManager->flush();
 
         $data = $user->jsonSerialize();
         $data["image"] = $this->imageRepository->getImages($user, "avatar");

@@ -12,6 +12,7 @@ use App\Entity\ConversationUser;
 use App\Entity\User;
 use App\Repository\ConversationRepository;
 use App\Repository\ConversationUserRepository;
+use App\Repository\ImageRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,6 +31,7 @@ class ConversationService
         private readonly EntityManagerInterface $entityManager,
         private readonly MessageRepository $messageRepository,
         private readonly HubInterface $hub,
+        private readonly ImageRepository $imageRepository,
         #[Autowire('%kernel.project_dir%')] private readonly string $projectDir,
     ) {
         $this->mercureConfig = require $this->projectDir . '/config/mercure.php';
@@ -67,12 +69,14 @@ class ConversationService
             ->orderBy('u.name', 'ASC');
 
         $users = $qb->getQuery()->getResult();
+        $userIds = array_map(fn(User $user) => (int) $user->getId(), $users);
+        $imagesMap = $this->imageRepository->getImagesMap(User::class, $userIds, 'avatar');
 
         return array_map(fn(User $user) => [
             'id'     => $user->getId(),
             'name'   => $user->getName(),
             'email'  => $user->getEmail(),
-            'avatar' => $user->getImage(),
+            'avatar' => $imagesMap[(int) $user->getId()] ?? null,
         ], $users);
     }
 
@@ -88,7 +92,20 @@ class ConversationService
             ->getQuery()
             ->getResult();
 
-        return array_map(function (Conversation $conv) use ($currentUser) {
+        $partnerIds = [];
+        foreach ($conversations as $conv) {
+            if ($conv->getType() === Constanst::TYPE_CONVERSATION['private']) {
+                foreach ($conv->getConversationUsers() as $cu) {
+                    $m = $cu->getMember();
+                    if ($m && $m->getId() !== $currentUser->getId()) {
+                        $partnerIds[] = (int) $m->getId();
+                    }
+                }
+            }
+        }
+        $partnerImages = $this->imageRepository->getImagesMap(User::class, array_unique($partnerIds), 'avatar');
+
+        return array_map(function (Conversation $conv) use ($currentUser, $partnerImages) {
             $data = $conv->jsonSerialize();
 
             // Lấy unreadCount của currentUser trong conversation này
@@ -115,7 +132,7 @@ class ConversationService
             if ($conv->getType() === Constanst::TYPE_CONVERSATION['private']) {
                 $data['receiverId']  = $partner?->getId();
                 $data['nameUser']   = $partner?->getName() ?? $conv->getName();
-                $data['avatarUser'] = $partner?->getImage() ?? $conv->getAvatar();
+                $data['avatarUser'] = ($partner && isset($partnerImages[(int) $partner->getId()])) ? $partnerImages[(int) $partner->getId()] : $conv->getAvatar();
             } else {
                 $data['receiverId']  = null;
                 $data['nameUser']   = $conv->getName();
@@ -163,9 +180,9 @@ class ConversationService
 
         $dataRes = $item->jsonSerialize();
 
-        $dataRes['nameUser'] = $user->getName();
-        $dataRes['avatarUser'] = $user->getImage();
-        $dataRes['receiverId'] = $user->getId();
+        $dataRes['nameUser'] = $user?->getName();
+        $dataRes['avatarUser'] = $user ? $this->imageRepository->getOneImage($user, 'avatar') : null;
+        $dataRes['receiverId'] = $user?->getId();
 
         return $dataRes;
     }

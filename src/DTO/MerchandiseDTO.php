@@ -55,5 +55,8 @@ class MerchandiseDTO
 
         #[Assert\Valid(groups: ['create', 'update'])]
         public readonly ?RecipeDTO $recipe = null,
+
+        #[Assert\Length(max: 255, groups: ['create', 'update'])]
+        public readonly ?string $image = null,
     ) {}
 }

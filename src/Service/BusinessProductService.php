@@ -20,6 +20,7 @@ use App\Repository\BusinessProductVariantPriceRepository;
 use App\Repository\BusinessProductVariantRecipeRepository;
 use App\Repository\BusinessProductVariantRepository;
 use App\Repository\CategoryRepository;
+use App\Repository\ImageRepository;
 use App\Repository\MerchandiseRepository;
 use App\Repository\MerchandiseUnitRepository;
 use App\Repository\UnitRepository;
@@ -38,6 +39,7 @@ class BusinessProductService
         private readonly MerchandiseUnitRepository $merchandiseUnitRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly MerchandiseService $merchandiseService,
+        private readonly ImageRepository $imageRepository,
     ) {}
 
     public function findAll(array $params): array
@@ -60,7 +62,9 @@ class BusinessProductService
         );
 
         $productIds = array_map(fn(BusinessProduct $item) => (int) $item->getId(), $result['collection']);
+        $imagesMap = $this->imageRepository->getImagesMap(BusinessProduct::class, $productIds, 'image');
         $enrichData = $this->getListEnrichData($productIds);
+        $enrichData['imagesMap'] = $imagesMap;
 
         $result['collection'] = array_map(
             fn(BusinessProduct $item) => $this->enrichItem($item, $enrichData),
@@ -292,6 +296,7 @@ class BusinessProductService
             ];
         }
         $data['variantPrices'] = $variantPrices;
+        $data['image'] = $enrichData['imagesMap'][$id] ?? null;
 
         return $data;
     }
@@ -321,6 +326,7 @@ class BusinessProductService
 
         $data = $item->jsonSerialize();
         $data['variants'] = $this->getVariantsData($item);
+        $data['image'] = $this->imageRepository->getOneImage($item, 'image');
 
         return $data;
     }
@@ -336,6 +342,11 @@ class BusinessProductService
             $this->entityManager->persist($item);
 
             $this->saveVariants($item, $dto->variants ?? [], $dto->targetProfitMargin);
+
+            $imagePath = $dto->image ?? $dto->imageUrl;
+            if (!empty($imagePath)) {
+                $this->imageRepository->addOneImage($item, $imagePath, 'image', false);
+            }
 
             $this->entityManager->flush();
             $conn->commit();
@@ -361,6 +372,12 @@ class BusinessProductService
 
             $this->mapProduct($item, $dto);
             $this->replaceVariants($item, $dto->variants ?? [], $dto->targetProfitMargin);
+
+            $imagePath = $dto->image ?? $dto->imageUrl;
+            $this->imageRepository->removeImages($item, 'image');
+            if (!empty($imagePath)) {
+                $this->imageRepository->addOneImage($item, $imagePath, 'image', false);
+            }
 
             $this->entityManager->flush();
             $conn->commit();
@@ -438,7 +455,6 @@ class BusinessProductService
         );
         $item->setDescription($dto->description);
         $item->setNotes($dto->notes);
-        $item->setImageUrl($dto->imageUrl);
         $item->setStatus($dto->status ?? 1);
         $item->setSortOrder($dto->sortOrder ?? 0);
     }

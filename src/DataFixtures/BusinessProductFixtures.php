@@ -98,7 +98,6 @@ class BusinessProductFixtures extends Fixture implements DependentFixtureInterfa
         $product->setTargetProfitMargin($data['target_profit_margin']);
         $product->setDescription($data['description'] ?? null);
         $product->setNotes($data['notes'] ?? null);
-        $product->setImageUrl($data['image_url'] ?? null);
         $product->setStatus($data['status'] ?? 1);
         $product->setSortOrder($data['sort_order'] ?? 0);
     }

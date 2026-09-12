@@ -31,7 +31,9 @@
                                         :model-value="value"
                                         :error-message="errorMessage"
                                         @selected="
-                                            handleChange($event?.path || null)
+                                            handleChange(
+                                                $event?.path || $event || null,
+                                            )
                                         "
                                     />
                                 </VeeField>

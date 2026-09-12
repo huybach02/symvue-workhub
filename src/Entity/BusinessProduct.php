@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Interface\ImageableInterface;
 use App\Repository\BusinessProductRepository;
 use App\Traits\ModifierTrait;
 use App\Traits\SoftDeleteableTrait;
@@ -20,7 +21,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
     options: ['where' => 'deleted_at IS NULL']
 )]
 #[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
-class BusinessProduct implements \JsonSerializable
+class BusinessProduct implements \JsonSerializable, ImageableInterface
 {
     use TimestampableTrait;
     use SoftDeleteableTrait;
@@ -46,9 +47,6 @@ class BusinessProduct implements \JsonSerializable
 
     #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => 'Ghi chú'])]
     private ?string $notes = null;
-
-    #[ORM\Column(name: 'image_url', length: 255, nullable: true, options: ['comment' => 'Đường dẫn ảnh'])]
-    private ?string $imageUrl = null;
 
     #[ORM\Column(name: 'target_profit_margin', type: Types::DECIMAL, precision: 5, scale: 2, nullable: true, options: ['comment' => 'Tỷ lệ lợi nhuận mục tiêu (%)'])]
     private ?string $targetProfitMargin = null;
@@ -119,17 +117,6 @@ class BusinessProduct implements \JsonSerializable
         return $this;
     }
 
-    public function getImageUrl(): ?string
-    {
-        return $this->imageUrl;
-    }
-
-    public function setImageUrl(?string $imageUrl): static
-    {
-        $this->imageUrl = $imageUrl;
-        return $this;
-    }
-
     public function getTargetProfitMargin(): ?string
     {
         return $this->targetProfitMargin;
@@ -173,7 +160,6 @@ class BusinessProduct implements \JsonSerializable
             'category' => $this->category?->jsonSerialize(),
             'description' => $this->description,
             'notes' => $this->notes,
-            'imageUrl' => $this->imageUrl,
             'targetProfitMargin' => formatDecimal($this->targetProfitMargin),
             'status' => $this->status,
             'sortOrder' => $this->sortOrder,

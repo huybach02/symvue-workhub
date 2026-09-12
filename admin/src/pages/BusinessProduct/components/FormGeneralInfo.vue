@@ -97,6 +97,22 @@
             </VeeField>
         </v-col>
 
+        <v-col cols="12" md="4">
+            <VeeField
+                v-slot="{ handleChange, errorMessage, value }"
+                name="image"
+            >
+                <ImageSelector
+                    :label="$t('field.image')"
+                    :required="false"
+                    :is-multiple="false"
+                    :model-value="value"
+                    :error-message="errorMessage"
+                    @selected="handleChange($event?.path || $event || null)"
+                />
+            </VeeField>
+        </v-col>
+
         <v-col cols="12" md="12">
             <VeeField
                 v-slot="{ field, errorMessage, handleChange, handleBlur }"
@@ -135,6 +151,7 @@ import { Field as VeeField } from "vee-validate";
 import { constant } from "@/utils/constants/constant";
 import TreeAutocomplete from "@/pages/Category/TreeAutocomplete.vue";
 import RichEditor from "@/components/RichEditor.vue";
+import ImageSelector from "@/components/ImageSelector.vue";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
@@ -143,6 +160,7 @@ export default {
         VeeField,
         TreeAutocomplete,
         RichEditor,
+        ImageSelector,
     },
     props: {
         type: {

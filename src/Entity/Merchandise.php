@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Interface\ImageableInterface;
 use App\Repository\MerchandiseRepository;
 use App\Traits\ModifierTrait;
 use App\Traits\SoftDeleteableTrait;
@@ -20,7 +21,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
     options: ['where' => 'deleted_at IS NULL']
 )]
 #[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
-class Merchandise
+class Merchandise implements ImageableInterface
 {
     use TimestampableTrait;
     use SoftDeleteableTrait;

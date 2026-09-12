@@ -48,6 +48,72 @@ class ImageRepository extends ServiceEntityRepository
         return $images;
     }
 
+    public function getOneImage(ImageableInterface $owner, ?string $type = null): ?string
+    {
+        $entityType = $this->getRealClass(get_class($owner));
+        $entityId = $owner->getId();
+
+        $qb = $this->createQueryBuilder('i')
+            ->select('i.path')
+            ->where('i.entityType = :entityType')
+            ->andWhere('i.entityId = :entityId')
+            ->setParameter('entityType', $entityType)
+            ->setParameter('entityId', $entityId)
+            ->setMaxResults(1);
+
+        if ($type) {
+            $qb->andWhere('i.type = :type')
+                ->setParameter('type', $type);
+        }
+
+        $res = $qb->getQuery()->getOneOrNullResult();
+
+        return $res['path'] ?? null;
+    }
+
+    /**
+     * Batch load 1 ảnh cho danh sách entityId để tránh N+1 query.
+     * Trả về mảng key-value: [entityId => path]
+     *
+     * @param string $entityClass
+     * @param int[] $entityIds
+     * @param string|null $type
+     * @return array<int, string>
+     */
+    public function getImagesMap(string $entityClass, array $entityIds, ?string $type = null): array
+    {
+        if (empty($entityIds)) {
+            return [];
+        }
+
+        $entityType = $this->getRealClass($entityClass);
+
+        $qb = $this->createQueryBuilder('i')
+            ->select('i.entityId, i.path')
+            ->where('i.entityType = :entityType')
+            ->andWhere('i.entityId IN (:entityIds)')
+            ->setParameter('entityType', $entityType)
+            ->setParameter('entityIds', $entityIds)
+            ->orderBy('i.id', 'ASC');
+
+        if ($type) {
+            $qb->andWhere('i.type = :type')
+                ->setParameter('type', $type);
+        }
+
+        $rows = $qb->getQuery()->getArrayResult();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $eId = (int) $row['entityId'];
+            if (!isset($map[$eId])) {
+                $map[$eId] = $row['path'];
+            }
+        }
+
+        return $map;
+    }
+
     public function getImages(ImageableInterface $owner, ?string $type = null)
     {
         $entityType = $this->getRealClass(get_class($owner));
@@ -76,16 +142,21 @@ class ImageRepository extends ServiceEntityRepository
         }
     }
 
-    public function removeImages(ImageableInterface $owner): void
+    public function removeImages(ImageableInterface $owner, ?string $type = null): void
     {
-        $this->createQueryBuilder('i')
+        $qb = $this->createQueryBuilder('i')
             ->delete()
             ->where('i.entityType = :entityType')
             ->andWhere('i.entityId = :entityId')
             ->setParameter('entityType', $this->getRealClass(get_class($owner)))
-            ->setParameter('entityId', $owner->getId())
-            ->getQuery()
-            ->execute();
+            ->setParameter('entityId', $owner->getId());
+
+        if ($type !== null) {
+            $qb->andWhere('i.type = :type')
+                ->setParameter('type', $type);
+        }
+
+        $qb->getQuery()->execute();
     }
 
     private function getRealClass(string $className): string

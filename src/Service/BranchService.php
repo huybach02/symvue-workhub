@@ -8,6 +8,7 @@ use App\DTO\BranchDTO;
 use App\Entity\Branch;
 use App\Entity\Warehouse;
 use App\Repository\BranchRepository;
+use App\Repository\ImageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class BranchService
@@ -15,6 +16,7 @@ class BranchService
     public function __construct(
         private readonly BranchRepository $branchRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly ImageRepository $imageRepository,
     ) {}
 
     public function findAll(array $params): array
@@ -23,9 +25,16 @@ class BranchService
 
         $result = FilterWithPagination::findWithPagination($qb, $params, 'e');
 
+        $branchIds = array_map(fn(Branch $item) => (int) $item->getId(), $result['collection']);
+        $imagesMap = $this->imageRepository->getImagesMap(Branch::class, $branchIds, 'image');
+
         // Map collection to JSON
         $result['collection'] = array_map(
-            fn(Branch $item) => $item->jsonSerialize(),
+            function (Branch $item) use ($imagesMap) {
+                $data = $item->jsonSerialize();
+                $data['image'] = $imagesMap[(int) $item->getId()] ?? null;
+                return $data;
+            },
             $result['collection']
         );
 
@@ -40,7 +49,10 @@ class BranchService
             throw new \Exception(t('error.not_found'));
         }
 
-        return $item->jsonSerialize();
+        $data = $item->jsonSerialize();
+        $data['image'] = $this->imageRepository->getOneImage($item, 'image');
+
+        return $data;
     }
 
     public function getDataSelect(array $params): array
@@ -93,9 +105,16 @@ class BranchService
 
         $this->entityManager->persist($warehouse);
 
+        if (!empty($dto->image)) {
+            $this->imageRepository->addOneImage($item, $dto->image, 'image', false);
+        }
+
         $this->entityManager->flush();
 
-        return $item->jsonSerialize();
+        $data = $item->jsonSerialize();
+        $data['image'] = $this->imageRepository->getOneImage($item, 'image');
+
+        return $data;
     }
 
     public function update(int $id, BranchDTO $dto): array
@@ -118,9 +137,17 @@ class BranchService
         $warehouse->setStatus($dto->status);
         $warehouse->setNote($dto->note);
 
+        $this->imageRepository->removeImages($item, 'image');
+        if (!empty($dto->image)) {
+            $this->imageRepository->addOneImage($item, $dto->image, 'image', false);
+        }
+
         $this->entityManager->flush();
 
-        return $item->jsonSerialize();
+        $data = $item->jsonSerialize();
+        $data['image'] = $this->imageRepository->getOneImage($item, 'image');
+
+        return $data;
     }
 
     public function delete(int $id): void

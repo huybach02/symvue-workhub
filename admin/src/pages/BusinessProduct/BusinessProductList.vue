@@ -104,6 +104,25 @@
                     </div>
                 </template>
 
+                <template #[`item.image`]="{ item }">
+                    <div class="py-2">
+                        <v-avatar v-if="item.image" size="50" rounded="lg">
+                            <v-img :src="item.image" :alt="item.name" cover />
+                        </v-avatar>
+                        <v-avatar
+                            v-else
+                            color="grey-lighten-2"
+                            size="50"
+                            rounded="lg"
+                        >
+                            <v-icon
+                                icon="mdi-image-outline"
+                                color="grey-darken-1"
+                            />
+                        </v-avatar>
+                    </div>
+                </template>
+
                 <template #[`item.category`]="{ item }">
                     {{ item?.category?.name ?? "" }}
                 </template>
@@ -244,6 +263,13 @@ export default {
                     key: "id",
                     width: 100,
                     filterComponent: markRaw(FilterText),
+                },
+                {
+                    title: this.$t("business_product.columns.image"),
+                    key: "image",
+                    width: 100,
+                    sortable: false,
+                    filterComponent: markRaw(FilterPlaceholder),
                 },
                 {
                     title: this.$t("business_product.columns.code"),

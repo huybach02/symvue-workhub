@@ -673,6 +673,7 @@
         "title": "Branch",
         "columns": {
             "id": "ID",
+            "image": "Image",
             "name": "Name",
             "code": "Code",
             "phone": "Phone number",
@@ -790,6 +791,7 @@
         },
         "columns": {
             "id": "ID",
+            "image": "Image",
             "code": "Item code",
             "name": "Item name",
             "type": "Type",
@@ -821,6 +823,7 @@
         },
         "columns": {
             "id": "ID",
+            "image": "Image",
             "code": "Code",
             "name": "Name",
             "category": "Category",
