@@ -57,6 +57,7 @@ class UserFixture extends Fixture implements FixtureGroupInterface, DependentFix
 
         // Tạo 1 admin user mặc định
         $admin = new User();
+        $admin->setMaNhanVien('NV00000');
         $admin->setEmail('huybach2002ct@gmail.com');
         $admin->setName('Administrator');
         $admin->setPassword($this->passwordHasher->hashPassword($admin, 'password'));

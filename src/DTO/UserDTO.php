@@ -17,7 +17,7 @@ class UserDTO
 
         // ===== THÔNG TIN CÁ NHÂN =====
 
-        #[Assert\NotBlank(groups: ["create", "update"])] #[
+        #[Assert\NotBlank(groups: ["create"])] #[
             Assert\Length(max: 50, groups: ["create", "update"]),
         ]
         public readonly ?string $maNhanVien = null,

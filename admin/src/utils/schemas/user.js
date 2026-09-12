@@ -76,3 +76,10 @@ export const userSchema = yup.object({
         max: 500,
     }),
 });
+
+export const profileSchema = userSchema.shape({
+    maNhanVien: buildStringRule(t("field.ma_nhan_vien"), {
+        required: false,
+        max: 50,
+    }),
+});

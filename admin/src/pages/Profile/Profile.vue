@@ -1,7 +1,9 @@
 <template>
     <div>
         <!-- Header đẹp mắt với background gradient nhẹ -->
-        <div class="profile-header d-flex align-center pa-6 text-white rounded-lg mb-6">
+        <div
+            class="profile-header d-flex align-center pa-6 text-white rounded-lg mb-6"
+        >
             <v-avatar size="80" class="mr-4 border-lg border-white">
                 <v-img
                     v-if="currentUser?.avatarUrl"
@@ -41,7 +43,7 @@
                 <VeeForm
                     ref="formRef"
                     as="form"
-                    :validation-schema="userSchema"
+                    :validation-schema="profileSchema"
                     @submit="handleUpdateProfile"
                 >
                     <v-row>
@@ -63,13 +65,17 @@
                                             name="avatar"
                                         >
                                             <ImageSelector
-                                                :label="$t('field.anh_dai_dien')"
+                                                :label="
+                                                    $t('field.anh_dai_dien')
+                                                "
                                                 :required="false"
                                                 :is-multiple="false"
                                                 :model-value="value"
                                                 :error-message="errorMessage"
                                                 @selected="
-                                                    handleChange($event?.path || null)
+                                                    handleChange(
+                                                        $event?.path || null,
+                                                    )
                                                 "
                                             />
                                         </VeeField>
@@ -81,7 +87,9 @@
                                             v-slot="{ field, errorMessage }"
                                             name="maNhanVien"
                                         >
-                                            <div class="mb-2 font-weight-medium text-body-2">
+                                            <div
+                                                class="mb-2 font-weight-medium text-body-2"
+                                            >
                                                 {{ $t("field.ma_nhan_vien") }}
                                             </div>
                                             <v-text-field
@@ -101,7 +109,9 @@
                                             v-slot="{ field, errorMessage }"
                                             name="name"
                                         >
-                                            <div class="mb-2 font-weight-medium text-body-2">
+                                            <div
+                                                class="mb-2 font-weight-medium text-body-2"
+                                            >
                                                 {{ $t("field.ho_va_ten") }}
                                                 <span class="text-red">*</span>
                                             </div>
@@ -126,7 +136,9 @@
                                             }"
                                             name="gender"
                                         >
-                                            <div class="mb-2 font-weight-medium text-body-2">
+                                            <div
+                                                class="mb-2 font-weight-medium text-body-2"
+                                            >
                                                 {{ $t("field.gioi_tinh") }}
                                                 <span class="text-red">*</span>
                                             </div>
@@ -138,7 +150,9 @@
                                                 :error-messages="errorMessage"
                                                 variant="outlined"
                                                 :placeholder="`${$t('base.enter')} ${$t('field.gioi_tinh')}`"
-                                                @update:model-value="handleChange"
+                                                @update:model-value="
+                                                    handleChange
+                                                "
                                                 @blur="handleBlur"
                                             />
                                         </VeeField>
@@ -155,7 +169,9 @@
                                             }"
                                             name="birthday"
                                         >
-                                            <div class="mb-2 font-weight-medium text-body-2">
+                                            <div
+                                                class="mb-2 font-weight-medium text-body-2"
+                                            >
                                                 {{ $t("field.ngay_sinh") }}
                                                 <span class="text-red">*</span>
                                             </div>
@@ -180,7 +196,9 @@
                                             v-slot="{ field, errorMessage }"
                                             name="cmnd"
                                         >
-                                            <div class="mb-2 font-weight-medium text-body-2">
+                                            <div
+                                                class="mb-2 font-weight-medium text-body-2"
+                                            >
                                                 {{ $t("field.cmnd") }}
                                                 <span class="text-red">*</span>
                                             </div>
@@ -205,7 +223,9 @@
                                             }"
                                             name="ngayCapCmnd"
                                         >
-                                            <div class="mb-2 font-weight-medium text-body-2">
+                                            <div
+                                                class="mb-2 font-weight-medium text-body-2"
+                                            >
                                                 {{ $t("field.ngay_cap_cmnd") }}
                                                 <span class="text-red">*</span>
                                             </div>
@@ -230,7 +250,9 @@
                                             v-slot="{ field, errorMessage }"
                                             name="noiCapCmnd"
                                         >
-                                            <div class="mb-2 font-weight-medium text-body-2">
+                                            <div
+                                                class="mb-2 font-weight-medium text-body-2"
+                                            >
                                                 {{ $t("field.noi_cap_cmnd") }}
                                                 <span class="text-red">*</span>
                                             </div>
@@ -260,7 +282,9 @@
                                             v-slot="{ field, errorMessage }"
                                             name="email"
                                         >
-                                            <div class="mb-2 font-weight-medium text-body-2">
+                                            <div
+                                                class="mb-2 font-weight-medium text-body-2"
+                                            >
                                                 {{ $t("field.email") }}
                                             </div>
                                             <v-text-field
@@ -280,7 +304,9 @@
                                             v-slot="{ field, errorMessage }"
                                             name="phone"
                                         >
-                                            <div class="mb-2 font-weight-medium text-body-2">
+                                            <div
+                                                class="mb-2 font-weight-medium text-body-2"
+                                            >
                                                 {{ $t("field.so_dien_thoai") }}
                                                 <span class="text-red">*</span>
                                             </div>
@@ -297,10 +323,16 @@
                                     <!-- Tỉnh/Thành phố -->
                                     <v-col cols="12" md="4">
                                         <VeeField
-                                            v-slot="{ field, errorMessage, handleChange }"
+                                            v-slot="{
+                                                field,
+                                                errorMessage,
+                                                handleChange,
+                                            }"
                                             name="province"
                                         >
-                                            <div class="mb-2 font-weight-medium text-body-2">
+                                            <div
+                                                class="mb-2 font-weight-medium text-body-2"
+                                            >
                                                 {{ $t("field.tinh_thanh_pho") }}
                                                 <span class="text-red">*</span>
                                             </div>
@@ -317,7 +349,9 @@
                                                 @update:model-value="
                                                     (value) => {
                                                         handleChange(value);
-                                                        handleProvinceChange(value);
+                                                        handleProvinceChange(
+                                                            value,
+                                                        );
                                                     }
                                                 "
                                                 @blur="field.onBlur"
@@ -329,10 +363,16 @@
                                     <v-col cols="12" md="4">
                                         <VeeField
                                             ref="wardField"
-                                            v-slot="{ field, errorMessage, handleChange }"
+                                            v-slot="{
+                                                field,
+                                                errorMessage,
+                                                handleChange,
+                                            }"
                                             name="ward"
                                         >
-                                            <div class="mb-2 font-weight-medium text-body-2">
+                                            <div
+                                                class="mb-2 font-weight-medium text-body-2"
+                                            >
                                                 {{ $t("field.xa_phuong") }}
                                                 <span class="text-red">*</span>
                                             </div>
@@ -347,7 +387,9 @@
                                                 variant="outlined"
                                                 clearable
                                                 :placeholder="`${$t('base.enter')} ${$t('field.xa_phuong')}`"
-                                                @update:model-value="handleChange"
+                                                @update:model-value="
+                                                    handleChange
+                                                "
                                                 @blur="field.onBlur"
                                             />
                                         </VeeField>
@@ -359,7 +401,9 @@
                                             v-slot="{ field, errorMessage }"
                                             name="address"
                                         >
-                                            <div class="mb-2 font-weight-medium text-body-2">
+                                            <div
+                                                class="mb-2 font-weight-medium text-body-2"
+                                            >
                                                 {{ $t("field.dia_chi") }}
                                                 <span class="text-red">*</span>
                                             </div>
@@ -387,7 +431,9 @@
                                 }"
                                 name="status"
                             >
-                                <div class="mb-2 font-weight-medium text-body-2">
+                                <div
+                                    class="mb-2 font-weight-medium text-body-2"
+                                >
                                     {{ $t("field.trang_thai") }}
                                 </div>
                                 <v-select
@@ -437,7 +483,9 @@
                                     v-slot="{ field, errorMessage }"
                                     name="currentPassword"
                                 >
-                                    <div class="mb-2 font-weight-medium text-body-2">
+                                    <div
+                                        class="mb-2 font-weight-medium text-body-2"
+                                    >
                                         {{ $t("auth.current_password") }}
                                         <span class="text-red">*</span>
                                     </div>
@@ -446,7 +494,9 @@
                                         :error-messages="errorMessage"
                                         type="password"
                                         variant="outlined"
-                                        :placeholder="$t('auth.enter_current_password')"
+                                        :placeholder="
+                                            $t('auth.enter_current_password')
+                                        "
                                     />
                                 </VeeField>
                             </div>
@@ -457,7 +507,9 @@
                                     v-slot="{ field, errorMessage }"
                                     name="newPassword"
                                 >
-                                    <div class="mb-2 font-weight-medium text-body-2">
+                                    <div
+                                        class="mb-2 font-weight-medium text-body-2"
+                                    >
                                         {{ $t("auth.new_password") }}
                                         <span class="text-red">*</span>
                                     </div>
@@ -466,7 +518,9 @@
                                         :error-messages="errorMessage"
                                         type="password"
                                         variant="outlined"
-                                        :placeholder="$t('auth.enter_new_password')"
+                                        :placeholder="
+                                            $t('auth.enter_new_password')
+                                        "
                                     />
                                 </VeeField>
                             </div>
@@ -477,7 +531,9 @@
                                     v-slot="{ field, errorMessage }"
                                     name="confirmPassword"
                                 >
-                                    <div class="mb-2 font-weight-medium text-body-2">
+                                    <div
+                                        class="mb-2 font-weight-medium text-body-2"
+                                    >
                                         {{ $t("auth.confirm_password") }}
                                         <span class="text-red">*</span>
                                     </div>
@@ -486,7 +542,9 @@
                                         :error-messages="errorMessage"
                                         type="password"
                                         variant="outlined"
-                                        :placeholder="$t('auth.enter_confirm_password')"
+                                        :placeholder="
+                                            $t('auth.enter_confirm_password')
+                                        "
                                     />
                                 </VeeField>
                             </div>
@@ -519,7 +577,7 @@ import { Form as VeeForm, Field as VeeField } from "vee-validate";
 import DatePicker from "@/components/DatePicker.vue";
 import ImageSelector from "@/components/ImageSelector.vue";
 import UserSignatureSection from "./components/UserSignatureSection.vue";
-import { userSchema } from "@/utils/schemas/user";
+import { profileSchema } from "@/utils/schemas/user";
 import { changePasswordSchema } from "@/utils/schemas/changePassword";
 import { constant } from "@/utils/constants/constant";
 import { addressHelper } from "@/helpers/addressHelper";
@@ -537,7 +595,7 @@ export default {
     data() {
         return {
             tab: "info",
-            userSchema,
+            profileSchema,
             changePasswordSchema,
             selectedProvince: "",
         };
