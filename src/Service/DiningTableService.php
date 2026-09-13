@@ -50,6 +50,7 @@ class DiningTableService
                 'label' => 'Bàn ' . $item->getTableNumber(),
                 'value' => $item->getId(),
                 'tableNumber' => $item->getTableNumber(),
+                'isUsing' => (bool) $item->isUsing(),
             ];
         }, $result['collection']);
     }

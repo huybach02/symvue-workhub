@@ -166,8 +166,9 @@ class GeneralSettingFixture extends Fixture implements FixtureGroupInterface
             ],
         ];
 
+        $repo = $manager->getRepository(GeneralSetting::class);
         foreach ($data as $item) {
-            $cauhinh = new GeneralSetting();
+            $cauhinh = $repo->findOneBy(["tenCauHinh" => $item["ten_cau_hinh"]]) ?? new GeneralSetting();
             $cauhinh->setTenCauHinh($item["ten_cau_hinh"]);
             $cauhinh->setGiaTri($item["gia_tri"]);
             $cauhinh->setMoTa($item["mo_ta"]);

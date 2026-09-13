@@ -2,7 +2,7 @@
     <v-dialog v-model="isVisible" max-width="500" persistent>
         <v-card>
             <!-- Header -->
-            <v-card-title class="text-h5 bg-error">
+            <v-card-title :class="['text-h5', 'bg-' + headerColor]">
                 <v-icon :icon="icon" :color="iconColor" class="mr-2" />
                 {{ displayTitle }}
             </v-card-title>
@@ -65,6 +65,11 @@ export default {
         iconColor: {
             type: String,
             default: "white",
+        },
+        // Màu header
+        headerColor: {
+            type: String,
+            default: "error",
         },
         // Text nút xác nhận
         confirmText: {

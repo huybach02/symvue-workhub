@@ -160,4 +160,10 @@ export const menuSidebar = [
         value: NAME_ROUTES_CONFIG.diningTable,
         to: { name: NAME_ROUTES_CONFIG.diningTable },
     },
+    {
+        title: i18n.global.t("sidebar.sell_product"),
+        icon: "mdi-view-dashboard",
+        value: NAME_ROUTES_CONFIG.sellProduct,
+        to: { name: NAME_ROUTES_CONFIG.sellProduct },
+    },
 ];

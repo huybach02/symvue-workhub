@@ -362,6 +362,21 @@ export const routes = [
                         ).icon || "",
                 },
             },
+            {
+                path: "sell-product",
+                name: NAME_ROUTES_CONFIG.sellProduct,
+                component: () => import("../pages/SellProduct/SellProduct.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.sellProduct,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.sellProduct,
+                        ).icon || "",
+                },
+            },
 ],
     },
     {

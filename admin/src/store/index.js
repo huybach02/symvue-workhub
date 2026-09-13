@@ -23,6 +23,7 @@ import stockReceipt from "./modules/stockReceipt";
 import stockTransfer from "./modules/stockTransfer";
 import productionOrder from "./modules/productionOrder";
 import diningTable from "./modules/diningTable";
+import sellProduct from "./modules/sellProduct";
 
 const store = createStore({
     state() {
@@ -64,6 +65,7 @@ const store = createStore({
         stockTransfer,
         productionOrder,
         diningTable,
+        sellProduct,
 },
 });
 

@@ -7,6 +7,7 @@ namespace App\DataFixtures;
 use App\Class\InventoryLotStatus;
 use App\Class\InventoryMovementType;
 use App\Class\MathHelper;
+use App\Entity\BusinessProductVariantRecipe;
 use App\Entity\GeneralSetting;
 use App\Entity\InventoryBalance;
 use App\Entity\InventoryLot;
@@ -22,8 +23,8 @@ use Doctrine\Persistence\ObjectManager;
 
 class InventorySeedFixture extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
-    private const LOT_MULTIPLIER = 30; // Tồn mỗi lot gấp 30x nhu cầu tối đa 1 lần sản xuất toàn hệ thống
-    private const LOT_COUNT = 3;
+    private const LOT_MULTIPLIER = 50; // Tồn mỗi lot gấp 50x nhu cầu 1 chu kỳ sản xuất / bán hàng
+    private const LOT_COUNT = 3;       // 3 lot cách hạn nhau để kiểm thử FEFO
 
     private ObjectManager $manager;
 
@@ -44,6 +45,7 @@ class InventorySeedFixture extends Fixture implements DependentFixtureInterface,
             UserFixture::class,
             MerchandiseIngredientFixtures::class,
             MerchandiseFinishedProductFixtures::class,
+            BusinessProductFixtures::class,
         ];
     }
 
@@ -54,75 +56,69 @@ class InventorySeedFixture extends Fixture implements DependentFixtureInterface,
         $this->warehouse = $this->resolveMaterialWarehouse();
         $this->systemUser = $this->resolveSystemUser();
 
-        $recipes = $this->manager->getRepository(MerchandiseRecipe::class)->findAll();
-        $productionProducts = array_filter(
-            $recipes,
-            fn (MerchandiseRecipe $recipe): bool => $this->isProductionFinishedProduct($recipe->getFinishedProduct()),
-        );
+        // 1. Tổng hợp nhu cầu từ công thức sản xuất nội bộ & công thức món ăn POS
+        $demandMap = $this->computeTotalDemandMap();
 
-        $demandByIngredient = $this->computeTotalDemandByIngredient($productionProducts);
+        // 2. Lấy toàn bộ hàng hóa trong hệ thống (cả nguyên liệu và thành phẩm)
+        $merchandiseList = $this->manager->getRepository(Merchandise::class)->findBy(['status' => 1]);
+        if (empty($merchandiseList)) {
+            $merchandiseList = $this->manager->getRepository(Merchandise::class)->findAll();
+        }
 
         $seq = 0;
-        foreach ($demandByIngredient as $ingredientId => $demandBase) {
-            $ingredient = $this->manager->getRepository(Merchandise::class)->find($ingredientId);
-            if (!$ingredient || !$ingredient->getBaseUnit()) {
+        foreach ($merchandiseList as $merchandise) {
+            if (!$merchandise->getBaseUnit()) {
                 continue;
             }
 
-            $perLot = MathHelper::mul($demandBase, (string) self::LOT_MULTIPLIER, 6);
-            $unitCostBase = $this->resolveUnitCostBase($ingredient);
+            $demandBase = $demandMap[$merchandise->getId()] ?? null;
+            $perLot = $this->computePerLotQuantity($merchandise, $demandBase);
+            $unitCostBase = $this->resolveUnitCostBase($merchandise);
 
-            for ($i = 0; $i < self::LOT_COUNT; ++$i) {
+            for ($lotIndex = 0; $lotIndex < self::LOT_COUNT; ++$lotIndex) {
                 $this->createLotWithBalanceAndMovement(
-                    $ingredient,
+                    $merchandise,
                     $perLot,
                     $unitCostBase,
                     ++$seq,
-                    $i,
+                    $lotIndex,
                 );
             }
 
-            if (($seq % 10) === 0) {
-                $manager->flush();
+            if (($seq % 15) === 0) {
+                $this->manager->flush();
             }
         }
 
-        $manager->flush();
-    }
-
-    private function isProductionFinishedProduct(?Merchandise $product): bool
-    {
-        return $product !== null
-            && $product->getType() === 'finished_product'
-            && $product->getFinishedProductSource() === 'production';
+        $this->manager->flush();
     }
 
     /**
-     * Tổng nhu cầu base quantity của từng nguyên liệu khi sản xuất TẤT CẢ
-     * thành phẩm 1 lần (theo recipe hiện tại, có tính tỷ lệ hao hụt).
+     * Tổng hợp nhu cầu base quantity của từng mặt hàng khi:
+     * - Sản xuất tất cả thành phẩm 1 lần (MerchandiseRecipe).
+     * - Bán tất cả các món trong menu 1 lần (BusinessProductVariantRecipe).
      *
-     * @param MerchandiseRecipe[] $recipes
-     *
-     * @return array<int, string> ingredientId => base quantity
+     * @return array<int, string> merchandiseId => base quantity
      */
-    private function computeTotalDemandByIngredient(array $recipes): array
+    private function computeTotalDemandMap(): array
     {
         $demand = [];
 
-        foreach ($recipes as $recipe) {
+        // 1. Nhu cầu nguyên liệu từ công thức sản xuất nội bộ (MerchandiseRecipe)
+        $merchandiseRecipes = $this->manager->getRepository(MerchandiseRecipe::class)->findAll();
+        foreach ($merchandiseRecipes as $recipe) {
             foreach ($recipe->getItems() as $recipeItem) {
                 $ingredient = $recipeItem->getIngredient();
-                $factor = $recipeItem->getFactorToBaseSnapshot();
-                $wasteRate = $recipeItem->getWasteRate() ?? '0.00';
-                if (!$ingredient || $factor === null) {
+                if (!$ingredient || !$ingredient->getId()) {
                     continue;
                 }
 
-                // Nhu cầu base quantity cho 1 lần sản xuất output của recipe:
-                // quantity (đơn vị công thức) x hệ số quy đổi về base unit,
-                // cộng thêm tỷ lệ hao hụt nếu có.
+                $factor = (string) ($recipeItem->getFactorToBaseSnapshot() ?? '1');
+                $wasteRate = (string) ($recipeItem->getWasteRate() ?? '0.00');
+                $qty = (string) ($recipeItem->getQuantity() ?? '0');
+
                 $materialBase = MathHelper::mul(
-                    MathHelper::mul($recipeItem->getQuantity() ?? '0', $factor, 6),
+                    MathHelper::mul($qty, $factor, 6),
                     MathHelper::add('1', MathHelper::div($wasteRate, '100', 6), 8),
                     6,
                 );
@@ -135,7 +131,63 @@ class InventorySeedFixture extends Fixture implements DependentFixtureInterface,
             }
         }
 
+        // 2. Nhu cầu từ công thức món ăn bán tại quầy / POS (BusinessProductVariantRecipe)
+        $variantRecipes = $this->manager->getRepository(BusinessProductVariantRecipe::class)->findAll();
+        foreach ($variantRecipes as $recipe) {
+            foreach ($recipe->getItems() as $recipeItem) {
+                $itemMerchandise = $recipeItem->getFinishedProduct(); // trỏ tới Merchandise
+                if (!$itemMerchandise || !$itemMerchandise->getId()) {
+                    continue;
+                }
+
+                $factor = (string) ($recipeItem->getFactorToBaseSnapshot() ?? '1');
+                $wasteRate = (string) ($recipeItem->getWasteRate() ?? '0.00');
+                $qty = (string) ($recipeItem->getQuantity() ?? '0');
+
+                $neededBase = MathHelper::mul(
+                    MathHelper::mul($qty, $factor, 6),
+                    MathHelper::add('1', MathHelper::div($wasteRate, '100', 6), 8),
+                    6,
+                );
+
+                $demand[$itemMerchandise->getId()] = MathHelper::add(
+                    $demand[$itemMerchandise->getId()] ?? '0',
+                    $neededBase,
+                    6,
+                );
+            }
+        }
+
         return $demand;
+    }
+
+    /**
+     * Xác định số lượng tồn kho dồi dào cho mỗi Lot theo đơn vị tính chuẩn
+     */
+    private function computePerLotQuantity(Merchandise $merchandise, ?string $demandBase): string
+    {
+        $unitCode = strtoupper($merchandise->getBaseUnit()?->getCode() ?? '');
+
+        // Định mức số lượng tồn kho tiêu chuẩn cho từng loại đơn vị
+        $defaultQuantity = match ($unitCode) {
+            'G' => '100000.000000',    // 100 kg / lot => 3 lots = 300 kg
+            'ML' => '100000.000000',   // 100 Lít / lot => 3 lots = 300 Lít
+            'KG' => '1000.000000',     // 1,000 kg / lot => 3 lots = 3 tấn
+            'L' => '1000.000000',      // 1,000 Lít / lot => 3 lots = 3,000 Lít
+            'GOI' => '1000.000000',    // 1,000 gói / lot => 3 lots = 3,000 gói
+            'VIEN' => '5000.000000',   // 5,000 viên / lot => 3 lots = 15,000 viên
+            'PHAN' => '1000.000000',   // 1,000 phần / lot => 3 lots = 3,000 phần
+            default => '1000.000000',  // 1,000 đơn vị / lot => 3 lots = 3,000 đơn vị
+        };
+
+        if ($demandBase !== null && MathHelper::comp($demandBase, '0') > 0) {
+            $calculatedFromDemand = MathHelper::mul($demandBase, (string) self::LOT_MULTIPLIER, 6);
+            if (MathHelper::comp($calculatedFromDemand, $defaultQuantity) > 0) {
+                return $calculatedFromDemand;
+            }
+        }
+
+        return $defaultQuantity;
     }
 
     /**
@@ -170,7 +222,7 @@ class InventorySeedFixture extends Fixture implements DependentFixtureInterface,
 
         throw new \RuntimeException(
             'Không tìm thấy warehouse nào để seed tồn kho. '
-            . 'Chạy group main-branch-and-warehouse trước.',
+                . 'Chạy group main-branch-and-warehouse trước.',
         );
     }
 
@@ -187,12 +239,12 @@ class InventorySeedFixture extends Fixture implements DependentFixtureInterface,
     }
 
     /**
-     * Giá vốn đơn vị (base unit) của nguyên liệu = MerchandiseProviderPrice
-     * đang áp dụng cho base unit; fallback '0.0000'.
+     * Giá vốn đơn vị (base unit) của hàng hóa = MerchandiseProviderPrice
+     * đang áp dụng cho base unit; fallback giá NCC bất kỳ hoặc 10,000.0000.
      */
-    private function resolveUnitCostBase(Merchandise $ingredient): string
+    private function resolveUnitCostBase(Merchandise $merchandise): string
     {
-        $baseUnit = $ingredient->getBaseUnit();
+        $baseUnit = $merchandise->getBaseUnit();
 
         $price = $this->manager->createQuery(
             'SELECT p.price
@@ -202,16 +254,35 @@ class InventorySeedFixture extends Fixture implements DependentFixtureInterface,
                AND p.unit = :unit
              ORDER BY p.effectiveFrom DESC, p.id DESC'
         )
-            ->setParameter('merchandise', $ingredient)
+            ->setParameter('merchandise', $merchandise)
             ->setParameter('unit', $baseUnit)
             ->setMaxResults(1)
             ->getOneOrNullResult();
 
-        return $price['price'] ?? '0.0000';
+        if (!empty($price['price'])) {
+            return (string) $price['price'];
+        }
+
+        $anyPrice = $this->manager->createQuery(
+            'SELECT p.price
+             FROM App\Entity\MerchandiseProviderPrice p
+             JOIN p.merchandiseProvider mp
+             WHERE mp.merchandise = :merchandise
+             ORDER BY p.effectiveFrom DESC, p.id DESC'
+        )
+            ->setParameter('merchandise', $merchandise)
+            ->setMaxResults(1)
+            ->getOneOrNullResult();
+
+        if (!empty($anyPrice['price'])) {
+            return (string) $anyPrice['price'];
+        }
+
+        return '10000.0000';
     }
 
     private function createLotWithBalanceAndMovement(
-        Merchandise $ingredient,
+        Merchandise $merchandise,
         string $quantityBase,
         string $unitCostBase,
         int $seq,
@@ -223,39 +294,70 @@ class InventorySeedFixture extends Fixture implements DependentFixtureInterface,
         $manufactureDate = (clone $today)->modify(sprintf('-%d days', 15 * ($lotIndex + 1)));
         $receivedAt = (clone $today)->modify(sprintf('-%d days', 10 * ($lotIndex + 1)));
 
-        $lot = new InventoryLot();
-        $lot->setInternalCode(sprintf('LOT-SEED-%06d', $seq));
-        $lot->setMerchandise($ingredient);
+        $internalCode = sprintf(
+            'LOT-%s-%02d',
+            $merchandise->getCode() ?? (string) $merchandise->getId(),
+            $lotIndex + 1,
+        );
+
+        $lot = $this->manager->getRepository(InventoryLot::class)->findOneBy(['internalCode' => $internalCode]);
+        if (!$lot) {
+            $lot = new InventoryLot();
+            $lot->setInternalCode($internalCode);
+            $this->manager->persist($lot);
+        }
+
+        $originType = $merchandise->getFinishedProductSource() === 'production' ? 'PRODUCTION' : 'PURCHASE';
+        $lot->setOriginType($originType);
+        $lot->setMerchandise($merchandise);
         $lot->setManufactureDate($manufactureDate);
         $lot->setExpiryDate($expiry);
         $lot->setReceivedAt($receivedAt);
         $lot->setStatus(InventoryLotStatus::Available->value);
-        $lot->setNote('Seed dữ liệu tồn kho để test xuất kho nguyên liệu sản xuất');
-        $this->manager->persist($lot);
+        $lot->setNote('Seed dữ liệu tồn kho dồi dào để test');
 
-        $movement = new InventoryMovement();
-        $movement->setMovementType(InventoryMovementType::StockIn->value);
-        $movement->setSourceRef([
-            'seed' => true,
-            'ingredientId' => $ingredient->getId(),
-            'lotSeq' => $seq,
+        $movement = $this->manager->getRepository(InventoryMovement::class)->findOneBy([
+            'warehouse' => $this->warehouse,
+            'merchandise' => $merchandise,
+            'lot' => $lot,
+            'movementType' => InventoryMovementType::StockIn->value,
         ]);
-        $movement->setWarehouse($this->warehouse);
-        $movement->setMerchandise($ingredient);
-        $movement->setLot($lot);
+        if (!$movement) {
+            $movement = new InventoryMovement();
+            $movement->setMovementType(InventoryMovementType::StockIn->value);
+            $movement->setSourceRef([
+                'seed' => true,
+                'merchandiseId' => $merchandise->getId(),
+                'lotSeq' => $seq,
+            ]);
+            $movement->setWarehouse($this->warehouse);
+            $movement->setMerchandise($merchandise);
+            $movement->setLot($lot);
+            $this->manager->persist($movement);
+        }
+
         $movement->setQuantityBaseDelta($quantityBase);
-        $movement->setBaseUnit($ingredient->getBaseUnit());
+        $movement->setBaseUnit($merchandise->getBaseUnit());
         $movement->setUnitCostBase($unitCostBase);
-        $movement->setNote('Seed tồn kho nguyên liệu ' . ($ingredient->getName() ?? $ingredient->getCode()));
+        $movement->setNote('Seed tồn kho ' . ($merchandise->getName() ?? $merchandise->getCode()));
         $movement->setPostedAt($receivedAt);
         $movement->setPostedBy($this->systemUser);
-        $this->manager->persist($movement);
 
-        $balance = new InventoryBalance();
-        $balance->setWarehouse($this->warehouse);
-        $balance->setMerchandise($ingredient);
-        $balance->setLot($lot);
+        $balance = $this->manager->getRepository(InventoryBalance::class)->findOneBy([
+            'warehouse' => $this->warehouse,
+            'merchandise' => $merchandise,
+            'lot' => $lot,
+        ]);
+        if (!$balance) {
+            $balance = new InventoryBalance();
+            $balance->setWarehouse($this->warehouse);
+            $balance->setMerchandise($merchandise);
+            $balance->setLot($lot);
+            $this->manager->persist($balance);
+        }
+
         $balance->setOnHandBaseQuantity($quantityBase);
-        $this->manager->persist($balance);
+        $balance->setReservedBaseQuantity('0.000000');
+        $balance->setBlockedBaseQuantity('0.000000');
     }
 }

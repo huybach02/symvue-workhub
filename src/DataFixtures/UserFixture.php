@@ -56,6 +56,12 @@ class UserFixture extends Fixture implements FixtureGroupInterface, DependentFix
             "https://i.pinimg.com/736x/37/35/29/373529bb20ebc2b8bbe8162896ae0904.jpg",
         ];
 
+        // Kiểm tra nếu đã có admin user thì bỏ qua khi chạy --append
+        $existingAdmin = $manager->getRepository(User::class)->findOneBy(['email' => 'huybach2002ct@gmail.com']);
+        if ($existingAdmin) {
+            return;
+        }
+
         // Tạo 1 admin user mặc định
         $admin = new User();
         $admin->setMaNhanVien('NV00000');

@@ -37,7 +37,8 @@
         "select_time": "Chọn thời gian",
         "select_date": "Chọn ngày",
         "default": "Mặc định",
-        "add_variant": "Thêm mới phiên bản"
+        "add_variant": "Thêm mới phiên bản",
+        "currency_symbol": "đ"
     },
     "title": {
         "create": "Thêm mới",
@@ -84,7 +85,8 @@
         "warehouse": "Kho",
         "stock_receipt": "Nhập kho",
         "production_order": "Lệnh sản xuất",
-        "dining_table": "Bàn ăn"
+        "dining_table": "Bàn ăn",
+        "sell_product": "Bán hàng"
     },
     "gender": {
         "male": "Nam",

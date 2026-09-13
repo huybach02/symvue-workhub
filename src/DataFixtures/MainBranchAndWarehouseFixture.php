@@ -6,16 +6,25 @@ namespace App\DataFixtures;
 
 use App\Class\WarehouseType;
 use App\Entity\Branch;
+use App\Entity\GeneralSetting;
 use App\Entity\Warehouse;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class MainBranchAndWarehouseFixture extends Fixture implements FixtureGroupInterface
+class MainBranchAndWarehouseFixture extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
     public static function getGroups(): array
     {
         return ['main-branch-and-warehouse'];
+    }
+
+    public function getDependencies(): array
+    {
+        return [
+            GeneralSettingFixture::class,
+        ];
     }
 
     public function load(ObjectManager $manager): void
@@ -40,6 +49,21 @@ class MainBranchAndWarehouseFixture extends Fixture implements FixtureGroupInter
 
         $manager->persist($mainWarehouse);
         $manager->persist($mainBranch);
+        $manager->flush();
+
+        // Cập nhật cấu hình kho mặc định vào GeneralSetting
+        $settingKeys = [
+            'RECEIVE_FROM_PROVIDER_WAREHOUSE_ID',
+            'PRODUCTION_MATERIAL_WAREHOUSE_ID',
+            'PRODUCTION_FINISHED_GOODS_WAREHOUSE_ID',
+        ];
+        foreach ($settingKeys as $key) {
+            $setting = $manager->getRepository(GeneralSetting::class)->findOneBy(['tenCauHinh' => $key]);
+            if ($setting) {
+                $setting->setGiaTri((string) $mainWarehouse->getId());
+                $manager->persist($setting);
+            }
+        }
         $manager->flush();
     }
 }

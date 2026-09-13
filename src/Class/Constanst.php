@@ -433,4 +433,20 @@ enum InventoryMovementSourceType: string
     case ProductionMaterialIssue = 'PRODUCTION_MATERIAL_ISSUE';
     case ProductionGoodsReceipt = 'PRODUCTION_GOODS_RECEIPT';
     case StockTransfer = 'STOCK_TRANSFER';
+    case SaleOrder = 'SALE_ORDER';
+}
+
+enum SaleOrderStatus: string
+{
+    case Created = 'CREATED';
+    case Processing = 'PROCESSING';
+    case Shipped = 'SHIPPED';
+    case Completed = 'COMPLETED';
+}
+
+enum SaleOrderPaymentStatus: int
+{
+    case Unpaid = 0;
+    case Paid = 1;
+    case Refunded = 2;
 }

@@ -37,7 +37,8 @@
         "select_time": "Select time",
         "select_date": "Select date",
         "default": "Default",
-        "add_variant": "Add new variant"
+        "add_variant": "Add new variant",
+        "currency_symbol": "VND"
     },
     "title": {
         "create": "Create",
@@ -84,7 +85,8 @@
         "warehouse": "Warehouse",
         "stock_receipt": "Stock Receipt",
         "production_order": "Production Order",
-        "dining_table": "Dining Table"
+        "dining_table": "Dining Table",
+        "sell_product": "POS / Selling"
     },
     "gender": {
         "male": "Male",

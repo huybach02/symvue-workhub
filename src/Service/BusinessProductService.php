@@ -239,7 +239,7 @@ class BusinessProductService
         }
 
         $variantData = $this->variantRepository->createQueryBuilder('v')
-            ->select('IDENTITY(v.businessProduct) as productId', 'v.id as variantId', 'v.name as variantName', 'v.sellingPrice', 'v.currency')
+            ->select('IDENTITY(v.businessProduct) as productId', 'v.id as variantId', 'v.name as variantName', 'v.code as variantCode', 'v.sellingPrice', 'v.currency')
             ->where('v.businessProduct IN (:ids)')
             ->andWhere('v.deletedAt IS NULL')
             ->setParameter('ids', $productIds)
@@ -290,6 +290,8 @@ class BusinessProductService
         $variantPrices = [];
         foreach ($variants as $v) {
             $variantPrices[] = [
+                'id' => (int) $v['variantId'],
+                'code' => $v['variantCode'],
                 'name' => $v['variantName'],
                 'price' => formatDecimal($v['sellingPrice']),
                 'currency' => $v['currency'] ?? 'VND',
@@ -530,7 +532,7 @@ class BusinessProductService
 
         $sellingPrice = (float) $priceConfig->price;
         $currency = $priceConfig->currency ?: ($dto->currency ?: 'VND');
-        $margin = $targetProfitMargin;
+        $margin = (float) ($targetProfitMargin ?? 0.0);
 
         $variant = new BusinessProductVariant();
         $variant->setBusinessProduct($product);
