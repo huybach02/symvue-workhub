@@ -79,13 +79,23 @@ class SellProductService
 
     public function create(CreateSaleOrderDTO $dto, ?User $currentUser = null): array
     {
+        if (!$currentUser instanceof User) {
+            throw new \Exception('Yêu cầu thông tin tài khoản người dùng để thực hiện bán hàng và ghi nhận biến động kho');
+        }
+
         $this->entityManager->beginTransaction();
 
         try {
             $branch = $this->resolveBranch($dto, $currentUser);
             $warehouse = $branch?->getWarehouse();
 
-            $diningTable = $this->diningTableRepository->find($dto->diningTableId);
+            $diningTable = $this->diningTableRepository->findForUpdate($dto->diningTableId);
+            if (!$diningTable instanceof DiningTable) {
+                throw new \Exception(sprintf('Bàn ăn ID %d không tồn tại', $dto->diningTableId));
+            }
+            if ($diningTable->getStatus() !== DiningTable::STATUS_ACTIVE) {
+                throw new \Exception(sprintf('Bàn số %d hiện đang ngưng sử dụng', $diningTable->getTableNumber()));
+            }
             if ($diningTable->isUsing() === true) {
                 throw new \Exception(sprintf('Bàn số %d hiện đang có khách sử dụng', $diningTable->getTableNumber()));
             }
@@ -113,12 +123,21 @@ class SellProductService
                 if (!$product instanceof BusinessProduct) {
                     throw new \Exception(sprintf('Sản phẩm ID %d không tồn tại', $itemDto->productId));
                 }
+                if ($product->getStatus() !== 1) {
+                    throw new \Exception(sprintf('Sản phẩm "%s" hiện đang ngừng kinh doanh', $product->getName()));
+                }
 
                 $variant = null;
                 if ($itemDto->variantId !== null) {
                     $variant = $this->variantRepository->find($itemDto->variantId);
                     if (!$variant instanceof BusinessProductVariant) {
                         throw new \Exception(sprintf('Biến thể ID %d không tồn tại', $itemDto->variantId));
+                    }
+                    if ($variant->getBusinessProduct()?->getId() !== $product->getId()) {
+                        throw new \Exception('Biến thể không thuộc sản phẩm đã chọn');
+                    }
+                    if ($variant->getStatus() !== 1) {
+                        throw new \Exception(sprintf('Biến thể "%s" hiện đang ngừng kinh doanh', $variant->getName()));
                     }
                 } else {
                     $variants = $this->variantRepository->findBy(
@@ -129,11 +148,16 @@ class SellProductService
                     $variant = $variants[0] ?? null;
                 }
 
+                if (!$variant instanceof BusinessProductVariant) {
+                    throw new \Exception(sprintf('Sản phẩm "%s" không có biến thể hoạt động để bán', $product->getName()));
+                }
+
                 $productSnapshot = $product->jsonSerialize();
-                $variantSnapshot = $variant !== null ? $this->serializeVariantSnapshot($variant) : [];
+                $variantSnapshot = $this->serializeVariantSnapshot($variant);
 
                 $itemQuantity = sprintf('%.2f', (float) $itemDto->quantity);
-                $unitPrice = sprintf('%.2f', (float) $itemDto->price);
+                // Lấy giá bán authoritative từ database (variant->getSellingPrice), tuyệt đối không tin cậy giá client gửi lên
+                $unitPrice = sprintf('%.2f', (float) ($variant->getSellingPrice() ?? '0.00'));
                 $lineSubtotal = MathHelper::mul($itemQuantity, $unitPrice, 2);
                 $subtotal = MathHelper::add($subtotal, $lineSubtotal, 2);
 
@@ -147,14 +171,11 @@ class SellProductService
                 $saleOrderItem->setProductSnapshot($productSnapshot);
                 $saleOrderItem->setVariantSnapshot($variantSnapshot);
 
-                // Thu thập nhu cầu nguyên vật liệu và lưu snapshot công thức của variant
+                // Thu thập nhu cầu nguyên vật liệu và lưu snapshot công thức đang hoạt động của variant
                 $recipeSnapshot = null;
                 if ($variant !== null) {
                     $recipe = $this->recipeRepository->findOneBy(
                         ['variant' => $variant, 'isActive' => true],
-                        ['version' => 'DESC', 'id' => 'DESC']
-                    ) ?? $this->recipeRepository->findOneBy(
-                        ['variant' => $variant],
                         ['version' => 'DESC', 'id' => 'DESC']
                     );
 
@@ -235,21 +256,28 @@ class SellProductService
         $this->entityManager->flush();
     }
 
-    private function resolveBranch(CreateSaleOrderDTO $dto, ?User $currentUser): ?Branch
+    private function resolveBranch(CreateSaleOrderDTO $dto, ?User $currentUser): Branch
     {
         if ($dto->branchId !== null) {
-            return $this->branchRepository->find($dto->branchId);
+            $branch = $this->branchRepository->find($dto->branchId);
+            if (!$branch instanceof Branch || $branch->getStatus() !== true) {
+                throw new \Exception(sprintf('Chi nhánh ID %d không tồn tại hoặc đã ngưng hoạt động', $dto->branchId));
+            }
+            return $branch;
         }
 
         if ($currentUser !== null) {
             $position = $this->userPositionRepository->findActivePrimaryPositionByUser($currentUser);
             $userBranch = $position?->getDepartment()?->getBranch();
             if ($userBranch instanceof Branch) {
+                if ($userBranch->getStatus() !== true) {
+                    throw new \Exception(sprintf('Chi nhánh "%s" của tài khoản đã ngưng hoạt động', $userBranch->getName()));
+                }
                 return $userBranch;
             }
         }
 
-        return $this->branchRepository->findOneBy(['status' => true]);
+        throw new \Exception('Không xác định được chi nhánh bán hàng');
     }
 
     /**
@@ -259,7 +287,7 @@ class SellProductService
         Warehouse $warehouse,
         array $recipeDemands,
         SaleOrder $saleOrder,
-        ?User $currentUser
+        User $currentUser
     ): void {
         $today = (new \DateTime())->setTime(0, 0, 0);
         $postedAt = new \DateTime();
@@ -342,10 +370,7 @@ class SellProductService
                 $movement->setUnitCostBase($unitCostBase);
                 $movement->setNote(sprintf('Xuất nguyên liệu bán hàng theo đơn %s', $saleOrder->getCode()));
                 $movement->setPostedAt($postedAt);
-                $poster = $currentUser ?? $this->entityManager->getRepository(User::class)->findOneBy([]);
-                if ($poster instanceof User) {
-                    $movement->setPostedBy($poster);
-                }
+                $movement->setPostedBy($currentUser);
 
                 $this->entityManager->persist($movement);
 

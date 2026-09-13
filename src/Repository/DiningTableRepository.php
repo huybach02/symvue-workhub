@@ -46,4 +46,12 @@ class DiningTableRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    /**
+     * Tìm bàn và khóa PESSIMISTIC_WRITE để tránh race condition khi tạo đơn
+     */
+    public function findForUpdate(int $id): ?DiningTable
+    {
+        return $this->find($id, \Doctrine\DBAL\LockMode::PESSIMISTIC_WRITE);
+    }
 }

@@ -1148,7 +1148,6 @@ export default defineComponent({
                     variantId: item.variantId,
                     variantCode: item.variantCode,
                     variantName: item.variantName,
-                    price: item.price,
                     quantity: item.quantity,
                     note: item.note || null,
                 })),

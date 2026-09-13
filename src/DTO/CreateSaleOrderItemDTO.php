@@ -31,10 +31,8 @@ class CreateSaleOrderItemDTO
         #[Assert\Positive(groups: ['create'])]
         public readonly string|int|float|null $quantity = 1,
 
-        #[Assert\NotNull(groups: ['create'])]
-        #[Assert\Type(type: 'numeric', groups: ['create'])]
-        #[Assert\PositiveOrZero(groups: ['create'])]
-        public readonly string|int|float|null $price = 0,
+        /** Giá bán authoritative được lấy trực tiếp từ database qua variant->getSellingPrice() */
+        public readonly string|int|float|null $price = null,
 
         #[Assert\Length(max: 500, groups: ['create'])]
         public readonly ?string $note = null,
