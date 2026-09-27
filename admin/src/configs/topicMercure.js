@@ -7,4 +7,5 @@ export const topicMercure = [
     "https://app.com/request/:userId",
     "https://app.com/presence",
     "https://app.com/sale-order",
+    "https://app.com/dining-table",
 ];

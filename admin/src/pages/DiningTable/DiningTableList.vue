@@ -5,12 +5,12 @@
             :style="{ '--table-min-width': tableMinWidth + 'px' }"
         >
             <v-data-table
-                :items="items"
+                :items="tableItems"
                 :headers="headers"
                 :sort-by="sortArray"
                 :items-per-page="-1"
                 hide-default-footer
-                :loading="loading"
+                :loading="tableLoading"
                 @update:options="onOptions"
             >
                 <template
@@ -35,10 +35,9 @@
                                 class="d-flex align-center justify-space-between py-2"
                             >
                                 <template v-if="!col.filterComponent">
-                                    <span
-                                        class="v-data-table-header__content"
-                                        >{{ col.title }}</span
-                                    >
+                                    <span class="v-data-table-header__content">
+                                        {{ col.title }}
+                                    </span>
                                 </template>
 
                                 <component
@@ -177,7 +176,7 @@
 
         <!-- Phân trang -->
         <FilterPagination
-            :total-items="totalItems"
+            :total-items="tableTotalItems"
             :current-page="query.page"
             :items-per-page="query.limit"
             @update:page="onPageChange"
@@ -199,6 +198,8 @@ import { useFilterPagination } from "@/hooks/useFilterPagination.js";
 import DiningTableQrDialog from "./DiningTableQrDialog.vue";
 import { mapActions, mapGetters } from "vuex";
 import FilterPlaceholder from "@/components/filters/FilterPlaceholder.vue";
+import { getListData } from "@/services/bases/getData";
+import { API_ROUTES_CONFIG } from "@/configs/apiRouteConfig";
 
 export default {
     name: "DiningTableList",
@@ -214,6 +215,14 @@ export default {
         permission: {
             type: Object,
             default: () => ({}),
+        },
+        branchId: {
+            type: [Number, String],
+            default: null,
+        },
+        branchName: {
+            type: String,
+            default: "",
         },
     },
     emits: ["reload"],
@@ -241,6 +250,9 @@ export default {
     },
     data() {
         return {
+            localItems: [],
+            localTotalItems: 0,
+            localLoading: false,
             selectedStatusFilter: "all",
             showQrDialog: false,
             selectedTable: null,
@@ -310,14 +322,106 @@ export default {
     },
     computed: {
         ...mapGetters("diningTable", ["items", "loading", "totalItems"]),
+        tableItems() {
+            return this.branchId ? this.localItems : this.items;
+        },
+        tableLoading() {
+            return this.branchId ? this.localLoading : this.loading;
+        },
+        tableTotalItems() {
+            return this.branchId ? this.localTotalItems : this.totalItems;
+        },
         tableMinWidth() {
             return this.headers.reduce((total, col) => {
                 return total + (col.width || col.minWidth || 0);
             }, 0);
         },
     },
+    watch: {
+        branchId: {
+            immediate: false,
+            handler(newVal) {
+                if (newVal) {
+                    this.loadLocalData();
+                }
+            },
+        },
+        query: {
+            deep: true,
+            handler(newQuery) {
+                if (this.branchId) {
+                    this.loadLocalData(newQuery);
+                }
+            },
+        },
+    },
+    mounted() {
+        if (this.branchId) {
+            this.loadLocalData();
+        }
+        window.addEventListener(
+            "dining_table:updated",
+            this.handleRealtimeTableUpdate,
+        );
+    },
+    beforeUnmount() {
+        window.removeEventListener(
+            "dining_table:updated",
+            this.handleRealtimeTableUpdate,
+        );
+    },
     methods: {
         ...mapActions("diningTable", ["toggleStatus"]),
+        handleRealtimeTableUpdate(event) {
+            const updatedTable = event?.detail?.diningTable;
+            if (!updatedTable?.id) return;
+
+            if (this.branchId) {
+                const tableBranchId = Number(
+                    updatedTable.branchId ?? updatedTable.branch?.id ?? 0,
+                );
+                if (
+                    tableBranchId === 0 ||
+                    Number(this.branchId) === tableBranchId
+                ) {
+                    const index = this.localItems.findIndex(
+                        (item) => Number(item.id) === Number(updatedTable.id),
+                    );
+                    if (index !== -1) {
+                        this.localItems[index] = {
+                            ...this.localItems[index],
+                            ...updatedTable,
+                        };
+                        this.localItems = [...this.localItems];
+                    }
+                }
+            }
+        },
+        async loadLocalData(queryParams = null) {
+            if (!this.branchId) return;
+            this.localLoading = true;
+            try {
+                const params = {
+                    ...(queryParams || this.query),
+                    branchId: this.branchId,
+                };
+                const response = await getListData(
+                    API_ROUTES_CONFIG.diningTable,
+                    params,
+                );
+                this.localItems = response?.data ?? [];
+                this.localTotalItems = response?.total ?? 0;
+            } finally {
+                this.localLoading = false;
+            }
+        },
+        reloadList() {
+            if (this.branchId) {
+                this.loadLocalData();
+            } else {
+                this.$emit("reload", { ...this.query });
+            }
+        },
         openQrDialog(item) {
             this.selectedTable = item;
             this.showQrDialog = true;
@@ -327,7 +431,11 @@ export default {
             try {
                 const res = await this.toggleStatus(item.id);
                 if (res) {
-                    this.$emit("reload", { ...this.query });
+                    if (this.branchId) {
+                        await this.loadLocalData();
+                    } else {
+                        this.$emit("reload", { ...this.query });
+                    }
                 }
             } finally {
                 this.togglingId = null;

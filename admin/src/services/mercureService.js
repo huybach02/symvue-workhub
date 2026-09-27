@@ -3,6 +3,9 @@ import axiosInstance from "@/configs/axios";
 import presenceService from "@/services/presenceService";
 import { topicMercure } from "@/configs/topicMercure";
 import { EventSourcePolyfill } from "event-source-polyfill";
+import i18n from "@/plugins/i18n";
+
+const t = (key, params) => i18n.global.t(key, params);
 
 const DEFAULT_READ_RETRY_DELAYS = [0, 300, 1000];
 
@@ -29,7 +32,7 @@ const parseMercureEventData = (event) => {
     try {
         return JSON.parse(event.data);
     } catch (error) {
-        console.error("[Mercure] Payload không hợp lệ:", error);
+        console.error(`[Mercure] ${t("mercure.invalid_payload")}`, error);
         return null;
     }
 };
@@ -143,9 +146,11 @@ export const createMercureConnection = ({
                 ) {
                     appStore.commit("chat/INCREMENT_UNREAD", data.conversationId);
                     appStore.commit("mercure/SET_POPUP_NOTIFICATION", {
-                        title: "[Tin nhắn mới] Từ: " + (data.senderName || ""),
+                        title: t("mercure.chat.new_message_title", {
+                            sender: data.senderName || "",
+                        }),
                         body: data.content || "",
-                        time: data.time || "Vừa xong",
+                        time: data.time || t("mercure.just_now"),
                         icon: "mdi-chat-outline",
                         color: "primary",
                         duration: 5000,
@@ -200,20 +205,31 @@ export const createMercureConnection = ({
                 appStore.commit("saleOrder/PREPEND_ITEM", saleOrder);
 
                 const tableInfo = saleOrder?.diningTable?.tableNumber
-                    ? `Bàn ${saleOrder.diningTable.tableNumber}`
-                    : "Mang về";
+                    ? t("sell_product.table_label", {
+                          number: saleOrder.diningTable.tableNumber,
+                      })
+                    : t("sale_order.table_takeaway");
                 const branchName = saleOrder?.branch?.name
-                    ? ` - Chi nhánh: ${saleOrder.branch.name}`
+                    ? t("mercure.sale_order.branch_suffix", {
+                          branch: saleOrder.branch.name,
+                      })
                     : "";
+                const currencySymbol = t("sale_order.currency_symbol") || "đ";
                 const totalFormatted = saleOrder?.totalAmount
-                    ? `${Number(saleOrder.totalAmount).toLocaleString("vi-VN")} đ`
-                    : "0 đ";
+                    ? `${Number(saleOrder.totalAmount).toLocaleString("vi-VN")} ${currencySymbol}`
+                    : `0 ${currencySymbol}`;
 
                 const notification = {
                     code: data.code || `sale_order_${saleOrder.id || Date.now()}`,
-                    title: `[Đơn hàng mới] ${saleOrder.code || ""}`,
-                    body: `${tableInfo}${branchName} - Tổng tiền: ${totalFormatted}`,
-                    time: "Vừa xong",
+                    title: t("mercure.sale_order.created_title", {
+                        code: saleOrder.code || "",
+                    }),
+                    body: t("mercure.sale_order.created_body", {
+                        table: tableInfo,
+                        branch: branchName,
+                        total: totalFormatted,
+                    }),
+                    time: t("mercure.just_now"),
                     icon: "mdi-receipt-text-outline",
                     color: "success",
                     seen: false,
@@ -226,11 +242,113 @@ export const createMercureConnection = ({
                 appStore.commit("mercure/SET_POPUP_NOTIFICATION", notification);
                 break;
             }
+            case "sale_order_status_updated": {
+                const saleOrder = data.saleOrder;
+                if (!saleOrder) break;
+
+                const isAdmin = Boolean(
+                    currentUser?.roles?.includes("ROLE_ADMIN"),
+                );
+                const orderBranchId = Number(
+                    saleOrder.branchId ?? saleOrder.branch?.id ?? 0,
+                );
+                const assignedBranchIds = Array.isArray(
+                    currentUser?.assignedBranchIds,
+                )
+                    ? currentUser.assignedBranchIds.map(Number)
+                    : [];
+
+                // Chỉ admin hoặc nhân sự thuộc đúng chi nhánh của đơn hàng mới nhận được dữ liệu realtime
+                const isAllowedBranch =
+                    isAdmin ||
+                    (orderBranchId > 0 &&
+                        assignedBranchIds.includes(orderBranchId));
+
+                if (!isAllowedBranch) {
+                    break;
+                }
+
+                window.dispatchEvent(
+                    new CustomEvent("sale_order:status_updated", {
+                        detail: data,
+                    }),
+                );
+                appStore.commit("saleOrder/UPDATE_ITEM", saleOrder);
+
+                // Chỉ gửi thông báo khi đơn hàng được thanh toán và hoàn tất (COMPLETED)
+                if (saleOrder.status === "COMPLETED") {
+                    const currencySymbol =
+                        t("sale_order.currency_symbol") || "đ";
+                    const totalFormatted = saleOrder?.totalAmount
+                        ? `${Number(saleOrder.totalAmount).toLocaleString("vi-VN")} ${currencySymbol}`
+                        : `0 ${currencySymbol}`;
+
+                    const notification = {
+                        code:
+                            data.code ||
+                            `so_status_${saleOrder.id}_${Date.now()}`,
+                        title: t("mercure.sale_order.completed_title", {
+                            code: saleOrder.code || "",
+                        }),
+                        body: t("mercure.sale_order.completed_body", {
+                            code: saleOrder.code || "",
+                            total: totalFormatted,
+                        }),
+                        time: t("mercure.just_now"),
+                        icon: "mdi-check-circle-outline",
+                        color: "success",
+                        seen: false,
+                        link: "/sale-order",
+                        createdAt: data.timestamp || new Date().toISOString(),
+                        duration: 5000,
+                    };
+
+                    appStore.commit("mercure/ADD_NOTIFICATION", notification);
+                    appStore.commit("mercure/SET_POPUP_NOTIFICATION", notification);
+                }
+                break;
+            }
+            case "dining_table_updated": {
+                const diningTable = data.diningTable;
+                if (!diningTable) break;
+
+                const isAdmin = Boolean(
+                    currentUser?.roles?.includes("ROLE_ADMIN"),
+                );
+                const tableBranchId = Number(
+                    diningTable.branchId ?? diningTable.branch?.id ?? 0,
+                );
+                const assignedBranchIds = Array.isArray(
+                    currentUser?.assignedBranchIds,
+                )
+                    ? currentUser.assignedBranchIds.map(Number)
+                    : [];
+
+                // Chỉ admin hoặc nhân sự thuộc đúng chi nhánh của bàn ăn mới nhận được dữ liệu realtime
+                const isAllowedBranch =
+                    isAdmin ||
+                    tableBranchId === 0 ||
+                    assignedBranchIds.includes(tableBranchId);
+
+                if (!isAllowedBranch) {
+                    break;
+                }
+
+                window.dispatchEvent(
+                    new CustomEvent("dining_table:updated", {
+                        detail: data,
+                    }),
+                );
+                appStore.commit("diningTable/UPDATE_ITEM", diningTable);
+                break;
+            }
             default:
                 appStore.commit("mercure/ADD_NOTIFICATION", data);
                 appStore.commit("mercure/SET_POPUP_NOTIFICATION", {
                     ...data,
-                    title: "[Thông báo mới] " + data.title,
+                    title: t("mercure.notification.new_title", {
+                        title: data.title || "",
+                    }),
                 });
                 break;
         }
@@ -283,7 +401,7 @@ export const createMercureConnection = ({
 
             eventSource.onopen = () => {
                 updateStatus("connected");
-                console.log("[Mercure] Kết nối thành công!");
+                console.log(`[Mercure] ${t("mercure.connected")}`);
                 presenceService.startPresence();
 
                 if (typeof onOpen === "function") {
@@ -298,7 +416,7 @@ export const createMercureConnection = ({
             };
 
             eventSource.onerror = (error) => {
-                console.error("[Mercure] Lỗi kết nối:", error);
+                console.error(`[Mercure] ${t("mercure.connection_error")}`, error);
                 updateStatus("error");
 
                 if (typeof onError === "function") {
@@ -308,7 +426,7 @@ export const createMercureConnection = ({
 
             return eventSource;
         } catch (error) {
-            console.error("Không thể kết nối Mercure:", error);
+            console.error(t("mercure.connect_failed"), error);
             updateStatus("error");
 
             if (typeof onError === "function") {

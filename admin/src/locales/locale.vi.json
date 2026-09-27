@@ -49,6 +49,26 @@
         "en": "English",
         "vi": "Tiếng Việt"
     },
+    "mercure": {
+        "connected": "Kết nối thành công!",
+        "connection_error": "Lỗi kết nối:",
+        "connect_failed": "Không thể kết nối Mercure:",
+        "invalid_payload": "Payload không hợp lệ:",
+        "just_now": "Vừa xong",
+        "chat": {
+            "new_message_title": "[Tin nhắn mới] Từ: {sender}"
+        },
+        "sale_order": {
+            "created_title": "[Đơn hàng mới] {code}",
+            "created_body": "{table}{branch} - Tổng tiền: {total}",
+            "completed_title": "[Đơn hàng hoàn tất] #{code}",
+            "completed_body": "Đơn hàng #{code} đã được thanh toán và hoàn tất. Tổng tiền: {total}",
+            "branch_suffix": " - Chi nhánh: {branch}"
+        },
+        "notification": {
+            "new_title": "[Thông báo mới] {title}"
+        }
+    },
     "dashboard": {
         "actions": {
             "send_test_notification": "Gửi thông báo test",
@@ -1125,6 +1145,8 @@
     },
     "dining_table": {
         "title": "Bàn ăn",
+        "branch_list_title": "Quản lý Bàn ăn theo Chi nhánh",
+        "no_branches": "Chưa có chi nhánh nào trong hệ thống",
         "create_range_btn": "Tạo danh sách bàn",
         "create_range_title": "Tạo danh sách bàn theo khoảng",
         "create_range_hint": "Hệ thống sẽ đảm bảo các bàn từ [Số bắt đầu] đến [Số kết thúc] tồn tại. Bàn đã có sẽ được giữ nguyên trạng thái và mã QR.",
@@ -1242,8 +1264,11 @@
             "CREATED": "Mới tạo",
             "PROCESSING": "Đang chế biến",
             "SHIPPED": "Đã phục vụ",
+            "PAYMENT": "Thanh toán",
             "COMPLETED": "Hoàn tất"
         },
+        "confirm_payment_title": "Xác nhận thanh toán",
+        "confirm_payment_message": "Xác nhận thanh toán và hoàn tất đơn hàng #{code}?",
         "payment_status_values": {
             "unpaid": "Chưa thanh toán",
             "paid": "Đã thanh toán",

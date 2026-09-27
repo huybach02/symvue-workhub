@@ -41,6 +41,23 @@ const mutations = {
             [id]: data,
         };
     },
+    UPDATE_ITEM(state, updatedItem) {
+        if (!updatedItem || !updatedItem.id) return;
+        const index = state.items.findIndex(
+            (item) => Number(item.id) === Number(updatedItem.id),
+        );
+        if (index !== -1) {
+            state.items[index] = { ...state.items[index], ...updatedItem };
+            state.items = [...state.items];
+        }
+        state.detailsById = {
+            ...state.detailsById,
+            [updatedItem.id]: {
+                ...(state.detailsById[updatedItem.id] || {}),
+                ...updatedItem,
+            },
+        };
+    },
 };
 
 const actions = {
@@ -84,6 +101,17 @@ const actions = {
     },
     async updateItem(_, { id, values }) {
         return putData(API_ROUTES_CONFIG.saleOrder, id, values);
+    },
+    async updateStatus({ commit }, { id, status, paymentStatus }) {
+        const response = await putData(
+            API_ROUTES_CONFIG.saleOrder,
+            `${id}/status`,
+            { status, paymentStatus },
+        );
+        if (response) {
+            commit("UPDATE_ITEM", response);
+        }
+        return response;
     },
 };
 

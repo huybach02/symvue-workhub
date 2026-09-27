@@ -49,6 +49,26 @@
         "en": "English",
         "vi": "Vietnamese"
     },
+    "mercure": {
+        "connected": "Connected successfully!",
+        "connection_error": "Connection error:",
+        "connect_failed": "Failed to connect to Mercure:",
+        "invalid_payload": "Invalid payload:",
+        "just_now": "Just now",
+        "chat": {
+            "new_message_title": "[New message] From: {sender}"
+        },
+        "sale_order": {
+            "created_title": "[New order] {code}",
+            "created_body": "{table}{branch} - Total: {total}",
+            "completed_title": "[Order completed] #{code}",
+            "completed_body": "Order #{code} has been paid and completed. Total: {total}",
+            "branch_suffix": " - Branch: {branch}"
+        },
+        "notification": {
+            "new_title": "[New notification] {title}"
+        }
+    },
     "dashboard": {
         "actions": {
             "send_test_notification": "Send test notification",
@@ -1125,6 +1145,8 @@
     },
     "dining_table": {
         "title": "Dining Table",
+        "branch_list_title": "Dining Table Management by Branch",
+        "no_branches": "No branches found in the system",
         "create_range_btn": "Create Table Range",
         "create_range_title": "Ensure Table Range",
         "create_range_hint": "The system ensures tables from [Start] to [End] exist. Existing tables will retain their status and QR code.",
@@ -1242,8 +1264,11 @@
             "CREATED": "Created",
             "PROCESSING": "Processing",
             "SHIPPED": "Served",
+            "PAYMENT": "Payment",
             "COMPLETED": "Completed"
         },
+        "confirm_payment_title": "Confirm Payment",
+        "confirm_payment_message": "Confirm payment and complete order #{code}?",
         "payment_status_values": {
             "unpaid": "Unpaid",
             "paid": "Paid",

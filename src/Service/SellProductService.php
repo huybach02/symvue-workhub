@@ -240,6 +240,7 @@ class SellProductService
 
             $orderData = $saleOrder->jsonSerialize();
             $this->mercureService->saleOrderCreated($orderData);
+            $this->mercureService->diningTableUpdated($diningTable->jsonSerialize());
 
             return $orderData;
         } catch (\Throwable $th) {

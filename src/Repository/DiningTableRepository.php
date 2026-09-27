@@ -19,18 +19,24 @@ class DiningTableRepository extends ServiceEntityRepository
     }
 
     /**
-     * Tìm tất cả các bàn trong khoảng số bàn [from, to]
+     * Tìm tất cả các bàn trong khoảng số bàn [from, to], có thể lọc theo chi nhánh
      *
      * @return DiningTable[]
      */
-    public function findTablesByRange(int $from, int $to): array
+    public function findTablesByRange(int $from, int $to, ?int $branchId = null): array
     {
-        return $this->createQueryBuilder('d')
+        $qb = $this->createQueryBuilder('d')
             ->andWhere('d.tableNumber >= :from')
             ->andWhere('d.tableNumber <= :to')
             ->setParameter('from', $from)
-            ->setParameter('to', $to)
-            ->orderBy('d.tableNumber', 'ASC')
+            ->setParameter('to', $to);
+
+        if ($branchId !== null) {
+            $qb->andWhere('d.branch = :branchId')
+                ->setParameter('branchId', $branchId);
+        }
+
+        return $qb->orderBy('d.tableNumber', 'ASC')
             ->getQuery()
             ->getResult();
     }

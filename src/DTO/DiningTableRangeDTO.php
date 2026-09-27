@@ -20,5 +20,7 @@ class DiningTableRangeDTO
             message: 'Số bàn kết thúc phải lớn hơn hoặc bằng số bàn bắt đầu'
         )]
         public readonly ?int $to = null,
+
+        public readonly ?int $branchId = null,
     ) {}
 }

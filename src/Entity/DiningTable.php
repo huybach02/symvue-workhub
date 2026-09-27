@@ -35,6 +35,10 @@ class DiningTable
     #[ORM\Column(nullable: true)]
     private ?int $status = null;
 
+    #[ORM\ManyToOne(targetEntity: Branch::class)]
+    #[ORM\JoinColumn(name: 'branch_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?Branch $branch = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -88,6 +92,18 @@ class DiningTable
         return $this;
     }
 
+    public function getBranch(): ?Branch
+    {
+        return $this->branch;
+    }
+
+    public function setBranch(?Branch $branch): static
+    {
+        $this->branch = $branch;
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
         return [
@@ -96,6 +112,12 @@ class DiningTable
             'qrCode' => $this->qrCode,
             'isUsing' => $this->isUsing,
             'status' => $this->status,
+            'branchId' => $this->branch?->getId(),
+            'branch' => $this->branch ? [
+                'id' => $this->branch->getId(),
+                'name' => $this->branch->getName(),
+                'code' => $this->branch->getCode(),
+            ] : null,
             'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
         ];

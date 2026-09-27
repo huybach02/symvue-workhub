@@ -18,5 +18,7 @@ class DiningTableDTO
 
         #[Assert\Choice(choices: [0, 1], groups: ['update'])]
         public readonly ?int $status = null,
+
+        public readonly ?int $branchId = null,
     ) {}
 }

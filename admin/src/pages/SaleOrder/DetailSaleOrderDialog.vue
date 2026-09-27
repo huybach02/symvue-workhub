@@ -46,6 +46,19 @@
                 />
             </v-card-title>
 
+            <v-divider />
+
+            <!-- Stepper trạng thái đơn hàng -->
+            <StatusStepper
+                v-if="currentOrder && currentOrder.status"
+                :status="currentOrder.status"
+                :steps="statusSteps"
+                :loading-value="updatingStatus"
+                @change="handleStepChange"
+            />
+
+            <v-divider />
+
             <v-card-text class="pa-4">
                 <div
                     v-if="loading"
@@ -321,8 +334,9 @@
                                         <span
                                             v-else
                                             class="text-caption text-medium-emphasis"
-                                            >--</span
                                         >
+                                            --
+                                        </span>
                                     </td>
                                     <td>
                                         <span
@@ -334,8 +348,9 @@
                                         <span
                                             v-else
                                             class="text-caption text-medium-emphasis"
-                                            >--</span
                                         >
+                                            --
+                                        </span>
                                     </td>
                                     <td class="text-end text-body-2">
                                         {{ formatNumber(item.unitPrice) }}
@@ -460,15 +475,40 @@
                 </div>
             </v-card-text>
         </v-card>
+
+        <ConfirmDialog
+            v-model="confirmPaymentDialog"
+            :title="$t('sale_order.confirm_payment_title') || 'Xác nhận thanh toán'"
+            :message="
+                $t('sale_order.confirm_payment_message', {
+                    code: currentOrder.code || '',
+                }) || 'Xác nhận thanh toán và hoàn tất đơn hàng?'
+            "
+            icon="mdi-cash-check"
+            icon-color="white"
+            header-color="primary"
+            :confirm-text="$t('button.confirm') || 'Xác nhận'"
+            confirm-color="primary"
+            :cancel-text="$t('button.cancel') || 'Hủy'"
+            :loading="confirmPaymentLoading"
+            @confirm="handleConfirmPayment"
+            @cancel="confirmPaymentDialog = false"
+        />
     </v-dialog>
 </template>
 
 <script>
 import { functionHelper } from "@/helpers/functionHelper";
 import { mapActions } from "vuex";
+import StatusStepper from "@/components/StatusStepper.vue";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
 export default {
     name: "DetailSaleOrderDialog",
+    components: {
+        StatusStepper,
+        ConfirmDialog,
+    },
     props: {
         modelValue: {
             type: Boolean,
@@ -483,11 +523,27 @@ export default {
             default: null,
         },
     },
-    emits: ["update:modelValue"],
+    emits: ["update:modelValue", "reload"],
     data() {
         return {
             loading: false,
             detail: null,
+            updatingStatus: null,
+            confirmPaymentDialog: false,
+            confirmPaymentLoading: false,
+            statusSteps: [
+                { key: "sale_order.status_values.CREATED", value: "CREATED" },
+                {
+                    key: "sale_order.status_values.PROCESSING",
+                    value: "PROCESSING",
+                },
+                { key: "sale_order.status_values.SHIPPED", value: "SHIPPED" },
+                { key: "sale_order.status_values.PAYMENT", value: "PAYMENT" },
+                {
+                    key: "sale_order.status_values.COMPLETED",
+                    value: "COMPLETED",
+                },
+            ],
         };
     },
     computed: {
@@ -520,8 +576,62 @@ export default {
             }
         },
     },
+    mounted() {
+        window.addEventListener(
+            "sale_order:status_updated",
+            this.handleRealtimeStatusUpdate,
+        );
+    },
+    beforeUnmount() {
+        window.removeEventListener(
+            "sale_order:status_updated",
+            this.handleRealtimeStatusUpdate,
+        );
+    },
     methods: {
-        ...mapActions("saleOrder", ["fetchItemDetail"]),
+        ...mapActions("saleOrder", ["fetchItemDetail", "updateStatus"]),
+        handleRealtimeStatusUpdate(event) {
+            const updatedOrder = event?.detail?.saleOrder;
+            if (
+                updatedOrder &&
+                Number(updatedOrder.id) === Number(this.currentOrder?.id)
+            ) {
+                this.detail = { ...this.currentOrder, ...updatedOrder };
+            }
+        },
+        async handleStepChange(targetStep) {
+            if (targetStep === "PAYMENT") {
+                this.confirmPaymentDialog = true;
+                return;
+            }
+
+            await this.executeStatusChange(targetStep);
+        },
+        async executeStatusChange(status, paymentStatus = null) {
+            this.updatingStatus = status;
+            try {
+                const res = await this.updateStatus({
+                    id: this.currentOrder.id,
+                    status,
+                    paymentStatus,
+                });
+                if (res) {
+                    this.detail = res;
+                    this.$emit("reload");
+                }
+            } finally {
+                this.updatingStatus = null;
+            }
+        },
+        async handleConfirmPayment() {
+            this.confirmPaymentLoading = true;
+            try {
+                await this.executeStatusChange("COMPLETED", 1);
+                this.confirmPaymentDialog = false;
+            } finally {
+                this.confirmPaymentLoading = false;
+            }
+        },
         async loadDetail(id) {
             this.loading = true;
             const res = await this.fetchItemDetail({ id, force: true });

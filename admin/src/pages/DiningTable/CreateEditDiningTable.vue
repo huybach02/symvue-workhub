@@ -49,6 +49,8 @@
                         "
                         :item="dataItem"
                         :mode="mode"
+                        :branch-id="branchId"
+                        :branch-name="branchName"
                         @submit="onSubmit"
                         @cancel="dialog = false"
                     />
@@ -76,6 +78,14 @@ export default {
             default: null,
         },
         path: {
+            type: String,
+            default: "",
+        },
+        branchId: {
+            type: [Number, String],
+            default: null,
+        },
+        branchName: {
             type: String,
             default: "",
         },
@@ -123,11 +133,15 @@ export default {
                     await this.ensureRange({
                         from: Number(values.from),
                         to: Number(values.to),
+                        branchId: values.branchId || this.branchId || null,
                     });
                 } else {
                     await this.updateItem({
                         id: this.item.id,
-                        values,
+                        values: {
+                            ...values,
+                            branchId: values.branchId || this.branchId || undefined,
+                        },
                     });
                 }
 

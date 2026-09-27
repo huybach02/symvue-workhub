@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Class\CustomResponse;
 use App\DTO\SaleOrderDTO;
+use App\DTO\UpdateSaleOrderStatusDTO;
 use App\Entity\User;
 use App\Service\SaleOrderService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -70,6 +71,27 @@ final class SaleOrderController extends AbstractController
         try {
             $data = $this->saleOrderService->findById($id, $currentUser);
             return CustomResponse::success($data);
+        } catch (\Throwable $th) {
+            return CustomResponse::error($th->getMessage());
+        }
+    }
+
+    #[Route('/sale-order/{id}/status', methods: ['PUT', 'PATCH'])]
+    public function updateStatus(
+        int $id,
+        #[MapRequestPayload] UpdateSaleOrderStatusDTO $dto
+    ): JsonResponse {
+        /** @var User|null $currentUser */
+        $currentUser = $this->getUser();
+
+        try {
+            $data = $this->saleOrderService->updateStatus(
+                $id,
+                $dto->status,
+                $dto->paymentStatus,
+                $currentUser
+            );
+            return CustomResponse::success($data, t('success.updated'));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
         }

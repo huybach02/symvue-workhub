@@ -8,6 +8,13 @@
             :initial-values="initialValues"
             @submit="handleSubmit"
         >
+            <div v-if="branchName" class="mb-3">
+                <v-chip color="primary" variant="tonal" class="font-weight-medium">
+                    <v-icon start size="small">mdi-store-outline</v-icon>
+                    {{ branchName }}
+                </v-chip>
+            </div>
+
             <template v-if="mode === 'create'">
                 <v-alert
                     type="info"
@@ -157,6 +164,14 @@ export default {
             type: String,
             default: "create",
         },
+        branchId: {
+            type: [Number, String],
+            default: null,
+        },
+        branchName: {
+            type: String,
+            default: "",
+        },
     },
     emits: ["submit", "cancel"],
     data() {
@@ -201,7 +216,10 @@ export default {
     },
     methods: {
         handleSubmit(values) {
-            this.$emit("submit", values);
+            this.$emit("submit", {
+                ...values,
+                branchId: this.branchId || values.branchId || null,
+            });
         },
         handleCancel() {
             this.$emit("cancel");

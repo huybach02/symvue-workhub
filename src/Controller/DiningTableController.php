@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Class\CustomResponse;
 use App\DTO\DiningTableDTO;
 use App\DTO\DiningTableRangeDTO;
+use App\Entity\User;
 use App\Service\DiningTableService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,9 +26,11 @@ final class DiningTableController extends AbstractController
     {
         $params = $request->query->all();
         $params = validateFilterParams($params);
+        $user = $this->getUser();
+        $currentUser = $user instanceof User ? $user : null;
 
         try {
-            $result = $this->diningTableService->findAll($params);
+            $result = $this->diningTableService->findAll($params, $currentUser);
             return CustomResponse::success([
                 'collection' => $result['collection'],
                 'total' => $result['total'],
@@ -49,9 +52,11 @@ final class DiningTableController extends AbstractController
     {
         $params = $request->query->all();
         $params = validateFilterParams($params);
+        $user = $this->getUser();
+        $currentUser = $user instanceof User ? $user : null;
 
         try {
-            $data = $this->diningTableService->getDataSelect($params);
+            $data = $this->diningTableService->getDataSelect($params, $currentUser);
             return CustomResponse::success($data);
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());
@@ -74,8 +79,11 @@ final class DiningTableController extends AbstractController
     public function ensureRange(
         #[MapRequestPayload] DiningTableRangeDTO $dto
     ): JsonResponse {
+        $user = $this->getUser();
+        $currentUser = $user instanceof User ? $user : null;
+
         try {
-            $data = $this->diningTableService->ensureRange($dto);
+            $data = $this->diningTableService->ensureRange($dto, $currentUser);
             return CustomResponse::success($data, t('success.created'));
         } catch (\Throwable $th) {
             return CustomResponse::error($th->getMessage());

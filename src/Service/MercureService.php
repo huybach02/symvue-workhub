@@ -349,4 +349,46 @@ class MercureService
             // Tránh làm gián đoạn luồng chính nếu Mercure hub không khả dụng
         }
     }
+
+    public function saleOrderStatusUpdated(array $saleOrder): void
+    {
+        try {
+            $payload = [
+                'type' => 'sale_order_status_updated',
+                'saleOrder' => $saleOrder,
+                'timestamp' => (new \DateTimeImmutable())->format(DATE_ATOM),
+            ];
+
+            $update = new Update(
+                $this->mercureConfig['topics']['sale-order'],
+                json_encode($payload),
+                false,
+            );
+
+            $this->hub->publish($update);
+        } catch (\Throwable) {
+            // Tránh làm gián đoạn luồng chính nếu Mercure hub không khả dụng
+        }
+    }
+
+    public function diningTableUpdated(array $diningTable): void
+    {
+        try {
+            $payload = [
+                'type' => 'dining_table_updated',
+                'diningTable' => $diningTable,
+                'timestamp' => (new \DateTimeImmutable())->format(DATE_ATOM),
+            ];
+
+            $update = new Update(
+                $this->mercureConfig['topics']['dining-table'],
+                json_encode($payload),
+                false,
+            );
+
+            $this->hub->publish($update);
+        } catch (\Throwable) {
+            // Tránh làm gián đoạn luồng chính nếu Mercure hub không khả dụng
+        }
+    }
 }

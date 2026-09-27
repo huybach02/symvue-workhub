@@ -3,7 +3,10 @@
 namespace App\Service;
 
 use App\Class\FilterWithPagination;
+use App\Class\SaleOrderPaymentStatus;
+use App\Class\SaleOrderStatus;
 use App\DTO\SaleOrderDTO;
+use App\Entity\DiningTable;
 use App\Entity\SaleOrder;
 use App\Entity\User;
 use App\Repository\SaleOrderRepository;
@@ -17,6 +20,7 @@ class SaleOrderService
         private readonly SaleOrderRepository $saleOrderRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly UserPositionRepository $userPositionRepository,
+        private readonly MercureService $mercureService,
     ) {}
 
     public function findAll(array $params, ?User $currentUser = null): array
@@ -137,6 +141,69 @@ class SaleOrderService
         $this->entityManager->flush();
 
         return $item->jsonSerialize();
+    }
+
+    public function updateStatus(
+        int $id,
+        string $status,
+        ?int $paymentStatus = null,
+        ?User $currentUser = null
+    ): array {
+        $qb = $this->saleOrderRepository
+            ->createQueryBuilder('e')
+            ->andWhere('e.id = :orderId')
+            ->setParameter('orderId', $id);
+
+        if ($currentUser instanceof User) {
+            $this->restrictToAssignedBranches($qb, $currentUser, 'e');
+        }
+
+        $saleOrder = $qb->getQuery()->getOneOrNullResult();
+
+        if (!$saleOrder instanceof SaleOrder) {
+            throw new \Exception(t('error.not_found'));
+        }
+
+        $allowedStatuses = [
+            SaleOrderStatus::Created->value,
+            SaleOrderStatus::Processing->value,
+            SaleOrderStatus::Shipped->value,
+            SaleOrderStatus::Completed->value,
+        ];
+
+        if (!in_array($status, $allowedStatuses, true)) {
+            throw new \Exception(sprintf('Trạng thái "%s" không hợp lệ', $status));
+        }
+
+        $saleOrder->setStatus($status);
+
+        if ($paymentStatus !== null) {
+            $saleOrder->setPaymentStatus($paymentStatus);
+        }
+
+        $updatedDiningTable = null;
+        if ($status === SaleOrderStatus::Completed->value) {
+            if ($paymentStatus === null) {
+                $saleOrder->setPaymentStatus(SaleOrderPaymentStatus::Paid->value);
+            }
+            $diningTable = $saleOrder->getDiningTable();
+            if ($diningTable instanceof DiningTable) {
+                $diningTable->setIsUsing(false);
+                $updatedDiningTable = $diningTable;
+            }
+        }
+
+        $saleOrder->setUpdatedAt(new \DateTime());
+
+        $this->entityManager->flush();
+
+        $serialized = $saleOrder->jsonSerialize();
+        $this->mercureService->saleOrderStatusUpdated($serialized);
+        if ($updatedDiningTable instanceof DiningTable) {
+            $this->mercureService->diningTableUpdated($updatedDiningTable->jsonSerialize());
+        }
+
+        return $serialized;
     }
 
     /**

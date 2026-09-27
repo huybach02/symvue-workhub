@@ -239,6 +239,7 @@
             v-model="showDetailDialog"
             :order-id="selectedOrderId"
             :order-data="selectedOrder"
+            @reload="emitReload"
         />
     </div>
 </template>
@@ -286,6 +287,10 @@ export default {
             emit("reload", { ...queryData });
         });
 
+        const emitReload = () => {
+            emit("reload", { ...query.value });
+        };
+
         return {
             query,
             sortArray,
@@ -293,6 +298,7 @@ export default {
             onPageChange,
             onLimitChange,
             onFilter,
+            emitReload,
         };
     },
     data() {

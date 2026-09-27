@@ -10,6 +10,7 @@ return [
         'https://app.com/presence',
         'https://app.com/request/{+path}',
         'https://app.com/sale-order',
+        'https://app.com/dining-table',
     ],
     "topics" => [
         "test" => "https://app.com/test",
@@ -20,5 +21,6 @@ return [
         "presence" => "https://app.com/presence",
         "request" => "https://app.com/request/:userId",
         "sale-order" => "https://app.com/sale-order",
+        "dining-table" => "https://app.com/dining-table",
     ]
 ];

@@ -26,6 +26,14 @@ export default {
             type: String,
             default: () => API_ROUTES_CONFIG.diningTable,
         },
+        branchId: {
+            type: [Number, String],
+            default: null,
+        },
+        branchName: {
+            type: String,
+            default: "",
+        },
     },
     data() {
         return {
@@ -96,11 +104,15 @@ export default {
             this.isExporting = true;
             try {
                 // Lấy toàn bộ danh sách bàn không phân trang (limit = -1)
-                const response = await getListData(this.path, {
+                const queryParams = {
                     limit: -1,
                     sort_column: "tableNumber",
                     sort_direction: "asc",
-                });
+                };
+                if (this.branchId) {
+                    queryParams.branchId = this.branchId;
+                }
+                const response = await getListData(this.path, queryParams);
 
                 const tables = (response?.data ?? []).filter(
                     (item) => item?.qrCode,
