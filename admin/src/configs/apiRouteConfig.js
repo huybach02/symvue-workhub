@@ -44,4 +44,5 @@ export const API_ROUTES_CONFIG = {
     productionOrder: "/production-order",
     diningTable: "/dining-table",
     sellProduct: "/sell-product",
+    saleOrder: "/sale-order",
 };

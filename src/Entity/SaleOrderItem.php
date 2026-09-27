@@ -174,7 +174,17 @@ class SaleOrderItem implements \JsonSerializable
             'id' => $this->id,
             'saleOrderId' => $this->saleOrder?->getId(),
             'businessProductId' => $this->businessProduct?->getId(),
+            'businessProduct' => $this->businessProduct ? [
+                'id' => $this->businessProduct->getId(),
+                'code' => $this->businessProduct->getCode(),
+                'name' => $this->businessProduct->getName(),
+            ] : null,
             'variantId' => $this->variant?->getId(),
+            'variant' => $this->variant ? [
+                'id' => $this->variant->getId(),
+                'code' => $this->variant->getCode(),
+                'name' => $this->variant->getName(),
+            ] : null,
             'quantity' => formatDecimal($this->quantity),
             'unitPrice' => formatDecimal($this->unitPrice),
             'subtotal' => formatDecimal($this->subtotal),

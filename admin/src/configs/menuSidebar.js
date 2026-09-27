@@ -155,15 +155,31 @@ export const menuSidebar = [
         ],
     },
     {
-        title: i18n.global.t("sidebar.dining_table"),
-        icon: "mdi-table-furniture",
-        value: NAME_ROUTES_CONFIG.diningTable,
-        to: { name: NAME_ROUTES_CONFIG.diningTable },
-    },
-    {
-        title: i18n.global.t("sidebar.sell_product"),
-        icon: "mdi-view-dashboard",
-        value: NAME_ROUTES_CONFIG.sellProduct,
-        to: { name: NAME_ROUTES_CONFIG.sellProduct },
+        title: i18n.global.t("sidebar.sales_management"),
+        icon: "mdi-cash-register",
+        value: NAME_ROUTES_CONFIG.salesManagement,
+        children: [
+            {
+                title: i18n.global.t("sidebar.dining_table"),
+                key: "dining-table",
+                icon: "mdi-table-furniture",
+                value: NAME_ROUTES_CONFIG.diningTable,
+                to: { name: NAME_ROUTES_CONFIG.diningTable },
+            },
+            {
+                title: i18n.global.t("sidebar.sell_product"),
+                key: "sell-product",
+                icon: "mdi-point-of-sale",
+                value: NAME_ROUTES_CONFIG.sellProduct,
+                to: { name: NAME_ROUTES_CONFIG.sellProduct },
+            },
+            {
+                title: i18n.global.t("sidebar.sale_order"),
+                key: "sale-order",
+                icon: "mdi-receipt-text-outline",
+                value: NAME_ROUTES_CONFIG.saleOrder,
+                to: { name: NAME_ROUTES_CONFIG.saleOrder },
+            },
+        ],
     },
 ];

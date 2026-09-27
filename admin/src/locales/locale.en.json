@@ -1213,5 +1213,70 @@
         "create_order_btn": "Create Order",
         "create_order_short": "Order",
         "items_count": "{count} items"
+    },
+    "sale_order": {
+        "title": "Sale Order",
+        "detail_title": "Sale Order Detail",
+        "general_info": "General Information",
+        "currency_symbol": "VND",
+        "columns": {
+            "id": "ID",
+            "code": "Order Code",
+            "order_date": "Order Date",
+            "branch": "Branch",
+            "dining_table": "Dining Table",
+            "cashier": "Cashier",
+            "items_count": "Items",
+            "subtotal": "Subtotal",
+            "discount_amount": "Discount",
+            "tax_amount": "VAT Tax",
+            "total_amount": "Total Amount",
+            "payment_method": "Payment Method",
+            "payment_status": "Payment Status",
+            "status": "Order Status",
+            "note": "Note",
+            "created_at": "Created At",
+            "updated_at": "Updated At"
+        },
+        "status_values": {
+            "CREATED": "Created",
+            "PROCESSING": "Processing",
+            "SHIPPED": "Served",
+            "COMPLETED": "Completed"
+        },
+        "payment_status_values": {
+            "unpaid": "Unpaid",
+            "paid": "Paid",
+            "refunded": "Refunded"
+        },
+        "payment_method_values": {
+            "CASH": "Cash",
+            "TRANSFER": "Bank Transfer",
+            "CARD": "Card",
+            "OTHER": "Other",
+            "cash": "Cash",
+            "transfer": "Bank Transfer",
+            "card": "Card",
+            "other": "Other"
+        },
+        "items": {
+            "title": "Ordered Items",
+            "index": "#",
+            "product_name": "Product Name",
+            "variant_name": "Variant",
+            "note": "Item Note",
+            "unit_price": "Unit Price",
+            "quantity": "Quantity",
+            "subtotal": "Subtotal",
+            "empty": "No items in this order"
+        },
+        "summary": {
+            "title": "Payment Summary",
+            "subtotal": "Subtotal:",
+            "discount": "Discount:",
+            "tax": "VAT Tax:",
+            "total": "TOTAL AMOUNT:"
+        },
+        "table_takeaway": "Takeaway"
     }
 }

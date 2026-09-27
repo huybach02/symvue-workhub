@@ -377,6 +377,21 @@ export const routes = [
                         ).icon || "",
                 },
             },
+            {
+                path: "sale-order",
+                name: NAME_ROUTES_CONFIG.saleOrder,
+                component: () => import("../pages/SaleOrder/SaleOrder.vue"),
+                meta: {
+                    title:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.saleOrder,
+                        ).title || "",
+                    icon:
+                        functionHelper.findMenuItemByValue(
+                            NAME_ROUTES_CONFIG.saleOrder,
+                        ).icon || "",
+                },
+            },
 ],
     },
     {

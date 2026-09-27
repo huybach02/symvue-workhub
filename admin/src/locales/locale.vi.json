@@ -1213,5 +1213,70 @@
         "create_order_btn": "Tạo đơn hàng",
         "create_order_short": "Tạo đơn",
         "items_count": "{count} món"
+    },
+    "sale_order": {
+        "title": "Đơn bán hàng",
+        "detail_title": "Chi tiết đơn bán hàng",
+        "general_info": "Thông tin chung",
+        "currency_symbol": "đ",
+        "columns": {
+            "id": "ID",
+            "code": "Mã đơn hàng",
+            "order_date": "Ngày tạo đơn",
+            "branch": "Chi nhánh",
+            "dining_table": "Bàn ăn",
+            "cashier": "Thu ngân",
+            "items_count": "Số món",
+            "subtotal": "Tạm tính",
+            "discount_amount": "Giảm giá",
+            "tax_amount": "Thuế VAT",
+            "total_amount": "Tổng tiền",
+            "payment_method": "Phương thức TT",
+            "payment_status": "Trạng thái TT",
+            "status": "Trạng thái đơn",
+            "note": "Ghi chú",
+            "created_at": "Ngày tạo",
+            "updated_at": "Ngày cập nhật"
+        },
+        "status_values": {
+            "CREATED": "Mới tạo",
+            "PROCESSING": "Đang chế biến",
+            "SHIPPED": "Đã phục vụ",
+            "COMPLETED": "Hoàn tất"
+        },
+        "payment_status_values": {
+            "unpaid": "Chưa thanh toán",
+            "paid": "Đã thanh toán",
+            "refunded": "Hoàn tiền"
+        },
+        "payment_method_values": {
+            "CASH": "Tiền mặt",
+            "TRANSFER": "Chuyển khoản",
+            "CARD": "Thẻ",
+            "OTHER": "Khác",
+            "cash": "Tiền mặt",
+            "transfer": "Chuyển khoản",
+            "card": "Thẻ",
+            "other": "Khác"
+        },
+        "items": {
+            "title": "Danh sách món đã đặt",
+            "index": "STT",
+            "product_name": "Tên món / Sản phẩm",
+            "variant_name": "Quy cách / Biến thể",
+            "note": "Ghi chú món",
+            "unit_price": "Đơn giá",
+            "quantity": "Số lượng",
+            "subtotal": "Thành tiền",
+            "empty": "Đơn hàng chưa có món nào"
+        },
+        "summary": {
+            "title": "Tổng kết thanh toán",
+            "subtotal": "Tạm tính:",
+            "discount": "Chiết khấu / Giảm giá:",
+            "tax": "Thuế VAT:",
+            "total": "TỔNG THANH TOÁN:"
+        },
+        "table_takeaway": "Mang về"
     }
 }

@@ -29,4 +29,6 @@ export const NAME_ROUTES_CONFIG = {
     productionOrder: "system.productionOrder",
     diningTable: "system.diningTable",
     sellProduct: "system.sellProduct",
+    saleOrder: "system.saleOrder",
+    salesManagement: "system.salesManagement",
 };

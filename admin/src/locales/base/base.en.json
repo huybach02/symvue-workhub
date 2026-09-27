@@ -85,8 +85,10 @@
         "warehouse": "Warehouse",
         "stock_receipt": "Stock Receipt",
         "production_order": "Production Order",
+        "sales_management": "Sales Management",
         "dining_table": "Dining Table",
-        "sell_product": "POS / Selling"
+        "sell_product": "POS / Selling",
+        "sale_order": "Sale Order"
     },
     "gender": {
         "male": "Male",

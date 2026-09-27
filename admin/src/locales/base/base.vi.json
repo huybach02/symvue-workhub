@@ -85,8 +85,10 @@
         "warehouse": "Kho",
         "stock_receipt": "Nhập kho",
         "production_order": "Lệnh sản xuất",
+        "sales_management": "Quản lý bán hàng",
         "dining_table": "Bàn ăn",
-        "sell_product": "Bán hàng"
+        "sell_product": "Bán hàng",
+        "sale_order": "Đơn bán hàng"
     },
     "gender": {
         "male": "Nam",
