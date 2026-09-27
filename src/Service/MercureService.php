@@ -328,4 +328,25 @@ class MercureService
 
         $this->hub->publish($update);
     }
+
+    public function saleOrderCreated(array $saleOrder): void
+    {
+        try {
+            $payload = [
+                'type' => 'sale_order_created',
+                'saleOrder' => $saleOrder,
+                'timestamp' => (new \DateTimeImmutable())->format(DATE_ATOM),
+            ];
+
+            $update = new Update(
+                $this->mercureConfig['topics']['sale-order'],
+                json_encode($payload),
+                false,
+            );
+
+            $this->hub->publish($update);
+        } catch (\Throwable) {
+            // Tránh làm gián đoạn luồng chính nếu Mercure hub không khả dụng
+        }
+    }
 }

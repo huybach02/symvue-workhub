@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Class\CustomResponse;
 use App\Entity\User;
 use App\Repository\ImageRepository;
+use App\Repository\UserPositionRepository;
 use App\Service\AuthService;
 use App\Service\CacheService;
 use App\Service\DepartmentService;
@@ -23,6 +24,7 @@ final class AuthController extends AbstractController
         private readonly CacheService $cacheService,
         private readonly DepartmentService $departmentService,
         private readonly ImageRepository $imageRepository,
+        private readonly UserPositionRepository $userPositionRepository,
     ) {}
 
     #[Route("/auth/me", methods: ["GET"])]
@@ -37,6 +39,9 @@ final class AuthController extends AbstractController
         $userData = $user->jsonSerialize();
         $userData['image'] = $this->imageRepository->getImages($user, "avatar");
         $userData['permissions'] = $userPermission;
+        $userData['assignedBranchIds'] = isAdmin($user)
+            ? null
+            : $this->userPositionRepository->findAssignedBranchIdsByUser($user);
 
         return CustomResponse::success($userData);
     }

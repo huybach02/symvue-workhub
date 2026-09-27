@@ -166,6 +166,66 @@ export const createMercureConnection = ({
                     `${data.requestId || "all"}-${data.timestamp || Date.now()}`,
                 );
                 break;
+            case "sale_order_created": {
+                const saleOrder = data.saleOrder;
+                if (!saleOrder) break;
+
+                const isAdmin = Boolean(
+                    currentUser?.roles?.includes("ROLE_ADMIN"),
+                );
+                const orderBranchId = Number(
+                    saleOrder.branchId ?? saleOrder.branch?.id ?? 0,
+                );
+                const assignedBranchIds = Array.isArray(
+                    currentUser?.assignedBranchIds,
+                )
+                    ? currentUser.assignedBranchIds.map(Number)
+                    : [];
+
+                // Chỉ admin hoặc nhân sự thuộc đúng chi nhánh của đơn hàng mới nhận được dữ liệu realtime
+                const isAllowedBranch =
+                    isAdmin ||
+                    (orderBranchId > 0 &&
+                        assignedBranchIds.includes(orderBranchId));
+
+                if (!isAllowedBranch) {
+                    break;
+                }
+
+                window.dispatchEvent(
+                    new CustomEvent("sale_order:created", {
+                        detail: data,
+                    }),
+                );
+                appStore.commit("saleOrder/PREPEND_ITEM", saleOrder);
+
+                const tableInfo = saleOrder?.diningTable?.tableNumber
+                    ? `Bàn ${saleOrder.diningTable.tableNumber}`
+                    : "Mang về";
+                const branchName = saleOrder?.branch?.name
+                    ? ` - Chi nhánh: ${saleOrder.branch.name}`
+                    : "";
+                const totalFormatted = saleOrder?.totalAmount
+                    ? `${Number(saleOrder.totalAmount).toLocaleString("vi-VN")} đ`
+                    : "0 đ";
+
+                const notification = {
+                    code: data.code || `sale_order_${saleOrder.id || Date.now()}`,
+                    title: `[Đơn hàng mới] ${saleOrder.code || ""}`,
+                    body: `${tableInfo}${branchName} - Tổng tiền: ${totalFormatted}`,
+                    time: "Vừa xong",
+                    icon: "mdi-receipt-text-outline",
+                    color: "success",
+                    seen: false,
+                    link: "/sale-order",
+                    createdAt: data.timestamp || new Date().toISOString(),
+                    duration: 5000,
+                };
+
+                appStore.commit("mercure/ADD_NOTIFICATION", notification);
+                appStore.commit("mercure/SET_POPUP_NOTIFICATION", notification);
+                break;
+            }
             default:
                 appStore.commit("mercure/ADD_NOTIFICATION", data);
                 appStore.commit("mercure/SET_POPUP_NOTIFICATION", {

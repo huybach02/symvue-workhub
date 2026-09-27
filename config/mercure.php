@@ -9,6 +9,7 @@ return [
         'https://app.com/message/{+path}',
         'https://app.com/presence',
         'https://app.com/request/{+path}',
+        'https://app.com/sale-order',
     ],
     "topics" => [
         "test" => "https://app.com/test",
@@ -18,5 +19,6 @@ return [
         "message" => "https://app.com/message/:userId",
         "presence" => "https://app.com/presence",
         "request" => "https://app.com/request/:userId",
+        "sale-order" => "https://app.com/sale-order",
     ]
 ];

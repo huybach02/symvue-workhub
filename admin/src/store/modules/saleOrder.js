@@ -22,6 +22,16 @@ const mutations = {
         state.items = items;
         state.totalItems = totalItems;
     },
+    PREPEND_ITEM(state, item) {
+        if (!item || !item.id) return;
+        const exists = state.items.some(
+            (existing) => Number(existing.id) === Number(item.id),
+        );
+        if (!exists) {
+            state.items = [item, ...state.items];
+            state.totalItems = (state.totalItems || 0) + 1;
+        }
+    },
     SET_LOADING(state, value) {
         state.loading = value;
     },

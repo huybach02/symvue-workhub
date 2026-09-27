@@ -68,4 +68,27 @@ class UserPositionRepository extends ServiceEntityRepository
 
         return $result instanceof UserPosition ? $result : null;
     }
+
+    /**
+     * @return int[] Danh sách ID chi nhánh mà user được phân công
+     */
+    public function findAssignedBranchIdsByUser(User $user): array
+    {
+        $currentTimestamp = time();
+
+        $result = $this->createQueryBuilder('userPosition')
+            ->select('DISTINCT IDENTITY(department.branch)')
+            ->innerJoin('userPosition.department', 'department')
+            ->andWhere('userPosition.member = :user')
+            ->andWhere('userPosition.status = 1')
+            ->andWhere('department.branch IS NOT NULL')
+            ->andWhere('(userPosition.startTemp IS NULL OR userPosition.startTemp <= :currentTimestamp)')
+            ->andWhere('(userPosition.endTemp IS NULL OR userPosition.endTemp > :currentTimestamp)')
+            ->setParameter('user', $user)
+            ->setParameter('currentTimestamp', $currentTimestamp)
+            ->getQuery()
+            ->getSingleColumnResult();
+
+        return array_values(array_unique(array_map('intval', array_filter($result))));
+    }
 }

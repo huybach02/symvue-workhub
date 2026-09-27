@@ -45,6 +45,7 @@ class SellProductService
         private readonly InventoryBalanceRepository $inventoryBalanceRepository,
         private readonly UserPositionRepository $userPositionRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly MercureService $mercureService,
     ) {}
 
     public function findAll(array $params): array
@@ -237,7 +238,10 @@ class SellProductService
             $this->entityManager->flush();
             $this->entityManager->commit();
 
-            return $saleOrder->jsonSerialize();
+            $orderData = $saleOrder->jsonSerialize();
+            $this->mercureService->saleOrderCreated($orderData);
+
+            return $orderData;
         } catch (\Throwable $th) {
             $this->entityManager->rollback();
             throw $th;
@@ -260,7 +264,7 @@ class SellProductService
     {
         if ($dto->branchId !== null) {
             $branch = $this->branchRepository->find($dto->branchId);
-            if (!$branch instanceof Branch || $branch->getStatus() !== true) {
+            if (!$branch instanceof Branch || $branch->isStatus() !== true) {
                 throw new \Exception(sprintf('Chi nhánh ID %d không tồn tại hoặc đã ngưng hoạt động', $dto->branchId));
             }
             return $branch;
@@ -270,7 +274,7 @@ class SellProductService
             $position = $this->userPositionRepository->findActivePrimaryPositionByUser($currentUser);
             $userBranch = $position?->getDepartment()?->getBranch();
             if ($userBranch instanceof Branch) {
-                if ($userBranch->getStatus() !== true) {
+                if ($userBranch->isStatus() !== true) {
                     throw new \Exception(sprintf('Chi nhánh "%s" của tài khoản đã ngưng hoạt động', $userBranch->getName()));
                 }
                 return $userBranch;

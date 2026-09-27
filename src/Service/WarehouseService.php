@@ -11,10 +11,10 @@ use App\Entity\InventoryMovement;
 use App\Entity\Merchandise;
 use App\Entity\Unit;
 use App\Entity\User;
-use App\Entity\UserPosition;
 use App\Entity\Warehouse;
 use App\Repository\InventoryBalanceRepository;
 use App\Repository\InventoryMovementRepository;
+use App\Repository\UserPositionRepository;
 use App\Repository\WarehouseRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
@@ -26,6 +26,7 @@ class WarehouseService
         private readonly InventoryBalanceRepository $inventoryBalanceRepository,
         private readonly InventoryMovementRepository $inventoryMovementRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly UserPositionRepository $userPositionRepository,
     ) {}
 
     public function findAll(array $params, User $currentUser): array
@@ -71,8 +72,7 @@ class WarehouseService
         int $id,
         array $params,
         User $currentUser,
-    ): array
-    {
+    ): array {
         $warehouse = $this->getWarehouseOrFail($id, $currentUser);
         $qb = $this->inventoryBalanceRepository
             ->createForWarehouseQueryBuilder($warehouse);
@@ -106,7 +106,7 @@ class WarehouseService
         );
 
         $result['collection'] = array_map(
-            fn (InventoryBalance $balance): array => $this->serializeBalance($balance),
+            fn(InventoryBalance $balance): array => $this->serializeBalance($balance),
             $result['collection'],
         );
 
@@ -117,8 +117,7 @@ class WarehouseService
         int $id,
         array $params,
         User $currentUser,
-    ): array
-    {
+    ): array {
         $warehouse = $this->getWarehouseOrFail($id, $currentUser);
         $qb = $this->inventoryMovementRepository
             ->createForWarehouseQueryBuilder($warehouse);
@@ -147,7 +146,7 @@ class WarehouseService
         );
 
         $result['collection'] = array_map(
-            fn (InventoryMovement $movement): array => $this->serializeMovement($movement),
+            fn(InventoryMovement $movement): array => $this->serializeMovement($movement),
             $result['collection'],
         );
 
@@ -157,10 +156,10 @@ class WarehouseService
     public function create(WarehouseDTO $dto): array
     {
         $item = new Warehouse();
-        
+
         // TODO: Map DTO properties to entity
         // Example: $item->setName($dto->name);
-        
+
         $this->entityManager->persist($item);
         $this->entityManager->flush();
 
@@ -170,7 +169,7 @@ class WarehouseService
     public function update(int $id, WarehouseDTO $dto): array
     {
         $item = $this->warehouseRepository->find($id);
-        
+
         if (!$item) {
             throw new \Exception(t('error.not_found'));
         }
@@ -186,7 +185,7 @@ class WarehouseService
     public function delete(int $id): void
     {
         $item = $this->warehouseRepository->find($id);
-        
+
         if (!$item) {
             throw new \Exception(t('error.not_found'));
         }
@@ -198,8 +197,7 @@ class WarehouseService
     private function getWarehouseOrFail(
         int $id,
         User $currentUser,
-    ): Warehouse
-    {
+    ): Warehouse {
         $qb = $this->warehouseRepository
             ->createQueryBuilder('warehouse')
             ->andWhere('warehouse.id = :warehouseId')
@@ -225,26 +223,15 @@ class WarehouseService
             return;
         }
 
-        $currentTimestamp = time();
-        $assignmentQb = $this->entityManager
-            ->createQueryBuilder()
-            ->select('1')
-            ->from(UserPosition::class, 'assignedPosition')
-            ->innerJoin('assignedPosition.department', 'assignedDepartment')
-            ->andWhere('assignedPosition.member = :warehouseCurrentUser')
-            ->andWhere('assignedPosition.status = 1')
-            ->andWhere(sprintf('assignedDepartment.branch = %s.branch', $warehouseAlias))
-            ->andWhere(
-                '(assignedPosition.startTemp IS NULL OR assignedPosition.startTemp <= :warehouseCurrentTimestamp)',
-            )
-            ->andWhere(
-                '(assignedPosition.endTemp IS NULL OR assignedPosition.endTemp > :warehouseCurrentTimestamp)',
-            );
+        $branchIds = $this->userPositionRepository->findAssignedBranchIdsByUser($currentUser);
 
-        $qb
-            ->andWhere($qb->expr()->exists($assignmentQb->getDQL()))
-            ->setParameter('warehouseCurrentUser', $currentUser)
-            ->setParameter('warehouseCurrentTimestamp', $currentTimestamp);
+        if (empty($branchIds)) {
+            $qb->andWhere('1 = 0');
+            return;
+        }
+
+        $qb->andWhere(sprintf('%s.branch IN (:assignedBranchIds)', $warehouseAlias))
+            ->setParameter('assignedBranchIds', $branchIds);
     }
 
     private function serializeBalance(InventoryBalance $balance): array

@@ -11,6 +11,7 @@
                 :items-per-page="-1"
                 hide-default-footer
                 :loading="loading"
+                :row-props="getRowProps"
                 @update:options="onOptions"
             >
                 <template
@@ -296,6 +297,8 @@ export default {
     },
     data() {
         return {
+            highlightedOrderIds: [],
+            highlightTimeouts: [],
             showDetailDialog: false,
             selectedOrderId: null,
             selectedOrder: null,
@@ -461,11 +464,55 @@ export default {
             }, 0);
         },
     },
+    mounted() {
+        window.addEventListener(
+            "sale_order:created",
+            this.handleNewSaleOrder,
+        );
+    },
+    beforeUnmount() {
+        window.removeEventListener(
+            "sale_order:created",
+            this.handleNewSaleOrder,
+        );
+        this.highlightTimeouts.forEach((timer) => clearTimeout(timer));
+    },
     methods: {
+        handleNewSaleOrder(event) {
+            const orderId = event?.detail?.saleOrder?.id;
+            if (!orderId) return;
+
+            const numId = Number(orderId);
+            if (!this.highlightedOrderIds.includes(numId)) {
+                this.highlightedOrderIds = [...this.highlightedOrderIds, numId];
+            }
+
+            const timer = setTimeout(() => {
+                this.removeHighlightedOrder(numId);
+            }, 30000);
+
+            this.highlightTimeouts.push(timer);
+        },
+        removeHighlightedOrder(orderId) {
+            const numId = Number(orderId);
+            if (this.highlightedOrderIds.includes(numId)) {
+                this.highlightedOrderIds = this.highlightedOrderIds.filter(
+                    (id) => id !== numId,
+                );
+            }
+        },
+        getRowProps({ item }) {
+            const id = Number(item?.id ?? item?.raw?.id);
+            if (this.highlightedOrderIds.includes(id)) {
+                return { class: "order-row-new-blink" };
+            }
+            return {};
+        },
         openDetailDialog(item) {
             this.selectedOrderId = item.id;
             this.selectedOrder = item;
             this.showDetailDialog = true;
+            this.removeHighlightedOrder(item.id);
         },
         getStatusColor(status) {
             switch (status) {
@@ -537,5 +584,30 @@ export default {
 .table-scroll-container :deep(.v-data-table),
 .table-scroll-container :deep(table) {
     min-width: var(--table-min-width, 600px);
+}
+
+.table-scroll-container :deep(.order-row-new-blink td) {
+    animation: blink-row-subtle 2s ease-in-out infinite alternate;
+    border-top: 1px solid rgba(16, 185, 129, 0.35) !important;
+    border-bottom: 1px solid rgba(16, 185, 129, 0.35) !important;
+    background-color: rgba(16, 185, 129, 0.06) !important;
+    transition: all 0.3s ease;
+}
+
+.table-scroll-container :deep(.order-row-new-blink td:first-child) {
+    border-left: 3px solid #10b981 !important;
+}
+
+@keyframes blink-row-subtle {
+    0% {
+        border-top-color: rgba(16, 185, 129, 0.6) !important;
+        border-bottom-color: rgba(16, 185, 129, 0.6) !important;
+        background-color: rgba(16, 185, 129, 0.1) !important;
+    }
+    100% {
+        border-top-color: rgba(16, 185, 129, 0.12) !important;
+        border-bottom-color: rgba(16, 185, 129, 0.12) !important;
+        background-color: rgba(16, 185, 129, 0.01) !important;
+    }
 }
 </style>

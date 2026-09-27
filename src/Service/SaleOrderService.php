@@ -6,8 +6,8 @@ use App\Class\FilterWithPagination;
 use App\DTO\SaleOrderDTO;
 use App\Entity\SaleOrder;
 use App\Entity\User;
-use App\Entity\UserPosition;
 use App\Repository\SaleOrderRepository;
+use App\Repository\UserPositionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 
@@ -16,6 +16,7 @@ class SaleOrderService
     public function __construct(
         private readonly SaleOrderRepository $saleOrderRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly UserPositionRepository $userPositionRepository,
     ) {}
 
     public function findAll(array $params, ?User $currentUser = null): array
@@ -152,25 +153,14 @@ class SaleOrderService
             return;
         }
 
-        $currentTimestamp = time();
-        $assignmentQb = $this->entityManager
-            ->createQueryBuilder()
-            ->select('1')
-            ->from(UserPosition::class, 'assignedPosition')
-            ->innerJoin('assignedPosition.department', 'assignedDepartment')
-            ->andWhere('assignedPosition.member = :orderCurrentUser')
-            ->andWhere('assignedPosition.status = 1')
-            ->andWhere(sprintf('assignedDepartment.branch = %s.branch', $alias))
-            ->andWhere(
-                '(assignedPosition.startTemp IS NULL OR assignedPosition.startTemp <= :orderCurrentTimestamp)',
-            )
-            ->andWhere(
-                '(assignedPosition.endTemp IS NULL OR assignedPosition.endTemp > :orderCurrentTimestamp)',
-            );
+        $branchIds = $this->userPositionRepository->findAssignedBranchIdsByUser($currentUser);
 
-        $qb
-            ->andWhere($qb->expr()->exists($assignmentQb->getDQL()))
-            ->setParameter('orderCurrentUser', $currentUser)
-            ->setParameter('orderCurrentTimestamp', $currentTimestamp);
+        if (empty($branchIds)) {
+            $qb->andWhere('1 = 0');
+            return;
+        }
+
+        $qb->andWhere(sprintf('%s.branch IN (:assignedBranchIds)', $alias))
+            ->setParameter('assignedBranchIds', $branchIds);
     }
 }
