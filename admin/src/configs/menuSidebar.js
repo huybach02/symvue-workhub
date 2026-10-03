@@ -30,6 +30,7 @@ export const menuSidebar = [
             },
             {
                 title: i18n.global.t("sidebar.branch"),
+                key: "branch",
                 icon: "mdi-store-outline",
                 value: NAME_ROUTES_CONFIG.branch,
                 to: { name: NAME_ROUTES_CONFIG.branch },
@@ -64,30 +65,35 @@ export const menuSidebar = [
         children: [
             {
                 title: i18n.global.t("sidebar.category"),
+                key: "category",
                 icon: "mdi-format-list-bulleted",
                 value: NAME_ROUTES_CONFIG.category,
                 to: { name: NAME_ROUTES_CONFIG.category },
             },
             {
                 title: i18n.global.t("sidebar.unit"),
+                key: "unit",
                 icon: "mdi-scale",
                 value: NAME_ROUTES_CONFIG.unit,
                 to: { name: NAME_ROUTES_CONFIG.unit },
             },
             {
                 title: i18n.global.t("sidebar.provider"),
+                key: "provider",
                 icon: "mdi-truck-delivery-outline",
                 value: NAME_ROUTES_CONFIG.provider,
                 to: { name: NAME_ROUTES_CONFIG.provider },
             },
             {
                 title: i18n.global.t("sidebar.merchandise"),
+                key: "merchandise",
                 icon: "mdi-package-variant-closed",
                 value: NAME_ROUTES_CONFIG.merchandise,
                 to: { name: NAME_ROUTES_CONFIG.merchandise },
             },
             {
                 title: i18n.global.t("sidebar.business_product"),
+                key: "business-product",
                 icon: "mdi-basket-check-outline",
                 value: NAME_ROUTES_CONFIG.businessProduct,
                 to: { name: NAME_ROUTES_CONFIG.businessProduct },
@@ -136,18 +142,21 @@ export const menuSidebar = [
         children: [
             {
                 title: i18n.global.t("sidebar.warehouse"),
+                key: "warehouse",
                 icon: "mdi-home-floor-g",
                 value: NAME_ROUTES_CONFIG.warehouse,
                 to: { name: NAME_ROUTES_CONFIG.warehouse },
             },
             {
                 title: i18n.global.t("sidebar.stock_receipt"),
+                key: "stock-receipt",
                 icon: "mdi-file-import-outline",
                 value: NAME_ROUTES_CONFIG.stockReceipt,
                 to: { name: NAME_ROUTES_CONFIG.stockReceipt },
             },
             {
                 title: i18n.global.t("sidebar.production_order"),
+                key: "production-order",
                 icon: "mdi-factory",
                 value: NAME_ROUTES_CONFIG.productionOrder,
                 to: { name: NAME_ROUTES_CONFIG.productionOrder },
