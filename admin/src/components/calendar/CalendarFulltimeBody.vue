@@ -42,12 +42,12 @@
                         <v-list density="compact">
                             <v-list-item
                                 prepend-icon="mdi-calendar-plus"
-                                title="{{ $t('work_schedule.add_override_schedule') }}"
+                                :title="$t('work_schedule.add_override_schedule')"
                                 @click="$emit('addOverride', user)"
                             />
                             <v-list-item
                                 prepend-icon="mdi-calendar-remove"
-                                title="{{ $t('work_schedule.delete_override_schedule') }}"
+                                :title="$t('work_schedule.delete_override_schedule')"
                                 class="text-error"
                                 @click="$emit('clearSchedule', user)"
                             />
@@ -124,12 +124,12 @@
                         <v-list density="compact">
                             <v-list-item
                                 prepend-icon="mdi-calendar-plus"
-                                title="{{ $t('calendar.addOverride') }}"
+                                :title="$t('work_schedule.add_override_schedule')"
                                 @click="$emit('addOverride', user)"
                             />
                             <v-list-item
                                 prepend-icon="mdi-calendar-remove"
-                                title="{{ $t('calendar.deleteSchedule') }}"
+                                :title="$t('work_schedule.delete_override_schedule')"
                                 class="text-error"
                                 @click="$emit('clearSchedule', user)"
                             />
